@@ -1,0 +1,68 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { GlassPanel } from "@/components/ui/glass-panel";
+
+const items = [
+  {
+    title: "Ubicación que lo tiene todo",
+    body: "A pocos minutos de restaurantes, bares, clínicas, universidades y escenarios deportivos, entre otros.",
+    icon: "📍",
+  },
+  {
+    title: "Espacios diseñados para tu ritmo",
+    body: "Ya sea que vengas a trabajar, recuperarte o explorar la ciudad, aquí tienes lo que necesitas.",
+    icon: "✦",
+  },
+  {
+    title: "Reserva directa, sin complicaciones",
+    body: "Habla con nosotros por WhatsApp y asegura tu estadía sin intermediarios ni comisiones.",
+    icon: "💬",
+  },
+];
+
+export function ValueProps() {
+  return (
+    <section id="propuesta" className="scroll-mt-28 py-20 md:py-28">
+      <div className="mx-auto max-w-6xl px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto mb-12 max-w-3xl text-center"
+        >
+          <h2 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl md:text-5xl">
+            ¿Por qué elegir LOFTHOUSE 14?
+          </h2>
+          <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
+            Alojamiento moderno y funcional, con el encanto urbano de Cali y la
+            autonomía que buscas.
+          </p>
+        </motion.div>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          {items.map((item, i) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ delay: i * 0.08, duration: 0.45 }}
+            >
+              <GlassPanel className="h-full space-y-4">
+                <div className="text-2xl">{item.icon}</div>
+                <h3 className="font-serif text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+                  {item.body}
+                </p>
+              </GlassPanel>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

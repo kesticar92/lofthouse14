@@ -28,7 +28,7 @@ export function Hero() {
           {site.name} — {site.tagline}. {site.brandLine}.
         </h1>
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 1, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-3xl space-y-6 text-white"
@@ -60,7 +60,7 @@ export function Hero() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 1, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col gap-3 sm:flex-row sm:items-center"
@@ -82,7 +82,7 @@ export function Hero() {
         </motion.div>
 
         <motion.p
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.35, duration: 0.5 }}
           className="max-w-xl text-xs leading-relaxed text-white/70"
@@ -92,7 +92,7 @@ export function Hero() {
         </motion.p>
 
         <motion.p
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.45, duration: 0.5 }}
           className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/65"

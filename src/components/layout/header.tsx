@@ -79,7 +79,7 @@ export function Header() {
         <AnimatePresence>
           {open ? (
             <motion.div
-              initial={{ opacity: 0, y: -8 }}
+              initial={{ opacity: 1, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               className="mt-2 rounded-2xl border border-black/10 bg-[#f2f0eb]/95 p-4 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/95 md:hidden"

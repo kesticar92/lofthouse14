@@ -9,7 +9,7 @@ export function Gallery() {
     <section id="galeria" className="scroll-mt-28 py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-4">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 1, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5 }}
@@ -27,7 +27,7 @@ export function Gallery() {
           {site.gallery.map((src, i) => (
             <motion.figure
               key={src}
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 1, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ delay: (i % 4) * 0.05, duration: 0.45 }}

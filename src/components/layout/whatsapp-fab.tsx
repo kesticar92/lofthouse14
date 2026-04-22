@@ -9,7 +9,7 @@ export function WhatsAppFab() {
       href={waLink()}
       target="_blank"
       rel="noopener noreferrer"
-      initial={{ scale: 0.85, opacity: 0 }}
+      initial={{ scale: 1, opacity: 1 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 18 }}
       whileHover={{ scale: 1.06 }}

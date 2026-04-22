@@ -88,6 +88,25 @@ export default function RootLayout({
       <body
         className={`${display.variable} ${sans.variable} min-h-screen bg-background font-sans antialiased`}
       >
+        <noscript>
+          <div
+            style={{
+              padding: "2rem",
+              background: "#f2f0eb",
+              color: "#0a0a0a",
+              fontFamily: "system-ui,sans-serif",
+            }}
+          >
+            <p style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
+              Activa JavaScript
+            </p>
+            <p>
+              Esta página necesita JavaScript para mostrar el contenido. Abre
+              el sitio en un navegador con JavaScript habilitado o prueba en
+              Chrome/Safari/Firefox.
+            </p>
+          </div>
+        </noscript>
         <ThemeProvider>{children}</ThemeProvider>
         <Script
           id="ld-json-lofthouse"

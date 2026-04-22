@@ -14,7 +14,7 @@ export function Audiences() {
           {site.audiences.map((label, i) => (
             <motion.span
               key={label}
-              initial={{ opacity: 0, scale: 0.96 }}
+              initial={{ opacity: 1, scale: 0.96 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.03, duration: 0.35 }}

@@ -23,7 +23,7 @@ export function Testimonials() {
     <section className="border-y border-black/5 bg-zinc-50/80 py-20 dark:border-white/5 dark:bg-zinc-950/40 md:py-28">
       <div className="mx-auto max-w-6xl px-4">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 1, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5 }}
@@ -42,7 +42,7 @@ export function Testimonials() {
           {quotes.map((q, i) => (
             <motion.div
               key={q.text}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 1, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: i * 0.08, duration: 0.45 }}

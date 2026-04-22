@@ -36,7 +36,7 @@ export function BookingSteps() {
     <section className="py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 1, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="mb-10 text-center"
@@ -53,7 +53,7 @@ export function BookingSteps() {
           {steps.map((s, i) => (
             <motion.div
               key={s.step}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 1, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ delay: i * 0.06, duration: 0.45 }}

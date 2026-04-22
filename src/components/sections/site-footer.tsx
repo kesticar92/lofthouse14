@@ -5,27 +5,37 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-black/10 bg-zinc-950 text-zinc-200 dark:border-white/10">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-14 md:flex-row md:justify-between">
-        <div className="max-w-md space-y-3">
-          <p className="font-serif text-xl font-semibold text-white">
-            {site.name}
+        <div className="max-w-md space-y-4">
+          <p className="font-display text-3xl tracking-wide text-[#f2f0eb]">
+            LOFTHOUSE 14
+          </p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+            {site.brandLine.toUpperCase()}
           </p>
           <p className="text-sm leading-relaxed text-zinc-400">
-            {site.neighborhood} · {site.city}. Reservas directas, sin comisiones
-            de intermediarios.
+            {site.addressLine} · {site.neighborhood} · {site.city}
+          </p>
+          <p className="text-sm text-zinc-400">
+            <a
+              className="font-medium text-[#f2f0eb] hover:underline"
+              href={`tel:${site.phoneTel}`}
+            >
+              {site.phoneDisplay}
+            </a>
           </p>
         </div>
         <div className="grid flex-1 gap-8 sm:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
               Políticas
             </p>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <span className="font-semibold text-white">Check-in:</span>{" "}
+                <span className="font-semibold text-[#f2f0eb]">Check-in:</span>{" "}
                 {site.checkIn}
               </li>
               <li>
-                <span className="font-semibold text-white">Check-out:</span>{" "}
+                <span className="font-semibold text-[#f2f0eb]">Check-out:</span>{" "}
                 {site.checkOut}
               </li>
               <li className="text-zinc-400">
@@ -34,27 +44,25 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-              OTAs (referencia)
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Contacto
             </p>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
                 <Link
-                  href="#otas"
+                  href="#reservas"
                   className="text-amber-400 hover:underline"
                 >
-                  Ver enlaces Booking + Airbnb
+                  Ir a reservas
                 </Link>
               </li>
               <li>
-                <Link
-                  href={site.bookingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <a
+                  href={`mailto:${site.email}`}
                   className="text-amber-400 hover:underline"
                 >
-                  Booking.com (directo)
-                </Link>
+                  {site.email}
+                </a>
               </li>
             </ul>
           </div>

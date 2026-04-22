@@ -11,13 +11,12 @@ import { Location } from "@/components/sections/location";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Contact } from "@/components/sections/contact";
 import { Upsell } from "@/components/sections/upsell";
-import { OtaLinks } from "@/components/sections/ota-links";
 import { SiteFooter } from "@/components/sections/site-footer";
 
 export default function Home() {
   return (
     <>
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[length:40px_40px] bg-grid-fade opacity-40 dark:opacity-25" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[length:40px_40px] bg-grid-fade opacity-[0.35] dark:bg-grid-fade-dark dark:opacity-20" />
       <Header />
       <main>
         <Hero />
@@ -31,7 +30,6 @@ export default function Home() {
         <Testimonials />
         <Contact />
         <Upsell />
-        <OtaLinks />
       </main>
       <SiteFooter />
       <WhatsAppFab />

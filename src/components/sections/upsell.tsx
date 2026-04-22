@@ -39,8 +39,8 @@ export function Upsell() {
           transition={{ duration: 0.5 }}
           className="mx-auto mb-10 max-w-3xl text-center"
         >
-          <h2 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl md:text-5xl">
-            Mejora tu experiencia
+          <h2 className="font-display text-4xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] sm:text-5xl md:text-6xl">
+            MEJORA TU EXPERIENCIA
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
             Añade servicios y recomendaciones para un viaje redondo.
@@ -58,8 +58,8 @@ export function Upsell() {
             >
               <GlassPanel className="flex h-full flex-col justify-between gap-4">
                 <div className="space-y-2">
-                  <h3 className="font-serif text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-                    {item.title}
+                  <h3 className="font-display text-2xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
+                    {item.title.toUpperCase()}
                   </h3>
                   <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
                     {item.body}

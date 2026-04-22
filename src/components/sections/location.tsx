@@ -20,21 +20,26 @@ export function Location() {
             transition={{ duration: 0.5 }}
             className="space-y-5"
           >
-            <h2 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl md:text-5xl">
-              En el corazón de Cali: barrio Miraflores
+            <h2 className="font-display text-4xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] sm:text-5xl md:text-6xl">
+              EN EL CORAZÓN DE CALI
             </h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              Barrio Miraflores
+            </p>
             <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-300 sm:text-lg">
               Una de las zonas más activas y estratégicas de Cali. A pocos pasos
               del Parque del Perro, con acceso a lo que necesitas para vivir,
               trabajar o recuperarte.
             </p>
             <GlassPanel className="space-y-2 text-sm text-zinc-700 dark:text-zinc-200">
-              <p className="font-semibold text-zinc-900 dark:text-zinc-50">
-                Menos tiempo en transporte, más tiempo disfrutando.
+              <p className="font-semibold text-zinc-900 dark:text-[#f2f0eb]">
+                Dirección
               </p>
               <p>
-                Ubicación privilegiada para moverte a pie y conectar rápido con
-                el resto de la ciudad.
+                {site.addressLine}, {site.neighborhood}, {site.city}
+              </p>
+              <p className="font-semibold text-zinc-900 dark:text-[#f2f0eb]">
+                Menos tiempo en transporte, más tiempo disfrutando.
               </p>
             </GlassPanel>
           </motion.div>
@@ -47,7 +52,7 @@ export function Location() {
             className="overflow-hidden rounded-2xl border border-black/10 shadow-xl dark:border-white/10"
           >
             <iframe
-              title={`Mapa — ${site.neighborhood}`}
+              title={`Mapa — ${site.addressLine}`}
               src={mapSrc}
               className="aspect-square w-full min-h-[320px] bg-zinc-100 dark:bg-zinc-900 lg:aspect-[5/4]"
               loading="lazy"

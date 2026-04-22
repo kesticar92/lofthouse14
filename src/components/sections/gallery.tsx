@@ -15,8 +15,8 @@ export function Gallery() {
           transition={{ duration: 0.5 }}
           className="mx-auto mb-12 max-w-3xl text-center"
         >
-          <h2 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl md:text-5xl">
-            Así se vive LOFTHOUSE
+          <h2 className="font-display text-4xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] sm:text-5xl md:text-6xl">
+            ASÍ SE VIVE LOFTHOUSE
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
             Espacios reales, cómodos y pensados para tu experiencia.

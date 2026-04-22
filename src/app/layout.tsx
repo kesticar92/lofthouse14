@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Bebas_Neue, Montserrat } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -7,14 +7,14 @@ import { site } from "@/lib/site";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lofthouse14.com";
 
-const serif = Cormorant_Garamond({
+const display = Bebas_Neue({
   subsets: ["latin"],
-  variable: "--font-serif",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+  weight: "400",
   display: "swap",
 });
 
-const sans = DM_Sans({
+const sans = Montserrat({
   subsets: ["latin"],
   variable: "--font-sans",
   weight: ["400", "500", "600", "700"],
@@ -27,13 +27,15 @@ const jsonLd = {
   name: site.name,
   description: site.description,
   url: siteUrl,
-  image: site.gallery.map((p) => `${siteUrl}${p}`),
+  image: [`${siteUrl}/logo-lofthouse.png`, ...site.gallery.map((p) => `${siteUrl}${p}`)],
+  telephone: site.phoneTel,
   address: {
     "@type": "PostalAddress",
+    streetAddress: site.addressLine,
     addressLocality: "Cali",
     addressRegion: "Valle del Cauca",
     addressCountry: "CO",
-    streetAddress: site.neighborhood,
+    addressNeighborhood: "Miraflores",
   },
   priceRange: "$$",
 };
@@ -48,11 +50,10 @@ export const metadata: Metadata = {
   keywords: [
     "loft cali",
     "apartaestudio miraflores",
-    "airbnb cali",
     "parque del perro",
     "alojamiento cali",
-    "lofthouse",
-    "reserva directa cali",
+    "lofthouse 14",
+    "hospedaje miraflores cali",
   ],
   authors: [{ name: site.name }],
   openGraph: {
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
     locale: "es_CO",
     type: "website",
     siteName: site.name,
-    images: [{ url: "/gallery/loft-01.jpg", width: 1200, height: 1600 }],
+    images: [{ url: "/logo-lofthouse.png", width: 800, height: 800 }],
   },
   twitter: {
     card: "summary_large_image",
@@ -85,7 +86,7 @@ export default function RootLayout({
   return (
     <html lang="es-CO" suppressHydrationWarning>
       <body
-        className={`${serif.variable} ${sans.variable} min-h-screen bg-background font-sans antialiased`}
+        className={`${display.variable} ${sans.variable} min-h-screen bg-background font-sans antialiased`}
       >
         <ThemeProvider>{children}</ThemeProvider>
         <Script

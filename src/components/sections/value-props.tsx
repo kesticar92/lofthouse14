@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { GlassPanel } from "@/components/ui/glass-panel";
+import { site } from "@/lib/site";
 
 const items = [
   {
@@ -15,9 +16,9 @@ const items = [
     icon: "✦",
   },
   {
-    title: "Reserva directa, sin complicaciones",
-    body: "Habla con nosotros por WhatsApp y asegura tu estadía sin intermediarios ni comisiones.",
-    icon: "💬",
+    title: "Reservas claras, paso a paso",
+    body: "Nuestro sistema es sencillo: confirmas fechas, número de huéspedes y capacidad disponible; luego el pago de la reserva y la verificación de identidad. Si todo es exitoso, habilitamos tu acceso autónomo al alojamiento.",
+    icon: "✓",
   },
 ];
 
@@ -32,12 +33,14 @@ export function ValueProps() {
           transition={{ duration: 0.5 }}
           className="mx-auto mb-12 max-w-3xl text-center"
         >
-          <h2 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl md:text-5xl">
-            ¿Por qué elegir LOFTHOUSE 14?
+          <h2 className="font-display text-4xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] sm:text-5xl md:text-6xl">
+            ¿POR QUÉ ELEGIR LOFTHOUSE 14?
           </h2>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
+            {site.brandLine.toUpperCase()}
+          </p>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
-            Alojamiento moderno y funcional, con el encanto urbano de Cali y la
-            autonomía que buscas.
+            Alojamiento moderno y funcional, con el encanto urbano de Cali.
           </p>
         </motion.div>
 
@@ -52,8 +55,8 @@ export function ValueProps() {
             >
               <GlassPanel className="h-full space-y-4">
                 <div className="text-2xl">{item.icon}</div>
-                <h3 className="font-serif text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-                  {item.title}
+                <h3 className="font-display text-2xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
+                  {item.title.toUpperCase()}
                 </h3>
                 <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
                   {item.body}

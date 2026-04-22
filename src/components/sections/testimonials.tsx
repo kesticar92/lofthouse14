@@ -29,8 +29,8 @@ export function Testimonials() {
           transition={{ duration: 0.5 }}
           className="mx-auto mb-12 max-w-3xl text-center"
         >
-          <h2 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl md:text-5xl">
-            Lo que valoran nuestros huéspedes
+          <h2 className="font-display text-4xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] sm:text-5xl md:text-6xl">
+            LO QUE VALORAN NUESTROS HUÉSPEDES
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
             Reseñas resumidas del estilo de experiencia que buscamos ofrecer

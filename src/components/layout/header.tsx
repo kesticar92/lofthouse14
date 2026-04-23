@@ -57,6 +57,14 @@ export function Header() {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Link
+              href="/admin/login"
+              aria-label="Acceso administrador"
+              title="Acceso administrador"
+              className="hidden h-9 w-9 items-center justify-center rounded-full border border-black/10 text-zinc-700 transition hover:bg-black/5 hover:text-amber-800 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5 dark:hover:text-amber-300 sm:inline-flex"
+            >
+              <span aria-hidden className="text-base">⚙</span>
+            </Link>
+            <Link
               href={waLink()}
               target="_blank"
               rel="noopener noreferrer"
@@ -103,6 +111,13 @@ export function Header() {
                   onClick={() => setOpen(false)}
                 >
                   Reservar por WhatsApp
+                </Link>
+                <Link
+                  href="/admin/login"
+                  onClick={() => setOpen(false)}
+                  className="rounded-full border border-black/15 px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-700 hover:bg-black/5 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5"
+                >
+                  Acceso administrador
                 </Link>
               </div>
             </motion.div>

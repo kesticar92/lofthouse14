@@ -20,7 +20,7 @@ export const site = {
   phoneDisplay:
     process.env.NEXT_PUBLIC_PHONE_DISPLAY || "+57 317 424 6076",
   phoneTel: "+573174246076",
-  email: process.env.NEXT_PUBLIC_EMAIL || "reservas@lofthouse14.com",
+  email: process.env.NEXT_PUBLIC_EMAIL || "lofthouse14cali@gmail.com",
   /** Para mapas / JSON-LD */
   mapQuery: "Carrera 26 2-91, Miraflores, Cali, Valle del Cauca, Colombia",
   checkIn: "Desde las 3:00 PM",

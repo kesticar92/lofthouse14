@@ -11,8 +11,13 @@ import { KEYS, safeGet, safeRemove, safeSet } from "./storage";
  * La sesión expira a las 12 horas o al cerrar sesión.
  */
 
-const DEFAULT_USER = process.env.NEXT_PUBLIC_ADMIN_USER || "admin";
-const DEFAULT_PASS = process.env.NEXT_PUBLIC_ADMIN_PASS || "lofthouse14";
+function envOr(v: string | undefined, fallback: string) {
+  const t = v?.trim();
+  return t ? t : fallback;
+}
+
+const DEFAULT_USER = envOr(process.env.NEXT_PUBLIC_ADMIN_USER, "admin");
+const DEFAULT_PASS = envOr(process.env.NEXT_PUBLIC_ADMIN_PASS, "lofthouse14");
 const TTL_MS = 12 * 60 * 60 * 1000;
 
 export type AuthSession = {
@@ -20,11 +25,17 @@ export type AuthSession = {
   createdAt: number;
 };
 
-export function login(user: string, pass: string): boolean {
-  if (user.trim() !== DEFAULT_USER || pass !== DEFAULT_PASS) return false;
+export type LoginResult = "ok" | "bad_credentials" | "storage_error";
+
+export function login(user: string, pass: string): LoginResult {
+  if (user.trim() !== DEFAULT_USER || pass !== DEFAULT_PASS)
+    return "bad_credentials";
   const session: AuthSession = { user: user.trim(), createdAt: Date.now() };
-  safeSet(KEYS.auth, session);
-  return true;
+  const wrote = safeSet(KEYS.auth, session);
+  if (!wrote) return "storage_error";
+  const stored = safeGet<AuthSession | null>(KEYS.auth, null);
+  if (!stored || stored.createdAt !== session.createdAt) return "storage_error";
+  return "ok";
 }
 
 export function logout() {

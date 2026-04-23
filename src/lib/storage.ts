@@ -27,11 +27,15 @@ export function safeGet<T>(key: string, fallback: T): T {
   }
 }
 
-export function safeSet<T>(key: string, value: T) {
-  if (typeof window === "undefined") return;
+/** @returns false si no hay ventana o localStorage no permite escribir (cuota, modo privado, etc.) */
+export function safeSet<T>(key: string, value: T): boolean {
+  if (typeof window === "undefined") return false;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
-  } catch {}
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function safeRemove(key: string) {

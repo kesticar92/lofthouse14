@@ -22,13 +22,23 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const ok = login(user, pass);
-    if (!ok) {
-      setError("Usuario o contraseña incorrectos.");
+    try {
+      const result = login(user, pass);
+      if (result === "bad_credentials") {
+        setError("Usuario o contraseña incorrectos.");
+        return;
+      }
+      if (result === "storage_error") {
+        setError(
+          "No se pudo guardar la sesión en este navegador. Prueba sin modo privado/incógnito, permite almacenamiento local para este sitio o usa otro navegador.",
+        );
+        return;
+      }
+      // Navegación completa: evita quedarse en “Ingresando…” cuando el router del cliente no termina la transición.
+      window.location.assign("/admin");
+    } finally {
       setLoading(false);
-      return;
     }
-    router.replace("/admin");
   }
 
   return (

@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { AdminShell, AdminCard, ADMIN_NAV } from "@/components/admin/admin-shell";
+import {
+  AdminShell,
+  AdminCard,
+  ADMIN_NAV,
+} from "@/components/admin/admin-shell";
 import { KEYS, safeGet, exportAll, importAllFromFile } from "@/lib/storage";
 import type { CotizacionGuardada } from "@/lib/cotizaciones-store";
 import type { AseoGuardado } from "@/lib/aseos-store";
@@ -56,7 +60,9 @@ export default function AdminHomePage() {
       setImportMsg("Respaldo importado correctamente.");
       recalc();
     } catch {
-      setImportMsg("No se pudo leer el archivo. Verifica que sea un JSON válido.");
+      setImportMsg(
+        "No se pudo leer el archivo. Verifica que sea un JSON válido.",
+      );
     } finally {
       if (fileRef.current) fileRef.current.value = "";
       setTimeout(() => setImportMsg(null), 4000);
@@ -102,7 +108,9 @@ export default function AdminHomePage() {
               </span>
               <div>
                 <h3 className="font-semibold">{n.label}</h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-300">{n.desc}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                  {n.desc}
+                </p>
                 <span className="mt-2 inline-flex text-xs font-semibold uppercase tracking-wider text-amber-800 group-hover:underline dark:text-amber-400">
                   Abrir →
                 </span>
@@ -142,9 +150,15 @@ export default function AdminHomePage() {
         }
       >
         <ul className="list-inside list-disc space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
-          <li>Los archivos de respaldo son JSON y puedes guardarlos en Drive o WhatsApp.</li>
+          <li>
+            Los archivos de respaldo son JSON y puedes guardarlos en Drive o
+            WhatsApp.
+          </li>
           <li>Al importar, los datos del respaldo reemplazan los actuales.</li>
-          <li>Si cambias de navegador o de dispositivo, importa tu último respaldo para no perder nada.</li>
+          <li>
+            Si cambias de navegador o de dispositivo, importa tu último respaldo
+            para no perder nada.
+          </li>
         </ul>
         {importMsg && (
           <p className="mt-3 rounded-lg bg-amber-200/50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-400/10 dark:text-amber-200">

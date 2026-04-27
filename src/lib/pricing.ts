@@ -131,8 +131,10 @@ export function quote(
 
   if (!ci || !co) return { ...empty, error: "Selecciona fechas válidas" };
   const noches = diffDays(ci, co);
-  if (noches <= 0) return { ...empty, error: "La salida debe ser posterior al ingreso" };
-  if (huespedes <= 0) return { ...empty, error: "Ingresa cantidad de huéspedes" };
+  if (noches <= 0)
+    return { ...empty, error: "La salida debe ser posterior al ingreso" };
+  if (huespedes <= 0)
+    return { ...empty, error: "Ingresa cantidad de huéspedes" };
 
   const nightByNight: NightBreakdown[] = [];
   let nochesLJ = 0;

@@ -13,6 +13,7 @@ export const KEYS = {
   cotizaciones: PREFIX + "cotizaciones",
   inventarios: PREFIX + "inventarios",
   aseos: PREFIX + "aseos",
+  /** Obsoleto: la sesión admin pasó a cookie httpOnly; se limpia al iniciar sesión de nuevo. */
   auth: PREFIX + "auth",
 } as const;
 
@@ -72,7 +73,10 @@ export function importAllFromFile(file: File): Promise<void> {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const data = JSON.parse(reader.result as string) as Record<string, unknown>;
+        const data = JSON.parse(reader.result as string) as Record<
+          string,
+          unknown
+        >;
         for (const key of Object.values(KEYS)) {
           if (key in data) {
             window.localStorage.setItem(key, JSON.stringify(data[key]));

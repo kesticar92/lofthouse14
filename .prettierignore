@@ -1,0 +1,10 @@
+.env.example
+node_modules
+.next
+out
+package-lock.json
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.ico

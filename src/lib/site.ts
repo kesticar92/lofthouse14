@@ -17,8 +17,7 @@ export const site = {
   whatsappNumber: n(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER, defaultWa),
   whatsappDefaultMessage:
     "Hola LOFTHOUSE 14, quiero información para reservar (fechas y número de personas).",
-  phoneDisplay:
-    process.env.NEXT_PUBLIC_PHONE_DISPLAY || "+57 317 424 6076",
+  phoneDisplay: process.env.NEXT_PUBLIC_PHONE_DISPLAY || "+57 317 424 6076",
   phoneTel: "+573174246076",
   email: process.env.NEXT_PUBLIC_EMAIL || "lofthouse14cali@gmail.com",
   /** Para mapas / JSON-LD */

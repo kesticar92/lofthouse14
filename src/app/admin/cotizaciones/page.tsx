@@ -34,7 +34,9 @@ function addDaysISO(iso: string, days: number) {
 }
 
 function newId() {
-  return "c_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  return (
+    "c_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
+  );
 }
 
 export default function CotizacionesPage() {
@@ -225,15 +227,22 @@ export default function CotizacionesPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Cantidad de huéspedes">
-                <NumInput value={huespedes} setValue={setHuespedes} min={1} max={63} />
+                <NumInput
+                  value={huespedes}
+                  setValue={setHuespedes}
+                  min={1}
+                  max={63}
+                />
                 <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                  Base incluye 1–2. Desde el 3º se cobra {formatCOP(config.recargoHuesped)} por huésped y por noche.
+                  Base incluye 1–2. Desde el 3º se cobra{" "}
+                  {formatCOP(config.recargoHuesped)} por huésped y por noche.
                 </p>
               </Field>
               <Field label="Cantidad de lofts">
                 <NumInput value={lofts} setValue={setLofts} min={1} max={13} />
                 <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                  Multiplica el impuesto de aseo. Si la reserva requiere más de un loft, cuéntalos aquí.
+                  Multiplica el impuesto de aseo. Si la reserva requiere más de
+                  un loft, cuéntalos aquí.
                 </p>
               </Field>
             </div>
@@ -258,18 +267,25 @@ export default function CotizacionesPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <MiniStat label="Noches" value={result.noches.toString()} />
-                <MiniStat label="L-J / V-D" value={`${result.nochesLJ} / ${result.nochesVD}`} />
+                <MiniStat
+                  label="L-J / V-D"
+                  value={`${result.nochesLJ} / ${result.nochesVD}`}
+                />
               </div>
 
               <dl className="divide-y divide-black/5 rounded-xl border border-black/10 bg-white/70 text-sm dark:divide-white/5 dark:border-white/10 dark:bg-zinc-900/60">
-                <Line label="Alojamiento">{formatCOP(result.subtotalAlojamiento)}</Line>
+                <Line label="Alojamiento">
+                  {formatCOP(result.subtotalAlojamiento)}
+                </Line>
                 <Line label="Recargo huéspedes">
                   {formatCOP(result.recargoHuespedes)}
                 </Line>
                 <Line label="Impuesto de aseo" sublabel={result.aseoDetalle}>
                   {formatCOP(result.aseoTotal)}
                 </Line>
-                <Line label="Subtotal">{formatCOP(result.subtotalReserva)}</Line>
+                <Line label="Subtotal">
+                  {formatCOP(result.subtotalReserva)}
+                </Line>
                 <Line label="Descuento" sublabel={result.descuentoDetalle}>
                   {formatCOP(result.descuento)}
                 </Line>
@@ -338,11 +354,16 @@ export default function CotizacionesPage() {
               </thead>
               <tbody className="divide-y divide-black/5 dark:divide-white/5">
                 {result.nightByNight.map((n) => (
-                  <tr key={n.n} className={n.esFinDeSemana ? "bg-amber-200/10" : ""}>
+                  <tr
+                    key={n.n}
+                    className={n.esFinDeSemana ? "bg-amber-200/10" : ""}
+                  >
                     <td className="px-3 py-2">{n.n}</td>
                     <td className="px-3 py-2">{n.date}</td>
                     <td className="px-3 py-2">{n.dia}</td>
-                    <td className="px-3 py-2 text-right">{formatCOP(n.tarifa)}</td>
+                    <td className="px-3 py-2 text-right">
+                      {formatCOP(n.tarifa)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -442,7 +463,9 @@ export default function CotizacionesPage() {
                 <div className="min-w-0">
                   <p className="font-semibold">{c.cliente}</p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {c.input.checkIn} → {c.input.checkOut} · {c.result.noches} noche(s) · {c.input.huespedes} huésped(es) · {c.input.lofts} loft(s)
+                    {c.input.checkIn} → {c.input.checkOut} · {c.result.noches}{" "}
+                    noche(s) · {c.input.huespedes} huésped(es) · {c.input.lofts}{" "}
+                    loft(s)
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -581,7 +604,10 @@ function PercentField({
           step={1}
           value={Math.round(value * 100)}
           onChange={(e) =>
-            onChange(Math.max(0, Math.min(100, parseInt(e.target.value, 10) || 0)) / 100)
+            onChange(
+              Math.max(0, Math.min(100, parseInt(e.target.value, 10) || 0)) /
+                100,
+            )
           }
           className={`${inputClass} rounded-r-none`}
         />

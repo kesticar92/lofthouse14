@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LOFTHOUSE 14 — sitio web
 
-## Getting Started
+Sitio de marketing y panel interno para **LOFTHOUSE 14** (lofts en Miraflores, Cali). Stack: **Next.js 15** (App Router), **React 19**, **TypeScript**, **Tailwind CSS**.
 
-First, run the development server:
+## Requisitos
+
+- Node.js 20 o 22 (recomendado 22, como en CI)
+- npm
+
+## Puesta en marcha
 
 ```bash
+npm ci
+cp .env.example .env.local
+# Edita .env.local con tus valores (obligatorio en producción para el panel).
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000). El panel admin está en `/admin`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Comando                | Descripción               |
+| ---------------------- | ------------------------- |
+| `npm run dev`          | Servidor de desarrollo    |
+| `npm run build`        | Compilación de producción |
+| `npm run start`        | Sirve el build            |
+| `npm run lint`         | ESLint (Next)             |
+| `npm run test`         | Vitest (tests unitarios)  |
+| `npm run format`       | Formatea con Prettier     |
+| `npm run format:check` | Comprueba formato (CI)    |
 
-## Learn More
+## Variables de entorno
 
-To learn more about Next.js, take a look at the following resources:
+Copia `.env.example` a `.env.local`. Las claves públicas del sitio usan el prefijo `NEXT_PUBLIC_`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Guías:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Credenciales **Supabase** y **Sentry**: [`docs/credenciales-supabase-sentry.md`](docs/credenciales-supabase-sentry.md).
+- **Sentry MCP** en Cursor: [`docs/mcp-sentry-cursor.md`](docs/mcp-sentry-cursor.md).
 
-## Deploy on Vercel
+### Panel `/admin` (Supabase Auth)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `NEXT_PUBLIC_SUPABASE_URL` y clave pública: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- La sesión es la de **Supabase Auth** (cookies gestionadas con `@supabase/ssr`); el **middleware** refresca la sesión y exige rol `staff`, `admin` o `super_admin` en la tabla `public.profiles`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Primera vez en Supabase**
+
+1. En **Authentication → Providers**, activa **Email** y crea usuarios del staff (o habilita registro solo si lo controlas).
+2. En **SQL Editor**, ejecuta el script [`supabase/migrations/001_profiles_audit.sql`](supabase/migrations/001_profiles_audit.sql) (perfiles, auditoría, RLS, trigger al crear usuario).
+3. Promueve al menos un **super admin** (sustituye el correo):
+
+   ```sql
+   update public.profiles
+   set role = 'super_admin'
+   where email = 'tu-correo@dominio.com';
+   ```
+
+Los datos operativos (cotizaciones, inventario, aseos) siguen en **localStorage** con respaldo JSON hasta que se migren a tablas Supabase.
+
+### Modelo de amenaza (resumen)
+
+El panel es para **staff de confianza**. RLS en Supabase limita quién lee/escribe datos; el **super admin** es quien puede ver auditoría y editar roles. Para cuentas muy sensibles, valorar **2FA** (Supabase u otro) y políticas de contraseña en el dashboard.
+
+## CI (GitHub Actions)
+
+El flujo de CI está en [`docs/github-ci-workflow.yml`](docs/github-ci-workflow.yml). Cópialo a `.github/workflows/ci.yml` en el repo (o créalo desde la UI de GitHub) cuando tu token o integración tenga permiso **`workflow`**; algunos clientes OAuth rechazan subir workflows sin ese alcance.
+
+En `package.json`, el campo **`overrides`** fija `postcss` ≥ 8.5.10 para alinear la dependencia transitiva de Next con el aviso de seguridad de PostCSS (sin usar `npm audit fix --force`).
+
+## Estructura relevante
+
+- `src/app/` — rutas y layout
+- `src/components/sections/` — bloques de la landing
+- `src/app/admin/` — panel (login + módulos)
+- `src/lib/` — configuración del sitio, precios, almacenamiento local, auth de servidor
+
+## Licencia
+
+Privado — uso interno del proyecto LOFTHOUSE 14.

@@ -27,7 +27,10 @@ const jsonLd = {
   name: site.name,
   description: site.description,
   url: siteUrl,
-  image: [`${siteUrl}/logo-lofthouse.png`, ...site.gallery.map((p) => `${siteUrl}${p}`)],
+  image: [
+    `${siteUrl}/logo-lofthouse.png`,
+    ...site.gallery.map((p) => `${siteUrl}${p}`),
+  ],
   telephone: site.phoneTel,
   address: {
     "@type": "PostalAddress",
@@ -101,8 +104,8 @@ export default function RootLayout({
               Activa JavaScript
             </p>
             <p>
-              Esta página necesita JavaScript para mostrar el contenido. Abre
-              el sitio en un navegador con JavaScript habilitado o prueba en
+              Esta página necesita JavaScript para mostrar el contenido. Abre el
+              sitio en un navegador con JavaScript habilitado o prueba en
               Chrome/Safari/Firefox.
             </p>
           </div>

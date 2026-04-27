@@ -18,7 +18,9 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 function newId() {
-  return "a_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  return (
+    "a_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
+  );
 }
 function fmtHora(h?: string) {
   if (!h) return "—";
@@ -101,7 +103,10 @@ export default function AseosPage() {
 
   const proximasFechas = useMemo(() => {
     const set = new Set(aseos.map((a) => a.fecha));
-    return Array.from(set).filter((f) => f > fecha).sort().slice(0, 5);
+    return Array.from(set)
+      .filter((f) => f > fecha)
+      .sort()
+      .slice(0, 5);
   }, [aseos, fecha]);
 
   return (
@@ -111,8 +116,8 @@ export default function AseosPage() {
           ASEOS DEL DÍA
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-          Programa los aseos diarios, reparte el trabajo por loft y marca
-          cuando quede listo. Sencillo y sin complicaciones.
+          Programa los aseos diarios, reparte el trabajo por loft y marca cuando
+          quede listo. Sencillo y sin complicaciones.
         </p>
       </div>
 
@@ -201,7 +206,11 @@ export default function AseosPage() {
       >
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatChip label="Total" value={resumen.total} />
-          <StatChip label="Pendientes" value={resumen.pendientes} color="amber" />
+          <StatChip
+            label="Pendientes"
+            value={resumen.pendientes}
+            color="amber"
+          />
           <StatChip label="En proceso" value={resumen.enProceso} color="blue" />
           <StatChip label="Hechos" value={resumen.hechos} color="green" />
         </div>
@@ -239,7 +248,9 @@ export default function AseosPage() {
                   <select
                     className={smallSelect}
                     value={a.estado}
-                    onChange={(e) => cambiarEstado(a.id, e.target.value as AseoEstado)}
+                    onChange={(e) =>
+                      cambiarEstado(a.id, e.target.value as AseoEstado)
+                    }
                   >
                     {ESTADOS_ASEO.map((e) => (
                       <option key={e} value={e}>
@@ -323,7 +334,9 @@ function StatChip({
         color ? palette[color] : "bg-white/60 dark:bg-zinc-900/50"
       }`}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-[0.18em]">{label}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em]">
+        {label}
+      </p>
       <p className="font-display text-xl tracking-wide">{value}</p>
     </div>
   );

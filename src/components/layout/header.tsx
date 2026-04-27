@@ -62,7 +62,9 @@ export function Header() {
               title="Acceso administrador"
               className="hidden h-9 w-9 items-center justify-center rounded-full border border-black/10 text-zinc-700 transition hover:bg-black/5 hover:text-amber-800 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5 dark:hover:text-amber-300 sm:inline-flex"
             >
-              <span aria-hidden className="text-base">⚙</span>
+              <span aria-hidden className="text-base">
+                ⚙
+              </span>
             </Link>
             <Link
               href={waLink()}

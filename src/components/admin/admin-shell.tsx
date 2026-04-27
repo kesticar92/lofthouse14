@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { isAuthed, logout, getSession } from "@/lib/auth";
+import { fetchAdminSession, logoutAdmin } from "@/lib/auth-client";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
@@ -47,15 +47,25 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<string>("");
+  const [role, setRole] = useState<string>("");
   const [openMenu, setOpenMenu] = useState(false);
 
   useEffect(() => {
-    if (!isAuthed()) {
-      router.replace("/admin/login");
-      return;
-    }
-    setUser(getSession()?.user || "");
-    setReady(true);
+    let cancelled = false;
+    (async () => {
+      const session = await fetchAdminSession();
+      if (cancelled) return;
+      if (!session) {
+        router.replace("/admin/login");
+        return;
+      }
+      setUser(session.user);
+      setRole(session.role);
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [router, pathname]);
 
   if (!ready) {
@@ -86,8 +96,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="flex items-center gap-2">
-            <span className="hidden rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-xs text-zinc-700 dark:border-white/10 dark:bg-zinc-900/60 dark:text-zinc-200 md:inline">
-              Hola, <strong className="font-semibold">{user}</strong>
+            <span className="hidden max-w-[220px] truncate rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-xs text-zinc-700 dark:border-white/10 dark:bg-zinc-900/60 dark:text-zinc-200 md:inline">
+              <strong className="font-semibold">{user}</strong>
+              {role ? (
+                <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-400">
+                  · {role.replaceAll("_", " ")}
+                </span>
+              ) : null}
             </span>
             <ThemeToggle />
             <Link
@@ -98,9 +113,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </Link>
             <button
               type="button"
-              onClick={() => {
-                logout();
-                router.replace("/admin/login");
+              onClick={async () => {
+                await logoutAdmin();
+                window.location.assign("/admin/login");
               }}
               className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900 dark:hover:bg-white"
             >

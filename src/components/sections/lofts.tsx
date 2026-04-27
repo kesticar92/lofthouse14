@@ -34,7 +34,8 @@ export function Lofts() {
             OPCIONES PARA CADA VIAJE
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
-            Desde estadías cortas hasta largas, tenemos el espacio ideal para ti.
+            Desde estadías cortas hasta largas, tenemos el espacio ideal para
+            ti.
           </p>
         </motion.div>
 
@@ -66,9 +67,9 @@ export function Lofts() {
               </p>
             </div>
             <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-              Cada unidad combina autonomía y comodidad en un edificio horizontal
-              organizado: ideal para turismo, trabajo remoto, estancias
-              médicas, rotaciones y grupos con logística coordinada.
+              Cada unidad combina autonomía y comodidad en un edificio
+              horizontal organizado: ideal para turismo, trabajo remoto,
+              estancias médicas, rotaciones y grupos con logística coordinada.
             </p>
             <ul className="grid gap-2 sm:grid-cols-2">
               {perks.map((p) => (

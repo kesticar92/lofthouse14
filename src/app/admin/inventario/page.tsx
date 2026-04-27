@@ -23,7 +23,9 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 function newId() {
-  return "i_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  return (
+    "i_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
+  );
 }
 
 function buildEmpty(loft: number): InventarioItemResultado[] {
@@ -162,7 +164,8 @@ export default function InventarioPage() {
           INVENTARIO POR LOFT
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-          Revisa artículo por artículo cada loft. Marca estado y si funciona; los ítems que no apliquen se llenan solos.
+          Revisa artículo por artículo cada loft. Marca estado y si funciona;
+          los ítems que no apliquen se llenan solos.
         </p>
       </div>
 
@@ -233,7 +236,10 @@ export default function InventarioPage() {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-          <StatChip label="Marcados" value={`${totales.marcados} / ${items.length}`} />
+          <StatChip
+            label="Marcados"
+            value={`${totales.marcados} / ${items.length}`}
+          />
           <StatChip label="Presentes" value={totales.presente} color="green" />
           <StatChip label="Ausentes" value={totales.ausente} color="amber" />
           <StatChip label="Dañados" value={totales.danado} color="red" />
@@ -248,7 +254,9 @@ export default function InventarioPage() {
         )}
       </AdminCard>
 
-      <AdminCard title={`Checklist — Loft ${loft}${loft === 4 ? " (bodega)" : ""}`}>
+      <AdminCard
+        title={`Checklist — Loft ${loft}${loft === 4 ? " (bodega)" : ""}`}
+      >
         <div className="overflow-x-auto">
           <table className="w-full min-w-[780px] border-collapse text-sm">
             <thead className="bg-black/5 text-[11px] uppercase tracking-wider text-zinc-600 dark:bg-white/5 dark:text-zinc-300">
@@ -275,13 +283,17 @@ export default function InventarioPage() {
                           : ""
                     }
                   >
-                    <td className="px-2 py-2 align-top text-zinc-500">{it.orden}</td>
+                    <td className="px-2 py-2 align-top text-zinc-500">
+                      {it.orden}
+                    </td>
                     <td className="px-2 py-2 align-top">
                       <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] dark:bg-white/10">
                         {it.zona}
                       </span>
                     </td>
-                    <td className="px-2 py-2 align-top font-medium">{it.item}</td>
+                    <td className="px-2 py-2 align-top font-medium">
+                      {it.item}
+                    </td>
                     <td className="px-2 py-2 align-top">
                       <select
                         className={smallSelect}
@@ -318,8 +330,14 @@ export default function InventarioPage() {
                       <input
                         className={smallInput}
                         value={it.detalles}
-                        onChange={(e) => setItem(idx, { detalles: e.target.value })}
-                        placeholder={/observaciones/i.test(it.item) ? "Notas libres" : "Novedad (opcional)"}
+                        onChange={(e) =>
+                          setItem(idx, { detalles: e.target.value })
+                        }
+                        placeholder={
+                          /observaciones/i.test(it.item)
+                            ? "Notas libres"
+                            : "Novedad (opcional)"
+                        }
                       />
                     </td>
                   </tr>
@@ -430,7 +448,9 @@ function StatChip({
         color ? palette[color] : "bg-white/60 dark:bg-zinc-900/50"
       }`}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-[0.18em]">{label}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em]">
+        {label}
+      </p>
       <p className="font-display text-xl tracking-wide">{value}</p>
     </div>
   );

@@ -11,7 +11,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 type NavItem = {
   href: string;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   desc: string;
 };
 
@@ -19,25 +19,44 @@ export const ADMIN_NAV: NavItem[] = [
   {
     href: "/admin",
     label: "Inicio",
-    icon: "⌂",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M3 11.5 12 4l9 7.5" />
+        <path d="M6.5 10.5V20h11V10.5" />
+      </svg>
+    ),
     desc: "Resumen general del panel",
   },
   {
     href: "/admin/cotizaciones",
     label: "Cotizaciones",
-    icon: "₲",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 3v18" />
+        <path d="M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3.5 5 3.5 5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5" />
+      </svg>
+    ),
     desc: "Calcula y guarda cotizaciones",
   },
   {
     href: "/admin/inventario",
     label: "Inventario",
-    icon: "☑",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="4" y="4" width="16" height="16" rx="2" />
+        <path d="m8 12 2.5 2.5L16 9" />
+      </svg>
+    ),
     desc: "Revisión de artículos por loft",
   },
   {
     href: "/admin/aseos",
     label: "Aseos del día",
-    icon: "✻",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3 6.3 17.7" />
+      </svg>
+    ),
     desc: "Programa y marca aseos diarios",
   },
 ];
@@ -89,6 +108,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               width={120}
               height={40}
               className="h-9 w-auto"
+              style={{ width: "auto" }}
             />
             <span className="hidden text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-900 dark:text-amber-400 sm:inline">
               Panel administrador

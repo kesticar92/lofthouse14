@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { site } from "@/lib/site";
 
 export function Gallery() {
+  const gridGallery = Array.from({ length: 9 }, (_, i) => site.gallery[i % site.gallery.length]);
+
   return (
     <section id="galeria" className="scroll-mt-28 py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-4">
@@ -23,17 +25,17 @@ export function Gallery() {
           </p>
         </motion.div>
 
-        <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
-          {site.gallery.map((src, i) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {gridGallery.map((src, i) => (
             <motion.figure
-              key={src}
+              key={`${src}-${i}`}
               initial={{ opacity: 1, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ delay: (i % 4) * 0.05, duration: 0.45 }}
-              className="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-black/10 shadow-lg dark:border-white/10"
+              transition={{ delay: (i % 3) * 0.05, duration: 0.45 }}
+              className="overflow-hidden rounded-2xl border border-black/10 shadow-lg dark:border-white/10"
             >
-              <div className="relative aspect-[4/5] w-full">
+              <div className="relative aspect-square w-full">
                 <Image
                   src={src}
                   alt={`Galería ${site.name} — imagen ${i + 1}`}

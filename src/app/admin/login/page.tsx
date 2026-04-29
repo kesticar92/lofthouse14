@@ -89,6 +89,7 @@ function LoginForm() {
           width={160}
           height={56}
           className="h-14 w-auto"
+          style={{ width: "auto" }}
           priority
         />
         <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-amber-900 dark:text-amber-400">

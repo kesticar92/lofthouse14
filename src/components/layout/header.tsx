@@ -38,6 +38,7 @@ export function Header() {
               width={140}
               height={48}
               className="h-10 w-auto md:h-11"
+              style={{ width: "auto" }}
               priority
             />
           </Link>
@@ -62,9 +63,17 @@ export function Header() {
               title="Acceso administrador"
               className="hidden h-9 w-9 items-center justify-center rounded-full border border-black/10 text-zinc-700 transition hover:bg-black/5 hover:text-amber-800 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5 dark:hover:text-amber-300 sm:inline-flex"
             >
-              <span aria-hidden className="text-base">
-                ⚙
-              </span>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                aria-hidden
+              >
+                <path d="m19.4 15 1.2 2-2 3.5-2.4-.7a7.8 7.8 0 0 1-2.1 1.2l-.4 2.5H10.3l-.4-2.5a7.8 7.8 0 0 1-2.1-1.2l-2.4.7-2-3.5 1.2-2a8.9 8.9 0 0 1 0-3l-1.2-2 2-3.5 2.4.7a7.8 7.8 0 0 1 2.1-1.2l.4-2.5h3.4l.4 2.5a7.8 7.8 0 0 1 2.1 1.2l2.4-.7 2 3.5-1.2 2a8.9 8.9 0 0 1 0 3Z" />
+                <circle cx="12" cy="12" r="2.8" />
+              </svg>
             </Link>
             <Link
               href={waLink()}

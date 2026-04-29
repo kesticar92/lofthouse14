@@ -11,7 +11,12 @@ export function Hero() {
       id="inicio"
       className="relative isolate flex min-h-[100svh] items-end overflow-hidden pb-24 pt-32 md:items-center md:pb-28 md:pt-36"
     >
-      <div className="absolute inset-0 -z-20">
+      <motion.div
+        className="absolute inset-0 -z-20"
+        initial={{ scale: 1.02 }}
+        animate={{ scale: 1.08, x: -8, y: -8 }}
+        transition={{ duration: 24, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+      >
         <Image
           src="/gallery/loft-01.jpg"
           alt={`Interior de loft en ${site.neighborhood}`}
@@ -21,7 +26,7 @@ export function Hero() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/25 dark:from-black dark:via-black/70 dark:to-black/35" />
-      </div>
+      </motion.div>
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4">
         <h1 className="sr-only">
@@ -33,16 +38,6 @@ export function Hero() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-3xl space-y-6 text-white"
         >
-          <div className="rounded-2xl border border-white/15 bg-black/25 p-4 shadow-lg backdrop-blur-md sm:inline-block sm:p-5">
-            <Image
-              src="/logo-lofthouse.png"
-              alt=""
-              width={220}
-              height={80}
-              className="h-16 w-auto brightness-0 invert sm:h-[4.5rem]"
-              aria-hidden
-            />
-          </div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#f2f0eb]/90">
             {site.neighborhood} · {site.city}
           </p>
@@ -85,16 +80,6 @@ export function Hero() {
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.35, duration: 0.5 }}
-          className="max-w-xl text-xs leading-relaxed text-white/70"
-        >
-          “Disponibilidad” según la cantidad de personas: te confirmamos qué
-          loft(s) pueden recibir a tu grupo y las fechas que necesitas.
-        </motion.p>
-
-        <motion.p
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.45, duration: 0.5 }}
           className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/65"
         >
           Ingreso autónomo · WiFi rápido · {site.addressLine}

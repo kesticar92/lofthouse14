@@ -8,17 +8,31 @@ const items = [
   {
     title: "Ubicación que lo tiene todo",
     body: "A pocos minutos de restaurantes, bares, clínicas, universidades y escenarios deportivos, entre otros.",
-    icon: "📍",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 21s-6-5.9-6-11a6 6 0 1 1 12 0c0 5.1-6 11-6 11Z" />
+        <circle cx="12" cy="10" r="2.3" />
+      </svg>
+    ),
   },
   {
     title: "Espacios diseñados para tu ritmo",
     body: "Ya sea que vengas a trabajar, recuperarte o explorar la ciudad, aquí tienes lo que necesitas.",
-    icon: "✦",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="m12 3 1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8L12 3Z" />
+        <path d="m18.5 14 1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1 1-2.2Z" />
+      </svg>
+    ),
   },
   {
     title: "Reservas claras, paso a paso",
     body: "Nuestro sistema es sencillo: confirmas fechas, número de huéspedes y capacidad disponible; luego el pago de la reserva y la verificación de identidad. Si todo es exitoso, habilitamos tu acceso autónomo al alojamiento.",
-    icon: "✓",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="m5 12 4 4 10-10" />
+      </svg>
+    ),
   },
 ];
 
@@ -54,7 +68,7 @@ export function ValueProps() {
               transition={{ delay: i * 0.08, duration: 0.45 }}
             >
               <GlassPanel className="h-full space-y-4">
-                <div className="text-2xl">{item.icon}</div>
+                <div className="text-amber-800 dark:text-amber-400">{item.icon}</div>
                 <h3 className="font-display text-2xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
                   {item.title.toUpperCase()}
                 </h3>

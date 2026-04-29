@@ -64,6 +64,25 @@ on conflict (id) do nothing;
 alter table public.profiles enable row level security;
 alter table public.audit_logs enable row level security;
 
+-- Evita recursión RLS: no consultamos `profiles` directamente dentro
+-- de políticas de `profiles`; usamos función SECURITY DEFINER.
+create or replace function public.is_super_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'super_admin'
+  );
+$$;
+
+grant execute on function public.is_super_admin() to authenticated;
+
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own"
   on public.profiles for select
@@ -72,22 +91,13 @@ create policy "profiles_select_own"
 drop policy if exists "profiles_select_super" on public.profiles;
 create policy "profiles_select_super"
   on public.profiles for select
-  using (
-    exists (
-      select 1 from public.profiles me
-      where me.id = auth.uid() and me.role = 'super_admin'
-    )
-  );
+  using (public.is_super_admin());
 
 drop policy if exists "profiles_update_super" on public.profiles;
 create policy "profiles_update_super"
   on public.profiles for update
-  using (
-    exists (
-      select 1 from public.profiles me
-      where me.id = auth.uid() and me.role = 'super_admin'
-    )
-  );
+  using (public.is_super_admin())
+  with check (public.is_super_admin());
 
 drop policy if exists "audit_insert_self" on public.audit_logs;
 create policy "audit_insert_self"
@@ -97,12 +107,7 @@ create policy "audit_insert_self"
 drop policy if exists "audit_select_super" on public.audit_logs;
 create policy "audit_select_super"
   on public.audit_logs for select
-  using (
-    exists (
-      select 1 from public.profiles me
-      where me.id = auth.uid() and me.role = 'super_admin'
-    )
-  );
+  using (public.is_super_admin());
 
 grant usage on schema public to anon, authenticated;
 grant select, update on public.profiles to authenticated;

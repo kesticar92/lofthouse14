@@ -1,28 +1,38 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { GlassPanel } from "@/components/ui/glass-panel";
 
 const cards = [
   {
     title: "Vive la salsa",
     body: "Estamos cerca de academias y zonas icónicas para bailar y disfrutar la cultura caleña.",
+    image: "/gallery/loft-02.jpg",
   },
   {
     title: "Explora la gastronomía",
     body: "Restaurantes, cafés y bares a pocos pasos para que cada comida sea parte del viaje.",
+    image: "/gallery/loft-03.jpg",
   },
   {
     title: "Ubicación para todo",
     body: "Cerca de clínicas, universidades y centros deportivos: menos traslados, más tiempo para ti.",
+    image: "/gallery/loft-04.jpg",
   },
   {
     title: "Perfecto para estancias médicas",
     body: "Tranquilidad, privacidad y cercanía para tu recuperación (consulta accesibilidad por escaleras).",
+    image: "/gallery/loft-05.jpg",
   },
   {
     title: "Ideal para grupos",
     body: "Capacidad combinada para alojar varias personas — hasta 63 huéspedes — con logística coordinada.",
+    image: "/gallery/loft-06.jpg",
+  },
+  {
+    title: "Trabajo remoto sin fricción",
+    body: "Ambientes con buena conectividad y ritmo urbano para jornadas productivas y descansos reales.",
+    image: "/gallery/loft-07.jpg",
   },
 ];
 
@@ -55,14 +65,25 @@ export function Experiences() {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: (i % 3) * 0.06, duration: 0.45 }}
             >
-              <GlassPanel className="h-full space-y-3">
-                <h3 className="font-display text-xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
-                  {c.title.toUpperCase()}
-                </h3>
-                <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-                  {c.body}
-                </p>
-              </GlassPanel>
+              <article className="h-full overflow-hidden border-2 border-zinc-900 bg-[#efe9dc] shadow-[8px_8px_0_0_#0a0a0a] transition-transform hover:-translate-y-1 dark:border-zinc-100 dark:bg-zinc-900 dark:shadow-[8px_8px_0_0_#f2f0eb]">
+                <div className="relative aspect-[4/3] w-full border-b-2 border-zinc-900 dark:border-zinc-100">
+                  <Image
+                    src={c.image}
+                    alt={c.title}
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="space-y-3 p-4">
+                  <h3 className="font-display text-xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
+                    {c.title.toUpperCase()}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+                    {c.body}
+                  </p>
+                </div>
+              </article>
             </motion.div>
           ))}
         </div>

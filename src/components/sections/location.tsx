@@ -49,12 +49,15 @@ export function Location() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.55 }}
-            className="overflow-hidden rounded-2xl border border-black/10 shadow-xl dark:border-white/10"
+            className="relative overflow-hidden rounded-2xl border-2 border-zinc-900 bg-[#efe9dc] shadow-[8px_8px_0_0_#0a0a0a] dark:border-zinc-100 dark:bg-zinc-900 dark:shadow-[8px_8px_0_0_#f2f0eb]"
           >
+            <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-md border border-zinc-900/60 bg-[#f2f0eb]/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-800 dark:border-zinc-200/60 dark:bg-zinc-950/80 dark:text-zinc-200">
+              Cómo llegar
+            </div>
             <iframe
               title={`Mapa — ${site.addressLine}`}
               src={mapSrc}
-              className="aspect-square w-full min-h-[320px] bg-zinc-100 dark:bg-zinc-900 lg:aspect-[5/4]"
+              className="aspect-square w-full min-h-[320px] grayscale-[0.15] contrast-[1.02] saturate-75 dark:grayscale-[0.25] dark:contrast-110 dark:saturate-50 lg:aspect-[5/4]"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />

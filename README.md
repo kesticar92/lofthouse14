@@ -48,12 +48,12 @@ Guías:
 
 1. En **Authentication → Providers**, activa **Email** y crea usuarios del staff (o habilita registro solo si lo controlas).
 2. En **SQL Editor**, ejecuta el script [`supabase/migrations/001_profiles_audit.sql`](supabase/migrations/001_profiles_audit.sql) (perfiles, auditoría, RLS, trigger al crear usuario).
-3. Promueve al menos un **super admin** (sustituye el correo):
+3. Crea el usuario en **Authentication → Users**, luego en **SQL Editor** ejecuta [`supabase/snippets/promote_super_admin.sql`](supabase/snippets/promote_super_admin.sql) (cambia el correo y pulsa **Run**). Alternativa rápida:
 
    ```sql
    update public.profiles
    set role = 'super_admin'
-   where email = 'tu-correo@dominio.com';
+   where email = lower('tu-correo@dominio.com');
    ```
 
 Los datos operativos (cotizaciones, inventario, aseos) siguen en **localStorage** con respaldo JSON hasta que se migren a tablas Supabase.

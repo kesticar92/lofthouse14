@@ -6,26 +6,21 @@ import { GlassPanel } from "@/components/ui/glass-panel";
 const steps = [
   {
     step: "01",
-    title: "Fechas",
-    body: "Nos indicas fechas de entrada y salida.",
+    title: "Fechas y huéspedes",
+    body: "Comparte fechas de entrada/salida y cuántas personas viajan contigo.",
   },
   {
     step: "02",
-    title: "Huéspedes",
-    body: "Número de personas que viajan con usted.",
+    title: "Confirmación de disponibilidad",
+    body: "Validamos qué loft(s) están disponibles para tu grupo y te confirmamos opciones.",
   },
   {
     step: "03",
-    title: "Capacidad",
-    body: "Confirmamos disponibilidad según el tamaño del grupo y qué loft(s) aplican.",
+    title: "Pago",
+    body: "Realizas el pago para bloquear la reserva en las fechas acordadas.",
   },
   {
     step: "04",
-    title: "Pago",
-    body: "Se coordina el pago de la reserva para bloquear las fechas.",
-  },
-  {
-    step: "05",
     title: "Identidad y acceso",
     body: "Verificación de identidad; si es exitosa, se habilita el ingreso autónomo al alojamiento.",
   },
@@ -49,7 +44,7 @@ export function BookingSteps() {
             etapa.
           </p>
         </motion.div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
             <motion.div
               key={s.step}

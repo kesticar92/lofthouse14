@@ -27,7 +27,7 @@ const items = [
   },
   {
     title: "Reservas claras, paso a paso",
-    body: "Nuestro sistema es sencillo: confirmas fechas, número de huéspedes y capacidad disponible; luego el pago de la reserva y la verificación de identidad. Si todo es exitoso, habilitamos tu acceso autónomo al alojamiento.",
+    body: "Fechas y huéspedes → disponibilidad confirmada → pago → verificación de identidad → acceso autónomo al edificio.",
     icon: (
       <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="m5 12 4 4 10-10" />

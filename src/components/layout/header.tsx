@@ -81,7 +81,7 @@ export function Header() {
               rel="noopener noreferrer"
               className="hidden rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900 dark:hover:bg-white sm:inline-flex"
             >
-              WhatsApp
+              Reservar
             </Link>
             <button
               type="button"

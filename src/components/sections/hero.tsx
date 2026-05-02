@@ -11,22 +11,30 @@ export function Hero() {
       id="inicio"
       className="relative isolate flex min-h-[100svh] items-end overflow-hidden pb-24 pt-32 md:items-center md:pb-28 md:pt-36"
     >
-      <motion.div
-        className="absolute inset-0 -z-20"
-        initial={{ scale: 1.02 }}
-        animate={{ scale: 1.08, x: -8, y: -8 }}
-        transition={{ duration: 24, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
-      >
-        <Image
-          src="/gallery/loft-01.jpg"
-          alt={`Interior de loft en ${site.neighborhood}`}
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
+      {/* Video background */}
+      <div className="absolute inset-0 -z-20">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/gallery/loft-01.jpg"
+          className="h-full w-full object-cover"
+          aria-hidden="true"
+        >
+          <source src="/hero.mp4" type="video/mp4" />
+          {/* Fallback image for browsers that don't support video */}
+          <Image
+            src="/gallery/loft-01.jpg"
+            alt={`Interior de loft en ${site.neighborhood}`}
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/25 dark:from-black dark:via-black/70 dark:to-black/35" />
-      </motion.div>
+      </div>
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4">
         <h1 className="sr-only">

@@ -5,16 +5,49 @@ import { GlassPanel } from "@/components/ui/glass-panel";
 
 const quotes = [
   {
-    text: "Excelente ubicación, todo queda cerca. Muy cómodo.",
-    author: "Huésped verificado",
+    text: "Excelente ubicación, todo queda cerca. El loft es cómodo, limpio y bien equipado. Sin duda volvería.",
+    author: "Camila R. · Turismo",
+    stars: 5,
   },
   {
-    text: "Perfecto para trabajar y salir a comer o tomar algo.",
-    author: "Huésped verificado",
+    text: "Perfecto para trabajar y salir a comer o tomar algo. El WiFi funcionó impecable toda la semana.",
+    author: "Sebastián M. · Trabajo remoto",
+    stars: 5,
   },
   {
-    text: "Volvería por la comodidad y la facilidad de todo.",
-    author: "Huésped verificado",
+    text: "Volvería por la comodidad y la facilidad de todo. El ingreso autónomo es muy práctico, llegué tarde y no hubo problema.",
+    author: "Laura G. · Viaje de descanso",
+    stars: 5,
+  },
+  {
+    text: "Vine por una cita médica y la cercanía a la clínica fue clave. El espacio es tranquilo y permite recuperarse bien.",
+    author: "Jorge P. · Estadía médica",
+    stars: 5,
+  },
+  {
+    text: "El barrio es increíble. A pasos del Parque del Perro, restaurantes y todo lo que necesitas. Una experiencia muy caleña.",
+    author: "Valentina O. · Turismo cultural",
+    stars: 5,
+  },
+  {
+    text: "Vinimos en grupo y coordinaron todo muy bien. Cada uno en su loft y todos cerca. La comunicación con el anfitrión fue excelente.",
+    author: "Equipo Comercial · Viaje corporativo",
+    stars: 5,
+  },
+  {
+    text: "El apartamento es exactamente como en las fotos, sin sorpresas. Moderno, limpio y con todo lo necesario para una estadía larga.",
+    author: "Ricardo F. · Estadía mensual",
+    stars: 5,
+  },
+  {
+    text: "Me encantó que pudiera llegar a cualquier hora sin depender de nadie. Acceso autónomo, simple y seguro.",
+    author: "Natalia V. · Viaje de negocios",
+    stars: 5,
+  },
+  {
+    text: "La cocina equipada hizo la diferencia. Pudimos preparar nuestras cosas y ahorrar bastante. Muy buena relación precio-calidad.",
+    author: "Familia Herrera · Vacaciones",
+    stars: 5,
   },
 ];
 
@@ -38,20 +71,27 @@ export function Testimonials() {
           </p>
         </motion.div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {quotes.map((q, i) => (
             <motion.div
               key={q.text}
               initial={{ opacity: 1, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: i * 0.08, duration: 0.45 }}
+              transition={{ delay: (i % 3) * 0.07, duration: 0.45 }}
             >
-              <GlassPanel className="h-full space-y-4">
-                <p className="text-lg font-medium leading-snug text-zinc-900 dark:text-zinc-50">
-                  “{q.text}”
+              <GlassPanel className="h-full space-y-3">
+                <div className="flex gap-0.5">
+                  {Array.from({ length: q.stars }).map((_, s) => (
+                    <svg key={s} viewBox="0 0 16 16" className="h-4 w-4 fill-amber-500" aria-hidden>
+                      <path d="M8 1l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 10.8l-3.8 2 .7-4.3-3.1-3 4.3-.6z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
+                  &ldquo;{q.text}&rdquo;
                 </p>
-                <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
                   {q.author}
                 </p>
               </GlassPanel>

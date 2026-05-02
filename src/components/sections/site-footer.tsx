@@ -38,8 +38,13 @@ export function SiteFooter() {
                 <span className="font-semibold text-[#f2f0eb]">Check-out:</span>{" "}
                 {site.checkOut}
               </li>
-              <li className="text-zinc-400">
-                Consulta condiciones completas al reservar.
+              <li>
+                <Link
+                  href="/politicas"
+                  className="text-amber-400 hover:underline"
+                >
+                  Ver todas las políticas →
+                </Link>
               </li>
             </ul>
           </div>

@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { fetchAdminSession, logoutAdmin } from "@/lib/auth-client";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { AdminNotificationBell } from "@/components/admin/admin-notification-bell";
 
 type NavItem = {
   href: string;
@@ -50,6 +51,29 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Revisión de artículos por loft",
   },
   {
+    href: "/admin/reservas",
+    label: "Reservas",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M3 9h18M8 3v4M16 3v4" />
+      </svg>
+    ),
+    desc: "Ocupación, iCal Airbnb y exportación",
+  },
+  {
+    href: "/admin/gastos",
+    label: "Gastos",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M4 7h16v10H4z" />
+        <path d="M8 11h8M8 15h5" />
+        <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+      </svg>
+    ),
+    desc: "Facturas, fotos y backup en Drive",
+  },
+  {
     href: "/admin/aseos",
     label: "Aseos del día",
     icon: (
@@ -57,7 +81,7 @@ export const ADMIN_NAV: NavItem[] = [
         <path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3 6.3 17.7" />
       </svg>
     ),
-    desc: "Programa y marca aseos diarios",
+    desc: "Limpieza y preparación desde reservas",
   },
 ];
 
@@ -124,6 +148,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </span>
               ) : null}
             </span>
+            <AdminNotificationBell />
             <ThemeToggle />
             <Link
               href="/"

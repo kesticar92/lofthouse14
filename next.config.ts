@@ -52,6 +52,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  /** node-ical + temporal: evitar bundle que rompe BigInt en el servidor. */
+  serverExternalPackages: ["node-ical", "rrule-temporal", "temporal-polyfill"],
   async headers() {
     return [
       {

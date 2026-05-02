@@ -7,6 +7,16 @@ import { waLink } from "@/lib/site";
 
 const items = [
   {
+    title: "Early Check-in",
+    body: "¿Tu vuelo llega temprano o necesitas entrar antes del mediodía? Coordina un ingreso anticipado según disponibilidad. Ideal si tienes pico y placa, vuelo matutino o simplemente quieres instalarte tranquilo.",
+    cta: "Solicitar early check-in",
+  },
+  {
+    title: "Late Check-out",
+    body: "¿Tu vuelo sale en la tarde o la noche? Extiende tu salida y aprovecha el día sin apuros. Perfecto si tienes restricciones de movilidad, vuelo nocturno o una última reunión en la ciudad.",
+    cta: "Solicitar late check-out",
+  },
+  {
     title: "Clases de salsa",
     body: "Te conectamos con academias y experiencias cercanas para que lleves Cali en el cuerpo.",
     cta: "Quiero clases de salsa",

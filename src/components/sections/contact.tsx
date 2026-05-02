@@ -40,19 +40,20 @@ export function Contact() {
               RESERVA FÁCIL
             </h2>
             <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-300 sm:text-lg">
-              Escríbenos por WhatsApp: confirmamos{" "}
+              Solo necesitamos saber tus{" "}
               <strong className="text-zinc-900 dark:text-[#f2f0eb]">
-                fechas, huéspedes y capacidad
-              </strong>{" "}
-              según el tamaño de tu grupo; luego el pago de la reserva y la{" "}
+                fechas y cuántos huéspedes
+              </strong>
+              . Verificamos disponibilidad y te confirmamos para que puedas
+              pagar. Luego una rápida{" "}
               <strong className="text-zinc-900 dark:text-[#f2f0eb]">
                 verificación de identidad
-              </strong>
-              . Si todo es correcto, activamos tu{" "}
-              <strong className="text-zinc-900 dark:text-[#f2f0eb]">
-                acceso autónomo
               </strong>{" "}
-              al alojamiento.
+              y, si todo está en orden, activamos tu{" "}
+              <strong className="text-zinc-900 dark:text-[#f2f0eb]">
+                ingreso autónomo al edificio
+              </strong>
+              .
             </p>
             <div className="space-y-2 text-sm text-zinc-700 dark:text-zinc-200">
               <p>

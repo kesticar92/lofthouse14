@@ -65,14 +65,14 @@ export function Experiences() {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: (i % 3) * 0.06, duration: 0.45 }}
             >
-              <article className="h-full overflow-hidden border-2 border-zinc-900 bg-[#efe9dc] shadow-[8px_8px_0_0_#0a0a0a] transition-transform hover:-translate-y-1 dark:border-zinc-100 dark:bg-zinc-900 dark:shadow-[8px_8px_0_0_#f2f0eb]">
-                <div className="relative aspect-[4/3] w-full border-b-2 border-zinc-900 dark:border-zinc-100">
+              <article className="h-full overflow-hidden rounded-2xl border border-black/10 bg-[#efe9dc] shadow-lg dark:border-white/10 dark:bg-zinc-900">
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
                   <Image
                     src={c.image}
                     alt={c.title}
                     fill
                     sizes="(max-width: 1024px) 50vw, 33vw"
-                    className="object-cover"
+                    className="object-cover transition duration-500 hover:scale-[1.03]"
                   />
                 </div>
                 <div className="space-y-3 p-4">

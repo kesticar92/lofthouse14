@@ -1,293 +1,590 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
-import { TODOS_LOS_LOFTS } from "@/lib/inventory-catalog";
-import {
-  listarAseos,
-  guardarAseo,
-  eliminarAseo,
-  TIPOS_ASEO,
-  ESTADOS_ASEO,
-  type AseoGuardado,
-  type AseoEstado,
-  type AseoTipo,
-} from "@/lib/aseos-store";
+import { fetchAdminSession } from "@/lib/auth-client";
+import { sourceLabel } from "@/lib/pms/colors";
+import { cn } from "@/lib/cn";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
-function newId() {
-  return (
-    "a_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
-  );
+
+function fmtCop(n: number) {
+  try {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      maximumFractionDigits: 0,
+    }).format(n);
+  } catch {
+    return String(n);
+  }
 }
-function fmtHora(h?: string) {
-  if (!h) return "—";
-  return h;
-}
+
+type CleaningTask = {
+  id: string;
+  property_id: string;
+  property_name?: string;
+  reservation_id: string | null;
+  task_date: string;
+  type: string;
+  status: string;
+  assigned_to: string | null;
+  guests: number;
+  source: string;
+  guest_name: string;
+  check_in: string | null;
+  check_out: string | null;
+  notes: string;
+  bed_setup_notes: string;
+  cleaning_price: number | null;
+  estimated_time_label: string;
+};
+
+type StaffRow = { id: string; full_name: string; email: string | null; role: string };
+
+type Pricing = {
+  base_cop: number;
+  guest_threshold: number;
+  extra_per_guest_cop: number;
+};
+
+const TAB = ["lista", "resumen", "tarifas"] as const;
+type Tab = (typeof TAB)[number];
 
 export default function AseosPage() {
-  const [fecha, setFecha] = useState<string>("");
-  const [loft, setLoft] = useState<number>(1);
-  const [tipo, setTipo] = useState<AseoTipo>("Entre huéspedes");
-  const [hora, setHora] = useState<string>("");
-  const [personal, setPersonal] = useState<string>("");
-  const [notas, setNotas] = useState<string>("");
-  const [aseos, setAseos] = useState<AseoGuardado[]>([]);
+  const [tab, setTab] = useState<Tab>("lista");
+  const [fecha, setFecha] = useState("");
+  const [tasks, setTasks] = useState<CleaningTask[]>([]);
+  const [summary, setSummary] = useState<{
+    today: {
+      cleaning: number;
+      preparation: number;
+      manual: number;
+      revenue_scheduled_cop: number;
+      revenue_done_cop: number;
+    };
+    month_totals: {
+      revenue_scheduled_cop: number;
+      revenue_done_cop: number;
+      task_count: number;
+    };
+  } | null>(null);
+  const [staff, setStaff] = useState<StaffRow[]>([]);
+  const [properties, setProperties] = useState<{ id: string; name: string }[]>([]);
+  const [pricing, setPricing] = useState<Pricing | null>(null);
+  const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  const [manualPid, setManualPid] = useState("");
+  const [manualDate, setManualDate] = useState("");
+  const [manualNotes, setManualNotes] = useState("");
+  const [manualGuests, setManualGuests] = useState("2");
+  const [myRole, setMyRole] = useState("");
 
   useEffect(() => {
-    setFecha(todayISO());
-    setAseos(listarAseos());
+    void (async () => {
+      const s = await fetchAdminSession();
+      setMyRole(s?.role ?? "");
+    })();
   }, []);
 
-  function reloadList() {
-    setAseos(listarAseos());
+  const isSupervisor = myRole === "admin" || myRole === "super_admin";
+
+  const loadTasks = useCallback(async (date: string) => {
+    const res = await fetch(
+      `/api/admin/cleaning-tasks?date=${encodeURIComponent(date)}`,
+      { credentials: "include" },
+    );
+    const j = await res.json();
+    if (!res.ok) throw new Error(j.error ?? res.statusText);
+    setTasks(j.tasks ?? []);
+  }, []);
+
+  const loadSummary = useCallback(async (date: string) => {
+    const month = date.slice(0, 7);
+    const res = await fetch(
+      `/api/admin/cleaning-summary?date=${encodeURIComponent(date)}&month=${encodeURIComponent(month)}`,
+      { credentials: "include" },
+    );
+    const j = await res.json();
+    if (!res.ok) throw new Error(j.error ?? res.statusText);
+    setSummary(j);
+  }, []);
+
+  const loadPricing = useCallback(async () => {
+    const res = await fetch("/api/admin/app-settings/cleaning", {
+      credentials: "include",
+    });
+    const j = await res.json();
+    if (!res.ok) throw new Error(j.error ?? res.statusText);
+    setPricing(j.pricing);
+  }, []);
+
+  const refreshAll = useCallback(async () => {
+    const d = fecha || todayISO();
+    setErr(null);
+    setLoading(true);
+    try {
+      await Promise.all([
+        loadTasks(d),
+        loadSummary(d),
+        loadPricing(),
+      ]);
+      const [rs, rp] = await Promise.all([
+        fetch("/api/admin/staff-directory", { credentials: "include" }),
+        fetch("/api/admin/pms/properties", { credentials: "include" }),
+      ]);
+      const sj = await rs.json();
+      const pj = await rp.json();
+      if (rs.ok) setStaff(sj.staff ?? []);
+      if (rp.ok) setProperties(pj.properties ?? []);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
+  }, [fecha, loadTasks, loadSummary, loadPricing]);
+
+  useEffect(() => {
+    const d = todayISO();
+    setFecha(d);
+    setManualDate(d);
+  }, []);
+
+  useEffect(() => {
+    if (!fecha) return;
+    void refreshAll();
+  }, [fecha, refreshAll]);
+
+  async function patchTask(
+    id: string,
+    patch: Record<string, unknown>,
+  ) {
+    setErr(null);
+    const res = await fetch(`/api/admin/cleaning-tasks/${id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+    const j = await res.json();
+    if (!res.ok) {
+      setErr(j.error ?? res.statusText);
+      return;
+    }
+    setMsg("Actualizado.");
+    setTimeout(() => setMsg(null), 2000);
+    await refreshAll();
   }
 
-  function handleAgregar() {
-    const nuevo: AseoGuardado = {
-      id: newId(),
-      creadoEn: new Date().toISOString(),
-      fecha,
-      loft,
-      tipo,
-      hora: hora || undefined,
-      personal: personal.trim() || "—",
-      estado: "Pendiente",
-      notas: notas.trim() || undefined,
-    };
-    guardarAseo(nuevo);
-    reloadList();
-    setNotas("");
-    setMsg("Aseo agregado al cronograma.");
+  async function savePricing(e: React.FormEvent) {
+    e.preventDefault();
+    if (!pricing) return;
+    setErr(null);
+    const res = await fetch("/api/admin/app-settings/cleaning", {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(pricing),
+    });
+    const j = await res.json();
+    if (!res.ok) {
+      setErr(j.error ?? res.statusText);
+      return;
+    }
+    setPricing(j.pricing);
+    setMsg("Tarifas guardadas. Las nuevas reservas usarán estos valores.");
+    setTimeout(() => setMsg(null), 3000);
+    await refreshAll();
+  }
+
+  async function addManual(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    const res = await fetch("/api/admin/cleaning-tasks", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        property_id: manualPid,
+        task_date: manualDate,
+        notes: manualNotes,
+        guests: Number(manualGuests) || 1,
+      }),
+    });
+    const j = await res.json();
+    if (!res.ok) {
+      setErr(j.error ?? res.statusText);
+      return;
+    }
+    setManualNotes("");
+    setMsg("Tarea manual creada.");
     setTimeout(() => setMsg(null), 2500);
+    await refreshAll();
   }
 
-  function cambiarEstado(id: string, estado: AseoEstado) {
-    const item = aseos.find((a) => a.id === id);
-    if (!item) return;
-    const next: AseoGuardado = {
-      ...item,
-      estado,
-      completadoEn: estado === "Hecho" ? new Date().toISOString() : undefined,
-    };
-    guardarAseo(next);
-    reloadList();
-  }
-
-  function handleEliminar(id: string) {
-    if (!confirm("¿Eliminar este aseo del cronograma?")) return;
-    eliminarAseo(id);
-    reloadList();
+  function taskTypeLabel(t: string) {
+    if (t === "cleaning") return "Limpieza (check-out)";
+    if (t === "preparation") return "Preparación (check-in)";
+    return "Manual";
   }
 
   const delDia = useMemo(
     () =>
-      aseos
-        .filter((a) => a.fecha === fecha)
-        .sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99")),
-    [aseos, fecha],
+      [...tasks].sort((a, b) =>
+        a.estimated_time_label.localeCompare(b.estimated_time_label),
+      ),
+    [tasks],
   );
-
-  const resumen = useMemo(() => {
-    const r = { total: delDia.length, pendientes: 0, enProceso: 0, hechos: 0 };
-    for (const a of delDia) {
-      if (a.estado === "Pendiente") r.pendientes++;
-      else if (a.estado === "En proceso") r.enProceso++;
-      else if (a.estado === "Hecho") r.hechos++;
-    }
-    return r;
-  }, [delDia]);
-
-  const proximasFechas = useMemo(() => {
-    const set = new Set(aseos.map((a) => a.fecha));
-    return Array.from(set)
-      .filter((f) => f > fecha)
-      .sort()
-      .slice(0, 5);
-  }, [aseos, fecha]);
 
   return (
     <AdminShell>
-      <div>
-        <h1 className="font-display text-3xl tracking-wide sm:text-4xl">
-          ASEOS DEL DÍA
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-          Programa los aseos diarios, reparte el trabajo por loft y marca cuando
-          quede listo. Sencillo y sin complicaciones.
-        </p>
-      </div>
-
-      <AdminCard title="Programar un aseo">
-        <div className="grid gap-4 md:grid-cols-3">
-          <Field label="Fecha">
-            <input
-              type="date"
-              className={inputClass}
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-            />
-          </Field>
-          <Field label="Loft">
-            <select
-              className={inputClass}
-              value={loft}
-              onChange={(e) => setLoft(parseInt(e.target.value, 10))}
-            >
-              {TODOS_LOS_LOFTS.map((l) => (
-                <option key={l} value={l}>
-                  {l === 4 ? "Loft 4 (bodega)" : `Loft ${l}`}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Tipo de aseo">
-            <select
-              className={inputClass}
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value as AseoTipo)}
-            >
-              {TIPOS_ASEO.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Hora (opcional)">
-            <input
-              type="time"
-              className={inputClass}
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
-            />
-          </Field>
-          <Field label="Personal asignado">
-            <input
-              className={inputClass}
-              value={personal}
-              onChange={(e) => setPersonal(e.target.value)}
-              placeholder="Nombre de quien lo realiza"
-            />
-          </Field>
-          <Field label="Notas (opcional)">
-            <input
-              className={inputClass}
-              value={notas}
-              onChange={(e) => setNotas(e.target.value)}
-              placeholder="Ej: cambiar ropa de cama, hay mascota, etc."
-            />
-          </Field>
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={handleAgregar}
-            className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900"
-          >
-            Agregar al cronograma
-          </button>
-        </div>
-
-        {msg && (
-          <p className="mt-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300">
-            {msg}
-          </p>
-        )}
-      </AdminCard>
-
-      <AdminCard
-        title={`Cronograma del ${fecha || "día seleccionado"}`}
-        subtitle="Marca cada aseo como «En proceso» o «Hecho» para que todos vean el avance del día."
-      >
-        <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatChip label="Total" value={resumen.total} />
-          <StatChip
-            label="Pendientes"
-            value={resumen.pendientes}
-            color="amber"
-          />
-          <StatChip label="En proceso" value={resumen.enProceso} color="blue" />
-          <StatChip label="Hechos" value={resumen.hechos} color="green" />
-        </div>
-
-        {delDia.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            No hay aseos programados para este día. Agrega uno arriba.
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {delDia.map((a) => (
-              <li
-                key={a.id}
-                className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 ${
-                  a.estado === "Hecho"
-                    ? "border-emerald-500/30 bg-emerald-500/5"
-                    : a.estado === "En proceso"
-                      ? "border-sky-500/30 bg-sky-500/5"
-                      : "border-amber-500/30 bg-amber-500/5"
-                }`}
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="font-display text-3xl tracking-wide sm:text-4xl">
+              Operación de aseo
+            </h1>
+            <p className="mt-1 max-w-2xl text-sm text-zinc-600 dark:text-zinc-300">
+              Tareas generadas desde{" "}
+              <strong>reservas confirmadas</strong>: limpieza el día del check-out
+              y preparación el día del check-in.{" "}
+              <Link
+                href="/admin/reservas"
+                className="font-semibold text-amber-900 underline dark:text-amber-400"
               >
-                <div className="min-w-0">
-                  <p className="font-semibold">
-                    <span className="rounded-full bg-black/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-zinc-700 dark:bg-white/10 dark:text-zinc-200">
-                      {fmtHora(a.hora)}
-                    </span>{" "}
-                    · Loft {a.loft} · {a.tipo}
-                  </p>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-300">
-                    {a.personal}
-                    {a.notas ? ` — ${a.notas}` : ""}
-                  </p>
+                Ver calendario central
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+
+        {(msg || err) && (
+          <div
+            className={cn(
+              "rounded-xl border px-3 py-2 text-sm",
+              err
+                ? "border-red-500/40 bg-red-500/10 text-red-900 dark:text-red-100"
+                : "border-emerald-500/40 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100",
+            )}
+          >
+            {err || msg}
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2">
+          {TAB.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={cn(
+                "rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition",
+                tab === t
+                  ? "bg-zinc-900 text-white dark:bg-amber-500 dark:text-zinc-900"
+                  : "border border-black/10 bg-white/70 dark:border-white/10 dark:bg-zinc-900/60",
+              )}
+            >
+              {t === "lista"
+                ? "Tareas del día"
+                : t === "resumen"
+                  ? "Resumen"
+                  : "Tarifas aseo"}
+            </button>
+          ))}
+        </div>
+
+        {tab === "lista" && (
+          <>
+            <AdminCard
+              title="Resumen rápido"
+              subtitle={fecha}
+            >
+              {loading || !summary ? (
+                <p className="text-sm text-zinc-500">Cargando…</p>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <StatChip
+                    label="Limpiezas hoy"
+                    value={summary.today.cleaning}
+                    color="amber"
+                  />
+                  <StatChip
+                    label="Preparaciones hoy"
+                    value={summary.today.preparation}
+                    color="blue"
+                  />
+                  <StatChip
+                    label="Ingresos aseo hoy (programado)"
+                    value={fmtCop(summary.today.revenue_scheduled_cop)}
+                  />
+                  <StatChip
+                    label="Ingresos aseo hoy (hecho)"
+                    value={fmtCop(summary.today.revenue_done_cop)}
+                    color="green"
+                  />
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+              )}
+            </AdminCard>
+
+            <AdminCard title="Selector de fecha">
+              <input
+                type="date"
+                className={inputClass}
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+              />
+            </AdminCard>
+
+            <AdminCard title="Tarea manual (extra)">
+              <form
+                className="grid gap-3 md:grid-cols-2 lg:grid-cols-4"
+                onSubmit={(e) => void addManual(e)}
+              >
+                <Field label="Propiedad">
                   <select
-                    className={smallSelect}
-                    value={a.estado}
-                    onChange={(e) =>
-                      cambiarEstado(a.id, e.target.value as AseoEstado)
-                    }
+                    className={inputClass}
+                    required
+                    value={manualPid}
+                    onChange={(e) => setManualPid(e.target.value)}
                   >
-                    {ESTADOS_ASEO.map((e) => (
-                      <option key={e} value={e}>
-                        {e}
+                    <option value="">—</option>
+                    {properties.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
                       </option>
                     ))}
                   </select>
+                </Field>
+                <Field label="Fecha">
+                  <input
+                    type="date"
+                    className={inputClass}
+                    required
+                    value={manualDate}
+                    onChange={(e) => setManualDate(e.target.value)}
+                  />
+                </Field>
+                <Field label="Huéspedes (precio)">
+                  <input
+                    type="number"
+                    min={1}
+                    className={inputClass}
+                    value={manualGuests}
+                    onChange={(e) => setManualGuests(e.target.value)}
+                  />
+                </Field>
+                <Field label="Notas">
+                  <input
+                    className={inputClass}
+                    value={manualNotes}
+                    onChange={(e) => setManualNotes(e.target.value)}
+                    placeholder="Extra fuera de reserva…"
+                  />
+                </Field>
+                <div className="md:col-span-2 lg:col-span-4">
                   <button
-                    type="button"
-                    onClick={() => handleEliminar(a.id)}
-                    className="rounded-full border border-red-400/40 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-700 hover:bg-red-500/10 dark:text-red-300"
+                    type="submit"
+                    className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white dark:bg-[#f2f0eb] dark:text-zinc-900"
                   >
-                    Eliminar
+                    Crear tarea manual
                   </button>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </AdminCard>
+              </form>
+            </AdminCard>
 
-      {proximasFechas.length > 0 && (
-        <AdminCard title="Próximas fechas programadas">
-          <div className="flex flex-wrap gap-2">
-            {proximasFechas.map((f) => (
-              <button
-                type="button"
-                key={f}
-                onClick={() => setFecha(f)}
-                className="rounded-full border border-black/15 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-zinc-700 hover:bg-white dark:border-white/10 dark:bg-zinc-900/60 dark:text-zinc-200"
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-        </AdminCard>
-      )}
+            <AdminCard
+              title={`Checklist · ${fecha}`}
+              subtitle="Marca estado y asigna personal (supervisores)."
+            >
+              {loading ? (
+                <p className="text-sm text-zinc-500">Cargando tareas…</p>
+              ) : delDia.length === 0 ? (
+                <p className="text-sm text-zinc-500">
+                  No hay tareas para esta fecha. Las reservas confirmadas generan
+                  preparación y limpieza automáticamente.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {delDia.map((t) => (
+                    <li
+                      key={t.id}
+                      className={cn(
+                        "rounded-xl border p-4 dark:border-white/10",
+                        t.status === "done"
+                          ? "border-emerald-500/30 bg-emerald-500/5"
+                          : t.status === "in_progress"
+                            ? "border-sky-500/30 bg-sky-500/5"
+                            : "border-amber-500/25 bg-amber-500/5",
+                      )}
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-zinc-900 dark:text-zinc-50">
+                            {t.property_name ?? "—"} · {taskTypeLabel(t.type)}
+                          </p>
+                          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                            {t.estimated_time_label}
+                            {t.guest_name ? ` · ${t.guest_name}` : ""} · Fuente:{" "}
+                            {sourceLabel(t.source || "direct")} · {t.guests}{" "}
+                            huéspedes
+                          </p>
+                          {t.bed_setup_notes ? (
+                            <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
+                              Camas / prep: {t.bed_setup_notes}
+                            </p>
+                          ) : null}
+                          {t.notes ? (
+                            <p className="mt-1 text-xs text-zinc-500">{t.notes}</p>
+                          ) : null}
+                          <p className="mt-1 text-sm font-medium text-amber-900 dark:text-amber-300">
+                            {fmtCop(Number(t.cleaning_price ?? 0))}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                          <select
+                            className={smallSelect}
+                            value={t.status}
+                            onChange={(e) =>
+                              void patchTask(t.id, { status: e.target.value })
+                            }
+                          >
+                            <option value="pending">Pendiente</option>
+                            <option value="in_progress">En progreso</option>
+                            <option value="done">Hecho</option>
+                          </select>
+                          {isSupervisor ? (
+                            <select
+                              className={smallSelect}
+                              value={t.assigned_to ?? ""}
+                              onChange={(e) =>
+                                void patchTask(t.id, {
+                                  assigned_to: e.target.value || null,
+                                })
+                              }
+                            >
+                              <option value="">Sin asignar</option>
+                              {staff.map((s) => (
+                                <option key={s.id} value={s.id}>
+                                  {s.full_name || s.email || s.id.slice(0, 8)}
+                                </option>
+                              ))}
+                            </select>
+                          ) : null}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </AdminCard>
+          </>
+        )}
+
+        {tab === "resumen" && (
+          <AdminCard title="Resumen mensual y del día">
+            <div className="mb-4">
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                Fecha referencia
+              </label>
+              <input
+                type="date"
+                className={cn(inputClass, "mt-1 max-w-xs")}
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+              />
+            </div>
+            {loading || !summary ? (
+              <p className="text-sm text-zinc-500">Cargando…</p>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <StatChip
+                  label="Tareas programadas en el mes"
+                  value={summary.month_totals.task_count}
+                />
+                <StatChip
+                  label="Ingresos aseo mes (programado)"
+                  value={fmtCop(summary.month_totals.revenue_scheduled_cop)}
+                />
+                <StatChip
+                  label="Ingresos aseo mes (hechas)"
+                  value={fmtCop(summary.month_totals.revenue_done_cop)}
+                  color="green"
+                />
+              </div>
+            )}
+          </AdminCard>
+        )}
+
+        {tab === "tarifas" && (
+          <AdminCard
+            title="Presupuesto automático por tarea"
+            subtitle="Base en COP + extra por huésped por encima del umbral. Las reservas ya creadas conservan precio hasta regenerar (cron diario o sincronización)."
+          >
+            {!pricing ? (
+              <p className="text-sm text-zinc-500">Cargando…</p>
+            ) : isSupervisor ? (
+              <form className="grid max-w-lg gap-4" onSubmit={(e) => void savePricing(e)}>
+                <Field label="Valor base limpieza / preparación (COP)">
+                  <input
+                    type="number"
+                    className={inputClass}
+                    value={pricing.base_cop}
+                    onChange={(e) =>
+                      setPricing((p) =>
+                        p ? { ...p, base_cop: Number(e.target.value) } : p,
+                      )
+                    }
+                  />
+                </Field>
+                <Field label="Umbral de huéspedes (sin extra)">
+                  <input
+                    type="number"
+                    className={inputClass}
+                    value={pricing.guest_threshold}
+                    onChange={(e) =>
+                      setPricing((p) =>
+                        p ? { ...p, guest_threshold: Number(e.target.value) } : p,
+                      )
+                    }
+                  />
+                </Field>
+                <Field label="Extra por huésped adicional (COP)">
+                  <input
+                    type="number"
+                    className={inputClass}
+                    value={pricing.extra_per_guest_cop}
+                    onChange={(e) =>
+                      setPricing((p) =>
+                        p
+                          ? { ...p, extra_per_guest_cop: Number(e.target.value) }
+                          : p,
+                      )
+                    }
+                  />
+                </Field>
+                <button
+                  type="submit"
+                  className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white dark:bg-amber-500 dark:text-zinc-900"
+                >
+                  Guardar tarifas
+                </button>
+              </form>
+            ) : (
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Solo supervisores (admin) pueden editar tarifas. Valores actuales: base{" "}
+                {fmtCop(pricing.base_cop)}, umbral {pricing.guest_threshold}, extra{" "}
+                {fmtCop(pricing.extra_per_guest_cop)}.
+              </p>
+            )}
+          </AdminCard>
+        )}
+      </div>
     </AdminShell>
   );
 }
@@ -295,7 +592,7 @@ export default function AseosPage() {
 const inputClass =
   "w-full rounded-xl border border-black/10 bg-white/80 px-4 py-3 text-sm outline-none ring-amber-800/25 focus:ring-2 dark:border-white/10 dark:bg-zinc-900/70";
 const smallSelect =
-  "rounded-lg border border-black/10 bg-white/80 px-2 py-1.5 text-sm outline-none ring-amber-800/25 focus:ring-2 dark:border-white/10 dark:bg-zinc-900/70";
+  "rounded-lg border border-black/10 bg-white/80 px-2 py-2 text-sm outline-none dark:border-white/10 dark:bg-zinc-900/70";
 
 function Field({
   label,
@@ -330,9 +627,10 @@ function StatChip({
   };
   return (
     <div
-      className={`rounded-xl border border-black/10 px-3 py-2 text-sm dark:border-white/10 ${
-        color ? palette[color] : "bg-white/60 dark:bg-zinc-900/50"
-      }`}
+      className={cn(
+        "rounded-xl border border-black/10 px-3 py-2 text-sm dark:border-white/10",
+        color ? palette[color] : "bg-white/60 dark:bg-zinc-900/50",
+      )}
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em]">
         {label}

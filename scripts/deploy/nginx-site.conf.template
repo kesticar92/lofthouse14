@@ -1,0 +1,19 @@
+# Plantilla: copia a /etc/nginx/sites-available/lofthouse14
+# Reemplaza SERVER_NAME por tu dominio o por la IP pública (solo HTTP).
+
+server {
+  listen 80;
+  listen [::]:80;
+  server_name SERVER_NAME;
+
+  location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_cache_bypass $http_upgrade;
+  }
+}

@@ -68,29 +68,30 @@ async function createFolder(parentId: string, name: string): Promise<string> {
   return id;
 }
 
-/** Asegura cadena: Gastos / AAAA / MM / expenseId bajo la carpeta raíz del .env */
+/** Asegura/crea la carpeta `AAAA-MM` bajo la carpeta raíz del .env, replicando
+ *  el formato manual que ya usa el equipo en Drive. Los archivos quedan planos
+ *  dentro de la carpeta del mes; la identificación de cada gasto va en el
+ *  filename (ver `buildDriveFilename` en upload-expense-file.ts).
+ *
+ *  El parámetro `expenseId` ya no participa en la jerarquía, se mantiene en la
+ *  firma solo para compatibilidad con llamadas existentes (retry, etc.). */
 export async function ensureExpenseDriveFolderPath(
   expenseDateISO: string,
-  expenseId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _expenseId?: string,
 ): Promise<string> {
   const rootId = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID?.trim();
   if (!rootId) throw new Error("Falta GOOGLE_DRIVE_ROOT_FOLDER_ID");
 
   const d = expenseDateISO.slice(0, 10);
-  const year = d.slice(0, 4);
-  const month = d.slice(5, 7);
-  const segments = ["Gastos", year, month, expenseId];
-
-  let parent = rootId;
-  for (const name of segments) {
-    const existing = await findChildFolderId(parent, name);
-    if (existing) {
-      parent = existing;
-      continue;
-    }
-    parent = await createFolder(parent, name);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    throw new Error(`Fecha de gasto inválida: ${expenseDateISO}`);
   }
-  return parent;
+  const monthFolder = d.slice(0, 7); // YYYY-MM
+
+  const existing = await findChildFolderId(rootId, monthFolder);
+  if (existing) return existing;
+  return createFolder(rootId, monthFolder);
 }
 
 export type DriveUploadResult = {

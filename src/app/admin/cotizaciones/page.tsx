@@ -18,6 +18,10 @@ import {
   type CotizacionGuardada,
 } from "@/lib/cotizaciones-store";
 import { site, waLink } from "@/lib/site";
+import {
+  PrintableQuote,
+  generarFolio,
+} from "@/components/admin/printable-quote";
 
 function todayISO() {
   const d = new Date();
@@ -42,7 +46,9 @@ function newId() {
 export default function CotizacionesPage() {
   const [config, setConfig] = useState<PricingConfig>(DEFAULT_PRICING);
   const [cliente, setCliente] = useState("");
+  const [documento, setDocumento] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [emailCliente, setEmailCliente] = useState("");
   const [observaciones, setObservaciones] = useState("");
   const [ingreso, setIngreso] = useState<string>("");
   const [salida, setSalida] = useState<string>("");
@@ -50,6 +56,8 @@ export default function CotizacionesPage() {
   const [lofts, setLofts] = useState<number>(1);
   const [saved, setSaved] = useState<CotizacionGuardada[]>([]);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
+  const [printFolio, setPrintFolio] = useState<string>("");
+  const [printEmision, setPrintEmision] = useState<string>("");
 
   useEffect(() => {
     setConfig(getPricingConfig(DEFAULT_PRICING));
@@ -85,7 +93,9 @@ export default function CotizacionesPage() {
       id: newId(),
       creadaEn: new Date().toISOString(),
       cliente: cliente.trim() || "Sin nombre",
+      documento: documento.trim(),
       telefono: telefono.trim(),
+      email: emailCliente.trim(),
       observaciones: observaciones.trim(),
       input,
       config,
@@ -144,7 +154,13 @@ export default function CotizacionesPage() {
   }
 
   function handlePrint() {
-    window.print();
+    if (!result.ok) return;
+    const now = new Date();
+    setPrintFolio(generarFolio(now));
+    setPrintEmision(now.toISOString());
+    requestAnimationFrame(() => {
+      window.print();
+    });
   }
 
   function handleCopy() {
@@ -158,7 +174,9 @@ export default function CotizacionesPage() {
 
   function loadCotizacion(c: CotizacionGuardada) {
     setCliente(c.cliente);
+    setDocumento(c.documento ?? "");
     setTelefono(c.telefono);
+    setEmailCliente(c.email ?? "");
     setObservaciones(c.observaciones);
     setIngreso(c.input.checkIn);
     setSalida(c.input.checkOut);
@@ -176,8 +194,8 @@ export default function CotizacionesPage() {
             COTIZADOR
           </h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-            Calcula el precio exacto de una reserva. La lógica replica la
-            Calculadora de Tarifas de LOFTHOUSE 14.
+            Calcula el precio exacto de una reserva directa. Genera una
+            cotización formal en PDF con los datos legales del establecimiento.
           </p>
         </div>
       </div>
@@ -191,9 +209,20 @@ export default function CotizacionesPage() {
                   className={inputClass}
                   value={cliente}
                   onChange={(e) => setCliente(e.target.value)}
-                  placeholder="Nombre completo"
+                  placeholder="Nombre completo o razón social"
                 />
               </Field>
+              <Field label="Documento (CC / NIT / Pasaporte)">
+                <input
+                  className={inputClass}
+                  value={documento}
+                  onChange={(e) => setDocumento(e.target.value)}
+                  placeholder="Ej: CC 1234567890"
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Teléfono (opcional)">
                 <input
                   className={inputClass}
@@ -201,6 +230,16 @@ export default function CotizacionesPage() {
                   onChange={(e) => setTelefono(e.target.value)}
                   placeholder="Ej: 3001234567"
                   inputMode="tel"
+                />
+              </Field>
+              <Field label="Correo (opcional)">
+                <input
+                  className={inputClass}
+                  type="email"
+                  value={emailCliente}
+                  onChange={(e) => setEmailCliente(e.target.value)}
+                  placeholder="cliente@correo.com"
+                  inputMode="email"
                 />
               </Field>
             </div>
@@ -252,7 +291,7 @@ export default function CotizacionesPage() {
                 className={`${inputClass} min-h-[80px]`}
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
-                placeholder="Preferencias, medio de pago, origen (Airbnb / Booking / Directo), etc."
+                placeholder="Preferencias, anticipo recibido, requerimientos especiales, etc."
               />
             </Field>
           </div>
@@ -292,12 +331,6 @@ export default function CotizacionesPage() {
                 <Line label="TOTAL RESERVA" strong>
                   {formatCOP(result.totalReserva)}
                 </Line>
-                <Line
-                  label={`Total si aplica Airbnb (+${(config.comisionAirbnb * 100).toFixed(0)}%)`}
-                  muted
-                >
-                  {formatCOP(result.totalConComisionAirbnb)}
-                </Line>
               </dl>
 
               <div className="flex flex-wrap gap-2">
@@ -325,9 +358,9 @@ export default function CotizacionesPage() {
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="rounded-full border border-black/15 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-800 hover:bg-white dark:border-white/10 dark:bg-zinc-900/60 dark:text-zinc-100"
+                  className="rounded-full border border-amber-700/40 bg-amber-50 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-900 hover:bg-amber-100 dark:border-amber-400/40 dark:bg-amber-400/10 dark:text-amber-300"
                 >
-                  Imprimir / PDF
+                  Generar PDF
                 </button>
               </div>
               {savedMsg && (
@@ -427,11 +460,6 @@ export default function CotizacionesPage() {
             value={config.descuentoMensual}
             onChange={(v) => handleConfigChange("descuentoMensual", v)}
           />
-          <PercentField
-            label="Comisión Airbnb (opcional)"
-            value={config.comisionAirbnb}
-            onChange={(v) => handleConfigChange("comisionAirbnb", v)}
-          />
         </div>
         <button
           type="button"
@@ -492,6 +520,28 @@ export default function CotizacionesPage() {
           </ul>
         )}
       </AdminCard>
+
+      {/* Versión imprimible (PDF). Oculta en pantalla, visible solo al imprimir. */}
+      {result.ok && printFolio && (
+        <PrintableQuote
+          folio={printFolio}
+          emisionISO={printEmision}
+          cliente={{
+            nombre: cliente.trim() || "Sin nombre",
+            documento: documento.trim(),
+            telefono: telefono.trim(),
+            email: emailCliente.trim() || undefined,
+          }}
+          estadia={{
+            checkIn: ingreso,
+            checkOut: salida,
+            huespedes,
+            lofts,
+          }}
+          result={result}
+          observaciones={observaciones.trim() || undefined}
+        />
+      )}
     </AdminShell>
   );
 }

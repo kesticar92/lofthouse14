@@ -24,7 +24,45 @@ export const site = {
   mapQuery: "Carrera 26 2-91, Miraflores, Cali, Valle del Cauca, Colombia",
   checkIn: "Desde las 3:00 PM",
   checkOut: "Hasta las 11:00 AM",
+  checkInTime: "15:00",
+  checkOutTime: "11:00",
   priceFromCop: 80_000,
+  /**
+   * Datos legales del establecimiento para documentos formales (cotizaciones,
+   * facturas/comprobantes). EDITAR antes de emitir el primer documento real.
+   */
+  legal: {
+    razonSocial:
+      process.env.NEXT_PUBLIC_LEGAL_RAZON_SOCIAL ||
+      "Kevin Stiven Cardoso Echeverri",
+    nit: process.env.NEXT_PUBLIC_LEGAL_NIT || "1.151.947.292-8",
+    regimen: "Régimen Simple de Tributación / Reserva ocasional",
+    moneda: "COP",
+    monedaNombre: "Pesos colombianos",
+    vigenciaDias: 7,
+    metodosPago: [
+      "Transferencia bancaria",
+      "Nequi",
+      "Daviplata",
+      "Efectivo (coordinado previamente)",
+    ],
+    amenitiesIncluidos: [
+      "Wi-Fi de alta velocidad",
+      "Acceso autónomo (cerradura digital)",
+      "Limpieza completa al ingreso",
+      "Agua, luz y servicios públicos",
+      "Soporte por WhatsApp 24/7",
+    ],
+    politicaCancelacion: [
+      "Más de 7 días antes del check-in: reembolso del 80% del anticipo.",
+      "Entre 3 y 7 días antes: reembolso del 50% del anticipo.",
+      "Menos de 72 horas o no presentación: sin reembolso del anticipo.",
+    ],
+    politicaPago:
+      "Anticipo del 50% para confirmar la reserva. Saldo restante el día del check-in antes del ingreso.",
+    avisoImpuestos:
+      "Tarifas finales en pesos colombianos (COP). El servicio de alojamiento ocasional no genera IVA bajo el régimen aplicable.",
+  },
   gallery: [
     "/gallery/loft-01.jpg",
     "/gallery/loft-02.jpg",

@@ -14,6 +14,8 @@ type NavItem = {
   label: string;
   icon: React.ReactNode;
   desc: string;
+  module?: string; // undefined = siempre visible
+  adminOnly?: boolean; // solo admin/super_admin
 };
 
 export const ADMIN_NAV: NavItem[] = [
@@ -31,6 +33,7 @@ export const ADMIN_NAV: NavItem[] = [
   {
     href: "/admin/cotizaciones",
     label: "Cotizaciones",
+    module: "cotizaciones",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M12 3v18" />
@@ -42,6 +45,7 @@ export const ADMIN_NAV: NavItem[] = [
   {
     href: "/admin/inventario",
     label: "Inventario",
+    module: "inventario",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <rect x="4" y="4" width="16" height="16" rx="2" />
@@ -53,6 +57,7 @@ export const ADMIN_NAV: NavItem[] = [
   {
     href: "/admin/reservas",
     label: "Reservas",
+    module: "reservas",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -64,6 +69,7 @@ export const ADMIN_NAV: NavItem[] = [
   {
     href: "/admin/gastos",
     label: "Gastos",
+    module: "gastos",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M4 7h16v10H4z" />
@@ -76,12 +82,28 @@ export const ADMIN_NAV: NavItem[] = [
   {
     href: "/admin/aseos",
     label: "Aseos del día",
+    module: "aseos",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3 6.3 17.7" />
       </svg>
     ),
     desc: "Limpieza y preparación desde reservas",
+  },
+  {
+    href: "/admin/usuarios",
+    label: "Usuarios",
+    module: "usuarios",
+    adminOnly: true,
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <circle cx="9" cy="7" r="4" />
+        <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        <path d="M21 21v-2a4 4 0 0 0-3-3.87" />
+      </svg>
+    ),
+    desc: "Gestión de accesos y permisos",
   },
 ];
 
@@ -91,6 +113,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<string>("");
   const [role, setRole] = useState<string>("");
+  const [allowedModules, setAllowedModules] = useState<string[]>([]);
   const [openMenu, setOpenMenu] = useState(false);
 
   useEffect(() => {
@@ -104,12 +127,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       }
       setUser(session.user);
       setRole(session.role);
+      setAllowedModules(session.allowedModules);
       setReady(true);
     })();
     return () => {
       cancelled = true;
     };
   }, [router, pathname]);
+
+  const visibleNav = ADMIN_NAV.filter((n) => {
+    if (!n.module) return true; // inicio: siempre visible
+    return allowedModules.includes(n.module);
+  });
 
   if (!ready) {
     return (
@@ -186,7 +215,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           )}
         >
           <nav className="flex flex-col gap-1 lg:sticky lg:top-[88px]">
-            {ADMIN_NAV.map((n) => {
+            {visibleNav.map((n) => {
               const active =
                 pathname === n.href ||
                 (n.href !== "/admin" && pathname?.startsWith(n.href));

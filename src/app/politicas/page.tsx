@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: `Políticas — ${site.name}`,
   description:
     "Conoce nuestras políticas de reservas, tratamiento de datos, anticipos, cancelaciones y normas del alojamiento.",
+  alternates: { canonical: "/politicas" },
 };
 
 const sections = [

@@ -3,9 +3,14 @@ import { isStaffRole } from "@/lib/supabase/env";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { User } from "@supabase/supabase-js";
 
+export type StaffProfile = {
+  role: string;
+};
+
 export type StaffContext = {
   supabase: SupabaseClient;
   user: User;
+  profile: StaffProfile;
 };
 
 export async function requireStaff(): Promise<
@@ -33,5 +38,5 @@ export async function requireStaff(): Promise<
       response: Response.json({ error: "Prohibido" }, { status: 403 }),
     };
   }
-  return { ok: true, ctx: { supabase, user } };
+  return { ok: true, ctx: { supabase, user, profile: { role: profile!.role as string } } };
 }

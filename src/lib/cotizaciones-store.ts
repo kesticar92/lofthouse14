@@ -7,7 +7,12 @@ export type CotizacionGuardada = {
   id: string;
   creadaEn: string; // ISO datetime
   cliente: string;
+  /** Documento de identidad o NIT del cliente. Opcional para compatibilidad
+   * con cotizaciones guardadas antes de exigirlo. */
+  documento?: string;
   telefono: string;
+  /** Correo del cliente (opcional). */
+  email?: string;
   observaciones: string;
   input: QuoteInput;
   config: PricingConfig;

@@ -36,6 +36,9 @@ export type ReservationRow = {
   /** Presente tras migración `006_reservations_referral` */
   referrer_name?: string;
   commission_amount?: number | null;
+  /** Presente tras migración `010_ical_source_link`. NULL si la reserva no
+   *  proviene de un iCal (reserva manual o legacy sin vínculo). */
+  ical_source_id?: string | null;
   created_at: string;
   updated_at: string;
 };

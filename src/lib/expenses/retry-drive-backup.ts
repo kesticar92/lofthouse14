@@ -4,7 +4,7 @@ import {
   isGoogleDriveConfigured,
   uploadBufferToGoogleDrive,
 } from "@/lib/expenses/google-drive-backup";
-import { sanitizeExpenseFilename } from "@/lib/expenses/upload-expense-file";
+import { buildDriveFilename } from "@/lib/expenses/upload-expense-file";
 
 export async function retryDriveBackupForExpenseFile(
   admin: SupabaseClient,
@@ -56,13 +56,12 @@ export async function retryDriveBackupForExpenseFile(
 
   try {
     const expenseId = row.expense_id as string;
-    const folderId = await ensureExpenseDriveFolderPath(
-      expenseDate,
+    const folderId = await ensureExpenseDriveFolderPath(expenseDate);
+    const name = buildDriveFilename({
+      expenseDateISO: expenseDate,
       expenseId,
-    );
-    const name = sanitizeExpenseFilename(
-      (row.original_filename as string) || "archivo",
-    );
+      originalFilename: (row.original_filename as string) || "archivo",
+    });
     const mime = (row.mime_type as string) || "application/octet-stream";
     const up = await uploadBufferToGoogleDrive({
       parentFolderId: folderId,

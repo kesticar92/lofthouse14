@@ -80,12 +80,12 @@ export const CATALOGO_LOFT: InventoryItem[] = [
   },
   {
     orden: 14,
-    zona: "Tragaluz (2º nivel)",
+    zona: "Escaleras y tragaluz",
     item: "Acrílicos / cerramiento del tragaluz: limpios, sin grietas",
   },
   {
     orden: 15,
-    zona: "Tragaluz (2º nivel)",
+    zona: "Escaleras y tragaluz",
     item: "Marco / sellos del tragaluz: sin goteras ni filtraciones",
   },
   {
@@ -163,11 +163,19 @@ export const CATALOGO_LOFT: InventoryItem[] = [
     zona: "Dormitorio (2º nivel)",
     item: "Paredes y pintura (dormitorio 2º)",
   },
-  { orden: 40, zona: "Escaleras", item: "Pasamanos / barandas: firmes" },
-  { orden: 41, zona: "Escaleras", item: "Escalones: huellas y bordes" },
+  {
+    orden: 40,
+    zona: "Escaleras y tragaluz",
+    item: "Pasamanos / barandas: firmes",
+  },
+  {
+    orden: 41,
+    zona: "Escaleras y tragaluz",
+    item: "Escalones: huellas y bordes",
+  },
   {
     orden: 42,
-    zona: "Escaleras",
+    zona: "Escaleras y tragaluz",
     item: "Paredes y pintura (hueco de escaleras)",
   },
   {

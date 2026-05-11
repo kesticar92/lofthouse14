@@ -12,6 +12,23 @@ export function sanitizeExpenseFilename(name: string): string {
   return (cleaned || "archivo").slice(0, 200);
 }
 
+/** Construye el nombre del archivo en Drive bajo la carpeta `AAAA-MM`.
+ *  Formato: `YYYY-MM-DD_{shortId}_{archivo_saneado}` para que dentro de la
+ *  misma carpeta del mes los archivos:
+ *    - se ordenen cronológicamente por fecha de gasto,
+ *    - sean trazables al gasto en BD (shortId = primeros 8 chars del UUID),
+ *    - conserven el nombre original que subió el usuario. */
+export function buildDriveFilename(opts: {
+  expenseDateISO: string;
+  expenseId: string;
+  originalFilename: string;
+}): string {
+  const date = opts.expenseDateISO.slice(0, 10);
+  const shortId = opts.expenseId.replace(/-/g, "").slice(0, 8);
+  const safe = sanitizeExpenseFilename(opts.originalFilename);
+  return `${date}_${shortId}_${safe}`.slice(0, 240);
+}
+
 export type UploadExpenseFileResult = {
   storage_path: string;
   supabase_url: string | null;
@@ -22,8 +39,13 @@ export type UploadExpenseFileResult = {
 };
 
 /**
- * 1) Subida a Supabase Storage (ruta expenses/AAAA/MM/{expense_id}/…)
- * 2) Backup en Google Drive (no bloquea si falla: status failed + mensaje)
+ * 1) Subida a Supabase Storage (ruta `expenses/AAAA/MM/{expense_id}/…`) —
+ *    backup interno, ordenado en subcarpetas para facilitar la auditoría.
+ * 2) Backup en Google Drive: una sola carpeta `AAAA-MM` plana bajo la raíz
+ *    configurada, con filename `YYYY-MM-DD_{shortId}_{archivo}` para que el
+ *    equipo pueda revisarlas tal como ya lo hace manualmente. No bloquea si
+ *    falla: marca `drive_backup_status = failed` y guarda el motivo para
+ *    reintentar luego (cron `/api/cron/expense-drive-retry`).
  */
 export async function uploadExpenseFile(opts: {
   supabase: SupabaseClient;
@@ -68,13 +90,15 @@ export async function uploadExpenseFile(opts: {
   }
 
   try {
-    const folderId = await ensureExpenseDriveFolderPath(
-      opts.expenseDateISO,
-      opts.expenseId,
-    );
+    const folderId = await ensureExpenseDriveFolderPath(opts.expenseDateISO);
+    const driveName = buildDriveFilename({
+      expenseDateISO: opts.expenseDateISO,
+      expenseId: opts.expenseId,
+      originalFilename: opts.originalFilename,
+    });
     const up = await uploadBufferToGoogleDrive({
       parentFolderId: folderId,
-      filename: safe,
+      filename: driveName,
       mimeType: opts.mimeType || "application/octet-stream",
       buffer: opts.buffer,
     });

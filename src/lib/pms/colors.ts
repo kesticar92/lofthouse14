@@ -1,11 +1,14 @@
 import type { ReservationSource } from "@/lib/pms/types";
 
-/** Colores timeline (origen OTA / directa / bloqueo). */
+/** Colores timeline (origen OTA / directa / bloqueo).
+ *  Las OTA conservan su color aun cuando el `status` sea `blocked`: muchos
+ *  feeds iCal (caso Airbnb "Not available") clasifican como bloqueo lo que en
+ *  realidad es una reserva confirmada sin datos del huésped. Pintarla del
+ *  color de la OTA permite distinguirla a simple vista de un bloqueo manual.
+ *  Solo cuando el `source` no es una OTA reconocida y el `status` es
+ *  `blocked`, usamos el gris zinc. */
 export function reservationBarClasses(source: string, status: string): string {
   const s = source.toLowerCase();
-  if (status === "blocked") {
-    return "bg-zinc-500/90 text-white ring-1 ring-zinc-700/30";
-  }
   if (s === "booking" || s === "booking.com") {
     return "bg-sky-600/90 text-white ring-1 ring-sky-900/20";
   }
@@ -23,6 +26,9 @@ export function reservationBarClasses(source: string, status: string): string {
   }
   if (s === "direct" || s === "manual") {
     return "bg-emerald-600/90 text-white ring-1 ring-emerald-900/20";
+  }
+  if (status === "blocked") {
+    return "bg-zinc-500/90 text-white ring-1 ring-zinc-700/30";
   }
   return "bg-zinc-400/90 text-white ring-1 ring-zinc-700/20";
 }

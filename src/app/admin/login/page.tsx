@@ -20,11 +20,13 @@ function LoginForm() {
   useEffect(() => {
     const q = searchParams.get("error");
     if (q === "no_profile") {
-      setError(
-        "Tu cuenta no tiene perfil de staff o el rol no está autorizado. Pide a un super admin que revise Supabase (tabla profiles).",
-      );
+      setError("Tu cuenta no tiene perfil de staff válido. Contacta al administrador.");
     } else if (q === "no_access") {
       setError("No tienes acceso al panel con esta cuenta.");
+    } else if (q === "pending_approval") {
+      setError("Tu cuenta está pendiente de aprobación. Un administrador debe activar tu acceso y asignarte los módulos correspondientes.");
+    } else if (q === "suspended") {
+      setError("Tu cuenta ha sido suspendida. Contacta al administrador.");
     }
   }, [searchParams]);
 
@@ -56,9 +58,15 @@ function LoginForm() {
         return;
       }
       if (result === "no_profile") {
-        setError(
-          "Tu usuario no tiene un rol válido en el panel. Ejecuta la migración SQL en Supabase y asigna rol staff/super_admin en la tabla profiles.",
-        );
+        setError("Tu usuario no tiene un rol válido. Contacta al administrador.");
+        return;
+      }
+      if (result === "pending_approval") {
+        setError("Tu cuenta está pendiente de aprobación por un administrador.");
+        return;
+      }
+      if (result === "suspended") {
+        setError("Tu cuenta ha sido suspendida. Contacta al administrador.");
         return;
       }
       if (result === "network") {
@@ -69,7 +77,7 @@ function LoginForm() {
       }
       if (result === "server") {
         setError(
-          "No se pudo iniciar sesión. Revisa el proyecto Supabase y que el email/contraseña estén habilitados (Authentication → Providers).",
+          "Error de servidor. Abre DevTools (F12) → Consola para ver el error exacto de Supabase.",
         );
         return;
       }
@@ -161,13 +169,19 @@ function LoginForm() {
           </button>
         </form>
 
-        <p className="mt-6 text-xs text-zinc-500 dark:text-zinc-400">
-          ¿Problemas de acceso? Contacta a un super admin.{" "}
-          <Link href="/" className="underline hover:text-amber-800">
-            Volver a la página principal
-          </Link>
-          .
-        </p>
+        <div className="mt-6 space-y-2 text-xs text-zinc-500 dark:text-zinc-400">
+          <p>
+            ¿Eres nuevo en el equipo?{" "}
+            <Link href="/admin/registro" className="font-semibold text-amber-800 underline hover:text-amber-900 dark:text-amber-400">
+              Solicitar acceso
+            </Link>
+          </p>
+          <p>
+            <Link href="/" className="underline hover:text-amber-800">
+              Volver a la página principal
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

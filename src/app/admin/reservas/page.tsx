@@ -8,6 +8,7 @@ import {
 import { PmsCalendarHub } from "@/components/admin/pms/pms-calendar-hub";
 import { ReservationsTimeline } from "@/components/admin/pms/reservations-timeline";
 import { usePmsModule } from "@/hooks/usePms";
+import { fetchAdminSession } from "@/lib/auth-client";
 import { addDays, parseISODate, toISODateString } from "@/lib/pms/date-range";
 import { cn } from "@/lib/cn";
 
@@ -26,6 +27,15 @@ export default function AdminReservasPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    fetchAdminSession().then((s) => {
+      if (s && (s.role === "super_admin" || s.role === "admin")) {
+        setIsSuperAdmin(true);
+      }
+    });
+  }, []);
 
   const [showRes, setShowRes] = useState(false);
   const [showBlock, setShowBlock] = useState(false);
@@ -228,7 +238,9 @@ export default function AdminReservasPage() {
       setErr(er);
       return { ok: false, error: er };
     }
-    setMsg("Enlace iCal eliminado.");
+    setMsg(
+      "Enlace iCal eliminado. Las reservas importadas desde él también se borraron del calendario.",
+    );
     await pms.refresh();
     return { ok: true };
   }
@@ -252,6 +264,59 @@ export default function AdminReservasPage() {
     }
     setMsg("Token de exportación regenerado.");
     await pms.refresh();
+  }
+
+  async function addProperty(name: string): Promise<{ ok: boolean; error?: string }> {
+    setBusy(true);
+    setErr(null);
+    const r = await postJson("/api/admin/pms/properties", { name });
+    setBusy(false);
+    if (!r.ok) { setErr(r.error ?? "Error"); return { ok: false, error: r.error }; }
+    setMsg(`Anuncio "${name}" creado.`);
+    await pms.refresh();
+    return { ok: true };
+  }
+
+  async function renameProperty(id: string, name: string): Promise<{ ok: boolean; error?: string }> {
+    setBusy(true);
+    setErr(null);
+    const res = await fetch("/api/admin/pms/properties", {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, name }),
+    });
+    setBusy(false);
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const e = (j as { error?: string }).error ?? res.statusText;
+      setErr(e);
+      return { ok: false, error: e };
+    }
+    setMsg("Anuncio renombrado.");
+    await pms.refresh();
+    return { ok: true };
+  }
+
+  async function deleteProperty(id: string): Promise<{ ok: boolean; error?: string }> {
+    setBusy(true);
+    setErr(null);
+    const res = await fetch(`/api/admin/pms/properties?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    setBusy(false);
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const e = (j as { error?: string }).error ?? res.statusText;
+      setErr(e);
+      return { ok: false, error: e };
+    }
+    setMsg(
+      "Anuncio eliminado. También se borraron sus reservas, enlaces iCal, bloqueos y tareas de aseo asociadas.",
+    );
+    await pms.refresh();
+    return { ok: true };
   }
 
   async function submitReservation(e: React.FormEvent) {
@@ -380,21 +445,24 @@ export default function AdminReservasPage() {
             <PmsCalendarHub
               properties={pms.properties}
               sources={pms.icalSources}
+              reservations={pms.reservations}
               selectedPropertyId={selectedPropertyId}
               onSelectPropertyId={setSelectedPropertyId}
               exportUrl={exportUrl}
               busy={busy}
+              isSuperAdmin={isSuperAdmin}
               onSyncAll={() => void syncNow()}
               onAddImportUrl={addImportUrl}
               onSyncOneSource={syncOneSource}
               onDeleteSource={deleteSource}
               onCopyExport={() => void copyExport()}
               onOpenExport={() => {
-                if (exportUrl) {
-                  window.open(exportUrl, "_blank", "noopener,noreferrer");
-                }
+                if (exportUrl) window.open(exportUrl, "_blank", "noopener,noreferrer");
               }}
               onRegenerateToken={() => void regenerateToken()}
+              onAddProperty={addProperty}
+              onRenameProperty={renameProperty}
+              onDeleteProperty={deleteProperty}
             />
           )}
         </AdminCard>

@@ -17,7 +17,13 @@ import {
   eliminarInventario,
   type InventarioGuardado,
   type InventarioItemResultado,
+  type FotoEvidencia,
 } from "@/lib/inventarios-store";
+import { compressImage, formatBytes } from "@/lib/compress-image";
+import {
+  PrintableInventory,
+} from "@/components/admin/printable-inventory";
+import { generarFolio } from "@/components/admin/printable-quote";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -40,8 +46,15 @@ function buildEmpty(loft: number): InventarioItemResultado[] {
       funciona: noAplica ? "No aplica" : "",
       detalles: "",
       requiereAtencion: false,
+      fotos: [],
     };
   });
+}
+
+function newFotoId() {
+  return (
+    "f_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
+  );
 }
 
 export default function InventarioPage() {
@@ -53,6 +66,9 @@ export default function InventarioPage() {
   const [guardados, setGuardados] = useState<InventarioGuardado[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
   const [filtroZona, setFiltroZona] = useState<string>("Todas");
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const [printFolio, setPrintFolio] = useState<string>("");
+  const [printEmision, setPrintEmision] = useState<string>("");
 
   useEffect(() => {
     setFecha(todayISO());
@@ -157,6 +173,70 @@ export default function InventarioPage() {
     setFecha(todayISO());
   }
 
+  async function handleAddFoto(idx: number, file: File) {
+    setUploadingIdx(idx);
+    try {
+      const { dataUrl, bytes } = await compressImage(file, {
+        maxDimension: 1280,
+        quality: 0.7,
+      });
+      const foto: FotoEvidencia = {
+        id: newFotoId(),
+        dataUrl,
+        bytes,
+        creadaEn: new Date().toISOString(),
+      };
+      setItems((prev) => {
+        const next = [...prev];
+        const cur = next[idx];
+        next[idx] = { ...cur, fotos: [...(cur.fotos ?? []), foto] };
+        return next;
+      });
+    } catch (e) {
+      console.error("[inventario] error subiendo foto:", e);
+      setMsg("No se pudo procesar la imagen. Intenta con otra foto.");
+      setTimeout(() => setMsg(null), 3500);
+    } finally {
+      setUploadingIdx(null);
+    }
+  }
+
+  function handleRemoveFoto(idx: number, fotoId: string) {
+    setItems((prev) => {
+      const next = [...prev];
+      const cur = next[idx];
+      next[idx] = {
+        ...cur,
+        fotos: (cur.fotos ?? []).filter((f) => f.id !== fotoId),
+      };
+      return next;
+    });
+  }
+
+  function handleCaptionFoto(idx: number, fotoId: string, caption: string) {
+    setItems((prev) => {
+      const next = [...prev];
+      const cur = next[idx];
+      next[idx] = {
+        ...cur,
+        fotos: (cur.fotos ?? []).map((f) =>
+          f.id === fotoId ? { ...f, caption } : f,
+        ),
+      };
+      return next;
+    });
+  }
+
+  function handleGenerarPDF() {
+    if (items.length === 0) return;
+    const now = new Date();
+    setPrintFolio(generarFolio(now));
+    setPrintEmision(now.toISOString());
+    requestAnimationFrame(() => {
+      window.print();
+    });
+  }
+
   return (
     <AdminShell>
       <div>
@@ -186,6 +266,13 @@ export default function InventarioPage() {
               className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900"
             >
               Guardar inventario
+            </button>
+            <button
+              type="button"
+              onClick={handleGenerarPDF}
+              className="rounded-full border border-amber-700/40 bg-amber-50 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-900 hover:bg-amber-100 dark:border-amber-400/40 dark:bg-amber-400/10 dark:text-amber-300"
+            >
+              Generar PDF
             </button>
           </div>
         }
@@ -272,75 +359,21 @@ export default function InventarioPage() {
             <tbody className="divide-y divide-black/5 dark:divide-white/5">
               {visibleIndices.map((idx) => {
                 const it = items[idx];
+                const fotos = it.fotos ?? [];
                 return (
-                  <tr
+                  <ItemRow
                     key={idx}
-                    className={
-                      it.requiereAtencion
-                        ? "bg-red-500/5"
-                        : it.estado === "No aplica"
-                          ? "opacity-60"
-                          : ""
+                    idx={idx}
+                    it={it}
+                    fotos={fotos}
+                    uploading={uploadingIdx === idx}
+                    onChange={(patch) => setItem(idx, patch)}
+                    onAddFoto={(file) => handleAddFoto(idx, file)}
+                    onRemoveFoto={(fotoId) => handleRemoveFoto(idx, fotoId)}
+                    onCaptionFoto={(fotoId, caption) =>
+                      handleCaptionFoto(idx, fotoId, caption)
                     }
-                  >
-                    <td className="px-2 py-2 align-top text-zinc-500">
-                      {it.orden}
-                    </td>
-                    <td className="px-2 py-2 align-top">
-                      <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] dark:bg-white/10">
-                        {it.zona}
-                      </span>
-                    </td>
-                    <td className="px-2 py-2 align-top font-medium">
-                      {it.item}
-                    </td>
-                    <td className="px-2 py-2 align-top">
-                      <select
-                        className={smallSelect}
-                        value={it.estado}
-                        onChange={(e) =>
-                          setItem(idx, { estado: e.target.value as EstadoItem })
-                        }
-                      >
-                        <option value="">—</option>
-                        {ESTADOS.map((o) => (
-                          <option key={o} value={o}>
-                            {o}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="px-2 py-2 align-top">
-                      <select
-                        className={smallSelect}
-                        value={it.funciona}
-                        onChange={(e) =>
-                          setItem(idx, { funciona: e.target.value as Funciona })
-                        }
-                      >
-                        <option value="">—</option>
-                        {FUNCIONA_OPCIONES.map((o) => (
-                          <option key={o} value={o}>
-                            {o}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="px-2 py-2 align-top">
-                      <input
-                        className={smallInput}
-                        value={it.detalles}
-                        onChange={(e) =>
-                          setItem(idx, { detalles: e.target.value })
-                        }
-                        placeholder={
-                          /observaciones/i.test(it.item)
-                            ? "Notas libres"
-                            : "Novedad (opcional)"
-                        }
-                      />
-                    </td>
-                  </tr>
+                  />
                 );
               })}
             </tbody>
@@ -400,7 +433,186 @@ export default function InventarioPage() {
           </ul>
         )}
       </AdminCard>
+
+      {/* Reporte imprimible (PDF). Oculto en pantalla, visible al imprimir. */}
+      {printFolio && items.length > 0 && (
+        <PrintableInventory
+          folio={printFolio}
+          emisionISO={printEmision}
+          loft={loft}
+          persona={persona.trim() || "—"}
+          fecha={fecha}
+          items={items}
+        />
+      )}
     </AdminShell>
+  );
+}
+
+type ItemRowProps = {
+  idx: number;
+  it: InventarioItemResultado;
+  fotos: FotoEvidencia[];
+  uploading: boolean;
+  onChange: (patch: Partial<InventarioItemResultado>) => void;
+  onAddFoto: (file: File) => void;
+  onRemoveFoto: (fotoId: string) => void;
+  onCaptionFoto: (fotoId: string, caption: string) => void;
+};
+
+function ItemRow({
+  idx,
+  it,
+  fotos,
+  uploading,
+  onChange,
+  onAddFoto,
+  onRemoveFoto,
+  onCaptionFoto,
+}: ItemRowProps) {
+  const showFotos = it.requiereAtencion;
+  const inputId = `foto-input-${idx}`;
+  return (
+    <>
+      <tr
+        className={
+          it.requiereAtencion
+            ? "bg-red-500/5"
+            : it.estado === "No aplica"
+              ? "opacity-60"
+              : ""
+        }
+      >
+        <td className="px-2 py-2 align-top text-zinc-500">{it.orden}</td>
+        <td className="px-2 py-2 align-top">
+          <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] dark:bg-white/10">
+            {it.zona}
+          </span>
+        </td>
+        <td className="px-2 py-2 align-top font-medium">{it.item}</td>
+        <td className="px-2 py-2 align-top">
+          <select
+            className={smallSelect}
+            value={it.estado}
+            onChange={(e) => onChange({ estado: e.target.value as EstadoItem })}
+          >
+            <option value="">—</option>
+            {ESTADOS.map((o) => (
+              <option key={o} value={o}>
+                {o}
+              </option>
+            ))}
+          </select>
+        </td>
+        <td className="px-2 py-2 align-top">
+          <select
+            className={smallSelect}
+            value={it.funciona}
+            onChange={(e) => onChange({ funciona: e.target.value as Funciona })}
+          >
+            <option value="">—</option>
+            {FUNCIONA_OPCIONES.map((o) => (
+              <option key={o} value={o}>
+                {o}
+              </option>
+            ))}
+          </select>
+        </td>
+        <td className="px-2 py-2 align-top">
+          <input
+            className={smallInput}
+            value={it.detalles}
+            onChange={(e) => onChange({ detalles: e.target.value })}
+            placeholder={
+              /observaciones/i.test(it.item)
+                ? "Notas libres"
+                : "Novedad (opcional)"
+            }
+          />
+        </td>
+      </tr>
+      {showFotos && (
+        <tr className="bg-red-500/5">
+          <td colSpan={6} className="px-2 pb-3">
+            <div className="rounded-lg border border-red-300/50 bg-white/80 p-3 dark:border-red-500/20 dark:bg-zinc-900/60">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-red-700 dark:text-red-300">
+                  Evidencia fotográfica del daño
+                </p>
+                <label
+                  htmlFor={inputId}
+                  className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition ${
+                    uploading
+                      ? "border-zinc-300 bg-zinc-100 text-zinc-500"
+                      : "border-amber-700/40 bg-amber-50 text-amber-900 hover:bg-amber-100 dark:border-amber-400/40 dark:bg-amber-400/10 dark:text-amber-300"
+                  }`}
+                >
+                  {uploading ? "Procesando…" : "+ Añadir foto"}
+                  <input
+                    id={inputId}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="sr-only"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) onAddFoto(file);
+                      e.currentTarget.value = "";
+                    }}
+                  />
+                </label>
+              </div>
+
+              {fotos.length === 0 ? (
+                <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                  Toma una foto del daño o sube una desde tu dispositivo. Las
+                  imágenes quedan guardadas con el inventario y aparecen en el
+                  PDF.
+                </p>
+              ) : (
+                <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                  {fotos.map((f, fi) => (
+                    <li
+                      key={f.id}
+                      className="overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm dark:border-white/10 dark:bg-zinc-900"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={f.dataUrl}
+                        alt={`Evidencia ${fi + 1}`}
+                        className="h-32 w-full object-cover"
+                      />
+                      <div className="space-y-2 p-2">
+                        <input
+                          type="text"
+                          value={f.caption ?? ""}
+                          onChange={(e) =>
+                            onCaptionFoto(f.id, e.target.value)
+                          }
+                          placeholder={`Descripción foto ${fi + 1}`}
+                          className="w-full rounded-md border border-black/10 bg-white/80 px-2 py-1 text-[11px] outline-none ring-amber-800/25 focus:ring-2 dark:border-white/10 dark:bg-zinc-800/70"
+                        />
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500">
+                          <span>{f.bytes ? formatBytes(f.bytes) : ""}</span>
+                          <button
+                            type="button"
+                            onClick={() => onRemoveFoto(f.id)}
+                            className="font-semibold uppercase tracking-wider text-red-600 hover:text-red-800 dark:text-red-400"
+                          >
+                            Quitar
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }
 

@@ -45,17 +45,28 @@ export async function middleware(request: NextRequest) {
     if (!user) return null;
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, status")
       .eq("id", user.id)
       .maybeSingle();
-    return profile?.role && isStaffRole(profile.role) ? profile.role : null;
+    if (!profile?.role || !isStaffRole(profile.role)) return null;
+    return profile as { role: string; status: string };
+  }
+
+  if (pathname.startsWith("/admin/registro")) {
+    // Página de registro: accesible sin sesión
+    return response;
   }
 
   if (pathname.startsWith("/admin/login")) {
     if (user) {
-      const role = await staffProfile();
-      if (role) {
+      const profile = await staffProfile();
+      if (profile && profile.status === "active") {
         return NextResponse.redirect(new URL("/admin", request.url));
+      }
+      if (profile && profile.status === "pending") {
+        return NextResponse.redirect(
+          new URL("/admin/login?error=pending_approval", request.url),
+        );
       }
       await supabase.auth.signOut();
     }
@@ -66,11 +77,23 @@ export async function middleware(request: NextRequest) {
     if (!user) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
-    const role = await staffProfile();
-    if (!role) {
+    const profile = await staffProfile();
+    if (!profile) {
       await supabase.auth.signOut();
       return NextResponse.redirect(
         new URL("/admin/login?error=no_profile", request.url),
+      );
+    }
+    if (profile.status === "pending") {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(
+        new URL("/admin/login?error=pending_approval", request.url),
+      );
+    }
+    if (profile.status === "suspended") {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(
+        new URL("/admin/login?error=suspended", request.url),
       );
     }
     return response;

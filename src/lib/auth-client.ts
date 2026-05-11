@@ -5,7 +5,10 @@ import { isStaffRole } from "@/lib/supabase/env";
 
 export type AdminSessionInfo = {
   user: string;
+  userId: string;
   role: string;
+  status: string;
+  allowedModules: string[];
 };
 
 export async function fetchAdminSession(): Promise<AdminSessionInfo | null> {
@@ -19,19 +22,31 @@ export async function fetchAdminSession(): Promise<AdminSessionInfo | null> {
 
   const { data: profile, error: profErr } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, status, allowed_modules")
     .eq("id", user.id)
     .maybeSingle();
 
   if (profErr || !profile?.role || !isStaffRole(profile.role)) return null;
+  if (profile.status !== "active") return null;
 
-  return { user: user.email, role: profile.role };
+  const isSuperAdmin = profile.role === "super_admin";
+  const isAdmin = profile.role === "admin";
+
+  return {
+    user: user.email,
+    userId: user.id,
+    role: profile.role,
+    status: profile.status,
+    allowedModules: isSuperAdmin || isAdmin
+      ? ["cotizaciones", "inventario", "reservas", "gastos", "aseos", "usuarios"]
+      : (profile.allowed_modules ?? []),
+  };
 }
 
 export async function loginAdmin(
   email: string,
   password: string,
-): Promise<"ok" | "bad_credentials" | "network" | "server" | "no_profile"> {
+): Promise<"ok" | "bad_credentials" | "network" | "server" | "no_profile" | "pending_approval" | "suspended"> {
   try {
     const supabase = getSupabaseBrowser();
     if (!supabase) return "server";
@@ -40,9 +55,15 @@ export async function loginAdmin(
       password,
     });
     if (error) {
+      // Log real Supabase error for debugging (visible in browser DevTools Console)
+      console.error("[loginAdmin] Supabase auth error:", error.status, error.message, error.code);
+      const msg = error.message.toLowerCase();
       if (
-        error.message.toLowerCase().includes("invalid") ||
-        error.message.toLowerCase().includes("credentials")
+        msg.includes("invalid login credentials") ||
+        msg.includes("invalid credentials") ||
+        msg.includes("email not confirmed") ||
+        msg.includes("invalid email or password") ||
+        (error.status === 400 && (msg.includes("invalid") || msg.includes("credentials")))
       ) {
         return "bad_credentials";
       }
@@ -50,15 +71,29 @@ export async function loginAdmin(
     }
     if (!data.user) return "server";
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profErr } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, status")
       .eq("id", data.user.id)
       .maybeSingle();
+
+    if (profErr) {
+      console.error("[loginAdmin] Error leyendo profiles:", profErr.message, profErr);
+    }
 
     if (!profile?.role || !isStaffRole(profile.role)) {
       await supabase.auth.signOut();
       return "no_profile";
+    }
+
+    if (profile.status === "pending") {
+      await supabase.auth.signOut();
+      return "pending_approval";
+    }
+
+    if (profile.status === "suspended") {
+      await supabase.auth.signOut();
+      return "suspended";
     }
 
     await supabase.from("audit_logs").insert({

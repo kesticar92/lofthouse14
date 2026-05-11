@@ -95,3 +95,103 @@ curl -sI https://lofthouse14.com | head -5
 ```
 
 Deberías ver `HTTP/2 200` (o `HTTP/1.1 200`) si Nginx enruta bien al proceso Node.
+
+---
+
+## 6. Si la web “no funciona” tras un deploy (errores frecuentes)
+
+### A) `fatal: not a git repository`
+
+La carpeta `/var/www/lofthouse14` no es un clon de Git (se subió por SFTP o se borró `.git`). Opción segura:
+
+```bash
+cd /var/www
+pm2 stop lofthouse14
+
+# Respalda env y sube de nuevo el código con git
+TS=$(date +%Y%m%d_%H%M%S)
+[ -d lofthouse14 ] && mv lofthouse14 "lofthouse14_backup_${TS}"
+
+git clone https://github.com/kesticar92/lofthouse14.git lofthouse14
+cd lofthouse14
+
+# Copia variables desde el backup (ajusta el nombre de la carpeta backup)
+# cp ../lofthouse14_backup_${TS}/.env.production.local .   # si existía
+# cp ../lofthouse14_backup_${TS}/.env.local .
+
+nano .env.production.local   # créalo si no existe: ver sección B)
+
+npm ci --include=dev
+# Build: ver sección C (memoria)
+NODE_OPTIONS="--max-old-space-size=768" npm run build
+pm2 restart lofthouse14 --update-env
+pm2 save
+```
+
+Luego vuelve a apuntar PM2 al `cwd` correcto si el proceso usa ruta absoluta antigua:
+
+```bash
+pm2 delete lofthouse14
+cd /var/www/lofthouse14 && pm2 start npm --name lofthouse14 -- start
+pm2 save
+```
+
+*(Si ya tenías otro comando `pm2 start`, úsalo igual que antes; lo importante es que el `cwd` sea `/var/www/lofthouse14`.)*
+
+### B) `Falta NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el servidor`
+
+Next carga en producción, entre otros, **`.env.production.local`** en la raíz del proyecto (junto a `package.json`). Crea o edita ese archivo **en el Droplet** (no se sube a GitHub):
+
+```bash
+nano /var/www/lofthouse14/.env.production.local
+```
+
+Mínimo para que el panel y las APIs admin funcionen:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://lofthouse14.com
+NEXT_PUBLIC_SUPABASE_URL=https://TU_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
+SUPABASE_SERVICE_ROLE_KEY=eyJ… o sb_secret_…
+```
+
+Guarda (`Ctrl+O`, Enter, `Ctrl+X`) y reinicia:
+
+```bash
+cd /var/www/lofthouse14
+pm2 restart lofthouse14 --update-env
+```
+
+*(La clave `service_role` solo en el servidor; nunca en el repo ni en variables `NEXT_PUBLIC_*`.)*
+
+### C) `JavaScript heap out of memory` durante `npm run build`
+
+En un Droplet de **512 MB RAM**, `next build` suele necesitar más memoria virtual. Si ya tienes **swap** (tu log mostró ~3% de uso, bien), sube el límite del heap y vuelve a compilar:
+
+```bash
+cd /var/www/lofthouse14
+NODE_OPTIONS="--max-old-space-size=768" npm run build
+```
+
+Si aún falla, aumenta swap a **2 GB** (una vez):
+
+```bash
+sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+grep -q swapfile /etc/fstab || echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+free -h
+```
+
+Luego repite el `npm run build` con `768` u `896`.
+
+### D) `Failed to find Server Action` en logs
+
+Suele ser caché del navegador o mezcla de **build viejo** con **código nuevo** tras un build fallido. Tras un `npm run build` **exitoso**, haz un hard refresh (Ctrl+Shift+R) o prueba en ventana privada.
+
+---
+
+## 7. Orden recomendado en un Droplet “roto”
+
+1. Variables en `.env.production.local` (sección B).  
+2. Código actualizado con `git` (sección A si hace falta).  
+3. `npm ci --include=dev` → `npm run build` con heap y swap (sección C).  
+4. `pm2 restart lofthouse14 --update-env` → revisar `pm2 logs`.

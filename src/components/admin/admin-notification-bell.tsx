@@ -131,13 +131,22 @@ export function AdminNotificationBell() {
                 ))}
               </ul>
             )}
-            <Link
-              href="/admin/aseos"
-              className="mt-3 block text-center text-xs font-semibold text-amber-900 underline dark:text-amber-400"
-              onClick={() => setOpen(false)}
-            >
-              Ir a operación de aseo
-            </Link>
+            <div className="mt-3 flex flex-col gap-1.5 text-center">
+              <Link
+                href="/admin/usuarios"
+                className="text-xs font-semibold text-amber-900 underline dark:text-amber-400"
+                onClick={() => setOpen(false)}
+              >
+                Ir a usuarios (aprobar accesos)
+              </Link>
+              <Link
+                href="/admin/aseos"
+                className="text-xs font-semibold text-zinc-600 underline dark:text-zinc-400"
+                onClick={() => setOpen(false)}
+              >
+                Ir a operación de aseo
+              </Link>
+            </div>
           </div>
         </>
       ) : null}

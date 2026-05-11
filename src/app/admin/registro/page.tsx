@@ -103,11 +103,12 @@ export default function RegistroPage() {
               <h1 className="text-xl font-semibold">Solicitud enviada</h1>
               <p className="text-sm text-zinc-600 dark:text-zinc-300">
                 Tu cuenta fue creada con estado <strong>pendiente de aprobación</strong>.
-                Un administrador revisará tu solicitud y te asignará los módulos
-                correspondientes antes de que puedas ingresar al panel.
+                Los administradores reciben un aviso en la campana del panel y pueden
+                aprobar en <strong>Usuarios → Pendientes</strong>.
               </p>
               <p className="text-xs text-zinc-500">
-                Recibirás acceso una vez que un <strong>super admin</strong> apruebe tu cuenta.
+                No enviamos correo automático: cuando activen tu cuenta podrás iniciar
+                sesión con el mismo correo y contraseña que registraste.
               </p>
               <Link
                 href="/admin/login"

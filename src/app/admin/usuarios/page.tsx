@@ -46,7 +46,8 @@ export default function UsuariosPage() {
   const [editModules, setEditModules] = useState<string[]>([]);
   const [editRole, setEditRole] = useState<string>("");
   const [editStatus, setEditStatus] = useState<string>("");
-  const [filter, setFilter] = useState<"all" | "pending" | "active" | "suspended">("all");
+  /** Por defecto «Pendientes»: es donde llegan las solicitudes de /admin/registro. */
+  const [filter, setFilter] = useState<"all" | "pending" | "active" | "suspended">("pending");
 
   useEffect(() => {
     fetchAdminSession().then((s) => {

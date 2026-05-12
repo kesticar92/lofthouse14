@@ -41,14 +41,40 @@ Sustituye `IP_DEL_DROPLET` y la ruta si en tu máquina el proyecto no está en `
 ssh root@IP_DEL_DROPLET
 ```
 
-Ya dentro del servidor:
+### Opción A — Re-deploy automatizado desde GitHub (recomendado)
+
+Este flujo funciona **incluso si `/var/www/lofthouse14` no es un repo Git** (instalación inicial por rsync, o `.git` borrado). Clona el repo limpio, conserva los `.env*` actuales, parchea `next.config.ts` para evitar OOM y reinicia PM2.
+
+Un solo comando, ya dentro del servidor:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kesticar92/lofthouse14/main/scripts/deploy/redeploy-from-github.sh \
+  -o /tmp/redeploy.sh && bash /tmp/redeploy.sh
+```
+
+Variables opcionales (anteponlas al `bash`):
+
+```bash
+BRANCH=main NODE_HEAP_MB=2048 bash /tmp/redeploy.sh
+```
+
+El script crea un backup en `/var/www/lofthouse14_old_<timestamp>` y un log en `/var/log/lh14-redeploy-<timestamp>.log`. Si algo sale mal:
+
+```bash
+pm2 stop lofthouse14
+rm -rf /var/www/lofthouse14
+mv /var/www/lofthouse14_old_<timestamp> /var/www/lofthouse14
+cd /var/www/lofthouse14 && pm2 restart lofthouse14 --update-env
+```
+
+### Opción B — Comando a comando (cuando ya hay clon de Git en el servidor)
 
 ```bash
 cd /var/www/lofthouse14
 
 git pull origin main
 npm ci --include=dev
-NODE_OPTIONS="--max-old-space-size=448" npm run build
+NODE_OPTIONS="--max-old-space-size=1536" npm run build
 pm2 restart lofthouse14
 pm2 logs lofthouse14 --lines 40 --nostream
 ```
@@ -56,8 +82,8 @@ pm2 logs lofthouse14 --lines 40 --nostream
 **Notas**
 
 - `npm ci --include=dev`: el build de Next necesita dependencias de desarrollo (TypeScript, etc.).
-- `NODE_OPTIONS=...`: en Droplets de **512 MB RAM** ayuda a evitar que `next build` muera por memoria. Si ves `Killed` o OOM, crea **swap** (2 GB) en el servidor y vuelve a intentar.
-- Si `git pull` falla porque la carpeta no es un clon de Git, clona el repo en otra ruta, copia `.env.production` / `.env.local` del servidor, `npm ci`, `build`, y actualiza PM2 al nuevo `cwd` o reemplaza la carpeta (como ya hiciste una vez con `lofthouse14_new`).
+- `NODE_OPTIONS=...`: en Droplets pequeños ayuda a evitar que `next build` muera por memoria. Si ves `Killed` o OOM, crea **swap** (2 GB) en el servidor y vuelve a intentar.
+- Si `git pull` falla porque la carpeta no es un clon de Git, **usa la Opción A** (script automatizado).
 
 Salir del SSH: `exit`.
 
@@ -67,13 +93,13 @@ Salir del SSH: `exit`.
 
 1. En [DigitalOcean](https://cloud.digitalocean.com) → **Droplets** → tu droplet → **Access** → **Launch Droplet Console** (consola web en el navegador).
 2. Inicia sesión como `root` (o el usuario que uses).
-3. Ejecuta los mismos comandos del apartado 2, pegando el bloque completo:
+3. Pega el siguiente bloque (descarga el script `redeploy-from-github.sh` y lo ejecuta — sirve aunque la carpeta no tenga `.git`):
 
 ```bash
-cd /var/www/lofthouse14 && git pull origin main && npm ci --include=dev && NODE_OPTIONS="--max-old-space-size=448" npm run build && pm2 restart lofthouse14 && sleep 3 && pm2 logs lofthouse14 --lines 30 --nostream
+curl -fsSL https://raw.githubusercontent.com/kesticar92/lofthouse14/main/scripts/deploy/redeploy-from-github.sh -o /tmp/redeploy.sh && bash /tmp/redeploy.sh
 ```
 
-4. Espera varios minutos (sobre todo en `npm ci` y `npm run build`). Si la consola web no pega bien con **Cmd+V**, usa el menú del navegador **Editar → Pegar**.
+4. Espera varios minutos (sobre todo en `npm ci` y `npm run build`). Si la consola web no pega bien con **Cmd+V**, usa el menú del navegador **Editar → Pegar**. La sesión puede cerrarse durante el build; si pasa, vuelve a abrir la consola y revisa el log con `tail -f /var/log/lh14-redeploy-*.log`.
 
 ---
 

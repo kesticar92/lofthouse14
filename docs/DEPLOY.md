@@ -1,5 +1,33 @@
 # Deploy: GitHub → Digital Ocean (Droplet Ubuntu + Nginx + PM2)
 
+## Resumen (qué es cada cosa)
+
+| Paso | Dónde | Qué hace |
+|------|--------|----------|
+| **1. Git push** | Tu Mac → **GitHub** | Guarda el código en `main`. **No toca el servidor.** |
+| **2. Redeploy** | **Digital Ocean** (Droplet) | Descarga `main` desde GitHub, hace `npm ci` + `build`, reinicia PM2. **Esto publica la web.** |
+| **CI (opcional)** | **GitHub Actions** | Solo comprueba lint/tests en cada push; **no despliega** solo. |
+
+**IP del Droplet:** `138.197.138.158` → `https://lofthouse14.com`
+
+### Un comando desde tu Mac (si tienes SSH al servidor)
+
+```bash
+chmod +x scripts/deploy/deploy-from-mac.sh
+scripts/deploy/deploy-from-mac.sh
+```
+
+### Sin SSH en tu Mac (consola web de Digital Ocean)
+
+1. [cloud.digitalocean.com](https://cloud.digitalocean.com) → Droplets → tu servidor → **Access** → **Launch Droplet Console**
+2. Pega y ejecuta:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kesticar92/lofthouse14/main/scripts/deploy/redeploy-from-github.sh -o /tmp/redeploy.sh && BRANCH=main NODE_HEAP_MB=2048 bash /tmp/redeploy.sh
+```
+
+---
+
 Este proyecto usa **Next.js** en producción con `next start` bajo **PM2**. Nginx hace de proxy hacia el puerto donde escucha Node (típicamente **3000**). La base de datos es **Supabase** (migraciones en `supabase/migrations/`); muchos cambios solo requieren aplicar SQL en Supabase y **no** obligan a redeployar la app.
 
 ---

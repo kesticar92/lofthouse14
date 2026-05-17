@@ -11,6 +11,6 @@ if (dsn) {
   Sentry.init({
     dsn,
     tracesSampleRate: defaultSentryTracesSampleRate,
-    integrations: sentryIntegrationsWithoutPrisma,
+    integrations: (defaults) => sentryIntegrationsWithoutPrisma(defaults),
   });
 }

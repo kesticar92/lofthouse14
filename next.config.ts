@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 /**
  * CSP alineada al sitio actual:
@@ -78,16 +77,6 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   /** node-ical + temporal: evitar bundle que rompe BigInt en el servidor. */
   serverExternalPackages: ["node-ical", "rrule-temporal", "temporal-polyfill"],
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "@prisma/instrumentation": path.resolve(
-        __dirname,
-        "src/lib/empty-module.ts",
-      ),
-    };
-    return config;
-  },
   /** Fotos inventario (multipart): evitar truncado por defecto (~1 MB en algunas rutas). */
   experimental: {
     serverActions: {

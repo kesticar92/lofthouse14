@@ -1,6 +1,8 @@
 "use client";
 
+import { ADMIN_MODULE_KEYS } from "@/lib/api/admin-modules";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { isSupabaseAuthUnreachable } from "@/lib/supabase/auth-errors";
 import { isStaffRole } from "@/lib/supabase/env";
 
 export type AdminSessionInfo = {
@@ -37,9 +39,7 @@ export async function fetchAdminSession(): Promise<AdminSessionInfo | null> {
     userId: user.id,
     role: profile.role,
     status: profile.status,
-    allowedModules: isSuperAdmin || isAdmin
-      ? ["cotizaciones", "inventario", "reservas", "gastos", "aseos", "usuarios"]
-      : (profile.allowed_modules ?? []),
+    allowedModules: isSuperAdmin || isAdmin ? [...ADMIN_MODULE_KEYS] : (profile.allowed_modules ?? []),
   };
 }
 
@@ -55,7 +55,8 @@ export async function loginAdmin(
       password,
     });
     if (error) {
-      // Log real Supabase error for debugging (visible in browser DevTools Console)
+      if (isSupabaseAuthUnreachable(error)) return "network";
+      // Log real Supabase error for debugging (visible en DevTools)
       console.error("[loginAdmin] Supabase auth error:", error.status, error.message, error.code);
       const msg = error.message.toLowerCase();
       if (
@@ -78,6 +79,7 @@ export async function loginAdmin(
       .maybeSingle();
 
     if (profErr) {
+      if (isSupabaseAuthUnreachable(profErr)) return "network";
       console.error("[loginAdmin] Error leyendo profiles:", profErr.message, profErr);
     }
 
@@ -104,8 +106,10 @@ export async function loginAdmin(
     });
 
     return "ok";
-  } catch {
-    return "network";
+  } catch (err) {
+    if (isSupabaseAuthUnreachable(err)) return "network";
+    console.error("[loginAdmin] excepción no manejada:", err);
+    return "server";
   }
 }
 

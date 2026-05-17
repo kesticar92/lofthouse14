@@ -1,29 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { fetchPmsBundle, type PmsBundle } from "@/features/pms/admin-api";
 import { addDays, toISODateString } from "@/lib/pms/date-range";
-import type {
-  AvailabilityBlockRow,
-  IcalSourceRow,
-  PropertyRow,
-  ReservationRow,
-} from "@/lib/pms/types";
 
-export type PmsBundle = {
-  properties: PropertyRow[];
-  reservations: ReservationRow[];
-  blocks: AvailabilityBlockRow[];
-  icalSources: IcalSourceRow[];
-};
-
-async function parseJson<T>(res: Response): Promise<T> {
-  const text = await res.text();
-  try {
-    return JSON.parse(text) as T;
-  } catch {
-    throw new Error(text || res.statusText);
-  }
-}
+export type { PmsBundle };
 
 export function usePmsModule() {
   const [viewFrom, setViewFrom] = useState(() =>
@@ -45,38 +26,8 @@ export function usePmsModule() {
     setError(null);
     setLoading(true);
     try {
-      const [pres, resv, srcs] = await Promise.all([
-        fetch("/api/admin/pms/properties", { credentials: "include" }),
-        fetch(
-          `/api/admin/pms/reservations?from=${encodeURIComponent(viewFrom)}&to=${encodeURIComponent(viewTo)}`,
-          { credentials: "include" },
-        ),
-        fetch("/api/admin/pms/ical-sources", { credentials: "include" }),
-      ]);
-      if (!pres.ok) {
-        const j = await parseJson<{ error?: string }>(pres);
-        throw new Error(j.error ?? pres.statusText);
-      }
-      if (!resv.ok) {
-        const j = await parseJson<{ error?: string }>(resv);
-        throw new Error(j.error ?? resv.statusText);
-      }
-      if (!srcs.ok) {
-        const j = await parseJson<{ error?: string }>(srcs);
-        throw new Error(j.error ?? srcs.statusText);
-      }
-      const pj = await parseJson<{ properties: PropertyRow[] }>(pres);
-      const rj = await parseJson<{
-        reservations: ReservationRow[];
-        blocks: AvailabilityBlockRow[];
-      }>(resv);
-      const sj = await parseJson<{ sources: IcalSourceRow[] }>(srcs);
-      setBundle({
-        properties: pj.properties ?? [],
-        reservations: rj.reservations ?? [],
-        blocks: rj.blocks ?? [],
-        icalSources: sj.sources ?? [],
-      });
+      const next = await fetchPmsBundle(viewFrom, viewTo);
+      setBundle(next);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {

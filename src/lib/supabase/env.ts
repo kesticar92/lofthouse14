@@ -1,22 +1,30 @@
-/** URL y clave pública (anon o publishable `sb_publishable_…`). */
+// Wrapper retro-compatible sobre `src/lib/env.ts` para no romper imports
+// existentes. La validación real (zod) vive en el módulo central.
+//
+// Para nuevo código, prefiere:
+//   import { publicEnv, hasSupabaseConfig } from "@/lib/env";
 
+import { publicEnv, hasSupabaseConfig } from "@/lib/env";
+import type { Database } from "@/types/database.types";
+
+/** URL y clave pública (anon o publishable `sb_publishable_…`). */
 export function supabasePublicEnv(): {
   url: string;
   key: string;
   ok: boolean;
 } {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "";
+  const url = publicEnv.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const key =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
+    publicEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    publicEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
     "";
-  return { url, key, ok: Boolean(url && key) };
+  return { url, key, ok: hasSupabaseConfig() };
 }
 
 export const STAFF_ROLES = ["super_admin", "admin", "staff"] as const;
 
-export type StaffRole = (typeof STAFF_ROLES)[number];
+export type StaffRole = Database["public"]["Enums"]["app_role"];
 
-export function isStaffRole(r: string | undefined): r is StaffRole {
+export function isStaffRole(r: string | null | undefined): r is StaffRole {
   return !!r && (STAFF_ROLES as readonly string[]).includes(r);
 }

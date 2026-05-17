@@ -1,5 +1,21 @@
 "use client";
 
+/**
+ * @deprecated DESDE FASE 1 — Los aseos viven en `cleaning_tasks` (Postgres).
+ *
+ * Este archivo se mantiene SOLO como referencia del shape histórico para
+ * eventuales migraciones de datos de localStorage. Las páginas activas
+ * (`/admin/aseos`, dashboard `/admin`) NO deben usarlo.
+ *
+ * Para consumir los datos reales:
+ *   - Listado del día:   `GET /api/admin/cleaning-tasks?date=YYYY-MM-DD`
+ *   - Resumen:           `GET /api/admin/cleaning-summary?date=...&month=...`
+ *   - Edición/asignación: `PATCH /api/admin/cleaning-tasks/{id}`
+ *
+ * En la próxima limpieza (Fase 2) este archivo se elimina si no quedan
+ * importaciones.
+ */
+
 import { KEYS, safeGet, safeSet } from "./storage";
 
 export type AseoEstado = "Pendiente" | "En proceso" | "Hecho";

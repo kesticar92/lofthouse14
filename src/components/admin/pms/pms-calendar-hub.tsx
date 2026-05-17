@@ -6,6 +6,7 @@ import type {
   PropertyRow,
   ReservationRow,
 } from "@/lib/pms/types";
+import { useConfirm } from "@/components/ui";
 
 function truncateUrl(s: string, max = 56): string {
   if (s.length <= max) return s;
@@ -42,6 +43,7 @@ function AnunciosManager({
   onRenameProperty: (id: string, name: string) => Promise<{ ok: boolean; error?: string }>;
   onDeleteProperty: (id: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
+  const confirm = useConfirm();
   const [newName, setNewName] = useState("");
   const [busy, setBusy] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -76,15 +78,22 @@ function AnunciosManager({
     const rCount = reservations.filter((r) => r.property_id === id).length;
     const sCount = sources.filter((s) => s.property_id === id).length;
     const partes: string[] = [];
-    if (rCount > 0) partes.push(`${rCount} reserva${rCount === 1 ? "" : "s"} visibles en el calendario`);
-    if (sCount > 0) partes.push(`${sCount} calendario${sCount === 1 ? "" : "s"} iCal sincronizado${sCount === 1 ? "" : "s"}`);
+    if (rCount > 0)
+      partes.push(
+        `${rCount} reserva${rCount === 1 ? "" : "s"} visible${rCount === 1 ? "" : "s"} en el calendario`,
+      );
+    if (sCount > 0)
+      partes.push(
+        `${sCount} calendario${sCount === 1 ? "" : "s"} iCal sincronizado${sCount === 1 ? "" : "s"}`,
+      );
     partes.push("sus bloqueos y tareas de aseo");
-    const detalle = partes.join(", ");
-    const mensaje =
-      `¿Eliminar definitivamente el anuncio "${name}"?\n\n` +
-      `Se borrarán también: ${detalle}.\n\n` +
-      `Esta acción NO se puede deshacer.`;
-    if (!confirm(mensaje)) return;
+    const ok = await confirm({
+      title: `¿Eliminar el anuncio "${name}"?`,
+      description: `Se borrarán también: ${partes.join(", ")}. Esta acción no se puede deshacer.`,
+      confirmLabel: "Eliminar",
+      variant: "danger",
+    });
+    if (!ok) return;
     setBusy(true);
     setLocalErr(null);
     const r = await onDeleteProperty(id);
@@ -232,6 +241,7 @@ export function PmsCalendarHub({
   onRenameProperty?: (id: string, name: string) => Promise<{ ok: boolean; error?: string }>;
   onDeleteProperty?: (id: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
+  const confirm = useConfirm();
   const [newUrl, setNewUrl] = useState("");
   const [rowBusy, setRowBusy] = useState<string | null>(null);
 
@@ -387,14 +397,16 @@ export function PmsCalendarHub({
                             const n = reservasDeSource(s.id);
                             const detalle =
                               n > 0
-                                ? `Se eliminarán también las ${n} reserva${n === 1 ? "" : "s"} visibles importada${n === 1 ? "" : "s"} desde este iCal (las que estén fuera del rango actual también desaparecerán).`
+                                ? `Se eliminarán también las ${n} reserva${n === 1 ? "" : "s"} visible${n === 1 ? "" : "s"} importada${n === 1 ? "" : "s"} desde este iCal.`
                                 : "Este enlace aún no ha sincronizado reservas. No se borrará nada más.";
-                            const mensaje =
-                              `¿Quitar este enlace iCal?\n\n` +
-                              `${detalle}\n\n` +
-                              `Esta acción NO se puede deshacer.`;
-                            if (!confirm(mensaje)) return;
                             void (async () => {
+                              const ok = await confirm({
+                                title: "¿Quitar este enlace iCal?",
+                                description: `${detalle} Esta acción no se puede deshacer.`,
+                                confirmLabel: "Quitar",
+                                variant: "danger",
+                              });
+                              if (!ok) return;
                               setRowBusy(s.id);
                               await onDeleteSource(s.id);
                               setRowBusy(null);

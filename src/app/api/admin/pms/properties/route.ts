@@ -1,86 +1,101 @@
 import { randomBytes } from "crypto";
-import { NextResponse } from "next/server";
-import { requireStaff } from "@/lib/api/require-staff";
+import { z } from "zod";
 
-export async function GET() {
-  const gate = await requireStaff();
-  if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
-  const { data, error } = await supabase
-    .from("properties")
-    .select("id, name, ical_token, created_at, updated_at")
-    .order("name");
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ properties: data ?? [] });
-}
+import { ApiHandlerError, apiHandler } from "@/lib/api/handler";
+import type { TablesUpdate } from "@/types/database.types";
 
-export async function POST(req: Request) {
-  const gate = await requireStaff();
-  if (!gate.ok) return gate.response;
-  const { supabase, profile } = gate.ctx;
-  if (profile.role !== "super_admin" && profile.role !== "admin") {
-    return NextResponse.json({ error: "Solo admin puede crear propiedades" }, { status: 403 });
-  }
-  let body: { name?: string };
-  try { body = await req.json(); } catch {
-    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
-  }
-  const name = body.name?.trim();
-  if (!name) return NextResponse.json({ error: "Falta nombre" }, { status: 400 });
-  const token = randomBytes(24).toString("hex");
-  const { data, error } = await supabase
-    .from("properties")
-    .insert({ name, ical_token: token })
-    .select("id, name, ical_token, created_at, updated_at")
-    .maybeSingle();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ property: data }, { status: 201 });
-}
+const patchBodySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().optional(),
+  regenerate_ical_token: z.boolean().optional(),
+});
 
-export async function PATCH(req: Request) {
-  const gate = await requireStaff();
-  if (!gate.ok) return gate.response;
-  const { supabase, profile } = gate.ctx;
-  if (profile.role !== "super_admin" && profile.role !== "admin") {
-    return NextResponse.json({ error: "Solo admin puede editar propiedades" }, { status: 403 });
-  }
-  let body: { id?: string; name?: string; regenerate_ical_token?: boolean };
-  try { body = await req.json(); } catch {
-    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
-  }
-  const id = body.id?.trim();
-  if (!id) return NextResponse.json({ error: "Falta id de propiedad" }, { status: 400 });
+const postBodySchema = z.object({
+  name: z.string().min(1),
+});
 
-  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  if (body.regenerate_ical_token) updates.ical_token = randomBytes(24).toString("hex");
-  if (body.name?.trim()) updates.name = body.name.trim();
+const deleteQuerySchema = z.object({
+  id: z.string().min(1),
+});
 
-  const { data, error } = await supabase
-    .from("properties")
-    .update(updates)
-    .eq("id", id)
-    .select("id, name, ical_token, updated_at")
-    .maybeSingle();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ property: data });
-}
+export const GET = apiHandler({
+  module: "reservas",
+  handler: async ({ ctx }) => {
+    const { data, error } = await ctx.supabase
+      .from("properties")
+      .select("id, name, ical_token, created_at, updated_at")
+      .order("name");
+    if (error) throw new ApiHandlerError(error.message, { status: 500 });
+    return { properties: data ?? [] };
+  },
+});
 
-export async function DELETE(req: Request) {
-  const gate = await requireStaff();
-  if (!gate.ok) return gate.response;
-  const { supabase, profile } = gate.ctx;
-  if (profile.role !== "super_admin") {
-    return NextResponse.json({ error: "Solo super_admin puede eliminar propiedades" }, { status: 403 });
-  }
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id")?.trim();
-  if (!id) return NextResponse.json({ error: "Falta id" }, { status: 400 });
+export const POST = apiHandler({
+  module: "reservas",
+  body: postBodySchema,
+  handler: async ({ body, ctx }) => {
+    if (ctx.profile.role !== "super_admin" && ctx.profile.role !== "admin") {
+      throw new ApiHandlerError("Solo admin puede crear propiedades", {
+        status: 403,
+        code: "FORBIDDEN",
+      });
+    }
+    const token = randomBytes(24).toString("hex");
+    const { data, error } = await ctx.supabase
+      .from("properties")
+      .insert({ name: body.name.trim(), ical_token: token })
+      .select("id, name, ical_token, created_at, updated_at")
+      .maybeSingle();
+    if (error) throw new ApiHandlerError(error.message, { status: 500 });
+    return { property: data };
+  },
+});
 
-  // La confirmación es responsabilidad del cliente. La FK `reservations`,
-  // `ical_sources`, `availability_blocks` y `cleaning_tasks` ya están con
-  // ON DELETE CASCADE, por lo que al eliminar el anuncio se limpian sus
-  // datos asociados de forma atómica.
-  const { error } = await supabase.from("properties").delete().eq("id", id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ ok: true });
-}
+export const PATCH = apiHandler({
+  module: "reservas",
+  body: patchBodySchema,
+  handler: async ({ body, ctx }) => {
+    if (ctx.profile.role !== "super_admin" && ctx.profile.role !== "admin") {
+      throw new ApiHandlerError("Solo admin puede editar propiedades", {
+        status: 403,
+        code: "FORBIDDEN",
+      });
+    }
+
+    const updates: TablesUpdate<"properties"> = {
+      updated_at: new Date().toISOString(),
+    };
+    if (body.regenerate_ical_token) {
+      updates.ical_token = randomBytes(24).toString("hex");
+    }
+    if (body.name?.trim()) updates.name = body.name.trim();
+
+    const { data, error } = await ctx.supabase
+      .from("properties")
+      .update(updates)
+      .eq("id", body.id)
+      .select("id, name, ical_token, updated_at")
+      .maybeSingle();
+    if (error) throw new ApiHandlerError(error.message, { status: 500 });
+    return { property: data };
+  },
+});
+
+export const DELETE = apiHandler({
+  module: "reservas",
+  query: deleteQuerySchema,
+  handler: async ({ query, ctx }) => {
+    if (ctx.profile.role !== "super_admin") {
+      throw new ApiHandlerError("Solo super_admin puede eliminar propiedades", {
+        status: 403,
+        code: "FORBIDDEN",
+      });
+    }
+    const { error } = await ctx.supabase
+      .from("properties")
+      .delete()
+      .eq("id", query.id);
+    if (error) throw new ApiHandlerError(error.message, { status: 500 });
+    return { deleted: true };
+  },
+});

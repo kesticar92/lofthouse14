@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 /**
  * CSP alineada al sitio actual:
@@ -17,6 +18,24 @@ function contentSecurityPolicy(): string {
     "https://browser.sentry-cdn.com",
   ].join(" ");
 
+  // En dev (p. ej. http://192.168.x.x desde el móvil) algunos navegadores
+  // interpretan 'self' + IPs locales de forma restrictiva y bloquean fetch a la
+  // misma API → "Failed to fetch". Permitimos esquemas en desarrollo únicamente.
+  const connectSrc = isDev
+    ? [
+        "'self'",
+        "http:",
+        "https:",
+        "ws:",
+        "wss:",
+        "https://*.supabase.co",
+        "wss://*.supabase.co",
+        "https://*.ingest.sentry.io",
+        "https://*.ingest.de.sentry.io",
+        "https://*.ingest.us.sentry.io",
+      ].join(" ")
+    : "'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io";
+
   const directives = [
     "default-src 'self'",
     `script-src ${scriptSrc}`,
@@ -24,14 +43,18 @@ function contentSecurityPolicy(): string {
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     "media-src 'self'",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io",
+    `connect-src ${connectSrc}`,
     "frame-src 'self' https://maps.google.com https://www.google.com",
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "upgrade-insecure-requests",
+    // Solo en prod: en http://localhost el upgrade fuerza https:// y rompe
+    // fetch() a /api/* (“Failed to fetch”) si no hay TLS local.
+    ...(process.env.NODE_ENV === "production"
+      ? (["upgrade-insecure-requests"] as const)
+      : []),
   ];
 
   return directives.join("; ");
@@ -43,7 +66,8 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    // Inventario admin: captura de fotos desde el mismo origen
+    value: "camera=(self), microphone=(), geolocation=()",
   },
   {
     key: "Content-Security-Policy",
@@ -54,6 +78,22 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   /** node-ical + temporal: evitar bundle que rompe BigInt en el servidor. */
   serverExternalPackages: ["node-ical", "rrule-temporal", "temporal-polyfill"],
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@prisma/instrumentation": path.resolve(
+        __dirname,
+        "src/lib/empty-module.ts",
+      ),
+    };
+    return config;
+  },
+  /** Fotos inventario (multipart): evitar truncado por defecto (~1 MB en algunas rutas). */
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   async headers() {
     return [
       {

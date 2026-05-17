@@ -1,10 +1,90 @@
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { isStaffRole, supabasePublicEnv } from "@/lib/supabase/env";
+
+import { staffCanAccessAdminPath } from "@/lib/api/admin-modules";
+import { isSupabaseAuthUnreachable } from "@/lib/supabase/auth-errors";
+import { isStaffRole, type StaffRole, supabasePublicEnv } from "@/lib/supabase/env";
+import type { Database } from "@/types/database.types";
+
+type TypedClient = SupabaseClient<Database>;
+
+async function getSessionUser(supabase: TypedClient): Promise<
+  | { unreachable: true }
+  | { unreachable: false; user: User | null }
+> {
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (error && isSupabaseAuthUnreachable(error)) {
+      return { unreachable: true };
+    }
+    return { unreachable: false, user: data?.user ?? null };
+  } catch (err) {
+    if (!isSupabaseAuthUnreachable(err)) {
+      console.error("[middleware] getSessionUser inesperado:", err);
+    }
+    return { unreachable: true };
+  }
+}
+
+async function loadStaffProfile(
+  supabase: TypedClient,
+  userId: string,
+): Promise<
+  | { unreachable: true }
+  | {
+      unreachable: false;
+      profile: null | {
+        role: StaffRole;
+        status: string;
+        allowed_modules: string[];
+      };
+    }
+> {
+  try {
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role, status, allowed_modules")
+      .eq("id", userId)
+      .maybeSingle();
+    if (error && isSupabaseAuthUnreachable(error)) {
+      return { unreachable: true };
+    }
+    if (error || !profile?.role || !isStaffRole(profile.role)) {
+      return { unreachable: false, profile: null };
+    }
+    return {
+      unreachable: false,
+      profile: {
+        role: profile.role,
+        status: String(profile.status ?? ""),
+        allowed_modules: Array.isArray(profile.allowed_modules)
+          ? profile.allowed_modules
+          : [],
+      },
+    };
+  } catch (err) {
+    if (!isSupabaseAuthUnreachable(err)) {
+      console.error("[middleware] loadStaffProfile inesperado:", err);
+    }
+    return { unreachable: true };
+  }
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith("/api/admin")) {
+    const { adminApiClientKey, allowAdminApiRequest } = await import(
+      "@/lib/admin-rate-limit"
+    );
+    const { apiRateLimited } = await import("@/lib/api/response");
+    if (!allowAdminApiRequest(adminApiClientKey(request))) {
+      return apiRateLimited(60);
+    }
+  }
+
   const { url, key, ok } = supabasePublicEnv();
 
   if (!ok) {
@@ -18,7 +98,7 @@ export async function middleware(request: NextRequest) {
     request: { headers: request.headers },
   });
 
-  const supabase = createServerClient(url, key, {
+  const supabase = createServerClient<Database>(url, key, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -37,29 +117,36 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const auth = await getSessionUser(supabase);
 
-  async function staffProfile() {
-    if (!user) return null;
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role, status")
-      .eq("id", user.id)
-      .maybeSingle();
-    if (!profile?.role || !isStaffRole(profile.role)) return null;
-    return profile as { role: string; status: string };
+  if (auth.unreachable) {
+    if (
+      pathname.startsWith("/admin/login") ||
+      pathname.startsWith("/admin/registro")
+    ) {
+      return response;
+    }
+    if (pathname.startsWith("/admin")) {
+      return NextResponse.redirect(
+        new URL("/admin/login?error=supabase_unreachable", request.url),
+      );
+    }
+    return response;
   }
 
+  const user = auth.user;
+
   if (pathname.startsWith("/admin/registro")) {
-    // Página de registro: accesible sin sesión
     return response;
   }
 
   if (pathname.startsWith("/admin/login")) {
     if (user) {
-      const profile = await staffProfile();
+      const sp = await loadStaffProfile(supabase, user.id);
+      if (sp.unreachable) {
+        return response;
+      }
+      const profile = sp.profile;
       if (profile && profile.status === "active") {
         return NextResponse.redirect(new URL("/admin", request.url));
       }
@@ -77,7 +164,13 @@ export async function middleware(request: NextRequest) {
     if (!user) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
-    const profile = await staffProfile();
+    const sp = await loadStaffProfile(supabase, user.id);
+    if (sp.unreachable) {
+      return NextResponse.redirect(
+        new URL("/admin/login?error=supabase_unreachable", request.url),
+      );
+    }
+    const profile = sp.profile;
     if (!profile) {
       await supabase.auth.signOut();
       return NextResponse.redirect(
@@ -95,6 +188,17 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(
         new URL("/admin/login?error=suspended", request.url),
       );
+    }
+    if (
+      !staffCanAccessAdminPath(
+        {
+          role: profile.role,
+          allowed_modules: profile.allowed_modules,
+        },
+        pathname,
+      )
+    ) {
+      return NextResponse.redirect(new URL("/admin", request.url));
     }
     return response;
   }

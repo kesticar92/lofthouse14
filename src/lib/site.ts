@@ -63,14 +63,44 @@ export const site = {
     avisoImpuestos:
       "Tarifas finales en pesos colombianos (COP). El servicio de alojamiento ocasional no genera IVA bajo el régimen aplicable.",
   },
+  /** Fotografías reales para la cuadrícula «Así se vive LOFTHOUSE» y JSON-LD. */
   gallery: [
-    "/gallery/loft-01.jpg",
-    "/gallery/loft-02.jpg",
-    "/gallery/loft-03.jpg",
-    "/gallery/loft-04.jpg",
-    "/gallery/loft-05.jpg",
-    "/gallery/loft-06.jpg",
-    "/gallery/loft-07.jpg",
+    {
+      src: "/gallery/vive/01-fachada.png",
+      alt: "Fachada de LOFTHOUSE 14 con escaleras de ingreso y cartel del establecimiento",
+    },
+    {
+      src: "/gallery/vive/02-entrada.png",
+      alt: "Interior luminoso del loft visto desde la puerta abierta, sofá y ventanal",
+    },
+    {
+      src: "/gallery/vive/03-cocina.png",
+      alt: "Cocina tipo loft bajo escalera con mesa para dos y equipamiento completo",
+    },
+    {
+      src: "/gallery/vive/04-mesa.png",
+      alt: "Mesa redonda con copas de vino y vajilla en rincón acogedor",
+    },
+    {
+      src: "/gallery/vive/05-dormitorio.png",
+      alt: "Dormitorio tendido con almohadas, televisión y cortinas",
+    },
+    {
+      src: "/gallery/vive/06-sala.png",
+      alt: "Sala de descanso con sofá junto a baranda en nivel elevado",
+    },
+    {
+      src: "/gallery/vive/07-exterior.png",
+      alt: "Zona exterior con bancas blancas y sombra de árboles",
+    },
+    {
+      src: "/gallery/vive/08-acceso.png",
+      alt: "Cerradura digital con teclado iluminado en puerta blanca",
+    },
+    {
+      src: "/gallery/vive/09-detalle.png",
+      alt: "Detalle de baño luminoso con cortina decorativa",
+    },
   ],
   audiences: [
     "Turistas nacionales e internacionales",

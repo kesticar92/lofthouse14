@@ -3,36 +3,40 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 
+/**
+ * Imágenes temáticas alineadas al texto de cada tarjeta (Unsplash License).
+ * Licencia: https://unsplash.com/license — uso gratuito con atribución recomendada.
+ */
 const cards = [
   {
     title: "Vive la salsa",
     body: "Estamos cerca de academias y zonas icónicas para bailar y disfrutar la cultura caleña.",
-    image: "/gallery/loft-02.jpg",
+    image: "/gallery/experiences/exp-vive-salsa.jpg",
   },
   {
     title: "Explora la gastronomía",
     body: "Restaurantes, cafés y bares a pocos pasos para que cada comida sea parte del viaje.",
-    image: "/gallery/loft-03.jpg",
+    image: "/gallery/experiences/exp-gastronomia.jpg",
   },
   {
     title: "Ubicación para todo",
     body: "Cerca de clínicas, universidades y centros deportivos: menos traslados, más tiempo para ti.",
-    image: "/gallery/loft-04.jpg",
+    image: "/gallery/experiences/exp-ubicacion.jpg",
   },
   {
     title: "Perfecto para estancias médicas",
     body: "Tranquilidad, privacidad y cercanía para tu recuperación (consulta accesibilidad por escaleras).",
-    image: "/gallery/loft-05.jpg",
+    image: "/gallery/experiences/exp-estancias.jpg",
   },
   {
     title: "Ideal para grupos",
     body: "Capacidad combinada para alojar varias personas — hasta 63 huéspedes — con logística coordinada.",
-    image: "/gallery/loft-06.jpg",
+    image: "/gallery/experiences/exp-grupos.jpg",
   },
   {
     title: "Trabajo remoto sin fricción",
     body: "Ambientes con buena conectividad y ritmo urbano para jornadas productivas y descansos reales.",
-    image: "/gallery/loft-07.jpg",
+    image: "/gallery/experiences/exp-remoto.jpg",
   },
 ];
 

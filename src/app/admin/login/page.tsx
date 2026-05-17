@@ -21,6 +21,10 @@ function LoginForm() {
     const q = searchParams.get("error");
     if (q === "no_profile") {
       setError("Tu cuenta no tiene perfil de staff válido. Contacta al administrador.");
+    } else if (q === "supabase_unreachable") {
+      setError(
+        "No pudimos conectar con Supabase (red, DNS o URL incorrecta). Comprueba tu internet y NEXT_PUBLIC_SUPABASE_URL en .env.local.",
+      );
     } else if (q === "no_access") {
       setError("No tienes acceso al panel con esta cuenta.");
     } else if (q === "pending_approval") {

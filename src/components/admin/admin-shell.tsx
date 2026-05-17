@@ -5,6 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { fetchAdminSession, logoutAdmin } from "@/lib/auth-client";
+import {
+  ADMIN_MODULE_LABELS,
+  ADMIN_MODULE_PATHS,
+  type AdminModuleKey,
+} from "@/lib/api/admin-modules";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { AdminNotificationBell } from "@/components/admin/admin-notification-bell";
@@ -14,8 +19,8 @@ type NavItem = {
   label: string;
   icon: React.ReactNode;
   desc: string;
-  module?: string; // undefined = siempre visible
-  adminOnly?: boolean; // solo admin/super_admin
+  module?: AdminModuleKey;
+  adminOnly?: boolean;
 };
 
 export const ADMIN_NAV: NavItem[] = [
@@ -31,8 +36,8 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Resumen general del panel",
   },
   {
-    href: "/admin/cotizaciones",
-    label: "Cotizaciones",
+    href: ADMIN_MODULE_PATHS.cotizaciones,
+    label: ADMIN_MODULE_LABELS.cotizaciones,
     module: "cotizaciones",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -43,8 +48,8 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Calcula y guarda cotizaciones",
   },
   {
-    href: "/admin/inventario",
-    label: "Inventario",
+    href: ADMIN_MODULE_PATHS.inventario,
+    label: ADMIN_MODULE_LABELS.inventario,
     module: "inventario",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -55,8 +60,8 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Revisión de artículos por loft",
   },
   {
-    href: "/admin/reservas",
-    label: "Reservas",
+    href: ADMIN_MODULE_PATHS.reservas,
+    label: ADMIN_MODULE_LABELS.reservas,
     module: "reservas",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -67,8 +72,8 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Ocupación, iCal Airbnb y exportación",
   },
   {
-    href: "/admin/gastos",
-    label: "Gastos",
+    href: ADMIN_MODULE_PATHS.gastos,
+    label: ADMIN_MODULE_LABELS.gastos,
     module: "gastos",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -80,8 +85,8 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Facturas, fotos y backup en Drive",
   },
   {
-    href: "/admin/aseos",
-    label: "Aseos del día",
+    href: ADMIN_MODULE_PATHS.aseos,
+    label: ADMIN_MODULE_LABELS.aseos,
     module: "aseos",
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -91,8 +96,8 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Limpieza y preparación desde reservas",
   },
   {
-    href: "/admin/usuarios",
-    label: "Usuarios",
+    href: ADMIN_MODULE_PATHS.usuarios,
+    label: ADMIN_MODULE_LABELS.usuarios,
     module: "usuarios",
     adminOnly: true,
     icon: (
@@ -136,7 +141,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [router, pathname]);
 
   const visibleNav = ADMIN_NAV.filter((n) => {
-    if (!n.module) return true; // inicio: siempre visible
+    if (
+      n.adminOnly &&
+      role !== "super_admin" &&
+      role !== "admin"
+    ) {
+      return false;
+    }
+    if (!n.module) return true;
     return allowedModules.includes(n.module);
   });
 

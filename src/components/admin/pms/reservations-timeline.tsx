@@ -16,6 +16,7 @@ import type {
   ReservationRow,
 } from "@/lib/pms/types";
 import { cn } from "@/lib/cn";
+import { useToast } from "@/components/ui";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const CELL = 28;
@@ -387,6 +388,7 @@ export function ReservationsTimeline({
     check_out: string;
   }) => Promise<{ ok: boolean; error?: string }>;
 }) {
+  const toast = useToast();
   const viewEndEx = addDays(viewFrom, viewDays);
   const days = useMemo(
     () =>
@@ -508,7 +510,10 @@ export function ReservationsTimeline({
       const newProp = d.hoverPropertyId;
       if (newProp === d.propertyId && newCheckIn === d.checkIn && newCheckOut === d.checkOut) return;
       const res = await onReservationPatch({ id: d.id, property_id: newProp, check_in: newCheckIn, check_out: newCheckOut });
-      if (!res.ok) window.alert(res.error ?? "No se pudo mover la reserva");
+      if (!res.ok)
+        toast.error("No se pudo mover la reserva", {
+          description: res.error ?? "Inténtalo nuevamente.",
+        });
     };
 
     const cancel = (ev: PointerEvent) => {

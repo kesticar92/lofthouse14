@@ -1,0 +1,61 @@
+# =============================================================================
+# CI básico para lofthouse14-web
+# -----------------------------------------------------------------------------
+# Ejecuta en cada push y PR contra `main`:
+#   - install (npm ci)
+#   - lint (next lint / ESLint)
+#   - typecheck (tsc --noEmit)
+#   - tests (vitest)
+#
+# Secret necesarios (ninguno por ahora; los tests no llaman a Supabase real).
+# Si en el futuro se añaden tests de integración, configurar:
+#   - SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD, ... en Settings → Secrets.
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancela ejecuciones previas del mismo branch al pushear de nuevo.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-typecheck-test:
+    name: Lint, typecheck y tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Tests (vitest)
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          NEXT_PUBLIC_SITE_URL: https://lofthouse14.com

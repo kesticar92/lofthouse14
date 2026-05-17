@@ -1,8 +1,7 @@
 import { Readable } from "node:stream";
-import { JWT } from "google-auth-library";
 import { google } from "googleapis";
 
-const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+import { getGoogleServiceAccountJwt } from "@/lib/expenses/google-service-account";
 
 function normalizePrivateKey(raw: string | undefined): string | undefined {
   if (!raw) return undefined;
@@ -17,26 +16,15 @@ export function isGoogleDriveConfigured(): boolean {
   );
 }
 
-function getJwt(): JWT | null {
-  const email = process.env.GOOGLE_CLIENT_EMAIL?.trim();
-  const key = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
-  if (!email || !key) return null;
-  return new JWT({
-    email,
-    key,
-    scopes: [DRIVE_SCOPE],
-  });
-}
-
 function driveViewUrl(fileId: string): string {
-  return `https://drive.google.com/file/d/${fileId}/view`;
+  return `https://drive.google.com/file/d/${fileId}/view?usp=drive_link`;
 }
 
 async function findChildFolderId(
   parentId: string,
   folderName: string,
 ): Promise<string | null> {
-  const auth = getJwt();
+  const auth = getGoogleServiceAccountJwt();
   if (!auth) return null;
   const drive = google.drive({ version: "v3", auth });
   const escaped = folderName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
@@ -51,7 +39,7 @@ async function findChildFolderId(
 }
 
 async function createFolder(parentId: string, name: string): Promise<string> {
-  const auth = getJwt();
+  const auth = getGoogleServiceAccountJwt();
   if (!auth) throw new Error("Google Drive no configurado");
   const drive = google.drive({ version: "v3", auth });
   const { data } = await drive.files.create({
@@ -68,13 +56,7 @@ async function createFolder(parentId: string, name: string): Promise<string> {
   return id;
 }
 
-/** Asegura/crea la carpeta `AAAA-MM` bajo la carpeta raíz del .env, replicando
- *  el formato manual que ya usa el equipo en Drive. Los archivos quedan planos
- *  dentro de la carpeta del mes; la identificación de cada gasto va en el
- *  filename (ver `buildDriveFilename` en upload-expense-file.ts).
- *
- *  El parámetro `expenseId` ya no participa en la jerarquía, se mantiene en la
- *  firma solo para compatibilidad con llamadas existentes (retry, etc.). */
+/** Asegura/crea la carpeta `AAAA-MM` bajo la carpeta raíz del .env (Comprobantes). */
 export async function ensureExpenseDriveFolderPath(
   expenseDateISO: string,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -105,7 +87,7 @@ export async function uploadBufferToGoogleDrive(opts: {
   mimeType: string;
   buffer: Buffer;
 }): Promise<DriveUploadResult> {
-  const auth = getJwt();
+  const auth = getGoogleServiceAccountJwt();
   if (!auth) throw new Error("Google Drive no configurado");
   const drive = google.drive({ version: "v3", auth });
   const body = Readable.from(opts.buffer);

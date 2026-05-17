@@ -29,7 +29,7 @@ const jsonLd = {
   url: siteUrl,
   image: [
     `${siteUrl}/logo-lofthouse.png`,
-    ...site.gallery.map((p) => `${siteUrl}${p}`),
+    ...site.gallery.map((p) => `${siteUrl}${p.src}`),
   ],
   telephone: site.phoneTel,
   address: {

@@ -25,8 +25,10 @@
 #   APP_DIR          Directorio de la app (default: /var/www/lofthouse14)
 #   REPO_URL         URL del repo (default: https://github.com/kesticar92/lofthouse14.git)
 #   BRANCH           Rama a desplegar (default: main)
-#   NODE_HEAP_MB     Memoria máx para Node (default: 1536)
+#   NODE_HEAP_MB     Memoria máx para Node (default: 2048)
 #   PM2_NAME         Nombre del proceso PM2 (default: lofthouse14)
+#   BUILD_SKIP_LINT  1=`next build --no-lint` (default), 0=lint en build
+#                    (ESLint debe correr en CI; typecheck TS SIEMPRE corre).
 #
 # Ejemplo:
 #   BRANCH=main NODE_HEAP_MB=2048 bash scripts/deploy/redeploy-from-github.sh
@@ -36,8 +38,12 @@ set -euo pipefail
 APP_DIR="${APP_DIR:-/var/www/lofthouse14}"
 REPO_URL="${REPO_URL:-https://github.com/kesticar92/lofthouse14.git}"
 BRANCH="${BRANCH:-main}"
-NODE_HEAP_MB="${NODE_HEAP_MB:-1536}"
+NODE_HEAP_MB="${NODE_HEAP_MB:-2048}"
 PM2_NAME="${PM2_NAME:-lofthouse14}"
+# Si BUILD_SKIP_LINT=1 (default) → next build --no-lint. ESLint debería
+# correr en CI, no en producción (ahorra RAM y tiempo). El typecheck TS sí
+# se ejecuta, para que un error de tipos NO llegue al servidor.
+BUILD_SKIP_LINT="${BUILD_SKIP_LINT:-1}"
 
 PARENT_DIR="$(dirname "$APP_DIR")"
 APP_NAME="$(basename "$APP_DIR")"
@@ -117,15 +123,19 @@ mv "$NEW_DIR" "$APP_DIR"
 cd "$APP_DIR"
 ok "Swap completado. Directorio activo: ${APP_DIR}"
 
-# ---------- 5. Parche next.config.ts (anti-OOM) ---------------------------
-info "[5/9] Asegurando ignoreDuringBuilds + ignoreBuildErrors en next.config.ts…"
+# ---------- 5. Limpieza defensiva de parches viejos -----------------------
+info "[5/9] Verificando que next.config.ts NO tenga ignoreBuildErrors / ignoreDuringBuilds…"
 if [[ -f next.config.ts ]]; then
-  if grep -q "ignoreDuringBuilds" next.config.ts && grep -q "ignoreBuildErrors" next.config.ts; then
-    ok "next.config.ts ya tiene los flags."
+  if grep -qE "ignoreDuringBuilds|ignoreBuildErrors" next.config.ts; then
+    warn "next.config.ts contiene ignoreDuringBuilds/ignoreBuildErrors."
+    warn "Esos flags permiten que errores TS/ESLint lleguen a producción."
+    warn "Eliminando líneas para forzar typecheck estricto en build…"
+    # Borra líneas que contengan estos flags (insertadas por scripts viejos)
+    sed -i '/eslint:\s*{\s*ignoreDuringBuilds:\s*true\s*},/d' next.config.ts
+    sed -i '/typescript:\s*{\s*ignoreBuildErrors:\s*true\s*},/d' next.config.ts
+    ok "Limpiados flags peligrosos. Si el build falla, ARREGLA EL ERROR; no los re-insertes."
   else
-    # Insertar justo después de la línea `const nextConfig: NextConfig = {`
-    sed -i '/^const nextConfig: NextConfig = {/a\  eslint: { ignoreDuringBuilds: true },\n  typescript: { ignoreBuildErrors: true },' next.config.ts
-    ok "Parcheado next.config.ts."
+    ok "next.config.ts limpio."
   fi
 else
   warn "No se encontró next.config.ts (¿estructura cambió?)."
@@ -136,8 +146,15 @@ info "[6/9] npm ci --include=dev (esto puede tardar 1-3 min)…"
 npm ci --include=dev
 
 # ---------- 7. Build de producción ----------------------------------------
-info "[7/9] next build (NODE_OPTIONS=--max-old-space-size=${NODE_HEAP_MB})…"
-NODE_OPTIONS="--max-old-space-size=${NODE_HEAP_MB}" npm run build
+BUILD_FLAGS=""
+if [[ "$BUILD_SKIP_LINT" == "1" ]]; then
+  BUILD_FLAGS="-- --no-lint"
+  info "[7/9] next build --no-lint (typecheck TS sí corre; ESLint debe correr en CI)"
+else
+  info "[7/9] next build (typecheck + ESLint)"
+fi
+info "       NODE_OPTIONS=--max-old-space-size=${NODE_HEAP_MB}"
+NODE_OPTIONS="--max-old-space-size=${NODE_HEAP_MB}" npm run build $BUILD_FLAGS
 [[ -f .next/BUILD_ID ]] || fail "Build falló: no se generó .next/BUILD_ID."
 ok "Build OK (BUILD_ID=$(cat .next/BUILD_ID))."
 

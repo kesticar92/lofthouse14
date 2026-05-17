@@ -2,6 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
+import { apiClient } from "@/lib/api/client";
+import {
+  ADMIN_STAFF_MODULE_OPTIONS,
+  adminModuleLabel,
+} from "@/lib/api/admin-modules";
 import { fetchAdminSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
@@ -14,14 +19,6 @@ type UserProfile = {
   allowed_modules: string[];
   created_at: string;
 };
-
-const ALL_MODULES = [
-  { key: "cotizaciones", label: "Cotizaciones" },
-  { key: "inventario", label: "Inventario" },
-  { key: "reservas", label: "Reservas" },
-  { key: "gastos", label: "Gastos" },
-  { key: "aseos", label: "Aseos del día" },
-];
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending: { label: "Pendiente", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" },
@@ -63,10 +60,13 @@ export default function UsuariosPage() {
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
-    const res = await fetch("/api/admin/users");
-    if (res.ok) {
-      const json = await res.json() as { users: UserProfile[] };
-      setUsers(json.users);
+    try {
+      const { users: list } = await apiClient<{ users: UserProfile[] }>(
+        "/api/admin/users",
+      );
+      setUsers(list ?? []);
+    } catch {
+      setUsers([]);
     }
     setLoading(false);
   }, []);
@@ -75,13 +75,16 @@ export default function UsuariosPage() {
 
   async function patchUser(id: string, patch: Partial<UserProfile>) {
     setSaving(id);
-    await fetch("/api/admin/users", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, ...patch }),
-    });
-    setSaving(null);
-    await loadUsers();
+    try {
+      await apiClient("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...patch }),
+      });
+    } finally {
+      await loadUsers();
+      setSaving(null);
+    }
   }
 
   function openEdit(u: UserProfile) {
@@ -161,7 +164,8 @@ export default function UsuariosPage() {
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">{u.email}</p>
                     {u.allowed_modules?.length > 0 && (
                       <p className="text-xs text-zinc-400">
-                        Módulos: {u.allowed_modules.map((m) => ALL_MODULES.find((x) => x.key === m)?.label ?? m).join(", ")}
+                        Módulos:{" "}
+                        {u.allowed_modules.map((m) => adminModuleLabel(m)).join(", ")}
                       </p>
                     )}
                     {u.status === "pending" && (
@@ -268,7 +272,7 @@ export default function UsuariosPage() {
                     Módulos permitidos
                   </label>
                   <div className="space-y-2">
-                    {ALL_MODULES.map((m) => (
+                    {ADMIN_STAFF_MODULE_OPTIONS.map((m) => (
                       <label key={m.key} className="flex cursor-pointer items-center gap-3 rounded-lg border border-black/8 px-3 py-2 hover:bg-black/3 dark:border-white/8">
                         <input
                           type="checkbox"

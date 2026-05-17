@@ -1,73 +1,81 @@
-import { NextResponse } from "next/server";
-import { requireStaff } from "@/lib/api/require-staff";
+import { z } from "zod";
+
+import { isAdminModuleKey } from "@/lib/api/admin-modules";
+import { ApiHandlerError, apiHandler } from "@/lib/api/handler";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import type { TablesUpdate } from "@/types/database.types";
 
-const ALL_MODULES = ["cotizaciones", "inventario", "reservas", "gastos", "aseos"];
+const patchBodySchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["pending", "active", "suspended"]).optional(),
+  role: z.enum(["super_admin", "admin", "staff"]).optional(),
+  allowed_modules: z.array(z.string()).optional(),
+  full_name: z.string().optional(),
+});
 
-export async function GET() {
-  const gate = await requireStaff();
-  if (!gate.ok) return gate.response;
-  const { profile } = gate.ctx;
-  if (profile.role !== "super_admin" && profile.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  const admin = createServiceRoleClient();
-  const { data, error: dbErr } = await admin
-    .from("profiles")
-    .select("id, email, full_name, role, status, allowed_modules, created_at, updated_at")
-    .order("created_at", { ascending: false });
-
-  if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 });
-  return NextResponse.json({ users: data ?? [] });
-}
-
-export async function PATCH(req: Request) {
-  const gate = await requireStaff();
-  if (!gate.ok) return gate.response;
-  const { profile } = gate.ctx;
-  if (profile.role !== "super_admin") {
-    return NextResponse.json({ error: "Solo el super_admin puede modificar usuarios" }, { status: 403 });
-  }
-
-  const body = await req.json().catch(() => null);
-  if (!body?.id) return NextResponse.json({ error: "id requerido" }, { status: 400 });
-
-  const { id, status, role, allowed_modules, full_name } = body as {
-    id: string;
-    status?: string;
-    role?: string;
-    allowed_modules?: string[];
-    full_name?: string;
-  };
-
-  if (status && !["pending", "active", "suspended"].includes(status)) {
-    return NextResponse.json({ error: "status inválido" }, { status: 400 });
-  }
-  if (role && !["super_admin", "admin", "staff"].includes(role)) {
-    return NextResponse.json({ error: "role inválido" }, { status: 400 });
-  }
-  if (allowed_modules) {
-    const invalid = allowed_modules.filter((m) => !ALL_MODULES.includes(m));
-    if (invalid.length > 0) {
-      return NextResponse.json({ error: `Módulos inválidos: ${invalid.join(", ")}` }, { status: 400 });
+export const GET = apiHandler({
+  module: "usuarios",
+  handler: async ({ ctx }) => {
+    if (ctx.profile.role !== "super_admin" && ctx.profile.role !== "admin") {
+      throw new ApiHandlerError("Forbidden", {
+        status: 403,
+        code: "FORBIDDEN",
+      });
     }
-  }
 
-  const admin = createServiceRoleClient();
-  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  if (status !== undefined) updates.status = status;
-  if (role !== undefined) updates.role = role;
-  if (allowed_modules !== undefined) updates.allowed_modules = allowed_modules;
-  if (full_name !== undefined) updates.full_name = full_name;
+    const admin = createServiceRoleClient();
+    const { data, error: dbErr } = await admin
+      .from("profiles")
+      .select(
+        "id, email, full_name, role, status, allowed_modules, created_at, updated_at",
+      )
+      .order("created_at", { ascending: false });
 
-  const { data, error: dbErr } = await admin
-    .from("profiles")
-    .update(updates)
-    .eq("id", id)
-    .select("id, email, full_name, role, status, allowed_modules")
-    .maybeSingle();
+    if (dbErr) throw new ApiHandlerError(dbErr.message, { status: 500 });
+    return { users: data ?? [] };
+  },
+});
 
-  if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 });
-  return NextResponse.json({ user: data });
-}
+export const PATCH = apiHandler({
+  module: "usuarios",
+  body: patchBodySchema,
+  handler: async ({ body, ctx }) => {
+    if (ctx.profile.role !== "super_admin") {
+      throw new ApiHandlerError("Solo el super_admin puede modificar usuarios", {
+        status: 403,
+        code: "FORBIDDEN",
+      });
+    }
+
+    if (body.allowed_modules) {
+      const invalid = body.allowed_modules.filter((m) => !isAdminModuleKey(m));
+      if (invalid.length > 0) {
+        throw new ApiHandlerError(
+          `Módulos inválidos: ${invalid.join(", ")}`,
+          { status: 400, code: "BAD_REQUEST" },
+        );
+      }
+    }
+
+    const admin = createServiceRoleClient();
+    const updates: TablesUpdate<"profiles"> = {
+      updated_at: new Date().toISOString(),
+    };
+    if (body.status !== undefined) updates.status = body.status;
+    if (body.role !== undefined) updates.role = body.role;
+    if (body.allowed_modules !== undefined) {
+      updates.allowed_modules = body.allowed_modules;
+    }
+    if (body.full_name !== undefined) updates.full_name = body.full_name;
+
+    const { data, error: dbErr } = await admin
+      .from("profiles")
+      .update(updates)
+      .eq("id", body.id)
+      .select("id, email, full_name, role, status, allowed_modules")
+      .maybeSingle();
+
+    if (dbErr) throw new ApiHandlerError(dbErr.message, { status: 500 });
+    return { user: data };
+  },
+});

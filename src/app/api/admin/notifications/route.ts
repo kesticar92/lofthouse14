@@ -1,39 +1,41 @@
-import { requireStaff } from "@/lib/api/require-staff";
+import { z } from "zod";
 
-export async function GET(req: Request) {
-  const gate = await requireStaff();
-  if (!gate.ok) return gate.response;
-  const { supabase, user } = gate.ctx;
-  const unreadOnly =
-    new URL(req.url).searchParams.get("unread") === "1";
+import { ApiHandlerError, apiHandler } from "@/lib/api/handler";
 
-  let q = supabase
-    .from("notifications")
-    .select("id, title, message, read, created_at")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(50);
-  if (unreadOnly) q = q.eq("read", false);
+const querySchema = z.object({
+  unread: z.enum(["0", "1"]).optional(),
+});
 
-  const { data, error } = await q;
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-  return Response.json({ notifications: data ?? [] });
-}
+export const GET = apiHandler({
+  query: querySchema,
+  handler: async ({ query, ctx }) => {
+    const unreadOnly = query.unread === "1";
+    let q = ctx.supabase
+      .from("notifications")
+      .select("id, title, message, read, created_at")
+      .eq("user_id", ctx.user.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (unreadOnly) q = q.eq("read", false);
 
-export async function PATCH() {
-  const gate = await requireStaff();
-  if (!gate.ok) return gate.response;
-  const { supabase, user } = gate.ctx;
+    const { data, error } = await q;
+    if (error) {
+      throw new ApiHandlerError(error.message, { status: 500 });
+    }
+    return { notifications: data ?? [] };
+  },
+});
 
-  const { error } = await supabase
-    .from("notifications")
-    .update({ read: true })
-    .eq("user_id", user.id)
-    .eq("read", false);
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-  return Response.json({ ok: true });
-}
+export const PATCH = apiHandler({
+  handler: async ({ ctx }) => {
+    const { error } = await ctx.supabase
+      .from("notifications")
+      .update({ read: true })
+      .eq("user_id", ctx.user.id)
+      .eq("read", false);
+    if (error) {
+      throw new ApiHandlerError(error.message, { status: 500 });
+    }
+    return { updated: true };
+  },
+});

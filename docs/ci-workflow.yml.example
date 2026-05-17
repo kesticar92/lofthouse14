@@ -1,15 +1,6 @@
+# Copiar a .github/workflows/ci.yml en GitHub (requiere permiso workflow al pushear).
 # =============================================================================
 # CI básico para lofthouse14-web
-# -----------------------------------------------------------------------------
-# Ejecuta en cada push y PR contra `main`:
-#   - install (npm ci)
-#   - lint (next lint / ESLint)
-#   - typecheck (tsc --noEmit)
-#   - tests (vitest)
-#
-# Secret necesarios (ninguno por ahora; los tests no llaman a Supabase real).
-# Si en el futuro se añaden tests de integración, configurar:
-#   - SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD, ... en Settings → Secrets.
 # =============================================================================
 
 name: CI
@@ -20,7 +11,6 @@ on:
   pull_request:
     branches: [main]
 
-# Cancela ejecuciones previas del mismo branch al pushear de nuevo.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true

@@ -72,7 +72,9 @@ export async function migrateLocalCotizacionesToServer(): Promise<MigrationRepor
         guests: Math.max(1, c.input.huespedes),
         loft_id: String(c.input.lofts ?? 1),
         price_per_night:
-          c.result.noches > 0 ? c.result.subtotalAlojamiento / c.result.noches : 0,
+          c.result.noches > 0
+            ? c.result.subtotalAlojamiento / c.result.noches
+            : 0,
         total: c.result.totalReserva,
         notes: c.observaciones ?? "",
         status: "draft",

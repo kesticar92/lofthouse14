@@ -6,7 +6,12 @@
 //
 //   import { Button, Modal, useToast, useConfirm } from "@/components/ui";
 // =============================================================================
-export { Button, type ButtonProps, type ButtonVariant, type ButtonSize } from "./button";
+export {
+  Button,
+  type ButtonProps,
+  type ButtonVariant,
+  type ButtonSize,
+} from "./button";
 export { Modal, type ModalProps, type ModalSize } from "./modal";
 export {
   ToastProvider,

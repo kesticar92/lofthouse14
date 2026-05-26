@@ -99,7 +99,7 @@ export const PATCH = apiHandler({
     const nextReferrerRaw =
       body.referrer_name !== undefined
         ? body.referrer_name.trim()
-        : (cur as { referrer_name?: string }).referrer_name ?? "";
+        : ((cur as { referrer_name?: string }).referrer_name ?? "");
 
     let nextCommission: number | null =
       (cur as { commission_amount?: number | null }).commission_amount ?? null;
@@ -169,10 +169,13 @@ export const PATCH = apiHandler({
         check_out,
       );
       if (blockHits.length > 0) {
-        throw new ApiHandlerError("Conflicto: las fechas coinciden con un bloqueo.", {
-          status: 409,
-          code: "CONFLICT",
-        });
+        throw new ApiHandlerError(
+          "Conflicto: las fechas coinciden con un bloqueo.",
+          {
+            status: 409,
+            code: "CONFLICT",
+          },
+        );
       }
     }
 

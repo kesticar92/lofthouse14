@@ -13,7 +13,9 @@ vi.mock("@/lib/supabase/server", () => ({
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-function profile(p: Partial<StaffProfile> & Pick<StaffProfile, "role">): StaffProfile {
+function profile(
+  p: Partial<StaffProfile> & Pick<StaffProfile, "role">,
+): StaffProfile {
   return {
     status: "active",
     allowed_modules: [],
@@ -84,9 +86,7 @@ describe("requireStaff", () => {
       },
       from: vi.fn(),
     };
-    vi.mocked(createSupabaseServerClient).mockResolvedValue(
-      supabase as never,
-    );
+    vi.mocked(createSupabaseServerClient).mockResolvedValue(supabase as never);
     const out = await requireStaff();
     expect(out.ok).toBe(false);
     if (!out.ok) expect(out.response.status).toBe(401);
@@ -114,9 +114,7 @@ describe("requireStaff", () => {
       },
       from,
     };
-    vi.mocked(createSupabaseServerClient).mockResolvedValue(
-      supabase as never,
-    );
+    vi.mocked(createSupabaseServerClient).mockResolvedValue(supabase as never);
 
     const out = await requireStaff();
     expect(out.ok).toBe(false);
@@ -152,9 +150,7 @@ describe("requireStaff", () => {
       },
       from,
     };
-    vi.mocked(createSupabaseServerClient).mockResolvedValue(
-      supabase as never,
-    );
+    vi.mocked(createSupabaseServerClient).mockResolvedValue(supabase as never);
 
     const out = await requireStaff();
     expect(out.ok).toBe(false);
@@ -189,9 +185,7 @@ describe("requireStaff", () => {
       },
       from,
     };
-    vi.mocked(createSupabaseServerClient).mockResolvedValue(
-      supabase as never,
-    );
+    vi.mocked(createSupabaseServerClient).mockResolvedValue(supabase as never);
 
     const out = await requireStaff();
     expect(out.ok).toBe(true);

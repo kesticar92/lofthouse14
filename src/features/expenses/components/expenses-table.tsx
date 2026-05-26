@@ -59,7 +59,10 @@ export function ExpensesTable({
                     <td className="py-2 pr-2">
                       {ex.vendor_name || "—"}
                       {anyFail ? (
-                        <span className="ml-1 text-rose-600" title="Backup Drive">
+                        <span
+                          className="ml-1 text-rose-600"
+                          title="Backup Drive"
+                        >
                           ⚠
                         </span>
                       ) : null}

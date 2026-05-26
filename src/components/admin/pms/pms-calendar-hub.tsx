@@ -40,7 +40,10 @@ function AnunciosManager({
   reservations: ReservationRow[];
   sources: IcalSourceRow[];
   onAddProperty: (name: string) => Promise<{ ok: boolean; error?: string }>;
-  onRenameProperty: (id: string, name: string) => Promise<{ ok: boolean; error?: string }>;
+  onRenameProperty: (
+    id: string,
+    name: string,
+  ) => Promise<{ ok: boolean; error?: string }>;
   onDeleteProperty: (id: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const confirm = useConfirm();
@@ -59,7 +62,10 @@ function AnunciosManager({
     setLocalErr(null);
     const r = await onAddProperty(n);
     setBusy(false);
-    if (!r.ok) { setLocalErr(r.error ?? "Error"); return; }
+    if (!r.ok) {
+      setLocalErr(r.error ?? "Error");
+      return;
+    }
     setNewName("");
   }
 
@@ -70,7 +76,10 @@ function AnunciosManager({
     setLocalErr(null);
     const r = await onRenameProperty(id, n);
     setBusy(false);
-    if (!r.ok) { setLocalErr(r.error ?? "Error"); return; }
+    if (!r.ok) {
+      setLocalErr(r.error ?? "Error");
+      return;
+    }
     setEditId(null);
   }
 
@@ -107,8 +116,8 @@ function AnunciosManager({
         Gestión de anuncios
       </h3>
       <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-        Cada anuncio aparece en el eje izquierdo del calendario. Puedes crear uno
-        por cada publicación en Airbnb u OTA.
+        Cada anuncio aparece en el eje izquierdo del calendario. Puedes crear
+        uno por cada publicación en Airbnb u OTA.
       </p>
 
       {localErr && (
@@ -131,7 +140,10 @@ function AnunciosManager({
                     className="min-w-0 flex-1 rounded-lg border border-black/10 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-zinc-800"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") void handleRename(p.id); if (e.key === "Escape") setEditId(null); }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") void handleRename(p.id);
+                      if (e.key === "Escape") setEditId(null);
+                    }}
                     autoFocus
                   />
                   <button
@@ -158,7 +170,10 @@ function AnunciosManager({
                   <button
                     type="button"
                     disabled={busy}
-                    onClick={() => { setEditId(p.id); setEditName(p.name); }}
+                    onClick={() => {
+                      setEditId(p.id);
+                      setEditName(p.name);
+                    }}
                     className="shrink-0 rounded-full border border-black/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider dark:border-white/10"
                   >
                     Renombrar
@@ -185,7 +200,9 @@ function AnunciosManager({
           placeholder="Nombre del nuevo anuncio (ej. Loft 101)"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") void handleAdd(); }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") void handleAdd();
+          }}
           disabled={busy}
         />
         <button
@@ -238,7 +255,10 @@ export function PmsCalendarHub({
   onOpenExport: () => void;
   onRegenerateToken: () => void | Promise<void>;
   onAddProperty?: (name: string) => Promise<{ ok: boolean; error?: string }>;
-  onRenameProperty?: (id: string, name: string) => Promise<{ ok: boolean; error?: string }>;
+  onRenameProperty?: (
+    id: string,
+    name: string,
+  ) => Promise<{ ok: boolean; error?: string }>;
   onDeleteProperty?: (id: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const confirm = useConfirm();
@@ -249,7 +269,10 @@ export function PmsCalendarHub({
     () =>
       sources
         .filter((s) => s.property_id === selectedPropertyId)
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+        .sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+        ),
     [sources, selectedPropertyId],
   );
 
@@ -257,7 +280,8 @@ export function PmsCalendarHub({
     return reservations.filter((r) => r.ical_source_id === sourceId).length;
   }
 
-  const selectedName = properties.find((p) => p.id === selectedPropertyId)?.name ?? "—";
+  const selectedName =
+    properties.find((p) => p.id === selectedPropertyId)?.name ?? "—";
 
   async function addUrl() {
     const url = newUrl.trim();
@@ -271,17 +295,20 @@ export function PmsCalendarHub({
   return (
     <div className="space-y-8">
       {/* Anuncios management (super admin only) */}
-      {isSuperAdmin && onAddProperty && onRenameProperty && onDeleteProperty && (
-        <AnunciosManager
-          properties={properties}
-          isSuperAdmin={!!isSuperAdmin}
-          reservations={reservations}
-          sources={sources}
-          onAddProperty={onAddProperty}
-          onRenameProperty={onRenameProperty}
-          onDeleteProperty={onDeleteProperty}
-        />
-      )}
+      {isSuperAdmin &&
+        onAddProperty &&
+        onRenameProperty &&
+        onDeleteProperty && (
+          <AnunciosManager
+            properties={properties}
+            isSuperAdmin={!!isSuperAdmin}
+            reservations={reservations}
+            sources={sources}
+            onAddProperty={onAddProperty}
+            onRenameProperty={onRenameProperty}
+            onDeleteProperty={onDeleteProperty}
+          />
+        )}
 
       {/* Property selector + sync */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -301,10 +328,11 @@ export function PmsCalendarHub({
             ))}
           </select>
           <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
-            Todas las URLs de importación Airbnb de <strong>{selectedName}</strong>{" "}
-            alimentan <strong>la misma</strong> fila en el calendario. El iCal de
-            exportación reúne reservas de <strong>todas las fuentes</strong> para que
-            lo pegues en cada anuncio de Airbnb y bloqueen fechas de forma coherente.
+            Todas las URLs de importación Airbnb de{" "}
+            <strong>{selectedName}</strong> alimentan <strong>la misma</strong>{" "}
+            fila en el calendario. El iCal de exportación reúne reservas de{" "}
+            <strong>todas las fuentes</strong> para que lo pegues en cada
+            anuncio de Airbnb y bloqueen fechas de forma coherente.
           </p>
         </div>
         <button
@@ -323,9 +351,9 @@ export function PmsCalendarHub({
           Importar iCal (Airbnb → PMS)
         </h3>
         <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-          Añade el enlace iCal de tu publicación en Airbnb. El sistema lo sincroniza
-          automáticamente y muestra las reservas en el calendario con color naranja
-          (Airbnb) y el nombre del huésped cuando esté disponible.
+          Añade el enlace iCal de tu publicación en Airbnb. El sistema lo
+          sincroniza automáticamente y muestra las reservas en el calendario con
+          color naranja (Airbnb) y el nombre del huésped cuando esté disponible.
         </p>
 
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
@@ -364,8 +392,13 @@ export function PmsCalendarHub({
               </thead>
               <tbody>
                 {sourcesHere.map((s, i) => (
-                  <tr key={s.id} className="border-b border-black/5 last:border-0 dark:border-white/5">
-                    <td className="py-2 pr-2 align-top text-zinc-500">{i + 1}</td>
+                  <tr
+                    key={s.id}
+                    className="border-b border-black/5 last:border-0 dark:border-white/5"
+                  >
+                    <td className="py-2 pr-2 align-top text-zinc-500">
+                      {i + 1}
+                    </td>
                     <td className="max-w-[280px] py-2 pr-2 align-top">
                       <span className="break-all font-mono text-[11px] text-zinc-800 dark:text-zinc-200">
                         {truncateUrl(s.url, 72)}
@@ -425,7 +458,8 @@ export function PmsCalendarHub({
           </div>
         )}
         <p className="mt-3 text-[11px] text-zinc-500">
-          Los datos del huésped no siempre vienen en el iCal de Airbnb; solo fechas y estado aproximado.
+          Los datos del huésped no siempre vienen en el iCal de Airbnb; solo
+          fechas y estado aproximado.
         </p>
       </section>
 
@@ -435,9 +469,10 @@ export function PmsCalendarHub({
           Exportar iCal (PMS → Airbnb)
         </h3>
         <p className="mt-1 text-xs text-amber-950/90 dark:text-amber-50/90">
-          Esta URL contiene <strong>todas</strong> las reservas activas y bloqueos de{" "}
-          <strong>{selectedName}</strong>. Pégala en «Importar calendario» de{" "}
-          <strong>cada</strong> anuncio en Airbnb para sincronizar fechas ocupadas.
+          Esta URL contiene <strong>todas</strong> las reservas activas y
+          bloqueos de <strong>{selectedName}</strong>. Pégala en «Importar
+          calendario» de <strong>cada</strong> anuncio en Airbnb para
+          sincronizar fechas ocupadas.
         </p>
         <div className="mt-3 break-all rounded-lg border border-black/10 bg-white/80 px-3 py-2 font-mono text-[11px] text-zinc-900 dark:border-white/10 dark:bg-zinc-900/80 dark:text-zinc-100">
           {exportUrl || "—"}

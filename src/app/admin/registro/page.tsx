@@ -77,7 +77,10 @@ export default function RegistroPage() {
       <div className="pointer-events-none absolute -left-24 top-40 -z-10 h-80 w-80 rounded-full bg-amber-300/30 blur-3xl dark:bg-amber-500/10" />
 
       <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-5 py-12">
-        <Link href="/admin/login" className="mb-8 flex flex-col items-center gap-2">
+        <Link
+          href="/admin/login"
+          className="mb-8 flex flex-col items-center gap-2"
+        >
           <Image
             src="/logo-lofthouse.png"
             alt="LOFTHOUSE 14"
@@ -96,19 +99,26 @@ export default function RegistroPage() {
           {success ? (
             <div className="space-y-4 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                <svg viewBox="0 0 24 24" className="h-7 w-7 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-7 w-7 text-emerald-600"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="m5 12 4 4 10-10" />
                 </svg>
               </div>
               <h1 className="text-xl font-semibold">Solicitud enviada</h1>
               <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                Tu cuenta fue creada con estado <strong>pendiente de aprobación</strong>.
-                Los administradores reciben un aviso en la campana del panel y pueden
-                aprobar en <strong>Usuarios → Pendientes</strong>.
+                Tu cuenta fue creada con estado{" "}
+                <strong>pendiente de aprobación</strong>. Los administradores
+                reciben un aviso en la campana del panel y pueden aprobar en{" "}
+                <strong>Usuarios → Pendientes</strong>.
               </p>
               <p className="text-xs text-zinc-500">
-                No enviamos correo automático: cuando activen tu cuenta podrás iniciar
-                sesión con el mismo correo y contraseña que registraste.
+                No enviamos correo automático: cuando activen tu cuenta podrás
+                iniciar sesión con el mismo correo y contraseña que registraste.
               </p>
               <Link
                 href="/admin/login"
@@ -119,9 +129,12 @@ export default function RegistroPage() {
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-semibold">Solicitar acceso al panel</h1>
+              <h1 className="text-xl font-semibold">
+                Solicitar acceso al panel
+              </h1>
               <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                Crea tu cuenta. Un administrador la activará y asignará tus módulos.
+                Crea tu cuenta. Un administrador la activará y asignará tus
+                módulos.
               </p>
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -212,7 +225,10 @@ export default function RegistroPage() {
 
               <p className="mt-5 text-xs text-zinc-500 dark:text-zinc-400">
                 ¿Ya tienes cuenta?{" "}
-                <Link href="/admin/login" className="font-semibold text-amber-800 underline hover:text-amber-900 dark:text-amber-400">
+                <Link
+                  href="/admin/login"
+                  className="font-semibold text-amber-800 underline hover:text-amber-900 dark:text-amber-400"
+                >
                   Iniciar sesión
                 </Link>
               </p>

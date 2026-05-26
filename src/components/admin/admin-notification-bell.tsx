@@ -4,7 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 
-type Row = { id: string; title: string; message: string; read: boolean; created_at: string };
+type Row = {
+  id: string;
+  title: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+};
 
 export function AdminNotificationBell() {
   const [open, setOpen] = useState(false);
@@ -64,7 +70,13 @@ export function AdminNotificationBell() {
         }}
         className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 text-zinc-700 transition hover:bg-black/5 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
       >
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <svg
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
           <path d="M12 5a5 5 0 0 0-5 5v3l-2 3h14l-2-3V10a5 5 0 0 0-5-5z" />
           <path d="M10 18a2 2 0 0 0 4 0" />
         </svg>

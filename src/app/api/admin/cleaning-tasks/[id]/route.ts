@@ -60,10 +60,13 @@ export const PATCH = apiHandler({
     }
     if (body.assigned_to !== undefined) {
       if (!isSuper) {
-        throw new ApiHandlerError("Prohibido: solo supervisor asigna personal", {
-          status: 403,
-          code: "FORBIDDEN",
-        });
+        throw new ApiHandlerError(
+          "Prohibido: solo supervisor asigna personal",
+          {
+            status: 403,
+            code: "FORBIDDEN",
+          },
+        );
       }
       patch.assigned_to = body.assigned_to;
     }

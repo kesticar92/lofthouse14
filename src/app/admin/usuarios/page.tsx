@@ -21,9 +21,20 @@ type UserProfile = {
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending: { label: "Pendiente", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" },
-  active: { label: "Activo", color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300" },
-  suspended: { label: "Suspendido", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" },
+  pending: {
+    label: "Pendiente",
+    color:
+      "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  },
+  active: {
+    label: "Activo",
+    color:
+      "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+  },
+  suspended: {
+    label: "Suspendido",
+    color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  },
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -44,11 +55,16 @@ export default function UsuariosPage() {
   const [editRole, setEditRole] = useState<string>("");
   const [editStatus, setEditStatus] = useState<string>("");
   /** Por defecto «Pendientes»: es donde llegan las solicitudes de /admin/registro. */
-  const [filter, setFilter] = useState<"all" | "pending" | "active" | "suspended">("pending");
+  const [filter, setFilter] = useState<
+    "all" | "pending" | "active" | "suspended"
+  >("pending");
 
   useEffect(() => {
     fetchAdminSession().then((s) => {
-      if (!s) { router.replace("/admin/login"); return; }
+      if (!s) {
+        router.replace("/admin/login");
+        return;
+      }
       if (s.role !== "super_admin" && s.role !== "admin") {
         router.replace("/admin");
         return;
@@ -71,7 +87,9 @@ export default function UsuariosPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { void loadUsers(); }, [loadUsers]);
+  useEffect(() => {
+    void loadUsers();
+  }, [loadUsers]);
 
   async function patchUser(id: string, patch: Partial<UserProfile>) {
     setSaving(id);
@@ -106,7 +124,7 @@ export default function UsuariosPage() {
 
   function toggleModule(key: string) {
     setEditModules((prev) =>
-      prev.includes(key) ? prev.filter((m) => m !== key) : [...prev, key]
+      prev.includes(key) ? prev.filter((m) => m !== key) : [...prev, key],
     );
   }
 
@@ -130,20 +148,31 @@ export default function UsuariosPage() {
                     : "border border-black/10 text-zinc-600 hover:bg-black/5 dark:border-white/10 dark:text-zinc-300"
                 }`}
               >
-                {f === "all" ? "Todos" : f === "pending" ? `Pendientes ${pendingCount > 0 ? `(${pendingCount})` : ""}` : f === "active" ? "Activos" : "Suspendidos"}
+                {f === "all"
+                  ? "Todos"
+                  : f === "pending"
+                    ? `Pendientes ${pendingCount > 0 ? `(${pendingCount})` : ""}`
+                    : f === "active"
+                      ? "Activos"
+                      : "Suspendidos"}
               </button>
             ))}
           </div>
         }
       >
         {loading ? (
-          <p className="py-8 text-center text-sm text-zinc-500">Cargando usuarios…</p>
+          <p className="py-8 text-center text-sm text-zinc-500">
+            Cargando usuarios…
+          </p>
         ) : filtered.length === 0 ? (
-          <p className="py-8 text-center text-sm text-zinc-500">No hay usuarios en esta categoría.</p>
+          <p className="py-8 text-center text-sm text-zinc-500">
+            No hay usuarios en esta categoría.
+          </p>
         ) : (
           <div className="space-y-3">
             {filtered.map((u) => {
-              const statusInfo = STATUS_LABELS[u.status] ?? STATUS_LABELS.pending;
+              const statusInfo =
+                STATUS_LABELS[u.status] ?? STATUS_LABELS.pending;
               return (
                 <div
                   key={u.id}
@@ -154,23 +183,30 @@ export default function UsuariosPage() {
                       <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                         {u.full_name || "Sin nombre"}
                       </p>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${statusInfo.color}`}>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${statusInfo.color}`}
+                      >
                         {statusInfo.label}
                       </span>
                       <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
                         {ROLE_LABELS[u.role] ?? u.role}
                       </span>
                     </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">{u.email}</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {u.email}
+                    </p>
                     {u.allowed_modules?.length > 0 && (
                       <p className="text-xs text-zinc-400">
                         Módulos:{" "}
-                        {u.allowed_modules.map((m) => adminModuleLabel(m)).join(", ")}
+                        {u.allowed_modules
+                          .map((m) => adminModuleLabel(m))
+                          .join(", ")}
                       </p>
                     )}
                     {u.status === "pending" && (
                       <p className="text-xs text-amber-700 dark:text-amber-400">
-                        Esperando aprobación · {new Date(u.created_at).toLocaleDateString("es-CO")}
+                        Esperando aprobación ·{" "}
+                        {new Date(u.created_at).toLocaleDateString("es-CO")}
                       </p>
                     )}
                   </div>
@@ -189,7 +225,9 @@ export default function UsuariosPage() {
                       {u.status === "active" && (
                         <button
                           disabled={saving === u.id}
-                          onClick={() => patchUser(u.id, { status: "suspended" })}
+                          onClick={() =>
+                            patchUser(u.id, { status: "suspended" })
+                          }
                           className="rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-500/20 disabled:opacity-50 dark:text-red-400"
                         >
                           Suspender
@@ -214,7 +252,9 @@ export default function UsuariosPage() {
                   )}
 
                   {isAdmin && !isSuperAdmin && (
-                    <span className="text-xs text-zinc-400">Solo visualización</span>
+                    <span className="text-xs text-zinc-400">
+                      Solo visualización
+                    </span>
                   )}
                 </div>
               );
@@ -273,19 +313,25 @@ export default function UsuariosPage() {
                   </label>
                   <div className="space-y-2">
                     {ADMIN_STAFF_MODULE_OPTIONS.map((m) => (
-                      <label key={m.key} className="flex cursor-pointer items-center gap-3 rounded-lg border border-black/8 px-3 py-2 hover:bg-black/3 dark:border-white/8">
+                      <label
+                        key={m.key}
+                        className="flex cursor-pointer items-center gap-3 rounded-lg border border-black/8 px-3 py-2 hover:bg-black/3 dark:border-white/8"
+                      >
                         <input
                           type="checkbox"
                           checked={editModules.includes(m.key)}
                           onChange={() => toggleModule(m.key)}
                           className="h-4 w-4 rounded accent-amber-800"
                         />
-                        <span className="text-sm text-zinc-700 dark:text-zinc-200">{m.label}</span>
+                        <span className="text-sm text-zinc-700 dark:text-zinc-200">
+                          {m.label}
+                        </span>
                       </label>
                     ))}
                   </div>
                   <p className="mt-1.5 text-[11px] text-zinc-400">
-                    Admin y Super Admin tienen acceso a todos los módulos automáticamente.
+                    Admin y Super Admin tienen acceso a todos los módulos
+                    automáticamente.
                   </p>
                 </div>
               )}

@@ -1,9 +1,5 @@
 // Multipart upload: no usa apiHandler (FormData); auth vía requireStaff + enforceStaffModule.
-import {
-  apiBadRequest,
-  apiErr,
-  apiOk,
-} from "@/lib/api/response";
+import { apiBadRequest, apiErr, apiOk } from "@/lib/api/response";
 import { enforceStaffModule, requireStaff } from "@/lib/api/require-staff";
 import { uploadExpenseFile } from "@/lib/expenses/upload-expense-file";
 
@@ -63,14 +59,11 @@ export async function POST(
   const created: unknown[] = [];
   for (const file of files) {
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return apiErr(
-        `El archivo "${file.name}" supera el máximo de 20 MB.`,
-        {
-          status: 413,
-          code: "PAYLOAD_TOO_LARGE",
-          details: { partial: created },
-        },
-      );
+      return apiErr(`El archivo "${file.name}" supera el máximo de 20 MB.`, {
+        status: 413,
+        code: "PAYLOAD_TOO_LARGE",
+        details: { partial: created },
+      });
     }
     const mime = (file.type || "application/octet-stream").toLowerCase();
     if (!ALLOWED_MIME.has(mime)) {

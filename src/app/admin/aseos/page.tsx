@@ -197,9 +197,8 @@ export default function AseosPage() {
               Operación de aseo
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-zinc-600 dark:text-zinc-300">
-              Tareas generadas desde{" "}
-              <strong>reservas confirmadas</strong>: limpieza el día del
-              check-out y preparación el día del check-in.{" "}
+              Tareas generadas desde <strong>reservas confirmadas</strong>:
+              limpieza el día del check-out y preparación el día del check-in.{" "}
               <Link
                 href="/admin/reservas"
                 className="font-semibold text-amber-900 underline dark:text-amber-400"

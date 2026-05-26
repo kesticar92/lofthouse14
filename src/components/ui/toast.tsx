@@ -179,21 +179,28 @@ function ToastViewport({
   );
 }
 
-const variantClasses: Record<ToastVariant, { container: string; icon: string }> = {
+const variantClasses: Record<
+  ToastVariant,
+  { container: string; icon: string }
+> = {
   success: {
-    container: "border-emerald-500/30 bg-emerald-50 text-emerald-900 dark:border-emerald-400/30 dark:bg-emerald-950/80 dark:text-emerald-100",
+    container:
+      "border-emerald-500/30 bg-emerald-50 text-emerald-900 dark:border-emerald-400/30 dark:bg-emerald-950/80 dark:text-emerald-100",
     icon: "text-emerald-600 dark:text-emerald-400",
   },
   error: {
-    container: "border-red-500/30 bg-red-50 text-red-900 dark:border-red-400/30 dark:bg-red-950/80 dark:text-red-100",
+    container:
+      "border-red-500/30 bg-red-50 text-red-900 dark:border-red-400/30 dark:bg-red-950/80 dark:text-red-100",
     icon: "text-red-600 dark:text-red-400",
   },
   info: {
-    container: "border-sky-500/30 bg-sky-50 text-sky-900 dark:border-sky-400/30 dark:bg-sky-950/80 dark:text-sky-100",
+    container:
+      "border-sky-500/30 bg-sky-50 text-sky-900 dark:border-sky-400/30 dark:bg-sky-950/80 dark:text-sky-100",
     icon: "text-sky-600 dark:text-sky-400",
   },
   warning: {
-    container: "border-amber-500/30 bg-amber-50 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/80 dark:text-amber-100",
+    container:
+      "border-amber-500/30 bg-amber-50 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/80 dark:text-amber-100",
     icon: "text-amber-600 dark:text-amber-400",
   },
 };

@@ -258,7 +258,8 @@ export default function CotizacionesPage() {
     return (
       <AdminShell>
         <p className="text-sm text-red-600 dark:text-red-400">
-          No se pudieron cargar las tarifas: {describeApiFailure(pricingQuery.error)}
+          No se pudieron cargar las tarifas:{" "}
+          {describeApiFailure(pricingQuery.error)}
         </p>
       </AdminShell>
     );

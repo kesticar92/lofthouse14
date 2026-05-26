@@ -51,9 +51,7 @@ const ZONE_VISIT_ORDER = [
 ] as const;
 
 function sortCatalogForVisit(items: InventoryItem[]): InventoryItem[] {
-  const rank = new Map<string, number>(
-    ZONE_VISIT_ORDER.map((z, i) => [z, i]),
-  );
+  const rank = new Map<string, number>(ZONE_VISIT_ORDER.map((z, i) => [z, i]));
   return [...items]
     .sort((a, b) => {
       const ra = rank.get(a.zona) ?? 999;

@@ -23,8 +23,7 @@ export const GET = apiHandler({
   module: "aseos",
   query: getQuerySchema,
   handler: async ({ query, ctx }) => {
-    const date =
-      query.date?.trim() ?? new Date().toISOString().slice(0, 10);
+    const date = query.date?.trim() ?? new Date().toISOString().slice(0, 10);
 
     const { data: tasks, error } = await ctx.supabase
       .from("cleaning_tasks")

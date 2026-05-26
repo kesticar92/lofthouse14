@@ -2,11 +2,11 @@
 
 ## Resumen (qué es cada cosa)
 
-| Paso | Dónde | Qué hace |
-|------|--------|----------|
-| **1. Git push** | Tu Mac → **GitHub** | Guarda el código en `main`. **No toca el servidor.** |
-| **2. Redeploy** | **Digital Ocean** (Droplet) | Descarga `main` desde GitHub, hace `npm ci` + `build`, reinicia PM2. **Esto publica la web.** |
-| **CI** | **GitHub Actions** (`.github/workflows/ci.yml`) | `format:check`, `lint`, `typecheck`, `test`, `build` en cada push/PR. |
+| Paso              | Dónde                                               | Qué hace                                                                                                                                          |
+| ----------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Git push**   | Tu Mac → **GitHub**                                 | Guarda el código en `main`. **No toca el servidor.**                                                                                              |
+| **2. Redeploy**   | **Digital Ocean** (Droplet)                         | Descarga `main` desde GitHub, hace `npm ci` + `build`, reinicia PM2. **Esto publica la web.**                                                     |
+| **CI**            | **GitHub Actions** (`.github/workflows/ci.yml`)     | `format:check`, `lint`, `typecheck`, `test`, `build` en cada push/PR.                                                                             |
 | **CD (opcional)** | **GitHub Actions** (`.github/workflows/deploy.yml`) | Tras push a `main`, SSH al Droplet si configuras secrets en environment `production`: `DROPLET_HOST`, `DROPLET_SSH_KEY`, opcional `DROPLET_USER`. |
 
 **IP del Droplet:** `138.197.138.158` → `https://lofthouse14.com`
@@ -191,7 +191,7 @@ cd /var/www/lofthouse14 && pm2 start npm --name lofthouse14 -- start
 pm2 save
 ```
 
-*(Si ya tenías otro comando `pm2 start`, úsalo igual que antes; lo importante es que el `cwd` sea `/var/www/lofthouse14`.)*
+_(Si ya tenías otro comando `pm2 start`, úsalo igual que antes; lo importante es que el `cwd` sea `/var/www/lofthouse14`.)_
 
 ### B) `Falta NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el servidor`
 
@@ -217,7 +217,7 @@ cd /var/www/lofthouse14
 pm2 restart lofthouse14 --update-env
 ```
 
-*(La clave `service_role` solo en el servidor; nunca en el repo ni en variables `NEXT_PUBLIC_*`.)*
+_(La clave `service_role` solo en el servidor; nunca en el repo ni en variables `NEXT*PUBLIC*_`.)\*
 
 ### C) `JavaScript heap out of memory` durante `npm run build`
 
@@ -246,7 +246,7 @@ Suele ser caché del navegador o mezcla de **build viejo** con **código nuevo**
 
 ## 7. Orden recomendado en un Droplet “roto”
 
-1. Variables en `.env.production.local` (sección B).  
-2. Código actualizado con `git` (sección A si hace falta).  
-3. `npm ci --include=dev` → `npm run build` con heap y swap (sección C).  
+1. Variables en `.env.production.local` (sección B).
+2. Código actualizado con `git` (sección A si hace falta).
+3. `npm ci --include=dev` → `npm run build` con heap y swap (sección C).
 4. `pm2 restart lofthouse14 --update-env` → revisar `pm2 logs`.

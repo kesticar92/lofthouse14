@@ -249,9 +249,13 @@ export default function InventarioPage() {
   async function handleAddFoto(idx: number, file: File) {
     const it = items[idx];
     if (!itemRequiereEvidenciaDanio(it)) {
-      toast.warning("Las fotos solo aplican a ítems dañados o que no funcionan.", {
-        description: "Marca «Dañado» o «No» en ¿Funciona? antes de subir evidencia.",
-      });
+      toast.warning(
+        "Las fotos solo aplican a ítems dañados o que no funcionan.",
+        {
+          description:
+            "Marca «Dañado» o «No» en ¿Funciona? antes de subir evidencia.",
+        },
+      );
       return;
     }
     if (!editId || !it.serverId) {
@@ -353,8 +357,8 @@ export default function InventarioPage() {
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
           Revisa artículo por artículo cada loft. Marca estado y si funciona;
           los ítems que no apliquen se llenan solos. Las fotos quedan
-          respaldadas en Supabase Storage. Las fotos son solo evidencia de daño o
-          fallo de funcionamiento.
+          respaldadas en Supabase Storage. Las fotos son solo evidencia de daño
+          o fallo de funcionamiento.
         </p>
       </div>
 

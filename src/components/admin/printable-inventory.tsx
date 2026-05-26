@@ -87,7 +87,9 @@ export function PrintableInventory({
               style={{ width: "auto", height: 64 }}
               priority
             />
-            <p className="pq-brand-line">Inventario por loft · Reporte oficial</p>
+            <p className="pq-brand-line">
+              Inventario por loft · Reporte oficial
+            </p>
           </div>
           <div className="pq-meta">
             <p className="pq-meta-row">
@@ -284,14 +286,13 @@ export function PrintableInventory({
 
         <footer className="pq-footer">
           <p>
-            Reporte generado automáticamente por la plataforma de
-            administración de {site.name}. Las fotografías de evidencia están
-            embebidas en este PDF y forman parte del soporte del inventario.
+            Reporte generado automáticamente por la plataforma de administración
+            de {site.name}. Las fotografías de evidencia están embebidas en este
+            PDF y forman parte del soporte del inventario.
           </p>
           <p className="pq-footer-brand">
-            {site.legal.razonSocial} · NIT {site.legal.nit} ·{" "}
-            {site.addressLine}, {site.city} · {site.phoneDisplay} ·{" "}
-            {site.email}
+            {site.legal.razonSocial} · NIT {site.legal.nit} · {site.addressLine}
+            , {site.city} · {site.phoneDisplay} · {site.email}
           </p>
         </footer>
       </div>

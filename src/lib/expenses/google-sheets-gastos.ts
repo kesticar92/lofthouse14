@@ -84,8 +84,7 @@ export type AppendGastoRowInput = {
 export async function appendGastoRowToSheet(
   input: AppendGastoRowInput,
 ): Promise<void> {
-  const spreadsheetId =
-    process.env.GOOGLE_SHEETS_GASTOS_SPREADSHEET_ID?.trim();
+  const spreadsheetId = process.env.GOOGLE_SHEETS_GASTOS_SPREADSHEET_ID?.trim();
   if (!spreadsheetId) {
     throw new Error("Falta GOOGLE_SHEETS_GASTOS_SPREADSHEET_ID");
   }

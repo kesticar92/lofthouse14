@@ -112,9 +112,7 @@ function ReservationTooltip({
     let left = anchorRect.left;
     if (left + tip.width + 8 > vw) left = vw - tip.width - 8;
     if (left < 8) left = 8;
-    const top = above
-      ? anchorRect.top - tip.height - 8
-      : anchorRect.bottom + 8;
+    const top = above ? anchorRect.top - tip.height - 8 : anchorRect.bottom + 8;
     setPos({ top, left, above });
   }, [anchorRect]);
 
@@ -145,12 +143,32 @@ function ReservationTooltip({
       <div className="mt-2 space-y-1 text-[11px]">
         <Row label="Check-in" value={fmtDate(r.check_in)} />
         <Row label="Check-out" value={fmtDate(r.check_out)} />
-        <Row label="Duración" value={`${nights} noche${nights !== 1 ? "s" : ""}`} />
-        {r.guests ? <Row label="Huéspedes" value={`${r.guests} persona${r.guests !== 1 ? "s" : ""}`} /> : null}
-        {r.price ? <Row label="Valor" value={formatMoneyCop(Number(r.price))} highlight /> : null}
-        {r.referrer_name?.trim() ? <Row label="Referidor" value={r.referrer_name.trim()} /> : null}
-        {r.commission_amount != null && Number.isFinite(Number(r.commission_amount)) ? (
-          <Row label="Comisión estimada" value={formatMoneyCop(Number(r.commission_amount))} />
+        <Row
+          label="Duración"
+          value={`${nights} noche${nights !== 1 ? "s" : ""}`}
+        />
+        {r.guests ? (
+          <Row
+            label="Huéspedes"
+            value={`${r.guests} persona${r.guests !== 1 ? "s" : ""}`}
+          />
+        ) : null}
+        {r.price ? (
+          <Row
+            label="Valor"
+            value={formatMoneyCop(Number(r.price))}
+            highlight
+          />
+        ) : null}
+        {r.referrer_name?.trim() ? (
+          <Row label="Referidor" value={r.referrer_name.trim()} />
+        ) : null}
+        {r.commission_amount != null &&
+        Number.isFinite(Number(r.commission_amount)) ? (
+          <Row
+            label="Comisión estimada"
+            value={formatMoneyCop(Number(r.commission_amount))}
+          />
         ) : null}
         {r.guest_phone ? <Row label="Teléfono" value={r.guest_phone} /> : null}
         {r.ical_summary ? <Row label="iCal" value={r.ical_summary} /> : null}
@@ -162,7 +180,7 @@ function ReservationTooltip({
         ) : null}
       </div>
 
-        <div className="mt-2 flex flex-wrap items-center gap-1 border-t border-black/5 pt-2 dark:border-white/5">
+      <div className="mt-2 flex flex-wrap items-center gap-1 border-t border-black/5 pt-2 dark:border-white/5">
         <span
           className={cn(
             "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
@@ -266,7 +284,13 @@ function ReservationModal({
               className="shrink-0 rounded-full p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+                <path
+                  d="M18 6L6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                />
               </svg>
             </button>
           </div>
@@ -274,15 +298,39 @@ function ReservationModal({
           <div className="mt-4 space-y-2 text-sm">
             <ModalRow label="Check-in" value={fmtDate(r.check_in)} />
             <ModalRow label="Check-out" value={fmtDate(r.check_out)} />
-            <ModalRow label="Duración" value={`${nights} noche${nights !== 1 ? "s" : ""}`} />
-            {r.guests ? <ModalRow label="Huéspedes" value={`${r.guests} persona${r.guests !== 1 ? "s" : ""}`} /> : null}
-            {r.price ? <ModalRow label="Valor" value={formatMoneyCop(Number(r.price))} highlight /> : null}
-            {r.guest_phone ? <ModalRow label="Teléfono" value={r.guest_phone} /> : null}
-            {r.referrer_name?.trim() ? <ModalRow label="Referidor" value={r.referrer_name.trim()} /> : null}
-            {r.commission_amount != null && Number.isFinite(Number(r.commission_amount)) ? (
-              <ModalRow label="Comisión estimada" value={formatMoneyCop(Number(r.commission_amount))} />
+            <ModalRow
+              label="Duración"
+              value={`${nights} noche${nights !== 1 ? "s" : ""}`}
+            />
+            {r.guests ? (
+              <ModalRow
+                label="Huéspedes"
+                value={`${r.guests} persona${r.guests !== 1 ? "s" : ""}`}
+              />
             ) : null}
-            {r.ical_summary ? <ModalRow label="iCal" value={r.ical_summary} /> : null}
+            {r.price ? (
+              <ModalRow
+                label="Valor"
+                value={formatMoneyCop(Number(r.price))}
+                highlight
+              />
+            ) : null}
+            {r.guest_phone ? (
+              <ModalRow label="Teléfono" value={r.guest_phone} />
+            ) : null}
+            {r.referrer_name?.trim() ? (
+              <ModalRow label="Referidor" value={r.referrer_name.trim()} />
+            ) : null}
+            {r.commission_amount != null &&
+            Number.isFinite(Number(r.commission_amount)) ? (
+              <ModalRow
+                label="Comisión estimada"
+                value={formatMoneyCop(Number(r.commission_amount))}
+              />
+            ) : null}
+            {r.ical_summary ? (
+              <ModalRow label="iCal" value={r.ical_summary} />
+            ) : null}
           </div>
 
           {r.notes ? (
@@ -380,7 +428,11 @@ export function ReservationsTimeline({
   blocks: AvailabilityBlockRow[];
   viewFrom: string;
   viewDays: number;
-  onBlockRange: (propertyId: string, start: string, endInclusive: string) => void;
+  onBlockRange: (
+    propertyId: string,
+    start: string,
+    endInclusive: string,
+  ) => void;
   onReservationPatch?: (payload: {
     id: string;
     property_id: string;
@@ -393,7 +445,9 @@ export function ReservationsTimeline({
   const days = useMemo(
     () =>
       Array.from({ length: viewDays }, (_, i) =>
-        toISODateString(new Date(parseISODate(viewFrom).getTime() + i * 86400000)),
+        toISODateString(
+          new Date(parseISODate(viewFrom).getTime() + i * 86400000),
+        ),
       ),
     [viewFrom, viewDays],
   );
@@ -418,7 +472,10 @@ export function ReservationsTimeline({
   );
 
   const [mode, setMode] = useState<Mode>("none");
-  const [anchor, setAnchor] = useState<{ propertyId: string; day: string } | null>(null);
+  const [anchor, setAnchor] = useState<{
+    propertyId: string;
+    day: string;
+  } | null>(null);
   const [drag, setDrag] = useState<DragState | null>(null);
   const dragRef = useRef<DragState | null>(null);
 
@@ -488,7 +545,13 @@ export function ReservationsTimeline({
       if (!d || ev.pointerId !== d.pointerId) return;
       const deltaDays = Math.round((ev.clientX - d.originClientX) / CELL);
       const hover = rowFromPoint(ev.clientX, ev.clientY) ?? d.hoverPropertyId;
-      const next: DragState = { ...d, deltaDays, hoverPropertyId: hover, clientX: ev.clientX, clientY: ev.clientY };
+      const next: DragState = {
+        ...d,
+        deltaDays,
+        hoverPropertyId: hover,
+        clientX: ev.clientX,
+        clientY: ev.clientY,
+      };
       dragRef.current = next;
       setDrag(next);
     };
@@ -508,8 +571,18 @@ export function ReservationsTimeline({
       const newCheckIn = addDays(d.checkIn, d.deltaDays);
       const newCheckOut = addDays(d.checkOut, d.deltaDays);
       const newProp = d.hoverPropertyId;
-      if (newProp === d.propertyId && newCheckIn === d.checkIn && newCheckOut === d.checkOut) return;
-      const res = await onReservationPatch({ id: d.id, property_id: newProp, check_in: newCheckIn, check_out: newCheckOut });
+      if (
+        newProp === d.propertyId &&
+        newCheckIn === d.checkIn &&
+        newCheckOut === d.checkOut
+      )
+        return;
+      const res = await onReservationPatch({
+        id: d.id,
+        property_id: newProp,
+        check_in: newCheckIn,
+        check_out: newCheckOut,
+      });
       if (!res.ok)
         toast.error("No se pudo mover la reserva", {
           description: res.error ?? "Inténtalo nuevamente.",
@@ -527,7 +600,11 @@ export function ReservationsTimeline({
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", finish);
     window.addEventListener("pointercancel", cancel);
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* noop */ }
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* noop */
+    }
   }
 
   const totalW = viewDays * CELL;
@@ -537,11 +614,13 @@ export function ReservationsTimeline({
     <div className="space-y-3">
       {onReservationPatch ? (
         <p className="text-xs text-zinc-600 dark:text-zinc-400">
-          <strong className="text-zinc-800 dark:text-zinc-200">Arrastrar:</strong>{" "}
+          <strong className="text-zinc-800 dark:text-zinc-200">
+            Arrastrar:
+          </strong>{" "}
           mantén pulsada una reserva y muévela para cambiar fechas o loft. Las
           reservas marcadas con <em className="font-semibold">iCal</em> (Airbnb
-          y otros calendarios sincronizados) son de solo lectura: edítalas en
-          su panel de origen.
+          y otros calendarios sincronizados) son de solo lectura: edítalas en su
+          panel de origen.
         </p>
       ) : null}
 
@@ -560,7 +639,9 @@ export function ReservationsTimeline({
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        <span className="font-semibold text-zinc-700 dark:text-zinc-200">Leyenda:</span>
+        <span className="font-semibold text-zinc-700 dark:text-zinc-200">
+          Leyenda:
+        </span>
         <LegendDot className="bg-sky-600" label="Booking" />
         <LegendDot className="bg-orange-500" label="Airbnb" />
         <LegendDot className="bg-amber-300" label="Expedia" />
@@ -574,7 +655,10 @@ export function ReservationsTimeline({
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={() => { setMode(mode === "block" ? "none" : "block"); setAnchor(null); }}
+          onClick={() => {
+            setMode(mode === "block" ? "none" : "block");
+            setAnchor(null);
+          }}
           className={cn(
             "rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition",
             mode === "block"
@@ -601,7 +685,9 @@ export function ReservationsTimeline({
             </div>
             <div className="flex" style={{ width: totalW }}>
               {days.map((d) => {
-                const wd = ["D", "L", "M", "X", "J", "V", "S"][parseISODate(d).getDay()];
+                const wd = ["D", "L", "M", "X", "J", "V", "S"][
+                  parseISODate(d).getDay()
+                ];
                 const isToday = d === today;
                 return (
                   <div
@@ -615,7 +701,14 @@ export function ReservationsTimeline({
                     )}
                   >
                     <div>{wd}</div>
-                    <div className={cn("font-semibold", isToday ? "text-amber-900 dark:text-amber-200" : "text-zinc-800 dark:text-zinc-100")}>
+                    <div
+                      className={cn(
+                        "font-semibold",
+                        isToday
+                          ? "text-amber-900 dark:text-amber-200"
+                          : "text-zinc-800 dark:text-zinc-100",
+                      )}
+                    >
                       {d.slice(8)}
                     </div>
                   </div>
@@ -631,7 +724,8 @@ export function ReservationsTimeline({
               data-pmsrow={p.id}
               className={cn(
                 "flex border-b border-black/5 transition-colors last:border-0 dark:border-white/5",
-                drag?.hoverPropertyId === p.id && drag.hoverPropertyId !== drag.propertyId
+                drag?.hoverPropertyId === p.id &&
+                  drag.hoverPropertyId !== drag.propertyId
                   ? "bg-amber-500/10 ring-1 ring-inset ring-amber-600/25"
                   : "",
               )}
@@ -642,9 +736,17 @@ export function ReservationsTimeline({
               </div>
 
               {/* Day cells */}
-              <div className="relative shrink-0" style={{ width: totalW, height: ROW_H }}>
+              <div
+                className="relative shrink-0"
+                style={{ width: totalW, height: ROW_H }}
+              >
                 {/* Clickable day cells */}
-                <div className={cn("absolute inset-0 flex", mode === "block" ? "z-20" : "z-0")}>
+                <div
+                  className={cn(
+                    "absolute inset-0 flex",
+                    mode === "block" ? "z-20" : "z-0",
+                  )}
+                >
                   {days.map((d) => {
                     const isToday = d === today;
                     return (
@@ -656,7 +758,9 @@ export function ReservationsTimeline({
                         className={cn(
                           "h-full shrink-0 border-l border-black/5 dark:border-white/5",
                           isToday && "bg-amber-500/8 dark:bg-amber-500/10",
-                          mode === "block" && anchor?.propertyId === p.id && anchor.day === d
+                          mode === "block" &&
+                            anchor?.propertyId === p.id &&
+                            anchor.day === d
                             ? "bg-amber-200/70 dark:bg-amber-900/50"
                             : "hover:bg-black/[0.04] dark:hover:bg-white/[0.05]",
                         )}
@@ -669,7 +773,8 @@ export function ReservationsTimeline({
                 {blocks
                   .filter((b) => b.property_id === p.id)
                   .map((b) => {
-                    const vs = b.start_date < viewFrom ? viewFrom : b.start_date;
+                    const vs =
+                      b.start_date < viewFrom ? viewFrom : b.start_date;
                     const ve = b.end_date > viewEndEx ? viewEndEx : b.end_date;
                     if (vs >= ve) return null;
                     const off = dayOffset(viewFrom, vs);
@@ -684,7 +789,7 @@ export function ReservationsTimeline({
                         )}
                         style={{
                           left: off * CELL + Math.round(CELL / 3),
-                          width: Math.max(Math.round(CELL * 2 / 3), w * CELL),
+                          width: Math.max(Math.round((CELL * 2) / 3), w * CELL),
                           top: BAR_TOP,
                           height: BAR_H,
                         }}
@@ -694,10 +799,13 @@ export function ReservationsTimeline({
 
                 {/* Reservation bars */}
                 {reservations
-                  .filter((r) => r.property_id === p.id && r.status !== "cancelled")
+                  .filter(
+                    (r) => r.property_id === p.id && r.status !== "cancelled",
+                  )
                   .map((r) => {
                     const vs = r.check_in < viewFrom ? viewFrom : r.check_in;
-                    const ve = r.check_out > viewEndEx ? viewEndEx : r.check_out;
+                    const ve =
+                      r.check_out > viewEndEx ? viewEndEx : r.check_out;
                     if (vs >= ve) return null;
 
                     // Clip offsets
@@ -709,11 +817,16 @@ export function ReservationsTimeline({
                     const isClippedStart = r.check_in < viewFrom;
                     const isClippedEnd = r.check_out > viewEndEx;
 
-                    const barLeft = isClippedStart ? off * CELL : off * CELL + Math.round(CELL / 3);
+                    const barLeft = isClippedStart
+                      ? off * CELL
+                      : off * CELL + Math.round(CELL / 3);
                     const barRight = isClippedEnd
                       ? (off + w) * CELL
                       : (off + w) * CELL + Math.round(CELL / 3);
-                    const barWidth = Math.max(Math.round(CELL * 2 / 3), barRight - barLeft);
+                    const barWidth = Math.max(
+                      Math.round((CELL * 2) / 3),
+                      barRight - barLeft,
+                    );
 
                     const isDragging = drag?.id === r.id;
                     const readOnly = isReadOnlyReservation(r);
@@ -733,7 +846,10 @@ export function ReservationsTimeline({
                         }
                         onMouseEnter={(e) => {
                           if (drag) return;
-                          setTooltip({ r, anchorRect: e.currentTarget.getBoundingClientRect() });
+                          setTooltip({
+                            r,
+                            anchorRect: e.currentTarget.getBoundingClientRect(),
+                          });
                         }}
                         onMouseLeave={() => setTooltip(null)}
                         onClick={(e) => {
@@ -763,7 +879,8 @@ export function ReservationsTimeline({
                               : onReservationPatch
                                 ? "cursor-grab active:cursor-grabbing"
                                 : "cursor-pointer"),
-                          readOnly && "ring-2 ring-offset-0 ring-black/15 dark:ring-white/20",
+                          readOnly &&
+                            "ring-2 ring-offset-0 ring-black/15 dark:ring-white/20",
                           isDragging && "opacity-30",
                         )}
                         style={{
@@ -812,9 +929,11 @@ export function ReservationsTimeline({
             }}
           >
             <span className="truncate leading-none">{drag.ghostLabel}</span>
-            {drag.deltaDays !== 0 || drag.hoverPropertyId !== drag.propertyId ? (
+            {drag.deltaDays !== 0 ||
+            drag.hoverPropertyId !== drag.propertyId ? (
               <span className="ml-1 shrink-0 text-[8px] font-normal opacity-90">
-                {addDays(drag.checkIn, drag.deltaDays)} · {propertyNames[drag.hoverPropertyId] ?? "…"}
+                {addDays(drag.checkIn, drag.deltaDays)} ·{" "}
+                {propertyNames[drag.hoverPropertyId] ?? "…"}
               </span>
             ) : null}
           </div>,
@@ -822,7 +941,9 @@ export function ReservationsTimeline({
         )}
 
       {/* Desktop tooltip */}
-      {tooltip && !drag && typeof document !== "undefined" &&
+      {tooltip &&
+        !drag &&
+        typeof document !== "undefined" &&
         createPortal(
           <ReservationTooltip r={tooltip.r} anchorRect={tooltip.anchorRect} />,
           document.body,

@@ -48,9 +48,12 @@ export const POST = apiHandler({
       .select("*")
       .maybeSingle();
     if (insErr || !ins?.id) {
-      throw new ApiHandlerError(insErr?.message ?? "No se pudo crear la fuente", {
-        status: 500,
-      });
+      throw new ApiHandlerError(
+        insErr?.message ?? "No se pudo crear la fuente",
+        {
+          status: 500,
+        },
+      );
     }
 
     let sync: { ok: boolean; message: string; upserted: number } | null = null;

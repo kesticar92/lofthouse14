@@ -1,7 +1,4 @@
-import {
-  DEFAULT_PRICING,
-  type PricingConfig,
-} from "@/lib/pricing";
+import { DEFAULT_PRICING, type PricingConfig } from "@/lib/pricing";
 
 export { DEFAULT_PRICING };
 
@@ -15,8 +12,14 @@ export function parseCotizacionesPricing(raw: unknown): PricingConfig {
     aseoCorta: num(o.aseoCorta, DEFAULT_PRICING.aseoCorta),
     aseoMedia: num(o.aseoMedia, DEFAULT_PRICING.aseoMedia),
     aseoSemanal: num(o.aseoSemanal, DEFAULT_PRICING.aseoSemanal),
-    descuentoSemanal: ratio(o.descuentoSemanal, DEFAULT_PRICING.descuentoSemanal),
-    descuentoMensual: ratio(o.descuentoMensual, DEFAULT_PRICING.descuentoMensual),
+    descuentoSemanal: ratio(
+      o.descuentoSemanal,
+      DEFAULT_PRICING.descuentoSemanal,
+    ),
+    descuentoMensual: ratio(
+      o.descuentoMensual,
+      DEFAULT_PRICING.descuentoMensual,
+    ),
   };
 }
 

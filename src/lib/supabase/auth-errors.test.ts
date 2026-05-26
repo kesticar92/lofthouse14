@@ -5,7 +5,10 @@ import { isSupabaseAuthUnreachable } from "./auth-errors";
 describe("isSupabaseAuthUnreachable", () => {
   it("detecta AuthRetryableFetchError", () => {
     expect(
-      isSupabaseAuthUnreachable({ name: "AuthRetryableFetchError", message: "x" }),
+      isSupabaseAuthUnreachable({
+        name: "AuthRetryableFetchError",
+        message: "x",
+      }),
     ).toBe(true);
   });
 

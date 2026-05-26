@@ -8,11 +8,11 @@ No pegues secretos en chats públicos. Copia los valores en **`.env.local`** (lo
 
 ### 1. Proyecto (público, seguro en el cliente con RLS)
 
-| Variable                               | Dónde copiarla en Supabase                                                                 |
-| -------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SUPABASE_URL`             | **Project Settings → API → Project URL**                                                   |
+| Variable                               | Dónde copiarla en Supabase                                                                |
+| -------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | **Project Settings → API → Project URL**                                                  |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | **API Keys → Publishable** (formato `sb_publishable_…`; recomendado en proyectos nuevos). |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`       | Alternativa legacy: **Project API keys → `anon` `public`** (JWT `eyJ…`).                    |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`        | Alternativa legacy: **Project API keys → `anon` `public`** (JWT `eyJ…`).                  |
 
 En el código se usa la publishable si existe; si no, la anon.
 

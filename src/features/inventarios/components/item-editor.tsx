@@ -40,12 +40,7 @@ function EvidenciaFotosPanel({
   onRemoveFoto,
 }: Pick<
   ItemEditorProps,
-  | "idx"
-  | "it"
-  | "canUploadFotos"
-  | "uploading"
-  | "onAddFoto"
-  | "onRemoveFoto"
+  "idx" | "it" | "canUploadFotos" | "uploading" | "onAddFoto" | "onRemoveFoto"
 >) {
   const camId = `inv-foto-cam-${idx}`;
   const galId = `inv-foto-gal-${idx}`;

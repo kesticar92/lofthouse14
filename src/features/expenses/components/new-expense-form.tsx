@@ -271,7 +271,11 @@ export function NewExpenseForm(props: NewExpenseFormProps) {
                 >
                   {isImg && url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={url} alt="" className="h-full w-full object-cover" />
+                    <img
+                      src={url}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <div className="flex h-full items-center justify-center p-1 text-center text-[10px] text-zinc-600">
                       {f.name}

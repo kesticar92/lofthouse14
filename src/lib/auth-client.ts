@@ -39,14 +39,25 @@ export async function fetchAdminSession(): Promise<AdminSessionInfo | null> {
     userId: user.id,
     role: profile.role,
     status: profile.status,
-    allowedModules: isSuperAdmin || isAdmin ? [...ADMIN_MODULE_KEYS] : (profile.allowed_modules ?? []),
+    allowedModules:
+      isSuperAdmin || isAdmin
+        ? [...ADMIN_MODULE_KEYS]
+        : (profile.allowed_modules ?? []),
   };
 }
 
 export async function loginAdmin(
   email: string,
   password: string,
-): Promise<"ok" | "bad_credentials" | "network" | "server" | "no_profile" | "pending_approval" | "suspended"> {
+): Promise<
+  | "ok"
+  | "bad_credentials"
+  | "network"
+  | "server"
+  | "no_profile"
+  | "pending_approval"
+  | "suspended"
+> {
   try {
     const supabase = getSupabaseBrowser();
     if (!supabase) return "server";
@@ -57,14 +68,20 @@ export async function loginAdmin(
     if (error) {
       if (isSupabaseAuthUnreachable(error)) return "network";
       // Log real Supabase error for debugging (visible en DevTools)
-      console.error("[loginAdmin] Supabase auth error:", error.status, error.message, error.code);
+      console.error(
+        "[loginAdmin] Supabase auth error:",
+        error.status,
+        error.message,
+        error.code,
+      );
       const msg = error.message.toLowerCase();
       if (
         msg.includes("invalid login credentials") ||
         msg.includes("invalid credentials") ||
         msg.includes("email not confirmed") ||
         msg.includes("invalid email or password") ||
-        (error.status === 400 && (msg.includes("invalid") || msg.includes("credentials")))
+        (error.status === 400 &&
+          (msg.includes("invalid") || msg.includes("credentials")))
       ) {
         return "bad_credentials";
       }
@@ -80,7 +97,11 @@ export async function loginAdmin(
 
     if (profErr) {
       if (isSupabaseAuthUnreachable(profErr)) return "network";
-      console.error("[loginAdmin] Error leyendo profiles:", profErr.message, profErr);
+      console.error(
+        "[loginAdmin] Error leyendo profiles:",
+        profErr.message,
+        profErr,
+      );
     }
 
     if (!profile?.role || !isStaffRole(profile.role)) {

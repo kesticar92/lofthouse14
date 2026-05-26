@@ -6,9 +6,16 @@ export async function syncAllIcalSources(admin: SupabaseClient): Promise<{
   sources: number;
   results: { id: string; ok: boolean; message: string; upserted: number }[];
 }> {
-  const { data: sources, error } = await admin.from("ical_sources").select("id, property_id, url");
+  const { data: sources, error } = await admin
+    .from("ical_sources")
+    .select("id, property_id, url");
   if (error) throw new Error(error.message);
-  const results: { id: string; ok: boolean; message: string; upserted: number }[] = [];
+  const results: {
+    id: string;
+    ok: boolean;
+    message: string;
+    upserted: number;
+  }[] = [];
   for (const s of sources ?? []) {
     const r = await syncIcalSource(admin, s.id, s.property_id, s.url);
     results.push({

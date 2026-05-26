@@ -53,8 +53,13 @@ export function Location() {
           >
             <div className="pointer-events-none absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-md border border-zinc-900/60 bg-[#f2f0eb]/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-800 dark:border-zinc-200/60 dark:bg-zinc-950/80 dark:text-zinc-200">
               {/* iPhone-style pin */}
-              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0 text-[#007AFF]" fill="currentColor" aria-hidden>
-                <path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-3.5 w-3.5 shrink-0 text-[#007AFF]"
+                fill="currentColor"
+                aria-hidden
+              >
+                <path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" />
               </svg>
               Cómo llegar
             </div>

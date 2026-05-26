@@ -1,19 +1,40 @@
-# Deploy al Droplet vía SSH cuando los secrets están configurados en GitHub.
-# Secrets requeridos: DROPLET_HOST, DROPLET_SSH_KEY (clave privada), opcional DROPLET_USER (default root)
+# Deploy al Droplet vía SSH (solo si CI pasó y los secrets están configurados).
+# Secrets en GitHub → Settings → Environments → production:
+#   DROPLET_HOST=138.197.138.158
+#   DROPLET_SSH_KEY=<contenido de clave privada SSH>
+#   DROPLET_USER=root (opcional)
 
 name: Deploy
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
     environment: production
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
+      - name: Comprobar secrets de deploy
+        id: secrets
+        run: |
+          if [ -z "${DROPLET_HOST:-}" ] || [ -z "${DROPLET_SSH_KEY:-}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Deploy omitido::Configura DROPLET_HOST y DROPLET_SSH_KEY en Environment production (Settings → Environments)."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
+          DROPLET_SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+
       - name: Deploy via SSH
+        if: steps.secrets.outputs.configured == 'true'
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.DROPLET_HOST }}
@@ -23,3 +44,7 @@ jobs:
             curl -fsSL https://raw.githubusercontent.com/kesticar92/lofthouse14/main/scripts/deploy/redeploy-from-github.sh \
               -o /tmp/redeploy.sh
             BRANCH=main NODE_HEAP_MB=2048 bash /tmp/redeploy.sh
+
+      - name: Deploy no configurado
+        if: steps.secrets.outputs.configured != 'true'
+        run: echo "Secrets ausentes; el deploy manual sigue disponible (ver docs/DEPLOY.md)."

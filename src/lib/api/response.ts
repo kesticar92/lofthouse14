@@ -78,5 +78,7 @@ export const apiRateLimited = (retryAfterSec?: number) =>
     status: 429,
     code: "RATE_LIMITED",
     details: retryAfterSec ? { retry_after_sec: retryAfterSec } : undefined,
-    headers: retryAfterSec ? { "Retry-After": String(retryAfterSec) } : undefined,
+    headers: retryAfterSec
+      ? { "Retry-After": String(retryAfterSec) }
+      : undefined,
   });

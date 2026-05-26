@@ -40,7 +40,9 @@ export function ExpenseDetailModal({
         ) : expense ? (
           <div className="space-y-4 text-sm">
             <p>
-              <strong>{fmtMoney(Number(expense.amount), expense.currency)}</strong>{" "}
+              <strong>
+                {fmtMoney(Number(expense.amount), expense.currency)}
+              </strong>{" "}
               · {expense.expense_date}
             </p>
             <p className="text-zinc-600 dark:text-zinc-300">

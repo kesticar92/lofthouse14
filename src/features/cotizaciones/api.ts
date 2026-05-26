@@ -7,10 +7,7 @@
 
 import { apiClient } from "@/lib/api/client";
 import type { Cotizacion } from "./types";
-import type {
-  CotizacionCreateInput,
-  CotizacionUpdateInput,
-} from "./schemas";
+import type { CotizacionCreateInput, CotizacionUpdateInput } from "./schemas";
 
 export async function listCotizaciones(params?: {
   status?: string;

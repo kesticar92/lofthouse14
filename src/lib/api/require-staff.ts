@@ -2,10 +2,7 @@ import {
   createSupabaseServerClient,
   type TypedSupabaseServerClient,
 } from "@/lib/supabase/server";
-import {
-  isStaffRole,
-  type StaffRole,
-} from "@/lib/supabase/env";
+import { isStaffRole, type StaffRole } from "@/lib/supabase/env";
 import { apiErr, apiForbidden, apiUnauthorized } from "@/lib/api/response";
 import {
   staffHasModuleAccess,

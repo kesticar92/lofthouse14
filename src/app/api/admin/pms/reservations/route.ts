@@ -91,7 +91,10 @@ export const POST = apiHandler({
 
     const referrer_name = body.referrer_name?.trim() ?? "";
     let commission_amount: number | null = null;
-    if (body.commission_amount !== undefined && body.commission_amount !== null) {
+    if (
+      body.commission_amount !== undefined &&
+      body.commission_amount !== null
+    ) {
       const n = Number(body.commission_amount);
       if (!Number.isFinite(n) || n < 0) {
         throw new ApiHandlerError("commission_amount inválido", {
@@ -128,10 +131,13 @@ export const POST = apiHandler({
       check_out,
     );
     if (blockHits.length > 0) {
-      throw new ApiHandlerError("Conflicto: las fechas coinciden con un bloqueo.", {
-        status: 409,
-        code: "CONFLICT",
-      });
+      throw new ApiHandlerError(
+        "Conflicto: las fechas coinciden con un bloqueo.",
+        {
+          status: 409,
+          code: "CONFLICT",
+        },
+      );
     }
 
     const row = {
@@ -163,7 +169,8 @@ export const POST = apiHandler({
         ctx.supabase,
         data.id,
       );
-      if (rpcErr) console.error("regenerateCleaningTasksForReservation", rpcErr);
+      if (rpcErr)
+        console.error("regenerateCleaningTasksForReservation", rpcErr);
       if (data.status === "confirmed") {
         try {
           const admin = createServiceRoleClient();

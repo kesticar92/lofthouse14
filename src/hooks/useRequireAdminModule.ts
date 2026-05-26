@@ -38,7 +38,10 @@ export function useRequireAdminModule(): {
         allowed_modules: session.allowedModules,
       };
       const path = pathname ?? "/admin";
-      if (isAdminOnlyAdminPath(path) && !staffCanAccessAdminPath(profile, path)) {
+      if (
+        isAdminOnlyAdminPath(path) &&
+        !staffCanAccessAdminPath(profile, path)
+      ) {
         router.replace("/admin");
         return;
       }

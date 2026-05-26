@@ -95,7 +95,8 @@ function emit(level: LogLevel, ctx: LoggerContext, payload: LogPayload) {
   for (const [k, v] of Object.entries(ctx)) {
     if (k !== "module") rest[k] = v;
   }
-  const restStr = Object.keys(rest).length > 0 ? ` ${JSON.stringify(rest)}` : "";
+  const restStr =
+    Object.keys(rest).length > 0 ? ` ${JSON.stringify(rest)}` : "";
 
   if (level === "error") console.error(`${prefix}${tag} ${msg}${restStr}`);
   else if (level === "warn") console.warn(`${prefix}${tag} ${msg}${restStr}`);

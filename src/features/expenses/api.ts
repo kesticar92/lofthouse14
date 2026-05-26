@@ -59,10 +59,9 @@ export async function uploadExpenseFiles(
 export async function retryExpenseDriveBackup(
   fileId: string,
 ): Promise<{ retried: true }> {
-  return apiClient(
-    `/api/admin/expenses/files/${fileId}/retry-drive`,
-    { method: "POST" },
-  );
+  return apiClient(`/api/admin/expenses/files/${fileId}/retry-drive`, {
+    method: "POST",
+  });
 }
 
 /** Elimina el gasto y sus archivos en Storage. */

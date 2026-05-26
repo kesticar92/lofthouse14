@@ -33,12 +33,7 @@ import type { NextRequest } from "next/server";
 import type { ZodTypeAny, infer as ZodInfer } from "zod";
 import { ZodError } from "zod";
 
-import {
-  apiBadRequest,
-  apiErr,
-  apiOk,
-  apiValidationError,
-} from "./response";
+import { apiBadRequest, apiErr, apiOk, apiValidationError } from "./response";
 import type { AdminModuleKey } from "./admin-modules";
 import {
   enforceStaffModule,

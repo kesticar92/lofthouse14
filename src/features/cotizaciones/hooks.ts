@@ -35,10 +35,7 @@ import {
   saveCotizacionesPricing,
 } from "@/services/cotizaciones-pricing";
 import type { Cotizacion } from "./types";
-import type {
-  CotizacionCreateInput,
-  CotizacionUpdateInput,
-} from "./schemas";
+import type { CotizacionCreateInput, CotizacionUpdateInput } from "./schemas";
 
 const baseKey = ["cotizaciones"] as const;
 
@@ -51,10 +48,7 @@ export const cotizacionesKeys = {
 
 export function useCotizaciones(
   filters?: { status?: string; limit?: number },
-  options?: Omit<
-    UseQueryOptions<Cotizacion[], Error>,
-    "queryKey" | "queryFn"
-  >,
+  options?: Omit<UseQueryOptions<Cotizacion[], Error>, "queryKey" | "queryFn">,
 ) {
   return useQuery<Cotizacion[], Error>({
     queryKey: cotizacionesKeys.list(filters),
@@ -116,10 +110,7 @@ export function useUpdateCotizacion(
 const pricingKey = ["cotizaciones", "pricing"] as const;
 
 export function useCotizacionesPricing(
-  options?: Omit<
-    UseQueryOptions<PricingConfig, Error>,
-    "queryKey" | "queryFn"
-  >,
+  options?: Omit<UseQueryOptions<PricingConfig, Error>, "queryKey" | "queryFn">,
 ) {
   return useQuery<PricingConfig, Error>({
     queryKey: pricingKey,
@@ -144,11 +135,7 @@ export function useSaveCotizacionesPricing(
 }
 
 export function useDeleteCotizacion(
-  options?: UseMutationOptions<
-    { id: number; deleted: boolean },
-    Error,
-    number
-  >,
+  options?: UseMutationOptions<{ id: number; deleted: boolean }, Error, number>,
 ) {
   const qc = useQueryClient();
   return useMutation<{ id: number; deleted: boolean }, Error, number>({

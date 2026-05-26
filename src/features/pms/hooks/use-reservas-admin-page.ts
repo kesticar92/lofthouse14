@@ -126,8 +126,7 @@ export function useReservasAdminPage(pms: Pms) {
         return { ok: false, error: r.error };
       }
       setMsg(
-        r.data?.sync?.message?.trim() ||
-          "Enlace iCal añadido y sincronizado.",
+        r.data?.sync?.message?.trim() || "Enlace iCal añadido y sincronizado.",
       );
       await pms.refresh();
       return { ok: true };

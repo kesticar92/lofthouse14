@@ -11,7 +11,9 @@ export const GOOGLE_EXPENSE_DEFAULT_SCOPES = [
   GOOGLE_SHEETS_SCOPE,
 ] as const;
 
-export function normalizeGooglePrivateKey(raw: string | undefined): string | undefined {
+export function normalizeGooglePrivateKey(
+  raw: string | undefined,
+): string | undefined {
   if (!raw) return undefined;
   return raw.replace(/\\n/g, "\n");
 }

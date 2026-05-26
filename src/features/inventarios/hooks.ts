@@ -118,11 +118,7 @@ export function useUpdateInventario(
 }
 
 export function useDeleteInventario(
-  options?: UseMutationOptions<
-    { id: string; deleted: boolean },
-    Error,
-    string
-  >,
+  options?: UseMutationOptions<{ id: string; deleted: boolean }, Error, string>,
 ) {
   const qc = useQueryClient();
   return useMutation<{ id: string; deleted: boolean }, Error, string>({
@@ -155,7 +151,9 @@ export function useUploadFoto(
     ...options,
     onSuccess: (...args) => {
       const vars = args[1];
-      qc.invalidateQueries({ queryKey: inventariosKeys.detail(vars.revisionId) });
+      qc.invalidateQueries({
+        queryKey: inventariosKeys.detail(vars.revisionId),
+      });
       qc.invalidateQueries({ queryKey: inventariosKeys.all });
       options?.onSuccess?.(...args);
     },
@@ -180,7 +178,9 @@ export function useDeleteFoto(
     ...options,
     onSuccess: (...args) => {
       const vars = args[1];
-      qc.invalidateQueries({ queryKey: inventariosKeys.detail(vars.revisionId) });
+      qc.invalidateQueries({
+        queryKey: inventariosKeys.detail(vars.revisionId),
+      });
       qc.invalidateQueries({ queryKey: inventariosKeys.all });
       options?.onSuccess?.(...args);
     },

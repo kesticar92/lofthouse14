@@ -23,7 +23,10 @@ export async function fetchPmsBundle(
 ): Promise<PmsBundle> {
   const [pj, rj, sj] = await Promise.all([
     apiClient<{ properties: PropertyRow[] }>("/api/admin/pms/properties"),
-    apiClient<{ reservations: ReservationRow[]; blocks: AvailabilityBlockRow[] }>(
+    apiClient<{
+      reservations: ReservationRow[];
+      blocks: AvailabilityBlockRow[];
+    }>(
       `/api/admin/pms/reservations?from=${encodeURIComponent(viewFrom)}&to=${encodeURIComponent(viewTo)}`,
     ),
     apiClient<{ sources: IcalSourceRow[] }>("/api/admin/pms/ical-sources"),
@@ -56,7 +59,10 @@ async function safeApi<T>(fn: () => Promise<T>): Promise<PmsPostResult<T>> {
 }
 
 /** POST JSON genérico al dominio PMS (compat con rutas legacy `{ error }`). */
-export function postPmsJson<T>(path: string, body: unknown): Promise<PmsPostResult<T>> {
+export function postPmsJson<T>(
+  path: string,
+  body: unknown,
+): Promise<PmsPostResult<T>> {
   return safeApi(() =>
     apiClient<T>(path, {
       method: "POST",
@@ -117,14 +123,11 @@ type IcalSyncApiData = {
 
 export async function requestPmsIcalSync(
   id: string,
-): Promise<
-  { ok: true; message?: string } | { ok: false; error: string }
-> {
+): Promise<{ ok: true; message?: string } | { ok: false; error: string }> {
   const r = await safeApi(() =>
-    apiClient<IcalSyncApiData>(
-      `/api/admin/pms/ical-sources/${id}/sync`,
-      { method: "POST" },
-    ),
+    apiClient<IcalSyncApiData>(`/api/admin/pms/ical-sources/${id}/sync`, {
+      method: "POST",
+    }),
   );
   if (!r.ok) return { ok: false, error: r.error };
   if (r.data.ok === false) {

@@ -11,8 +11,8 @@ function normalizePrivateKey(raw: string | undefined): string | undefined {
 export function isGoogleDriveConfigured(): boolean {
   return Boolean(
     process.env.GOOGLE_CLIENT_EMAIL?.trim() &&
-      normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY)?.trim() &&
-      process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID?.trim(),
+    normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY)?.trim() &&
+    process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID?.trim(),
   );
 }
 

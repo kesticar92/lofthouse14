@@ -60,7 +60,10 @@ export const POST = apiHandler({
     }
 
     const full = await loadRevisionFull(ctx.supabase, header.id);
-    if (!full) throw new ApiHandlerError("No se pudo cargar la revisión", { status: 500 });
+    if (!full)
+      throw new ApiHandlerError("No se pudo cargar la revisión", {
+        status: 500,
+      });
     return full;
   },
 });

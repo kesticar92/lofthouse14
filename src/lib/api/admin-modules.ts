@@ -36,11 +36,13 @@ export const ADMIN_MODULE_OPTIONS: { key: AdminModuleKey; label: string }[] =
  * Módulos que se suelen asignar a rol `staff` en la UI.
  * `usuarios` lo gestionan cuentas admin/super_admin desde la misma pantalla.
  */
-export const ADMIN_STAFF_MODULE_OPTIONS: { key: AdminModuleKey; label: string }[] =
-  ADMIN_MODULE_KEYS.filter((k) => k !== "usuarios").map((key) => ({
-    key,
-    label: ADMIN_MODULE_LABELS[key],
-  }));
+export const ADMIN_STAFF_MODULE_OPTIONS: {
+  key: AdminModuleKey;
+  label: string;
+}[] = ADMIN_MODULE_KEYS.filter((k) => k !== "usuarios").map((key) => ({
+  key,
+  label: ADMIN_MODULE_LABELS[key],
+}));
 
 export function isAdminModuleKey(s: string): s is AdminModuleKey {
   return (ADMIN_MODULE_KEYS as readonly string[]).includes(s);

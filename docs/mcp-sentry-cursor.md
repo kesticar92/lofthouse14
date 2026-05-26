@@ -17,7 +17,7 @@ Los pasos exactos cambian según la versión del producto; en general:
 2. Añade un servidor nuevo con URL `https://mcp.sentry.dev/mcp`.
 3. Completa la autenticación que te pida el flujo (OAuth o token según Sentry).
 
-Documentación oficial del proveedor: revisa la ayuda en [sentry.io](https://sentry.io) / docs de *Sentry MCP* para tokens y alcances recomendados.
+Documentación oficial del proveedor: revisa la ayuda en [sentry.io](https://sentry.io) / docs de _Sentry MCP_ para tokens y alcances recomendados.
 
 ## Relación con `NEXT_PUBLIC_SENTRY_DSN`
 

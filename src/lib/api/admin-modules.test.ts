@@ -11,7 +11,9 @@ import {
 describe("adminModuleForPath", () => {
   it("resuelve módulos por prefijo de ruta", () => {
     expect(adminModuleForPath("/admin/cotizaciones")).toBe("cotizaciones");
-    expect(adminModuleForPath("/admin/cotizaciones/extra")).toBe("cotizaciones");
+    expect(adminModuleForPath("/admin/cotizaciones/extra")).toBe(
+      "cotizaciones",
+    );
     expect(adminModuleForPath("/admin")).toBeNull();
   });
 });

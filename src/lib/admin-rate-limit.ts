@@ -41,9 +41,7 @@ export function allowAdminApiRequest(ipKey: string): boolean {
   return true;
 }
 
-export function adminApiClientKey(req: {
-  headers: Headers;
-}): string {
+export function adminApiClientKey(req: { headers: Headers }): string {
   const xf = req.headers.get("x-forwarded-for");
   const ip =
     xf?.split(",")[0]?.trim() ||

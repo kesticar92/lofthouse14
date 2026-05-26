@@ -28,7 +28,13 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin",
     label: "Inicio",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <path d="M3 11.5 12 4l9 7.5" />
         <path d="M6.5 10.5V20h11V10.5" />
       </svg>
@@ -40,7 +46,13 @@ export const ADMIN_NAV: NavItem[] = [
     label: ADMIN_MODULE_LABELS.cotizaciones,
     module: "cotizaciones",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <path d="M12 3v18" />
         <path d="M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3.5 5 3.5 5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5" />
       </svg>
@@ -52,7 +64,13 @@ export const ADMIN_NAV: NavItem[] = [
     label: ADMIN_MODULE_LABELS.inventario,
     module: "inventario",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <rect x="4" y="4" width="16" height="16" rx="2" />
         <path d="m8 12 2.5 2.5L16 9" />
       </svg>
@@ -64,7 +82,13 @@ export const ADMIN_NAV: NavItem[] = [
     label: ADMIN_MODULE_LABELS.reservas,
     module: "reservas",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <rect x="3" y="5" width="18" height="16" rx="2" />
         <path d="M3 9h18M8 3v4M16 3v4" />
       </svg>
@@ -76,7 +100,13 @@ export const ADMIN_NAV: NavItem[] = [
     label: ADMIN_MODULE_LABELS.gastos,
     module: "gastos",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <path d="M4 7h16v10H4z" />
         <path d="M8 11h8M8 15h5" />
         <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
@@ -89,7 +119,13 @@ export const ADMIN_NAV: NavItem[] = [
     label: ADMIN_MODULE_LABELS.aseos,
     module: "aseos",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3 6.3 17.7" />
       </svg>
     ),
@@ -101,7 +137,13 @@ export const ADMIN_NAV: NavItem[] = [
     module: "usuarios",
     adminOnly: true,
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <circle cx="9" cy="7" r="4" />
         <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
@@ -141,11 +183,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [router, pathname]);
 
   const visibleNav = ADMIN_NAV.filter((n) => {
-    if (
-      n.adminOnly &&
-      role !== "super_admin" &&
-      role !== "admin"
-    ) {
+    if (n.adminOnly && role !== "super_admin" && role !== "admin") {
       return false;
     }
     if (!n.module) return true;

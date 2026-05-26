@@ -59,7 +59,11 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 1, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              delay: 0.15,
+              duration: 0.6,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             className="flex flex-col gap-3 sm:flex-row sm:items-center"
           >
             <Link

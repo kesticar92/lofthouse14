@@ -19,8 +19,7 @@ export const GET = apiHandler({
   module: "aseos",
   query: querySchema,
   handler: async ({ query, ctx }) => {
-    const today =
-      query.date?.trim() ?? new Date().toISOString().slice(0, 10);
+    const today = query.date?.trim() ?? new Date().toISOString().slice(0, 10);
     const month = query.month?.trim() ?? today.slice(0, 7);
     const { start: mStart, end: mEnd } = monthRange(month);
 

@@ -12,7 +12,10 @@ import { MoneyField, PercentField } from "./atoms";
 
 export type ConfigTarifasCardProps = {
   config: PricingConfig;
-  onChange: <K extends keyof PricingConfig>(key: K, value: PricingConfig[K]) => void;
+  onChange: <K extends keyof PricingConfig>(
+    key: K,
+    value: PricingConfig[K],
+  ) => void;
   onReset: () => void;
 };
 

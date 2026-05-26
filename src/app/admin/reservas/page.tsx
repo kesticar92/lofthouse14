@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  AdminShell,
-  AdminCard,
-} from "@/components/admin/admin-shell";
+import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
 import { PmsCalendarHub } from "@/components/admin/pms/pms-calendar-hub";
 import { ReservationsTimeline } from "@/components/admin/pms/reservations-timeline";
 import { usePmsModule } from "@/hooks/usePms";
@@ -49,11 +46,11 @@ function ReservasPageContent({
           Reservas & ocupación
         </h1>
         <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-300">
-          Calendario tipo timeline para los{" "}
-          <strong>14 lofts</strong> (el 4 es bodega) y el listado{" "}
-          <strong>casa completa</strong> en Airbnb: importación iCal (solo
-          lectura), arrastre de reservas entre alojamientos, reservas manuales y
-          exportación iCal (delay de minutos, no en tiempo real).
+          Calendario tipo timeline para los <strong>14 lofts</strong> (el 4 es
+          bodega) y el listado <strong>casa completa</strong> en Airbnb:
+          importación iCal (solo lectura), arrastre de reservas entre
+          alojamientos, reservas manuales y exportación iCal (delay de minutos,
+          no en tiempo real).
         </p>
       </div>
 

@@ -32,8 +32,7 @@ export default function AdminGastosPage() {
   const removeMut = useRemoveExpenseMutation();
   const retryMut = useRetryExpenseDriveMutation();
 
-  const busy =
-    createMut.isPending || removeMut.isPending || retryMut.isPending;
+  const busy = createMut.isPending || removeMut.isPending || retryMut.isPending;
 
   const [amount, setAmount] = useState("");
   const [expenseDate, setExpenseDate] = useState(() =>
@@ -170,8 +169,7 @@ export default function AdminGastosPage() {
   const detailFiles: ExpenseFileRow[] = detailQuery.data?.files ?? [];
   const detailLoading =
     Boolean(detailId) &&
-    (detailQuery.isPending ||
-      (detailQuery.isFetching && !detailQuery.data));
+    (detailQuery.isPending || (detailQuery.isFetching && !detailQuery.data));
 
   if (!ready) {
     return (

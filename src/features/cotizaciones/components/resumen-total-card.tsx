@@ -44,7 +44,9 @@ export function ResumenTotalCard({
           </div>
 
           <dl className="divide-y divide-black/5 rounded-xl border border-black/10 bg-white/70 text-sm dark:divide-white/5 dark:border-white/10 dark:bg-zinc-900/60">
-            <Line label="Alojamiento">{formatCOP(result.subtotalAlojamiento)}</Line>
+            <Line label="Alojamiento">
+              {formatCOP(result.subtotalAlojamiento)}
+            </Line>
             <Line label="Recargo huéspedes">
               {formatCOP(result.recargoHuespedes)}
             </Line>

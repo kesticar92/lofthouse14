@@ -126,14 +126,16 @@ export function NewReservationModal({
             }}
           >
             <option value="direct">Directa (sin comisión a terceros)</option>
-            <option value="referral">Referido (lleva comisión al referidor)</option>
+            <option value="referral">
+              Referido (lleva comisión al referidor)
+            </option>
             <option value="booking">Booking</option>
             <option value="expedia">Expedia</option>
             <option value="lofthouse14.com">lofthouse14.com</option>
           </select>
           <p className="mt-1 text-[11px] font-normal text-zinc-500 dark:text-zinc-400">
-            Airbnb llega por iCal. Directa y referido son reservas que cargas tú:
-            solo &quot;Referido&quot; registra a quién pagar comisión.
+            Airbnb llega por iCal. Directa y referido son reservas que cargas
+            tú: solo &quot;Referido&quot; registra a quién pagar comisión.
           </p>
         </Field>
         {form.source === "referral" ? (

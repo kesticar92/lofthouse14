@@ -10,7 +10,7 @@ export function captureException(
   const dsn =
     typeof window !== "undefined"
       ? process.env.NEXT_PUBLIC_SENTRY_DSN
-      : process.env.SENTRY_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN;
+      : (process.env.SENTRY_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN);
   if (!dsn || String(dsn).trim() === "") return;
 
   void import("@sentry/nextjs")

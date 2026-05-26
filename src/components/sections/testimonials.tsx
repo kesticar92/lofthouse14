@@ -83,7 +83,12 @@ export function Testimonials() {
               <GlassPanel className="h-full space-y-3">
                 <div className="flex gap-0.5">
                   {Array.from({ length: q.stars }).map((_, s) => (
-                    <svg key={s} viewBox="0 0 16 16" className="h-4 w-4 fill-amber-500" aria-hidden>
+                    <svg
+                      key={s}
+                      viewBox="0 0 16 16"
+                      className="h-4 w-4 fill-amber-500"
+                      aria-hidden
+                    >
                       <path d="M8 1l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 10.8l-3.8 2 .7-4.3-3.1-3 4.3-.6z" />
                     </svg>
                   ))}

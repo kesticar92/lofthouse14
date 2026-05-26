@@ -68,17 +68,14 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const resolveCurrent = useCallback(
-    (ok: boolean) => {
-      setQueue((prev) => {
-        if (prev.length === 0) return prev;
-        const [head, ...rest] = prev;
-        head.resolve(ok);
-        return rest;
-      });
-    },
-    [],
-  );
+  const resolveCurrent = useCallback((ok: boolean) => {
+    setQueue((prev) => {
+      if (prev.length === 0) return prev;
+      const [head, ...rest] = prev;
+      head.resolve(ok);
+      return rest;
+    });
+  }, []);
 
   const value = useMemo(() => ask, [ask]);
 

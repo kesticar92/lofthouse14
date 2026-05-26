@@ -7,10 +7,7 @@ import {
   loadRevisionFull,
   FOTO_BUCKET_NAME,
 } from "@/features/inventarios/server";
-import type {
-  TablesInsert,
-  TablesUpdate,
-} from "@/types/database.types";
+import type { TablesInsert, TablesUpdate } from "@/types/database.types";
 
 export const GET = apiHandler({
   module: "inventario",
@@ -76,10 +73,7 @@ export const DELETE = apiHandler({
   module: "inventario",
   params: inventarioIdParamSchema,
   handler: async ({ ctx, params }) => {
-    if (
-      ctx.profile.role !== "super_admin" &&
-      ctx.profile.role !== "admin"
-    ) {
+    if (ctx.profile.role !== "super_admin" && ctx.profile.role !== "admin") {
       throw new ApiHandlerError(
         "Solo admin/super_admin pueden eliminar revisiones",
         { status: 403 },

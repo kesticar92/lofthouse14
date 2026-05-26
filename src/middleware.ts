@@ -5,15 +5,18 @@ import type { NextRequest } from "next/server";
 
 import { staffCanAccessAdminPath } from "@/lib/api/admin-modules";
 import { isSupabaseAuthUnreachable } from "@/lib/supabase/auth-errors";
-import { isStaffRole, type StaffRole, supabasePublicEnv } from "@/lib/supabase/env";
+import {
+  isStaffRole,
+  type StaffRole,
+  supabasePublicEnv,
+} from "@/lib/supabase/env";
 import type { Database } from "@/types/database.types";
 
 type TypedClient = SupabaseClient<Database>;
 
-async function getSessionUser(supabase: TypedClient): Promise<
-  | { unreachable: true }
-  | { unreachable: false; user: User | null }
-> {
+async function getSessionUser(
+  supabase: TypedClient,
+): Promise<{ unreachable: true } | { unreachable: false; user: User | null }> {
   try {
     const { data, error } = await supabase.auth.getUser();
     if (error && isSupabaseAuthUnreachable(error)) {
@@ -76,9 +79,8 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/api/admin")) {
-    const { adminApiClientKey, allowAdminApiRequest } = await import(
-      "@/lib/admin-rate-limit"
-    );
+    const { adminApiClientKey, allowAdminApiRequest } =
+      await import("@/lib/admin-rate-limit");
     const { apiRateLimited } = await import("@/lib/api/response");
     if (!allowAdminApiRequest(adminApiClientKey(request))) {
       return apiRateLimited(60);

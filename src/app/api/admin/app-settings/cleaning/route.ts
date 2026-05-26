@@ -35,7 +35,10 @@ export const PATCH = apiHandler({
       .eq("id", ctx.user.id)
       .maybeSingle();
     if (profile?.role !== "super_admin" && profile?.role !== "admin") {
-      throw new ApiHandlerError("Prohibido", { status: 403, code: "FORBIDDEN" });
+      throw new ApiHandlerError("Prohibido", {
+        status: 403,
+        code: "FORBIDDEN",
+      });
     }
 
     const merged = {

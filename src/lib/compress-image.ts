@@ -67,7 +67,8 @@ function scaleToFit(w: number, h: number, max: number) {
 /** Aproxima el peso en bytes de un data URL base64. */
 function estimateDataUrlBytes(dataUrl: string): number {
   const commaIdx = dataUrl.indexOf(",");
-  const base64Len = commaIdx >= 0 ? dataUrl.length - commaIdx - 1 : dataUrl.length;
+  const base64Len =
+    commaIdx >= 0 ? dataUrl.length - commaIdx - 1 : dataUrl.length;
   return Math.floor((base64Len * 3) / 4);
 }
 

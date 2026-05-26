@@ -23,10 +23,7 @@ export const GET = apiHandler({
   module: "gastos",
   query: listQuerySchema,
   handler: async ({ ctx, query }) => {
-    const limit = Math.min(
-      100,
-      Math.max(1, Number(query.limit ?? "40") || 40),
-    );
+    const limit = Math.min(100, Math.max(1, Number(query.limit ?? "40") || 40));
 
     const { data, error } = await ctx.supabase
       .from("expenses")
@@ -60,8 +57,7 @@ export const POST = apiHandler({
       description: body.description?.trim() ?? "",
       expense_date,
       notes: body.notes?.trim() ?? "",
-      payment_method:
-        body.payment_method?.trim() || "Transferencia ACH",
+      payment_method: body.payment_method?.trim() || "Transferencia ACH",
       responsible: body.responsible?.trim() || "LOFTHOUSE",
       created_by: ctx.user.id,
     };

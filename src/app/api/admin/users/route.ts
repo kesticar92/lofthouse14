@@ -41,19 +41,22 @@ export const PATCH = apiHandler({
   body: patchBodySchema,
   handler: async ({ body, ctx }) => {
     if (ctx.profile.role !== "super_admin") {
-      throw new ApiHandlerError("Solo el super_admin puede modificar usuarios", {
-        status: 403,
-        code: "FORBIDDEN",
-      });
+      throw new ApiHandlerError(
+        "Solo el super_admin puede modificar usuarios",
+        {
+          status: 403,
+          code: "FORBIDDEN",
+        },
+      );
     }
 
     if (body.allowed_modules) {
       const invalid = body.allowed_modules.filter((m) => !isAdminModuleKey(m));
       if (invalid.length > 0) {
-        throw new ApiHandlerError(
-          `Módulos inválidos: ${invalid.join(", ")}`,
-          { status: 400, code: "BAD_REQUEST" },
-        );
+        throw new ApiHandlerError(`Módulos inválidos: ${invalid.join(", ")}`, {
+          status: 400,
+          code: "BAD_REQUEST",
+        });
       }
     }
 

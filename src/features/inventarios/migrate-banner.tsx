@@ -65,9 +65,8 @@ export function MigrateLocalInventariosBanner() {
             base64).
           </p>
           <p className="mt-0.5 text-amber-800/80 dark:text-amber-100/80">
-            Migra ahora: los datos van a la base de datos y las fotos a
-            Supabase Storage. Puede tardar un minuto según la cantidad de
-            fotos.
+            Migra ahora: los datos van a la base de datos y las fotos a Supabase
+            Storage. Puede tardar un minuto según la cantidad de fotos.
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">

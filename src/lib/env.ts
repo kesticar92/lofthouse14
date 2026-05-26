@@ -46,8 +46,7 @@ function readPublicEnv() {
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_LEGAL_RAZON_SOCIAL:
-      process.env.NEXT_PUBLIC_LEGAL_RAZON_SOCIAL,
+    NEXT_PUBLIC_LEGAL_RAZON_SOCIAL: process.env.NEXT_PUBLIC_LEGAL_RAZON_SOCIAL,
     NEXT_PUBLIC_LEGAL_NIT: process.env.NEXT_PUBLIC_LEGAL_NIT,
   });
   if (!parsed.success) {
@@ -136,7 +135,9 @@ export const serverEnv = readServerEnv();
 function formatIssues(
   issues: ReadonlyArray<{ path: PropertyKey[]; message: string }>,
 ): string {
-  return issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`).join("; ");
+  return issues
+    .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)
+    .join("; ");
 }
 
 /**
@@ -146,7 +147,7 @@ function formatIssues(
 export function hasSupabaseConfig(): boolean {
   return Boolean(
     publicEnv.NEXT_PUBLIC_SUPABASE_URL &&
-      (publicEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        publicEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    (publicEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+      publicEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY),
   );
 }

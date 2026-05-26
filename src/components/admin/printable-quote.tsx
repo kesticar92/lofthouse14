@@ -69,9 +69,7 @@ function fmtVigencia(emisionISO: string, dias: number): string {
 
 function tipoAcomodacion(lofts: number, huespedes: number): string {
   const base =
-    lofts === 1
-      ? "Loft / apartaestudio"
-      : `${lofts} lofts / apartaestudios`;
+    lofts === 1 ? "Loft / apartaestudio" : `${lofts} lofts / apartaestudios`;
   return `${base} · capacidad para ${huespedes} huésped${huespedes === 1 ? "" : "es"}`;
 }
 
@@ -238,8 +236,12 @@ export function PrintableQuote({
               {result.recargoHuespedes > 0 && (
                 <tr>
                   <td>Recargo por huésped(es) adicional(es)</td>
-                  <td className="pq-num">{estadia.huespedes - 2} × {result.noches}</td>
-                  <td className="pq-num">{formatCOP(result.recargoHuespedes)}</td>
+                  <td className="pq-num">
+                    {estadia.huespedes - 2} × {result.noches}
+                  </td>
+                  <td className="pq-num">
+                    {formatCOP(result.recargoHuespedes)}
+                  </td>
                 </tr>
               )}
               <tr>
@@ -323,14 +325,13 @@ export function PrintableQuote({
         <footer className="pq-footer">
           <p>
             Esta cotización es informativa y no constituye una factura. La
-            reserva se confirma únicamente con el pago del anticipo del 50% y
-            la verificación de identidad del huésped, según las{" "}
+            reserva se confirma únicamente con el pago del anticipo del 50% y la
+            verificación de identidad del huésped, según las{" "}
             <em>políticas vigentes de {site.name}</em>.
           </p>
           <p className="pq-footer-brand">
-            {site.legal.razonSocial} · NIT {site.legal.nit} ·{" "}
-            {site.addressLine}, {site.city} · {site.phoneDisplay} ·{" "}
-            {site.email}
+            {site.legal.razonSocial} · NIT {site.legal.nit} · {site.addressLine}
+            , {site.city} · {site.phoneDisplay} · {site.email}
           </p>
         </footer>
       </div>

@@ -2,18 +2,18 @@
 
 ## Capas
 
-| Capa | Ruta | Responsabilidad |
-|------|------|-----------------|
-| App pública | `src/app/page.tsx`, `politicas`, `preview-movil` | Sitio marketing, SEO |
-| Admin | `src/app/admin/*` | Panel operativo (client components + React Query) |
-| API servidor | `src/app/api/admin/*`, `api/cron/*`, `api/ical/*` | Auth staff, validación Zod, Supabase |
-| Lib cliente | `src/lib/supabase/client.ts`, `storage.ts`, `auth-client.ts` | Browser + preferencias locales |
-| Lib servidor | `src/lib/supabase/server.ts`, `service-role.ts`, `env.ts` | RSC, cookies, secretos |
-| Features | `src/features/{cotizaciones,inventarios,expenses,pms,aseos}` | Dominio por módulo |
-| Services | `src/services/*` | Facades cliente → API remota |
-| Components | `src/components/` | UI compartida |
-| Hooks | `src/hooks/` | Permisos admin, PMS |
-| Types | `src/types/database.types.ts` | Esquema Supabase |
+| Capa         | Ruta                                                         | Responsabilidad                                   |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------- |
+| App pública  | `src/app/page.tsx`, `politicas`, `preview-movil`             | Sitio marketing, SEO                              |
+| Admin        | `src/app/admin/*`                                            | Panel operativo (client components + React Query) |
+| API servidor | `src/app/api/admin/*`, `api/cron/*`, `api/ical/*`            | Auth staff, validación Zod, Supabase              |
+| Lib cliente  | `src/lib/supabase/client.ts`, `storage.ts`, `auth-client.ts` | Browser + preferencias locales                    |
+| Lib servidor | `src/lib/supabase/server.ts`, `service-role.ts`, `env.ts`    | RSC, cookies, secretos                            |
+| Features     | `src/features/{cotizaciones,inventarios,expenses,pms,aseos}` | Dominio por módulo                                |
+| Services     | `src/services/*`                                             | Facades cliente → API remota                      |
+| Components   | `src/components/`                                            | UI compartida                                     |
+| Hooks        | `src/hooks/`                                                 | Permisos admin, PMS                               |
+| Types        | `src/types/database.types.ts`                                | Esquema Supabase                                  |
 
 ## Auth y roles
 

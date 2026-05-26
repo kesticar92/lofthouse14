@@ -95,8 +95,8 @@ export function MigrateLocalCotizacionesBanner() {
       {report ? (
         <div className="mt-3 rounded-lg bg-white/70 p-3 text-xs text-zinc-700 dark:bg-zinc-900/40 dark:text-zinc-300">
           <p>
-            Encontradas {report.scanned} · Subidas {report.uploaded} ·
-            Omitidas {report.skipped} · Errores {report.errors.length}
+            Encontradas {report.scanned} · Subidas {report.uploaded} · Omitidas{" "}
+            {report.skipped} · Errores {report.errors.length}
           </p>
           {report.errors.length > 0 ? (
             <ul className="mt-2 list-disc space-y-0.5 pl-4 text-rose-700 dark:text-rose-300">

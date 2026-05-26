@@ -20,7 +20,9 @@ function LoginForm() {
   useEffect(() => {
     const q = searchParams.get("error");
     if (q === "no_profile") {
-      setError("Tu cuenta no tiene perfil de staff válido. Contacta al administrador.");
+      setError(
+        "Tu cuenta no tiene perfil de staff válido. Contacta al administrador.",
+      );
     } else if (q === "supabase_unreachable") {
       setError(
         "No pudimos conectar con Supabase (red, DNS o URL incorrecta). Comprueba tu internet y NEXT_PUBLIC_SUPABASE_URL en .env.local.",
@@ -28,7 +30,9 @@ function LoginForm() {
     } else if (q === "no_access") {
       setError("No tienes acceso al panel con esta cuenta.");
     } else if (q === "pending_approval") {
-      setError("Tu cuenta está pendiente de aprobación. Un administrador debe activar tu acceso y asignarte los módulos correspondientes.");
+      setError(
+        "Tu cuenta está pendiente de aprobación. Un administrador debe activar tu acceso y asignarte los módulos correspondientes.",
+      );
     } else if (q === "suspended") {
       setError("Tu cuenta ha sido suspendida. Contacta al administrador.");
     }
@@ -62,11 +66,15 @@ function LoginForm() {
         return;
       }
       if (result === "no_profile") {
-        setError("Tu usuario no tiene un rol válido. Contacta al administrador.");
+        setError(
+          "Tu usuario no tiene un rol válido. Contacta al administrador.",
+        );
         return;
       }
       if (result === "pending_approval") {
-        setError("Tu cuenta está pendiente de aprobación por un administrador.");
+        setError(
+          "Tu cuenta está pendiente de aprobación por un administrador.",
+        );
         return;
       }
       if (result === "suspended") {
@@ -147,9 +155,7 @@ function LoginForm() {
               />
               <button
                 type="button"
-                aria-label={
-                  show ? "Ocultar contraseña" : "Mostrar contraseña"
-                }
+                aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
                 onClick={() => setShow((v) => !v)}
                 className="rounded-xl border border-black/10 bg-white/80 px-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 hover:bg-white dark:border-white/10 dark:bg-zinc-900/70 dark:text-zinc-300"
               >
@@ -176,7 +182,10 @@ function LoginForm() {
         <div className="mt-6 space-y-2 text-xs text-zinc-500 dark:text-zinc-400">
           <p>
             ¿Eres nuevo en el equipo?{" "}
-            <Link href="/admin/registro" className="font-semibold text-amber-800 underline hover:text-amber-900 dark:text-amber-400">
+            <Link
+              href="/admin/registro"
+              className="font-semibold text-amber-800 underline hover:text-amber-900 dark:text-amber-400"
+            >
               Solicitar acceso
             </Link>
           </p>

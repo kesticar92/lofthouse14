@@ -45,10 +45,7 @@ export const DELETE = apiHandler({
   module: "cotizaciones",
   params: cotizacionIdParamSchema,
   handler: async ({ ctx, params }) => {
-    if (
-      ctx.profile.role !== "super_admin" &&
-      ctx.profile.role !== "admin"
-    ) {
+    if (ctx.profile.role !== "super_admin" && ctx.profile.role !== "admin") {
       throw new ApiHandlerError(
         "Solo admin/super_admin pueden eliminar cotizaciones",
         { status: 403 },

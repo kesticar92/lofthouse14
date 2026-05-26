@@ -6,7 +6,8 @@
 |------|--------|----------|
 | **1. Git push** | Tu Mac → **GitHub** | Guarda el código en `main`. **No toca el servidor.** |
 | **2. Redeploy** | **Digital Ocean** (Droplet) | Descarga `main` desde GitHub, hace `npm ci` + `build`, reinicia PM2. **Esto publica la web.** |
-| **CI (opcional)** | **GitHub Actions** | Solo comprueba lint/tests en cada push; **no despliega** solo. |
+| **CI** | **GitHub Actions** (`.github/workflows/ci.yml`) | `format:check`, `lint`, `typecheck`, `test`, `build` en cada push/PR. |
+| **CD (opcional)** | **GitHub Actions** (`.github/workflows/deploy.yml`) | Tras push a `main`, SSH al Droplet si configuras secrets en environment `production`: `DROPLET_HOST`, `DROPLET_SSH_KEY`, opcional `DROPLET_USER`. |
 
 **IP del Droplet:** `138.197.138.158` → `https://lofthouse14.com`
 

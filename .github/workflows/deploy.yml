@@ -1,0 +1,25 @@
+# Deploy al Droplet vía SSH cuando los secrets están configurados en GitHub.
+# Secrets requeridos: DROPLET_HOST, DROPLET_SSH_KEY (clave privada), opcional DROPLET_USER (default root)
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER || 'root' }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: |
+            curl -fsSL https://raw.githubusercontent.com/kesticar92/lofthouse14/main/scripts/deploy/redeploy-from-github.sh \
+              -o /tmp/redeploy.sh
+            BRANCH=main NODE_HEAP_MB=2048 bash /tmp/redeploy.sh

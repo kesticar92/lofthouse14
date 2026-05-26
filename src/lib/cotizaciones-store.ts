@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * @deprecated Cotizaciones y tarifas viven en Supabase. Solo se usa para migración
+ * one-shot desde localStorage (ver admin/cotizaciones y migrate-banner).
+ */
+
 import { KEYS, safeGet, safeSet } from "./storage";
 import type { QuoteInput, QuoteResult, PricingConfig } from "./pricing";
 

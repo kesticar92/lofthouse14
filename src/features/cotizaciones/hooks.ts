@@ -29,6 +29,11 @@ import {
   listCotizaciones,
   updateCotizacion,
 } from "./api";
+import type { PricingConfig } from "@/lib/pricing";
+import {
+  fetchCotizacionesPricing,
+  saveCotizacionesPricing,
+} from "@/services/cotizaciones-pricing";
 import type { Cotizacion } from "./types";
 import type {
   CotizacionCreateInput,
@@ -103,6 +108,36 @@ export function useUpdateCotizacion(
       const vars = args[1];
       qc.invalidateQueries({ queryKey: cotizacionesKeys.all });
       qc.invalidateQueries({ queryKey: cotizacionesKeys.detail(vars.id) });
+      options?.onSuccess?.(...args);
+    },
+  });
+}
+
+const pricingKey = ["cotizaciones", "pricing"] as const;
+
+export function useCotizacionesPricing(
+  options?: Omit<
+    UseQueryOptions<PricingConfig, Error>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useQuery<PricingConfig, Error>({
+    queryKey: pricingKey,
+    queryFn: fetchCotizacionesPricing,
+    staleTime: 60_000,
+    ...options,
+  });
+}
+
+export function useSaveCotizacionesPricing(
+  options?: UseMutationOptions<PricingConfig, Error, Partial<PricingConfig>>,
+) {
+  const qc = useQueryClient();
+  return useMutation<PricingConfig, Error, Partial<PricingConfig>>({
+    mutationFn: saveCotizacionesPricing,
+    ...options,
+    onSuccess: (...args) => {
+      qc.setQueryData(pricingKey, args[0]);
       options?.onSuccess?.(...args);
     },
   });

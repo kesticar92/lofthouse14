@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ApiClientError } from "@/lib/api/client";
 import {
@@ -10,7 +10,8 @@ import {
   formatCOP,
   quote,
 } from "@/lib/pricing";
-import { getPricingConfig, setPricingConfig } from "@/lib/cotizaciones-store";
+import { getPricingConfig } from "@/lib/cotizaciones-store";
+import { KEYS, safeRemove } from "@/lib/storage";
 import { site, waLink } from "@/lib/site";
 import {
   PrintableQuote,
@@ -18,8 +19,10 @@ import {
 } from "@/components/admin/printable-quote";
 import {
   useCotizaciones,
+  useCotizacionesPricing,
   useCreateCotizacion,
   useDeleteCotizacion,
+  useSaveCotizacionesPricing,
 } from "@/features/cotizaciones/hooks";
 import type { Cotizacion } from "@/features/cotizaciones/types";
 import { MigrateLocalCotizacionesBanner } from "@/features/cotizaciones/migrate-banner";
@@ -73,13 +76,35 @@ export default function CotizacionesPage() {
   const saved = cotizacionesQuery.data ?? [];
   const createMut = useCreateCotizacion();
   const deleteMut = useDeleteCotizacion();
+  const pricingQuery = useCotizacionesPricing();
+  const savePricingMut = useSaveCotizacionesPricing();
+  const migratedLocalPricing = useRef(false);
 
   useEffect(() => {
-    setConfig(getPricingConfig(DEFAULT_PRICING));
     const t = todayISO();
     setIngreso(t);
     setSalida(addDaysISO(t, 2));
   }, []);
+
+  useEffect(() => {
+    if (!pricingQuery.data) return;
+    setConfig(pricingQuery.data);
+  }, [pricingQuery.data]);
+
+  useEffect(() => {
+    if (!pricingQuery.isSuccess || migratedLocalPricing.current) return;
+    migratedLocalPricing.current = true;
+    const local = getPricingConfig(DEFAULT_PRICING);
+    const remote = pricingQuery.data;
+    const localDiffers =
+      JSON.stringify(local) !== JSON.stringify(DEFAULT_PRICING) &&
+      JSON.stringify(local) !== JSON.stringify(remote);
+    if (localDiffers) {
+      savePricingMut.mutate(local, {
+        onSuccess: () => safeRemove(KEYS.pricing),
+      });
+    }
+  }, [pricingQuery.isSuccess, pricingQuery.data, savePricingMut]);
 
   const input: QuoteInput = useMemo(
     () => ({
@@ -98,12 +123,12 @@ export default function CotizacionesPage() {
   ) {
     const next = { ...config, [key]: value };
     setConfig(next);
-    setPricingConfig(next);
+    savePricingMut.mutate(next);
   }
 
   function handleConfigReset() {
     setConfig(DEFAULT_PRICING);
-    setPricingConfig(DEFAULT_PRICING);
+    savePricingMut.mutate(DEFAULT_PRICING);
   }
 
   async function handleSave() {
@@ -221,10 +246,20 @@ export default function CotizacionesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  if (!ready) {
+  if (!ready || pricingQuery.isLoading) {
     return (
       <AdminShell>
         <p className="text-sm text-zinc-600 dark:text-zinc-300">Cargando…</p>
+      </AdminShell>
+    );
+  }
+
+  if (pricingQuery.isError) {
+    return (
+      <AdminShell>
+        <p className="text-sm text-red-600 dark:text-red-400">
+          No se pudieron cargar las tarifas: {describeApiFailure(pricingQuery.error)}
+        </p>
       </AdminShell>
     );
   }

@@ -1,9 +1,8 @@
 "use client";
 
 /**
- * Almacenamiento local (localStorage) para los módulos del panel.
- * Todo se guarda en el navegador del administrador; además se ofrecen
- * funciones para exportar/importar respaldos en JSON.
+ * localStorage: solo preferencias no críticas y respaldos legacy.
+ * Datos operativos (cotizaciones, inventario, tarifas, PMS, gastos) → Supabase vía API.
  */
 
 const PREFIX = "lofthouse14.";

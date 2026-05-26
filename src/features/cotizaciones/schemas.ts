@@ -12,7 +12,7 @@ const dateString = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato esperado YYYY-MM-DD");
 
-const pricingConfigSchema = z.object({
+export const pricingConfigSchema = z.object({
   tarifaLJ: z.number().nonnegative(),
   tarifaVD: z.number().nonnegative(),
   recargoHuesped: z.number().nonnegative(),

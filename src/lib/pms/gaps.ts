@@ -1,10 +1,7 @@
 import { addDays, nightCount } from "@/lib/pms/date-range";
 import type { ReservationRow, SuspiciousGapAlert } from "@/lib/pms/types";
 
-type Row = Pick<
-  ReservationRow,
-  "property_id" | "check_in" | "check_out" | "status"
->;
+type Row = Pick<ReservationRow, "property_id" | "check_in" | "check_out" | "status">;
 
 /**
  * Huecos de exactamente 1 noche entre estancias "ocupadas"
@@ -14,7 +11,9 @@ export function detectSuspiciousGaps(
   reservations: Row[],
   propertyNames: Record<string, string>,
 ): SuspiciousGapAlert[] {
-  const active = reservations.filter((r) => r.status !== "cancelled");
+  const active = reservations.filter(
+    (r) => r.status !== "cancelled",
+  );
   const byProp = new Map<string, Row[]>();
   for (const r of active) {
     const list = byProp.get(r.property_id) ?? [];
@@ -23,9 +22,7 @@ export function detectSuspiciousGaps(
   }
   const alerts: SuspiciousGapAlert[] = [];
   for (const [propertyId, list] of byProp) {
-    const sorted = [...list].sort((a, b) =>
-      a.check_in.localeCompare(b.check_in),
-    );
+    const sorted = [...list].sort((a, b) => a.check_in.localeCompare(b.check_in));
     for (let i = 0; i < sorted.length - 1; i++) {
       const a = sorted[i];
       const b = sorted[i + 1];

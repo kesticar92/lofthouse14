@@ -1,34 +1,7 @@
 "use client";
 
-/**
- * @deprecated DESDE FASE 1 — Los inventarios viven en `inventario_revisiones`
- * (Postgres) y las fotos en el bucket Storage `inventario-fotos`.
- *
- * Este archivo se mantiene SOLO para que la rutina de migración
- * (`features/inventarios/migrate.ts`) pueda leer datos antiguos de
- * localStorage y subirlos al servidor. La UI activa
- * (`/admin/inventario`) NO debe importar ni `guardarInventario` ni
- * `eliminarInventario` — usa los hooks de `features/inventarios/hooks.ts`.
- */
-
 import { KEYS, safeGet, safeSet } from "./storage";
 import type { EstadoItem, Funciona } from "./inventory-catalog";
-
-/**
- * Foto de evidencia de un daño. En la versión actual las fotos se suben a
- * Supabase Storage; este tipo solo existe para la migración de datos viejos.
- */
-export type FotoEvidencia = {
-  id: string;
-  /** data:image/jpeg;base64,... — listo para usar en <img src> y en PDF. */
-  dataUrl: string;
-  /** Bytes aproximados después de compresión (para diagnóstico). */
-  bytes?: number;
-  /** Comentario opcional sobre lo que muestra la foto. */
-  caption?: string;
-  /** ISO datetime de captura/carga. */
-  creadaEn: string;
-};
 
 export type InventarioItemResultado = {
   orden: number;
@@ -38,8 +11,6 @@ export type InventarioItemResultado = {
   funciona: Funciona;
   detalles: string;
   requiereAtencion: boolean;
-  /** Fotos de evidencia. Solo aplica cuando hay daño / no funciona. */
-  fotos?: FotoEvidencia[];
 };
 
 export type InventarioGuardado = {

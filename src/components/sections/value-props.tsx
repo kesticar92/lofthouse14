@@ -1,82 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GlassPanel } from "@/components/ui/glass-panel";
 import { site } from "@/lib/site";
-
-const items = [
-  {
-    title: "Ubicación que lo tiene todo",
-    body: "A pocos minutos de restaurantes, bares, clínicas, universidades y escenarios deportivos, entre otros.",
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-6 w-6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
-        <path d="M12 21s-6-5.9-6-11a6 6 0 1 1 12 0c0 5.1-6 11-6 11Z" />
-        <circle cx="12" cy="10" r="2.3" />
-      </svg>
-    ),
-  },
-  {
-    title: "Espacios diseñados para tu ritmo",
-    body: "Ya sea que vengas a trabajar, recuperarte o explorar la ciudad, aquí tienes lo que necesitas.",
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-6 w-6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
-        <path d="m12 3 1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8L12 3Z" />
-        <path d="m18.5 14 1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1 1-2.2Z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Reservas claras, paso a paso",
-    body: "Fechas y huéspedes → disponibilidad confirmada → pago → verificación de identidad → acceso autónomo al edificio.",
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-6 w-6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
-        <path d="m5 12 4 4 10-10" />
-      </svg>
-    ),
-  },
-];
-
-export function ValueProps() {
-  return (
-    <section id="propuesta" className="scroll-mt-28 py-20 md:py-28">
-      <div className="mx-auto max-w-6xl px-4">
-        <motion.div
-          initial={{ opacity: 1, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-          className="mx-auto mb-12 max-w-3xl text-center"
-        >
-          <h2 className="font-display text-4xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] sm:text-5xl md:text-6xl">
-            ¿POR QUÉ ELEGIR LOFTHOUSE 14?
-          </h2>
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
-            {site.brandLine.toUpperCase()}
-          </p>
-          <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
-            Alojamiento moderno y funcional, con el encanto urbano de Cali.
-          </p>
-        </motion.div>
-
-        <div className="grid gap-6 md:grid-cols-3">
+import { UserFocusIcon, MapPinIcon, BookOpenIcon } from "@phosphor-icons/react"
+import { GlassPanel } from "../ui/glass-panel";
+/*
+<div className="grid gap-6 md:grid-cols-3">
           {items.map((item, i) => (
             <motion.div
               key={item.title}
@@ -85,20 +14,97 @@ export function ValueProps() {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ delay: i * 0.08, duration: 0.45 }}
             >
-              <GlassPanel className="h-full space-y-4">
-                <div className="text-amber-800 dark:text-amber-400">
-                  {item.icon}
-                </div>
-                <h3 className="font-display text-2xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
+              <SpotlightCard className="h-full space-y-4">
+                <div className="text-2xl">{item.icon}</div>
+                <h3 className="font-display text-2xl tracking-wide text-[#f2f0eb] ">
                   {item.title.toUpperCase()}
                 </h3>
-                <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+                <p className="text-sm leading-relaxed text-zinc-300">
                   {item.body}
                 </p>
-              </GlassPanel>
+
+              </SpotlightCard>
             </motion.div>
           ))}
         </div>
+
+*/
+const items = [
+  {
+    title: "Flexibilidad única",
+    body: "¿Un viaje de negocios en solitario o una delegación entera? Tenemos la capacidad de hospedar desde 1 hasta 60 personas en lofts independientes. Mantén a todo tu grupo en el mismo lugar sin sacrificar la privacidad de nadie.",
+    tagline: "Tu espacio, tu ritmo, tu grupo. (pensar bien esto)",
+    icon: <MapPinIcon size={32} color="#FFFFFF" weight="duotone" />,
+  },
+  {
+    title: "El corazón de Cali, a tus pies",
+    body: "Olvídate de los largos trayectos. Estás en San Fernando, a pasos del Parque del Perro. La mejor gastronomía, el ritmo de la salsa y los centros deportivos de la ciudad suceden justo fuera de tu puerta.",
+    tagline: "Vive Cali como un local, con la comodidad de un hogar.(**pensar bien esto)",
+    icon: <UserFocusIcon size={40} color="#FFFFFF" weight="duotone" />
+
+    ,
+  },
+  {
+    title: "Tu refugio después del caos urbano",
+    body: "Ambientes modernos, impecables y totalmente equipados. Disfruta de camas premium para un descanso real, cocinas listas para usar y espacios optimizados tanto para relajarte como para trabajar en remoto sin interrupciones.",
+    tagline: "Tu oasis privado en el corazón de la ciudad.(**pensar bien esto)",
+    icon: <BookOpenIcon size={32} color="#FFFFFF" weight="duotone" />,
+  },
+];
+
+export function ValueProps() {
+  return (
+    <section id="propuesta" className="min-h-screen py-12 px-4 md:py-20 md:px-20"
+      style={{ backgroundImage: "url('/gallery/lofthouse_afuera.webp')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start text-white">
+
+        <motion.div
+          initial={{ opacity: 1, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="max-w-7xl px-4 mx-auto text-center text-white md:text-left lg:sticky lg:top-40"
+        >
+          <h2 className="font-display text-4xl md:text-5xl tracking-wide  text-[#f2f0eb]">
+            ¿POR QUÉ SOMOS
+          </h2>
+          <h2 className="font-display text-4xl text-amber-600 md:text-5xl tracking-wide text-[#f2f0eb]">
+            LA MEJOR OPCIÓN?
+          </h2>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em]  dark:text-zinc-400">
+            {site.brandLine.toUpperCase()}
+          </p>
+          <p className="mt-4 text-base  dark:text-zinc-300 sm:text-lg">
+            Diseñamos cada loft pensando en tu comodidad, privacidad y conexión con la ciudad. Ya sea que viajes solo o con 60 personas, aquí tienes tu espacio.
+          </p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 1, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col mt-8 gap-4 text-white">
+          {items.map((item, i) => (
+            <GlassPanel key={item.title} className="px-6 items-center transition duration-500 ease-in-out hover:scale-[1.02] ">
+              <span className="text-xl font-bold m-2 flex-1 ">
+                <h3 className=" border-orange-500 border-b-4">
+                  {item.title}
+                </h3>
+              </span>
+              <span className="text-base m-1 flex-1">
+                <p>
+                  {item.body}
+                </p>
+              </span>
+              <span className="text-base m-1  flex-1">
+                <p>
+                  {item.tagline}
+                </p>
+              </span>
+            </GlassPanel>
+          ))}
+
+        </motion.div>
       </div>
     </section>
   );

@@ -4,7 +4,7 @@ import {
   isGoogleDriveConfigured,
   uploadBufferToGoogleDrive,
 } from "@/lib/expenses/google-drive-backup";
-import { buildDriveFilename } from "@/lib/expenses/upload-expense-file";
+import { sanitizeExpenseFilename } from "@/lib/expenses/upload-expense-file";
 
 export async function retryDriveBackupForExpenseFile(
   admin: SupabaseClient,
@@ -34,10 +34,7 @@ export async function retryDriveBackupForExpenseFile(
     .from("expenses")
     .download(row.storage_path);
   if (dlErr || !blob) {
-    return {
-      ok: false,
-      error: dlErr?.message ?? "No se pudo leer desde Storage",
-    };
+    return { ok: false, error: dlErr?.message ?? "No se pudo leer desde Storage" };
   }
   const buffer = Buffer.from(await blob.arrayBuffer());
 
@@ -49,7 +46,8 @@ export async function retryDriveBackupForExpenseFile(
       .from("expense_files")
       .update({
         drive_backup_status: "failed",
-        drive_last_error: "Google Drive no configurado (variables de entorno).",
+        drive_last_error:
+          "Google Drive no configurado (variables de entorno).",
         drive_retry_count: prevRetries + 1,
       })
       .eq("id", fileId);
@@ -58,12 +56,13 @@ export async function retryDriveBackupForExpenseFile(
 
   try {
     const expenseId = row.expense_id as string;
-    const folderId = await ensureExpenseDriveFolderPath(expenseDate);
-    const name = buildDriveFilename({
-      expenseDateISO: expenseDate,
+    const folderId = await ensureExpenseDriveFolderPath(
+      expenseDate,
       expenseId,
-      originalFilename: (row.original_filename as string) || "archivo",
-    });
+    );
+    const name = sanitizeExpenseFilename(
+      (row.original_filename as string) || "archivo",
+    );
     const mime = (row.mime_type as string) || "application/octet-stream";
     const up = await uploadBufferToGoogleDrive({
       parentFolderId: folderId,

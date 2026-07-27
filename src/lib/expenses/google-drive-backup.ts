@@ -1,7 +1,8 @@
 import { Readable } from "node:stream";
+import { JWT } from "google-auth-library";
 import { google } from "googleapis";
 
-import { getGoogleServiceAccountJwt } from "@/lib/expenses/google-service-account";
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
 
 function normalizePrivateKey(raw: string | undefined): string | undefined {
   if (!raw) return undefined;
@@ -11,20 +12,31 @@ function normalizePrivateKey(raw: string | undefined): string | undefined {
 export function isGoogleDriveConfigured(): boolean {
   return Boolean(
     process.env.GOOGLE_CLIENT_EMAIL?.trim() &&
-    normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY)?.trim() &&
-    process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID?.trim(),
+      normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY)?.trim() &&
+      process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID?.trim(),
   );
 }
 
+function getJwt(): JWT | null {
+  const email = process.env.GOOGLE_CLIENT_EMAIL?.trim();
+  const key = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
+  if (!email || !key) return null;
+  return new JWT({
+    email,
+    key,
+    scopes: [DRIVE_SCOPE],
+  });
+}
+
 function driveViewUrl(fileId: string): string {
-  return `https://drive.google.com/file/d/${fileId}/view?usp=drive_link`;
+  return `https://drive.google.com/file/d/${fileId}/view`;
 }
 
 async function findChildFolderId(
   parentId: string,
   folderName: string,
 ): Promise<string | null> {
-  const auth = getGoogleServiceAccountJwt();
+  const auth = getJwt();
   if (!auth) return null;
   const drive = google.drive({ version: "v3", auth });
   const escaped = folderName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
@@ -39,7 +51,7 @@ async function findChildFolderId(
 }
 
 async function createFolder(parentId: string, name: string): Promise<string> {
-  const auth = getGoogleServiceAccountJwt();
+  const auth = getJwt();
   if (!auth) throw new Error("Google Drive no configurado");
   const drive = google.drive({ version: "v3", auth });
   const { data } = await drive.files.create({
@@ -56,24 +68,29 @@ async function createFolder(parentId: string, name: string): Promise<string> {
   return id;
 }
 
-/** Asegura/crea la carpeta `AAAA-MM` bajo la carpeta raíz del .env (Comprobantes). */
+/** Asegura cadena: Gastos / AAAA / MM / expenseId bajo la carpeta raíz del .env */
 export async function ensureExpenseDriveFolderPath(
   expenseDateISO: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _expenseId?: string,
+  expenseId: string,
 ): Promise<string> {
   const rootId = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID?.trim();
   if (!rootId) throw new Error("Falta GOOGLE_DRIVE_ROOT_FOLDER_ID");
 
   const d = expenseDateISO.slice(0, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) {
-    throw new Error(`Fecha de gasto inválida: ${expenseDateISO}`);
-  }
-  const monthFolder = d.slice(0, 7); // YYYY-MM
+  const year = d.slice(0, 4);
+  const month = d.slice(5, 7);
+  const segments = ["Gastos", year, month, expenseId];
 
-  const existing = await findChildFolderId(rootId, monthFolder);
-  if (existing) return existing;
-  return createFolder(rootId, monthFolder);
+  let parent = rootId;
+  for (const name of segments) {
+    const existing = await findChildFolderId(parent, name);
+    if (existing) {
+      parent = existing;
+      continue;
+    }
+    parent = await createFolder(parent, name);
+  }
+  return parent;
 }
 
 export type DriveUploadResult = {
@@ -87,7 +104,7 @@ export async function uploadBufferToGoogleDrive(opts: {
   mimeType: string;
   buffer: Buffer;
 }): Promise<DriveUploadResult> {
-  const auth = getGoogleServiceAccountJwt();
+  const auth = getJwt();
   if (!auth) throw new Error("Google Drive no configurado");
   const drive = google.drive({ version: "v3", auth });
   const body = Readable.from(opts.buffer);

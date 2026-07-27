@@ -1,5 +1,6 @@
 /**
- * Lógica de cotización para reservas directas de LOFTHOUSE 14.
+ * Lógica de cotización — réplica exacta de
+ * "Calculadora_Tarifas_Lofthouse.xlsx" (hojas Configuracion + Calculadora).
  *
  * Valores por defecto (editables en Admin → Configuración):
  *  - Lunes a Jueves:      80.000 COP por noche (base 1–2 huéspedes)
@@ -10,6 +11,7 @@
  *  - Aseo >7 noches (por loft): ROUNDUP(noches/7) × 30.000 COP
  *  - Descuento ≥7 noches:  20 %   (sobre alojamiento + recargo huéspedes)
  *  - Descuento ≥28 noches: 40 %   (reemplaza al anterior)
+ *  - Comisión Airbnb (opcional): + 12 %
  */
 
 export type PricingConfig = {
@@ -21,6 +23,7 @@ export type PricingConfig = {
   aseoSemanal: number;
   descuentoSemanal: number;
   descuentoMensual: number;
+  comisionAirbnb: number;
 };
 
 export const DEFAULT_PRICING: PricingConfig = {
@@ -32,6 +35,7 @@ export const DEFAULT_PRICING: PricingConfig = {
   aseoSemanal: 30_000,
   descuentoSemanal: 0.2,
   descuentoMensual: 0.4,
+  comisionAirbnb: 0.12,
 };
 
 export type QuoteInput = {
@@ -63,6 +67,8 @@ export type QuoteResult = {
   descuento: number;
   descuentoDetalle: string;
   totalReserva: number;
+  totalConComisionAirbnb: number;
+  comisionAirbnb: number;
   nightByNight: NightBreakdown[];
 };
 
@@ -118,6 +124,8 @@ export function quote(
     descuento: 0,
     descuentoDetalle: "",
     totalReserva: 0,
+    comisionAirbnb: 0,
+    totalConComisionAirbnb: 0,
     nightByNight: [],
   };
 
@@ -183,6 +191,8 @@ export function quote(
   }
 
   const totalReserva = subtotalReserva + descuento;
+  const comisionAirbnb = totalReserva * cfg.comisionAirbnb;
+  const totalConComisionAirbnb = totalReserva + comisionAirbnb;
 
   return {
     ok: true,
@@ -197,6 +207,8 @@ export function quote(
     descuento,
     descuentoDetalle,
     totalReserva,
+    comisionAirbnb,
+    totalConComisionAirbnb,
     nightByNight,
   };
 }

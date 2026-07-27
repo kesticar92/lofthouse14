@@ -1,101 +1,46 @@
 import { randomBytes } from "crypto";
-import { z } from "zod";
+import { requireStaff } from "@/lib/api/require-staff";
 
-import { ApiHandlerError, apiHandler } from "@/lib/api/handler";
-import type { TablesUpdate } from "@/types/database.types";
+export async function GET() {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const { supabase } = gate.ctx;
+  const { data, error } = await supabase
+    .from("properties")
+    .select("id, name, ical_token, created_at, updated_at")
+    .order("name");
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+  return Response.json({ properties: data ?? [] });
+}
 
-const patchBodySchema = z.object({
-  id: z.string().min(1),
-  name: z.string().optional(),
-  regenerate_ical_token: z.boolean().optional(),
-});
-
-const postBodySchema = z.object({
-  name: z.string().min(1),
-});
-
-const deleteQuerySchema = z.object({
-  id: z.string().min(1),
-});
-
-export const GET = apiHandler({
-  module: "reservas",
-  handler: async ({ ctx }) => {
-    const { data, error } = await ctx.supabase
-      .from("properties")
-      .select("id, name, ical_token, created_at, updated_at")
-      .order("name");
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
-    return { properties: data ?? [] };
-  },
-});
-
-export const POST = apiHandler({
-  module: "reservas",
-  body: postBodySchema,
-  handler: async ({ body, ctx }) => {
-    if (ctx.profile.role !== "super_admin" && ctx.profile.role !== "admin") {
-      throw new ApiHandlerError("Solo admin puede crear propiedades", {
-        status: 403,
-        code: "FORBIDDEN",
-      });
-    }
+export async function PATCH(req: Request) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const { supabase } = gate.ctx;
+  let body: { id?: string; regenerate_ical_token?: boolean };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "JSON inválido" }, { status: 400 });
+  }
+  const id = body.id?.trim();
+  if (!id) {
+    return Response.json({ error: "Falta id de propiedad" }, { status: 400 });
+  }
+  if (body.regenerate_ical_token) {
     const token = randomBytes(24).toString("hex");
-    const { data, error } = await ctx.supabase
+    const { data, error } = await supabase
       .from("properties")
-      .insert({ name: body.name.trim(), ical_token: token })
-      .select("id, name, ical_token, created_at, updated_at")
+      .update({ ical_token: token, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select("id, ical_token")
       .maybeSingle();
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
-    return { property: data };
-  },
-});
-
-export const PATCH = apiHandler({
-  module: "reservas",
-  body: patchBodySchema,
-  handler: async ({ body, ctx }) => {
-    if (ctx.profile.role !== "super_admin" && ctx.profile.role !== "admin") {
-      throw new ApiHandlerError("Solo admin puede editar propiedades", {
-        status: 403,
-        code: "FORBIDDEN",
-      });
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
     }
-
-    const updates: TablesUpdate<"properties"> = {
-      updated_at: new Date().toISOString(),
-    };
-    if (body.regenerate_ical_token) {
-      updates.ical_token = randomBytes(24).toString("hex");
-    }
-    if (body.name?.trim()) updates.name = body.name.trim();
-
-    const { data, error } = await ctx.supabase
-      .from("properties")
-      .update(updates)
-      .eq("id", body.id)
-      .select("id, name, ical_token, updated_at")
-      .maybeSingle();
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
-    return { property: data };
-  },
-});
-
-export const DELETE = apiHandler({
-  module: "reservas",
-  query: deleteQuerySchema,
-  handler: async ({ query, ctx }) => {
-    if (ctx.profile.role !== "super_admin") {
-      throw new ApiHandlerError("Solo super_admin puede eliminar propiedades", {
-        status: 403,
-        code: "FORBIDDEN",
-      });
-    }
-    const { error } = await ctx.supabase
-      .from("properties")
-      .delete()
-      .eq("id", query.id);
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
-    return { deleted: true };
-  },
-});
+    return Response.json({ property: data });
+  }
+  return Response.json({ error: "Sin acción" }, { status: 400 });
+}

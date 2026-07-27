@@ -1,12 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type {
-  IcalSourceRow,
-  PropertyRow,
-  ReservationRow,
-} from "@/lib/pms/types";
-import { useConfirm } from "@/components/ui";
+import type { IcalSourceRow, PropertyRow } from "@/lib/pms/types";
+import { cn } from "@/lib/cn";
 
 function truncateUrl(s: string, max = 56): string {
   if (s.length <= max) return s;
@@ -16,7 +12,8 @@ function truncateUrl(s: string, max = 56): string {
 function fmtSync(iso: string | null): string {
   if (!iso) return "—";
   try {
-    return new Date(iso).toLocaleString("es-CO", {
+    const d = new Date(iso);
+    return d.toLocaleString("es-CO", {
       dateStyle: "short",
       timeStyle: "short",
     });
@@ -25,209 +22,13 @@ function fmtSync(iso: string | null): string {
   }
 }
 
-// ─── Anuncios Manager ─────────────────────────────────────────────────────────
-function AnunciosManager({
-  properties,
-  isSuperAdmin,
-  reservations,
-  sources,
-  onAddProperty,
-  onRenameProperty,
-  onDeleteProperty,
-}: {
-  properties: PropertyRow[];
-  isSuperAdmin: boolean;
-  reservations: ReservationRow[];
-  sources: IcalSourceRow[];
-  onAddProperty: (name: string) => Promise<{ ok: boolean; error?: string }>;
-  onRenameProperty: (
-    id: string,
-    name: string,
-  ) => Promise<{ ok: boolean; error?: string }>;
-  onDeleteProperty: (id: string) => Promise<{ ok: boolean; error?: string }>;
-}) {
-  const confirm = useConfirm();
-  const [newName, setNewName] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
-  const [localErr, setLocalErr] = useState<string | null>(null);
-
-  if (!isSuperAdmin) return null;
-
-  async function handleAdd() {
-    const n = newName.trim();
-    if (!n) return;
-    setBusy(true);
-    setLocalErr(null);
-    const r = await onAddProperty(n);
-    setBusy(false);
-    if (!r.ok) {
-      setLocalErr(r.error ?? "Error");
-      return;
-    }
-    setNewName("");
-  }
-
-  async function handleRename(id: string) {
-    const n = editName.trim();
-    if (!n) return;
-    setBusy(true);
-    setLocalErr(null);
-    const r = await onRenameProperty(id, n);
-    setBusy(false);
-    if (!r.ok) {
-      setLocalErr(r.error ?? "Error");
-      return;
-    }
-    setEditId(null);
-  }
-
-  async function handleDelete(id: string, name: string) {
-    const rCount = reservations.filter((r) => r.property_id === id).length;
-    const sCount = sources.filter((s) => s.property_id === id).length;
-    const partes: string[] = [];
-    if (rCount > 0)
-      partes.push(
-        `${rCount} reserva${rCount === 1 ? "" : "s"} visible${rCount === 1 ? "" : "s"} en el calendario`,
-      );
-    if (sCount > 0)
-      partes.push(
-        `${sCount} calendario${sCount === 1 ? "" : "s"} iCal sincronizado${sCount === 1 ? "" : "s"}`,
-      );
-    partes.push("sus bloqueos y tareas de aseo");
-    const ok = await confirm({
-      title: `¿Eliminar el anuncio "${name}"?`,
-      description: `Se borrarán también: ${partes.join(", ")}. Esta acción no se puede deshacer.`,
-      confirmLabel: "Eliminar",
-      variant: "danger",
-    });
-    if (!ok) return;
-    setBusy(true);
-    setLocalErr(null);
-    const r = await onDeleteProperty(id);
-    setBusy(false);
-    if (!r.ok) setLocalErr(r.error ?? "Error");
-  }
-
-  return (
-    <section className="rounded-xl border border-black/10 bg-black/[0.02] p-4 dark:border-white/10 dark:bg-white/[0.03]">
-      <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        Gestión de anuncios
-      </h3>
-      <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-        Cada anuncio aparece en el eje izquierdo del calendario. Puedes crear
-        uno por cada publicación en Airbnb u OTA.
-      </p>
-
-      {localErr && (
-        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/20 dark:text-red-300">
-          {localErr}
-        </p>
-      )}
-
-      {/* Existing list */}
-      {properties.length > 0 && (
-        <ul className="mt-3 space-y-1">
-          {properties.map((p) => (
-            <li
-              key={p.id}
-              className="flex items-center gap-2 rounded-lg border border-black/5 bg-white/80 px-3 py-2 dark:border-white/5 dark:bg-zinc-900/60"
-            >
-              {editId === p.id ? (
-                <>
-                  <input
-                    className="min-w-0 flex-1 rounded-lg border border-black/10 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-zinc-800"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") void handleRename(p.id);
-                      if (e.key === "Escape") setEditId(null);
-                    }}
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void handleRename(p.id)}
-                    className="shrink-0 rounded-full bg-zinc-900 px-2 py-1 text-[10px] font-semibold uppercase text-white dark:bg-amber-500 dark:text-zinc-900"
-                  >
-                    Guardar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditId(null)}
-                    className="shrink-0 rounded-full border border-black/10 px-2 py-1 text-[10px] font-semibold uppercase dark:border-white/10"
-                  >
-                    Cancelar
-                  </button>
-                </>
-              ) : (
-                <>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                    {p.name}
-                  </span>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => {
-                      setEditId(p.id);
-                      setEditName(p.name);
-                    }}
-                    className="shrink-0 rounded-full border border-black/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider dark:border-white/10"
-                  >
-                    Renombrar
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void handleDelete(p.id, p.name)}
-                    className="shrink-0 rounded-full border border-red-500/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-red-700 dark:text-red-400"
-                  >
-                    Eliminar
-                  </button>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* Add new */}
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-        <input
-          className="min-w-0 flex-1 rounded-xl border border-black/10 bg-white/90 px-3 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/80"
-          placeholder="Nombre del nuevo anuncio (ej. Loft 101)"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") void handleAdd();
-          }}
-          disabled={busy}
-        />
-        <button
-          type="button"
-          disabled={busy || !newName.trim()}
-          onClick={() => void handleAdd()}
-          className="shrink-0 rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white disabled:opacity-50 dark:bg-amber-500 dark:text-zinc-900"
-        >
-          Añadir anuncio
-        </button>
-      </div>
-    </section>
-  );
-}
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 export function PmsCalendarHub({
   properties,
   sources,
-  reservations,
   selectedPropertyId,
   onSelectPropertyId,
   exportUrl,
   busy,
-  isSuperAdmin,
   onSyncAll,
   onAddImportUrl,
   onSyncOneSource,
@@ -235,18 +36,13 @@ export function PmsCalendarHub({
   onCopyExport,
   onOpenExport,
   onRegenerateToken,
-  onAddProperty,
-  onRenameProperty,
-  onDeleteProperty,
 }: {
   properties: PropertyRow[];
   sources: IcalSourceRow[];
-  reservations: ReservationRow[];
   selectedPropertyId: string;
   onSelectPropertyId: (id: string) => void;
   exportUrl: string;
   busy: boolean;
-  isSuperAdmin?: boolean;
   onSyncAll: () => void | Promise<void>;
   onAddImportUrl: (url: string) => Promise<{ ok: boolean; error?: string }>;
   onSyncOneSource: (id: string) => Promise<{ ok: boolean; error?: string }>;
@@ -254,14 +50,7 @@ export function PmsCalendarHub({
   onCopyExport: () => void | Promise<void>;
   onOpenExport: () => void;
   onRegenerateToken: () => void | Promise<void>;
-  onAddProperty?: (name: string) => Promise<{ ok: boolean; error?: string }>;
-  onRenameProperty?: (
-    id: string,
-    name: string,
-  ) => Promise<{ ok: boolean; error?: string }>;
-  onDeleteProperty?: (id: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
-  const confirm = useConfirm();
   const [newUrl, setNewUrl] = useState("");
   const [rowBusy, setRowBusy] = useState<string | null>(null);
 
@@ -275,10 +64,6 @@ export function PmsCalendarHub({
         ),
     [sources, selectedPropertyId],
   );
-
-  function reservasDeSource(sourceId: string): number {
-    return reservations.filter((r) => r.ical_source_id === sourceId).length;
-  }
 
   const selectedName =
     properties.find((p) => p.id === selectedPropertyId)?.name ?? "—";
@@ -294,27 +79,10 @@ export function PmsCalendarHub({
 
   return (
     <div className="space-y-8">
-      {/* Anuncios management (super admin only) */}
-      {isSuperAdmin &&
-        onAddProperty &&
-        onRenameProperty &&
-        onDeleteProperty && (
-          <AnunciosManager
-            properties={properties}
-            isSuperAdmin={!!isSuperAdmin}
-            reservations={reservations}
-            sources={sources}
-            onAddProperty={onAddProperty}
-            onRenameProperty={onRenameProperty}
-            onDeleteProperty={onDeleteProperty}
-          />
-        )}
-
-      {/* Property selector + sync */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1">
           <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            Anuncio (hub de calendarios)
+            Propiedad (hub de calendarios)
           </label>
           <select
             className="mt-1 w-full max-w-xl rounded-xl border border-black/10 bg-white/90 px-3 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/80"
@@ -328,11 +96,12 @@ export function PmsCalendarHub({
             ))}
           </select>
           <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
-            Todas las URLs de importación Airbnb de{" "}
-            <strong>{selectedName}</strong> alimentan <strong>la misma</strong>{" "}
-            fila en el calendario. El iCal de exportación reúne reservas de{" "}
-            <strong>todas las fuentes</strong> para que lo pegues en cada
-            anuncio de Airbnb y bloqueen fechas de forma coherente.
+            Todas las URLs de importación Airbnb de <strong>{selectedName}</strong>{" "}
+            alimentan <strong>la misma</strong> propiedad en el PMS. El iCal de
+            exportación (abajo) reúne reservas y bloqueos de{" "}
+            <strong>todas las fuentes</strong> guardadas aquí (Airbnb, Booking,
+            manual, etc.) para que puedas pegar <strong>la misma URL</strong> en
+            cada anuncio de Airbnb y bloqueen fechas de forma coherente.
           </p>
         </div>
         <button
@@ -345,15 +114,14 @@ export function PmsCalendarHub({
         </button>
       </div>
 
-      {/* Import section */}
       <section className="rounded-xl border border-black/10 bg-black/[0.02] p-4 dark:border-white/10 dark:bg-white/[0.03]">
         <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-          Importar iCal (Airbnb → PMS)
+          Importar (Airbnb — solo lectura)
         </h3>
         <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-          Añade el enlace iCal de tu publicación en Airbnb. El sistema lo
-          sincroniza automáticamente y muestra las reservas en el calendario con
-          color naranja (Airbnb) y el nombre del huésped cuando esté disponible.
+          Añade un enlace por cada publicación de Airbnb (incluidas varias del
+          mismo loft). El cron y «Sincronizar» traen los eventos a esta
+          propiedad.
         </p>
 
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
@@ -377,7 +145,7 @@ export function PmsCalendarHub({
 
         {sourcesHere.length === 0 ? (
           <p className="mt-4 text-sm text-zinc-500">
-            No hay enlaces iCal para este anuncio. Añade el primero arriba.
+            No hay enlaces iCal para esta propiedad. Añade el primero arriba.
           </p>
         ) : (
           <div className="mt-4 overflow-x-auto">
@@ -396,9 +164,7 @@ export function PmsCalendarHub({
                     key={s.id}
                     className="border-b border-black/5 last:border-0 dark:border-white/5"
                   >
-                    <td className="py-2 pr-2 align-top text-zinc-500">
-                      {i + 1}
-                    </td>
+                    <td className="py-2 pr-2 align-top text-zinc-500">{i + 1}</td>
                     <td className="max-w-[280px] py-2 pr-2 align-top">
                       <span className="break-all font-mono text-[11px] text-zinc-800 dark:text-zinc-200">
                         {truncateUrl(s.url, 72)}
@@ -421,25 +187,20 @@ export function PmsCalendarHub({
                           }}
                           className="rounded-full border border-black/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider dark:border-white/10"
                         >
-                          {rowBusy === s.id ? "…" : "Sync"}
+                          Sync
                         </button>
                         <button
                           type="button"
                           disabled={busy || rowBusy !== null}
                           onClick={() => {
-                            const n = reservasDeSource(s.id);
-                            const detalle =
-                              n > 0
-                                ? `Se eliminarán también las ${n} reserva${n === 1 ? "" : "s"} visible${n === 1 ? "" : "s"} importada${n === 1 ? "" : "s"} desde este iCal.`
-                                : "Este enlace aún no ha sincronizado reservas. No se borrará nada más.";
+                            if (
+                              !confirm(
+                                "¿Eliminar este enlace iCal? No borra reservas ya importadas.",
+                              )
+                            ) {
+                              return;
+                            }
                             void (async () => {
-                              const ok = await confirm({
-                                title: "¿Quitar este enlace iCal?",
-                                description: `${detalle} Esta acción no se puede deshacer.`,
-                                confirmLabel: "Quitar",
-                                variant: "danger",
-                              });
-                              if (!ok) return;
                               setRowBusy(s.id);
                               await onDeleteSource(s.id);
                               setRowBusy(null);
@@ -457,22 +218,23 @@ export function PmsCalendarHub({
             </table>
           </div>
         )}
-        <p className="mt-3 text-[11px] text-zinc-500">
-          Los datos del huésped no siempre vienen en el iCal de Airbnb; solo
-          fechas y estado aproximado.
+        <p className="mt-3 text-[11px] text-zinc-500 dark:text-zinc-500">
+          Los datos del huésped no vienen en el iCal de Airbnb; solo fechas y
+          estado aproximado (reservado vs no disponible).
         </p>
       </section>
 
-      {/* Export section */}
       <section className="rounded-xl border border-amber-900/20 bg-amber-500/5 p-4 dark:border-amber-400/25 dark:bg-amber-500/10">
         <h3 className="text-sm font-semibold text-amber-950 dark:text-amber-100">
-          Exportar iCal (PMS → Airbnb)
+          Exportar (un solo iCal consolidado)
         </h3>
         <p className="mt-1 text-xs text-amber-950/90 dark:text-amber-50/90">
-          Esta URL contiene <strong>todas</strong> las reservas activas y
-          bloqueos de <strong>{selectedName}</strong>. Pégala en «Importar
-          calendario» de <strong>cada</strong> anuncio en Airbnb para
-          sincronizar fechas ocupadas.
+          Esta URL incluye <strong>todas</strong> las reservas activas y bloqueos
+          de <strong>{selectedName}</strong> en el PMS (cualquier OTA o manual).
+          Pégala en «Importar calendario» en <strong>cada</strong> anuncio de
+          Airbnb (u otra OTA que acepte iCal) para que bloqueen las mismas
+          fechas. No sustituye la lectura desde Airbnb: sigue siendo solo
+          bloqueo con delay de minutos.
         </p>
         <div className="mt-3 break-all rounded-lg border border-black/10 bg-white/80 px-3 py-2 font-mono text-[11px] text-zinc-900 dark:border-white/10 dark:bg-zinc-900/80 dark:text-zinc-100">
           {exportUrl || "—"}
@@ -498,7 +260,9 @@ export function PmsCalendarHub({
             type="button"
             disabled={!selectedPropertyId || busy}
             onClick={() => void onRegenerateToken()}
-            className="rounded-full border border-amber-900/30 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-950 dark:border-amber-400/40 dark:text-amber-200"
+            className={cn(
+              "rounded-full border border-amber-900/30 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-950 dark:border-amber-400/40 dark:text-amber-200",
+            )}
           >
             Regenerar token
           </button>

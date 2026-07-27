@@ -19,10 +19,7 @@ export async function GET(req: Request) {
       .order("created_at", { ascending: true })
       .limit(30);
     if (error) {
-      return Response.json(
-        { ok: false, error: error.message },
-        { status: 500 },
-      );
+      return Response.json({ ok: false, error: error.message }, { status: 500 });
     }
 
     const results: { id: string; ok: boolean; error?: string }[] = [];

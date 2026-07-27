@@ -40,30 +40,8 @@ export function itemNoAplica(loft: number, item: string): boolean {
   return false;
 }
 
-/** Orden de zonas al hacer el inventario: entrada → sala → cocina → escaleras → dormitorio → baño. */
-const ZONE_VISIT_ORDER = [
-  "Entrada / general (1er nivel)",
-  "Sala-comedor (1er nivel)",
-  "Cocina (1er nivel)",
-  "Escaleras y tragaluz",
-  "Dormitorio (2º nivel)",
-  "Baño (2º nivel)",
-] as const;
-
-function sortCatalogForVisit(items: InventoryItem[]): InventoryItem[] {
-  const rank = new Map<string, number>(ZONE_VISIT_ORDER.map((z, i) => [z, i]));
-  return [...items]
-    .sort((a, b) => {
-      const ra = rank.get(a.zona) ?? 999;
-      const rb = rank.get(b.zona) ?? 999;
-      if (ra !== rb) return ra - rb;
-      return a.orden - b.orden;
-    })
-    .map((it, i) => ({ ...it, orden: i + 1 }));
-}
-
-/** Filas tal cual el Excel; el orden de visita se aplica al exportar `CATALOGO_LOFT`. */
-const RAW_CATALOGO_LOFT: InventoryItem[] = [
+/** Catálogo principal para todos los lofts habitacionales. */
+export const CATALOGO_LOFT: InventoryItem[] = [
   {
     orden: 1,
     zona: "Baño (2º nivel)",
@@ -102,12 +80,12 @@ const RAW_CATALOGO_LOFT: InventoryItem[] = [
   },
   {
     orden: 14,
-    zona: "Escaleras y tragaluz",
+    zona: "Tragaluz (2º nivel)",
     item: "Acrílicos / cerramiento del tragaluz: limpios, sin grietas",
   },
   {
     orden: 15,
-    zona: "Escaleras y tragaluz",
+    zona: "Tragaluz (2º nivel)",
     item: "Marco / sellos del tragaluz: sin goteras ni filtraciones",
   },
   {
@@ -185,19 +163,11 @@ const RAW_CATALOGO_LOFT: InventoryItem[] = [
     zona: "Dormitorio (2º nivel)",
     item: "Paredes y pintura (dormitorio 2º)",
   },
-  {
-    orden: 40,
-    zona: "Escaleras y tragaluz",
-    item: "Pasamanos / barandas: firmes",
-  },
-  {
-    orden: 41,
-    zona: "Escaleras y tragaluz",
-    item: "Escalones: huellas y bordes",
-  },
+  { orden: 40, zona: "Escaleras", item: "Pasamanos / barandas: firmes" },
+  { orden: 41, zona: "Escaleras", item: "Escalones: huellas y bordes" },
   {
     orden: 42,
-    zona: "Escaleras y tragaluz",
+    zona: "Escaleras",
     item: "Paredes y pintura (hueco de escaleras)",
   },
   {
@@ -322,10 +292,6 @@ const RAW_CATALOGO_LOFT: InventoryItem[] = [
     ayuda: "Texto libre en Detalles",
   },
 ];
-
-/** Catálogo principal para todos los lofts habitacionales (orden de recorrido). */
-export const CATALOGO_LOFT: InventoryItem[] =
-  sortCatalogForVisit(RAW_CATALOGO_LOFT);
 
 /** Catálogo especial de la bodega del Loft 4. */
 export const CATALOGO_ALMACEN_LOFT4: InventoryItem[] = [

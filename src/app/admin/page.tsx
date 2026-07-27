@@ -1,59 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import {
   AdminShell,
   AdminCard,
   ADMIN_NAV,
 } from "@/components/admin/admin-shell";
-import { exportAll, importAllFromFile } from "@/lib/storage";
-import { apiClient } from "@/lib/api/client";
-import { useCotizaciones } from "@/features/cotizaciones/hooks";
+import { KEYS, safeGet, exportAll, importAllFromFile } from "@/lib/storage";
+import type { CotizacionGuardada } from "@/lib/cotizaciones-store";
+import type { AseoGuardado } from "@/lib/aseos-store";
 import type { InventarioGuardado } from "@/lib/inventarios-store";
-import { KEYS, safeGet } from "@/lib/storage";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
-type CleaningTaskLite = { id: string; status: string };
-
 export default function AdminHomePage() {
+  const [stats, setStats] = useState({
+    cotizaciones: 0,
+    inventarios: 0,
+    aseosHoy: 0,
+    aseosHoyPendientes: 0,
+  });
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Cotizaciones desde el servidor (React Query)
-  const cotizacionesQ = useCotizaciones();
+  function recalc() {
+    const cots = safeGet<CotizacionGuardada[]>(KEYS.cotizaciones, []);
+    const invs = safeGet<InventarioGuardado[]>(KEYS.inventarios, []);
+    const aseos = safeGet<AseoGuardado[]>(KEYS.aseos, []);
+    const hoy = todayISO();
+    const aseosHoy = aseos.filter((a) => a.fecha === hoy);
+    setStats({
+      cotizaciones: cots.length,
+      inventarios: invs.length,
+      aseosHoy: aseosHoy.length,
+      aseosHoyPendientes: aseosHoy.filter((a) => a.estado !== "Hecho").length,
+    });
+  }
 
-  const aseosHoyQ = useQuery<CleaningTaskLite[], Error>({
-    queryKey: ["admin-home", "aseos-hoy"],
-    queryFn: async () => {
-      try {
-        const res = await apiClient<{ tasks: CleaningTaskLite[] }>(
-          `/api/admin/cleaning-tasks?date=${todayISO()}`,
-        );
-        return Array.isArray(res?.tasks) ? res.tasks : [];
-      } catch {
-        return [];
-      }
-    },
-    staleTime: 60_000,
-  });
-
-  // Inventarios: hasta que migremos a Postgres seguimos contando los locales
-  // (no es ideal, pero el dashboard no debe romper). Cuando exista la tabla
-  // inventario_revisiones cambiamos esta lectura por una API.
-  const localInventarios = safeGet<InventarioGuardado[]>(KEYS.inventarios, []);
-
-  const aseosHoyData = aseosHoyQ.data ?? [];
-  const stats = {
-    cotizaciones: cotizacionesQ.data?.length ?? 0,
-    inventarios: localInventarios.length,
-    aseosHoy: aseosHoyData.length,
-    aseosHoyPendientes: aseosHoyData.filter((a) => a.status !== "done").length,
-  };
+  useEffect(() => {
+    recalc();
+  }, []);
 
   function handleExport() {
     exportAll();
@@ -69,6 +58,7 @@ export default function AdminHomePage() {
     try {
       await importAllFromFile(file);
       setImportMsg("Respaldo importado correctamente.");
+      recalc();
     } catch {
       setImportMsg(
         "No se pudo leer el archivo. Verifica que sea un JSON válido.",

@@ -1,77 +1,75 @@
-import { z } from "zod";
-
-import { ApiHandlerError, apiHandler } from "@/lib/api/handler";
+import { requireStaff } from "@/lib/api/require-staff";
 import { syncIcalSource } from "@/lib/pms/ical-sync";
 
-const getQuerySchema = z.object({
-  property_id: z.string().optional(),
-});
+export async function GET(req: Request) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const { supabase } = gate.ctx;
+  const propertyId = new URL(req.url).searchParams.get("property_id")?.trim();
+  let q = supabase
+    .from("ical_sources")
+    .select("id, property_id, url, last_sync, created_at, updated_at")
+    .order("created_at");
+  if (propertyId) q = q.eq("property_id", propertyId);
+  const { data, error } = await q;
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+  return Response.json({ sources: data ?? [] });
+}
 
-const postBodySchema = z.object({
-  property_id: z.string().min(1),
-  url: z.string().min(1),
-  sync_now: z.boolean().optional(),
-});
+export async function POST(req: Request) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const { supabase } = gate.ctx;
+  let body: { property_id?: string; url?: string; sync_now?: boolean };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "JSON inválido" }, { status: 400 });
+  }
+  const property_id = body.property_id?.trim();
+  const url = body.url?.trim();
+  if (!property_id || !url) {
+    return Response.json(
+      { error: "Faltan property_id o url" },
+      { status: 400 },
+    );
+  }
+  let urlOk = false;
+  try {
+    new URL(url);
+    urlOk = true;
+  } catch {
+    urlOk = false;
+  }
+  if (!urlOk) {
+    return Response.json({ error: "URL iCal inválida" }, { status: 400 });
+  }
 
-export const GET = apiHandler({
-  module: "reservas",
-  query: getQuerySchema,
-  handler: async ({ query, ctx }) => {
-    const propertyId = query.property_id?.trim();
-    let q = ctx.supabase
-      .from("ical_sources")
-      .select("id, property_id, url, last_sync, created_at, updated_at")
-      .order("created_at");
-    if (propertyId) q = q.eq("property_id", propertyId);
-    const { data, error } = await q;
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
-    return { sources: data ?? [] };
-  },
-});
+  /** Varias URLs Airbnb por la misma propiedad (múltiples anuncios) → siempre nueva fila. */
+  const { data: ins, error: insErr } = await supabase
+    .from("ical_sources")
+    .insert({ property_id, url })
+    .select("*")
+    .maybeSingle();
+  if (insErr || !ins?.id) {
+    return Response.json(
+      { error: insErr?.message ?? "No se pudo crear la fuente" },
+      { status: 500 },
+    );
+  }
 
-export const POST = apiHandler({
-  module: "reservas",
-  body: postBodySchema,
-  handler: async ({ body, ctx }) => {
-    try {
-      new URL(body.url);
-    } catch {
-      throw new ApiHandlerError("URL iCal inválida", {
-        status: 400,
-        code: "BAD_REQUEST",
-      });
-    }
+  let sync: { ok: boolean; message: string; upserted: number } | null = null;
+  if (body.sync_now) {
+    sync = await syncIcalSource(supabase, ins.id, property_id, url);
+  }
 
-    const { data: ins, error: insErr } = await ctx.supabase
-      .from("ical_sources")
-      .insert({ property_id: body.property_id, url: body.url })
-      .select("*")
-      .maybeSingle();
-    if (insErr || !ins?.id) {
-      throw new ApiHandlerError(
-        insErr?.message ?? "No se pudo crear la fuente",
-        {
-          status: 500,
-        },
-      );
-    }
+  const { data: row } = await supabase
+    .from("ical_sources")
+    .select("*")
+    .eq("id", ins.id)
+    .maybeSingle();
 
-    let sync: { ok: boolean; message: string; upserted: number } | null = null;
-    if (body.sync_now) {
-      sync = await syncIcalSource(
-        ctx.supabase,
-        ins.id,
-        body.property_id,
-        body.url,
-      );
-    }
-
-    const { data: row } = await ctx.supabase
-      .from("ical_sources")
-      .select("*")
-      .eq("id", ins.id)
-      .maybeSingle();
-
-    return { source: row, sync };
-  },
-});
+  return Response.json({ source: row, sync });
+}

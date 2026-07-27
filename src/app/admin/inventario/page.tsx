@@ -4,122 +4,61 @@ import { useEffect, useMemo, useState } from "react";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
 import {
   TODOS_LOS_LOFTS,
+  getCatalogo,
+  itemNoAplica,
+  ESTADOS,
+  FUNCIONA_OPCIONES,
   type EstadoItem,
   type Funciona,
 } from "@/lib/inventory-catalog";
-import { compressImage } from "@/lib/compress-image";
-import { PrintableInventory } from "@/components/admin/printable-inventory";
-import { generarFolio } from "@/components/admin/printable-quote";
-import { MigrateLocalInventariosBanner } from "@/features/inventarios/migrate-banner";
 import {
-  useInventarios,
-  useInventario,
-  useCreateInventario,
-  useUpdateInventario,
-  useDeleteInventario,
-  useUploadFoto,
-  useDeleteFoto,
-} from "@/features/inventarios/hooks";
-import type { InventarioRevisionSummary } from "@/features/inventarios/types";
-import type { InventarioRevisionCreateInput } from "@/features/inventarios/schemas";
-import { ApiClientError } from "@/lib/api/client";
-import { useConfirm, useToast } from "@/components/ui";
-import { Field, StatChip } from "@/features/aseos/components/atoms";
-import {
-  ItemCardMobile,
-  ItemRowDesktop,
-  inputClass,
-} from "@/features/inventarios/components/item-editor";
-import {
-  buildEmpty,
-  itemRequiereEvidenciaDanio,
-  todayISO,
-  type EditableItem,
-} from "@/features/inventarios/utils";
-import { useRequireAdminModule } from "@/hooks/useRequireAdminModule";
+  listarInventarios,
+  guardarInventario,
+  eliminarInventario,
+  type InventarioGuardado,
+  type InventarioItemResultado,
+} from "@/lib/inventarios-store";
+
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+function newId() {
+  return (
+    "i_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36)
+  );
+}
+
+function buildEmpty(loft: number): InventarioItemResultado[] {
+  const catalogo = getCatalogo(loft);
+  return catalogo.map((c) => {
+    const noAplica = itemNoAplica(loft, c.item);
+    return {
+      orden: c.orden,
+      zona: c.zona,
+      item: c.item,
+      estado: noAplica ? "No aplica" : "",
+      funciona: noAplica ? "No aplica" : "",
+      detalles: "",
+      requiereAtencion: false,
+    };
+  });
+}
 
 export default function InventarioPage() {
-  const { ready } = useRequireAdminModule();
-  const toast = useToast();
-  const confirm = useConfirm();
   const [loft, setLoft] = useState<number>(1);
   const [persona, setPersona] = useState("");
   const [fecha, setFecha] = useState<string>("");
-  const [items, setItems] = useState<EditableItem[]>([]);
+  const [items, setItems] = useState<InventarioItemResultado[]>([]);
   const [editId, setEditId] = useState<string | null>(null);
+  const [guardados, setGuardados] = useState<InventarioGuardado[]>([]);
+  const [msg, setMsg] = useState<string | null>(null);
   const [filtroZona, setFiltroZona] = useState<string>("Todas");
-  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
-  const [printFolio, setPrintFolio] = useState<string>("");
-  const [printEmision, setPrintEmision] = useState<string>("");
 
-  const inventariosQuery = useInventarios();
-  const guardados = inventariosQuery.data ?? [];
-
-  const detalleQuery = useInventario(editId);
-
-  const createMut = useCreateInventario();
-  const updateMut = useUpdateInventario();
-  const deleteMut = useDeleteInventario();
-  const uploadFotoMut = useUploadFoto();
-  const deleteFotoMut = useDeleteFoto();
-
-  // Inicialización: fecha de hoy + checklist vacío para loft 1.
   useEffect(() => {
     setFecha(todayISO());
     setItems(buildEmpty(1));
+    setGuardados(listarInventarios());
   }, []);
-
-  // Cuando se carga una revisión desde el servidor (editId), aplanamos sus
-  // items en `items` manteniendo el orden del catálogo cuando coincide.
-  useEffect(() => {
-    if (!detalleQuery.data) return;
-    const rev = detalleQuery.data;
-    const loftNum = Number(rev.loft_id) || 1;
-    setLoft(loftNum);
-    setPersona(rev.persona);
-    setFecha(rev.fecha);
-
-    // Reconstruimos items partiendo del catálogo, mezclando con datos del server
-    const baseItems = buildEmpty(loftNum);
-    const byKey = new Map<string, (typeof rev.items)[number]>();
-    for (const it of rev.items) {
-      byKey.set(`${it.zona}|${it.item}`, it);
-    }
-
-    const merged: EditableItem[] = baseItems.map((base) => {
-      const key = `${base.zona}|${base.item}`;
-      const fromServer = byKey.get(key);
-      if (!fromServer) return base;
-      byKey.delete(key);
-      return {
-        serverId: fromServer.id,
-        orden: base.orden,
-        zona: base.zona,
-        item: base.item,
-        estado: (fromServer.estado as EstadoItem) ?? "",
-        funciona: (fromServer.funciona as Funciona) ?? "",
-        detalles: fromServer.detalles,
-        requiereAtencion: fromServer.requiere_atencion,
-        fotos: fromServer.fotos,
-      };
-    });
-
-    // Items en el server que NO estaban en el catálogo (por si el catálogo cambió)
-    for (const extra of byKey.values()) {
-      merged.push({
-        serverId: extra.id,
-        orden: extra.orden,
-        zona: extra.zona,
-        item: extra.item,
-        estado: (extra.estado as EstadoItem) ?? "",
-        funciona: (extra.funciona as Funciona) ?? "",
-        detalles: extra.detalles,
-        requiereAtencion: extra.requiere_atencion,
-        fotos: extra.fotos,
-      });
-    }
-    setItems(merged);
-  }, [detalleQuery.data]);
 
   function cambiarLoft(l: number) {
     setLoft(l);
@@ -128,7 +67,7 @@ export default function InventarioPage() {
     setFiltroZona("Todas");
   }
 
-  function setItem(idx: number, patch: Partial<EditableItem>) {
+  function setItem(idx: number, patch: Partial<InventarioItemResultado>) {
     setItems((prev) => {
       const next = [...prev];
       const item = { ...next[idx], ...patch };
@@ -175,67 +114,39 @@ export default function InventarioPage() {
       .map(({ idx }) => idx);
   }, [items, filtroZona]);
 
-  function buildPayload(): InventarioRevisionCreateInput {
-    return {
-      loft_id: String(loft),
+  function handleGuardar() {
+    const inv: InventarioGuardado = {
+      id: editId || newId(),
+      creadoEn: new Date().toISOString(),
+      loft,
       persona: persona.trim() || "—",
       fecha,
-      items: items.map((it) => ({
-        orden: it.orden,
-        zona: it.zona,
-        item: it.item,
-        estado: it.estado === "" ? "OK" : it.estado,
-        funciona: it.funciona === "" ? "Sí" : it.funciona,
-        detalles: it.detalles,
-        requiere_atencion: it.requiereAtencion,
-      })),
+      items,
     };
+    guardarInventario(inv);
+    setGuardados(listarInventarios());
+    setEditId(inv.id);
+    setMsg("Inventario guardado.");
+    setTimeout(() => setMsg(null), 3000);
   }
 
-  async function handleGuardar() {
-    try {
-      if (editId) {
-        await updateMut.mutateAsync({ id: editId, patch: buildPayload() });
-        toast.success("Inventario actualizado.");
-      } else {
-        const created = await createMut.mutateAsync(buildPayload());
-        setEditId(created.id);
-        toast.success("Inventario guardado.", {
-          description:
-            "Puedes añadir fotos en ítems marcados como Dañado o que No funcionan.",
-        });
-      }
-    } catch (err) {
-      const m = err instanceof Error ? err.message : "Error al guardar";
-      toast.error("No se pudo guardar el inventario", { description: m });
-    }
-  }
-
-  async function handleCargar(g: InventarioRevisionSummary) {
-    setEditId(g.id);
+  function handleCargar(inv: InventarioGuardado) {
+    setLoft(inv.loft);
+    setPersona(inv.persona);
+    setFecha(inv.fecha);
+    setItems(inv.items);
+    setEditId(inv.id);
     setFiltroZona("Todas");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function handleEliminar(id: string) {
-    const ok = await confirm({
-      title: "¿Eliminar este registro de inventario?",
-      description:
-        "Se eliminan también las fotos asociadas en Supabase Storage. Esta acción no se puede deshacer.",
-      confirmLabel: "Eliminar",
-      variant: "danger",
-    });
-    if (!ok) return;
-    try {
-      await deleteMut.mutateAsync(id);
-      if (editId === id) {
-        setEditId(null);
-        setItems(buildEmpty(loft));
-      }
-      toast.success("Inventario eliminado.");
-    } catch (err) {
-      const m = err instanceof Error ? err.message : "Error al eliminar";
-      toast.error("No se pudo eliminar el inventario", { description: m });
+  function handleEliminar(id: string) {
+    if (!confirm("¿Eliminar este registro de inventario?")) return;
+    eliminarInventario(id);
+    setGuardados(listarInventarios());
+    if (editId === id) {
+      setEditId(null);
+      setItems(buildEmpty(loft));
     }
   }
 
@@ -246,108 +157,6 @@ export default function InventarioPage() {
     setFecha(todayISO());
   }
 
-  async function handleAddFoto(idx: number, file: File) {
-    const it = items[idx];
-    if (!itemRequiereEvidenciaDanio(it)) {
-      toast.warning(
-        "Las fotos solo aplican a ítems dañados o que no funcionan.",
-        {
-          description:
-            "Marca «Dañado» o «No» en ¿Funciona? antes de subir evidencia.",
-        },
-      );
-      return;
-    }
-    if (!editId || !it.serverId) {
-      toast.warning("Guarda el inventario antes de subir fotos.", {
-        description:
-          "Las fotos se cargan en tiempo real a Supabase Storage y necesitan el ID del ítem.",
-      });
-      return;
-    }
-    setUploadingIdx(idx);
-    try {
-      const { dataUrl, bytes } = await compressImage(file, {
-        maxDimension: 1280,
-        quality: 0.7,
-      });
-      // Convertir el dataUrl comprimido en un Blob real para upload
-      const blob = await (await fetch(dataUrl)).blob();
-      const compressedFile = new File(
-        [blob],
-        file.name.replace(/\.[^.]+$/, "") + ".jpg",
-        { type: "image/jpeg" },
-      );
-      const uploaded = await uploadFotoMut.mutateAsync({
-        revisionId: editId,
-        itemId: it.serverId,
-        file: compressedFile,
-      });
-      void bytes; // tamaño calculado por la compresión; el server guarda el real
-      setItems((prev) => {
-        const next = [...prev];
-        next[idx] = {
-          ...next[idx],
-          fotos: [...next[idx].fotos, uploaded],
-        };
-        return next;
-      });
-    } catch (e) {
-      let m = e instanceof Error ? e.message : "Error al subir";
-      if (
-        e instanceof ApiClientError &&
-        (e.code === "NETWORK_ERROR" || /failed to fetch/i.test(m))
-      ) {
-        m =
-          "Sin respuesta del servidor. Si trabajas en local con http://localhost, reinicia `npm run dev` tras actualizar la configuración; comprueba también que no bloquee el firewall.";
-      }
-      toast.error("No se pudo subir la foto", { description: m });
-    } finally {
-      setUploadingIdx(null);
-    }
-  }
-
-  async function handleRemoveFoto(idx: number, fotoId: string) {
-    const it = items[idx];
-    if (!editId || !it.serverId) return;
-    try {
-      await deleteFotoMut.mutateAsync({
-        revisionId: editId,
-        itemId: it.serverId,
-        fotoId,
-      });
-      setItems((prev) => {
-        const next = [...prev];
-        next[idx] = {
-          ...next[idx],
-          fotos: next[idx].fotos.filter((f) => f.id !== fotoId),
-        };
-        return next;
-      });
-    } catch (e) {
-      const m = e instanceof Error ? e.message : "Error al eliminar";
-      toast.error("No se pudo eliminar la foto", { description: m });
-    }
-  }
-
-  function handleGenerarPDF() {
-    if (items.length === 0) return;
-    const now = new Date();
-    setPrintFolio(generarFolio(now));
-    setPrintEmision(now.toISOString());
-    requestAnimationFrame(() => {
-      window.print();
-    });
-  }
-
-  if (!ready) {
-    return (
-      <AdminShell>
-        <p className="text-sm text-zinc-600 dark:text-zinc-300">Cargando…</p>
-      </AdminShell>
-    );
-  }
-
   return (
     <AdminShell>
       <div>
@@ -356,13 +165,9 @@ export default function InventarioPage() {
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
           Revisa artículo por artículo cada loft. Marca estado y si funciona;
-          los ítems que no apliquen se llenan solos. Las fotos quedan
-          respaldadas en Supabase Storage. Las fotos son solo evidencia de daño
-          o fallo de funcionamiento.
+          los ítems que no apliquen se llenan solos.
         </p>
       </div>
-
-      <MigrateLocalInventariosBanner />
 
       <AdminCard
         title="Datos del registro"
@@ -378,21 +183,9 @@ export default function InventarioPage() {
             <button
               type="button"
               onClick={handleGuardar}
-              disabled={createMut.isPending || updateMut.isPending}
-              className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-zinc-800 disabled:opacity-60 dark:bg-[#f2f0eb] dark:text-zinc-900"
+              className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900"
             >
-              {createMut.isPending || updateMut.isPending
-                ? "Guardando…"
-                : editId
-                  ? "Actualizar inventario"
-                  : "Guardar inventario"}
-            </button>
-            <button
-              type="button"
-              onClick={handleGenerarPDF}
-              className="rounded-full border border-amber-700/40 bg-amber-50 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-900 hover:bg-amber-100 dark:border-amber-400/40 dark:bg-amber-400/10 dark:text-amber-300"
-            >
-              Generar PDF
+              Guardar inventario
             </button>
           </div>
         }
@@ -453,13 +246,18 @@ export default function InventarioPage() {
           <StatChip label="No aplica" value={totales.noAplica} />
           <StatChip label="Atención" value={totales.atencion} color="red" />
         </div>
+
+        {msg && (
+          <p className="mt-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300">
+            {msg}
+          </p>
+        )}
       </AdminCard>
 
       <AdminCard
         title={`Checklist — Loft ${loft}${loft === 4 ? " (bodega)" : ""}`}
       >
-        {/* Escritorio: tabla */}
-        <div className="hidden overflow-x-auto md:block">
+        <div className="overflow-x-auto">
           <table className="w-full min-w-[780px] border-collapse text-sm">
             <thead className="bg-black/5 text-[11px] uppercase tracking-wider text-zinc-600 dark:bg-white/5 dark:text-zinc-300">
               <tr>
@@ -475,125 +273,185 @@ export default function InventarioPage() {
               {visibleIndices.map((idx) => {
                 const it = items[idx];
                 return (
-                  <ItemRowDesktop
+                  <tr
                     key={idx}
-                    idx={idx}
-                    it={it}
-                    canUploadFotos={Boolean(editId && it.serverId)}
-                    uploading={uploadingIdx === idx}
-                    onChange={(patch) => setItem(idx, patch)}
-                    onAddFoto={(file) => handleAddFoto(idx, file)}
-                    onRemoveFoto={(fotoId) => handleRemoveFoto(idx, fotoId)}
-                  />
+                    className={
+                      it.requiereAtencion
+                        ? "bg-red-500/5"
+                        : it.estado === "No aplica"
+                          ? "opacity-60"
+                          : ""
+                    }
+                  >
+                    <td className="px-2 py-2 align-top text-zinc-500">
+                      {it.orden}
+                    </td>
+                    <td className="px-2 py-2 align-top">
+                      <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] dark:bg-white/10">
+                        {it.zona}
+                      </span>
+                    </td>
+                    <td className="px-2 py-2 align-top font-medium">
+                      {it.item}
+                    </td>
+                    <td className="px-2 py-2 align-top">
+                      <select
+                        className={smallSelect}
+                        value={it.estado}
+                        onChange={(e) =>
+                          setItem(idx, { estado: e.target.value as EstadoItem })
+                        }
+                      >
+                        <option value="">—</option>
+                        {ESTADOS.map((o) => (
+                          <option key={o} value={o}>
+                            {o}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-2 py-2 align-top">
+                      <select
+                        className={smallSelect}
+                        value={it.funciona}
+                        onChange={(e) =>
+                          setItem(idx, { funciona: e.target.value as Funciona })
+                        }
+                      >
+                        <option value="">—</option>
+                        {FUNCIONA_OPCIONES.map((o) => (
+                          <option key={o} value={o}>
+                            {o}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-2 py-2 align-top">
+                      <input
+                        className={smallInput}
+                        value={it.detalles}
+                        onChange={(e) =>
+                          setItem(idx, { detalles: e.target.value })
+                        }
+                        placeholder={
+                          /observaciones/i.test(it.item)
+                            ? "Notas libres"
+                            : "Novedad (opcional)"
+                        }
+                      />
+                    </td>
+                  </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
-
-        {/* Móvil: tarjetas apiladas, controles a ancho completo */}
-        <ul className="md:hidden space-y-4">
-          {visibleIndices.map((idx) => {
-            const it = items[idx];
-            return (
-              <li key={idx}>
-                <ItemCardMobile
-                  idx={idx}
-                  it={it}
-                  canUploadFotos={Boolean(editId && it.serverId)}
-                  uploading={uploadingIdx === idx}
-                  onChange={(patch) => setItem(idx, patch)}
-                  onAddFoto={(file) => handleAddFoto(idx, file)}
-                  onRemoveFoto={(fotoId) => handleRemoveFoto(idx, fotoId)}
-                />
-              </li>
-            );
-          })}
-        </ul>
       </AdminCard>
 
       <AdminCard
         title={`Inventarios guardados (${guardados.length})`}
-        subtitle="Aquí quedan todos los registros sincronizados desde la base de datos."
+        subtitle="Aquí quedan todos los registros. Ábrelos para continuar o modificar."
       >
-        {inventariosQuery.isLoading ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Cargando…</p>
-        ) : guardados.length === 0 ? (
+        {guardados.length === 0 ? (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Aún no hay inventarios guardados.
           </p>
         ) : (
           <ul className="divide-y divide-black/5 dark:divide-white/5">
-            {guardados.map((g) => (
-              <li
-                key={g.id}
-                className="flex flex-wrap items-center justify-between gap-3 py-3"
-              >
-                <div className="min-w-0">
-                  <p className="font-semibold">
-                    {Number(g.loft_id) === 4
-                      ? "Loft 4 (bodega)"
-                      : `Loft ${g.loft_id}`}
-                    <span className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
-                      {g.fecha} · {g.persona}
-                    </span>
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {g.con_atencion > 0
-                      ? `${g.con_atencion} ítem(s) requieren atención`
-                      : "Sin novedades destacadas"}
-                    {" · "}
-                    {g.fotos_count} foto(s)
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleCargar(g)}
-                    className="rounded-full border border-black/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-zinc-700 hover:bg-black/5 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
-                  >
-                    Abrir
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleEliminar(g.id)}
-                    className="rounded-full border border-red-400/40 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-700 hover:bg-red-500/10 dark:text-red-300"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </li>
-            ))}
+            {guardados.map((g) => {
+              const atencion = g.items.filter((i) => i.requiereAtencion).length;
+              return (
+                <li
+                  key={g.id}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold">
+                      {g.loft === 4 ? "Loft 4 (bodega)" : `Loft ${g.loft}`}
+                      <span className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        {g.fecha} · {g.persona}
+                      </span>
+                    </p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {atencion > 0
+                        ? `${atencion} ítem(s) requieren atención`
+                        : "Sin novedades destacadas"}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleCargar(g)}
+                      className="rounded-full border border-black/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-zinc-700 hover:bg-black/5 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
+                    >
+                      Abrir
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleEliminar(g.id)}
+                      className="rounded-full border border-red-400/40 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-700 hover:bg-red-500/10 dark:text-red-300"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </AdminCard>
-
-      {/* Reporte imprimible (PDF). Oculto en pantalla, visible al imprimir. */}
-      {printFolio && items.length > 0 && (
-        <PrintableInventory
-          folio={printFolio}
-          emisionISO={printEmision}
-          loft={loft}
-          persona={persona.trim() || "—"}
-          fecha={fecha}
-          items={items.map((it) => ({
-            orden: it.orden,
-            zona: it.zona,
-            item: it.item,
-            estado: (it.estado || "") as EstadoItem,
-            funciona: (it.funciona || "") as Funciona,
-            detalles: it.detalles,
-            requiereAtencion: it.requiereAtencion,
-            fotos: it.fotos.map((f) => ({
-              id: f.id,
-              dataUrl: f.url ?? "",
-              caption: f.caption,
-              creadaEn: f.created_at,
-              bytes: f.file_size,
-            })),
-          }))}
-        />
-      )}
     </AdminShell>
+  );
+}
+
+const inputClass =
+  "w-full rounded-xl border border-black/10 bg-white/80 px-4 py-3 text-sm outline-none ring-amber-800/25 focus:ring-2 dark:border-white/10 dark:bg-zinc-900/70";
+const smallSelect =
+  "w-full min-w-[130px] rounded-lg border border-black/10 bg-white/80 px-2 py-1.5 text-sm outline-none ring-amber-800/25 focus:ring-2 dark:border-white/10 dark:bg-zinc-900/70";
+const smallInput =
+  "w-full min-w-[180px] rounded-lg border border-black/10 bg-white/80 px-2 py-1.5 text-sm outline-none ring-amber-800/25 focus:ring-2 dark:border-white/10 dark:bg-zinc-900/70";
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
+function StatChip({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  color?: "green" | "amber" | "red";
+}) {
+  const palette: Record<string, string> = {
+    green: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    amber: "bg-amber-500/15 text-amber-800 dark:text-amber-300",
+    red: "bg-red-500/10 text-red-700 dark:text-red-300",
+  };
+  return (
+    <div
+      className={`rounded-xl border border-black/10 px-3 py-2 text-sm dark:border-white/10 ${
+        color ? palette[color] : "bg-white/60 dark:bg-zinc-900/50"
+      }`}
+    >
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em]">
+        {label}
+      </p>
+      <p className="font-display text-xl tracking-wide">{value}</p>
+    </div>
   );
 }

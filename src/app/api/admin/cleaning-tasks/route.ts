@@ -1,94 +1,110 @@
-import { z } from "zod";
-
-import { ApiHandlerError, apiHandler } from "@/lib/api/handler";
+import { requireStaff } from "@/lib/api/require-staff";
 import {
   computeCleaningPrice,
   parseCleaningPricing,
 } from "@/lib/pms/cleaning-pricing";
 
-const getQuerySchema = z.object({
-  date: z.string().optional(),
-});
+export async function GET(req: Request) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const { supabase } = gate.ctx;
+  const date =
+    new URL(req.url).searchParams.get("date")?.trim() ??
+    new Date().toISOString().slice(0, 10);
 
-const postBodySchema = z.object({
-  property_id: z.string().min(1),
-  task_date: z.string().min(1),
-  notes: z.string().optional(),
-  guests: z.coerce.number().int().min(1).optional(),
-  assigned_to: z.string().nullable().optional(),
-  cleaning_price: z.number().nullable().optional(),
-});
+  const { data: tasks, error } = await supabase
+    .from("cleaning_tasks")
+    .select("*")
+    .eq("task_date", date)
+    .order("estimated_time_label", { ascending: true });
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
 
-export const GET = apiHandler({
-  module: "aseos",
-  query: getQuerySchema,
-  handler: async ({ query, ctx }) => {
-    const date = query.date?.trim() ?? new Date().toISOString().slice(0, 10);
+  const ids = [...new Set((tasks ?? []).map((t) => t.property_id))];
+  let propNames: Record<string, string> = {};
+  if (ids.length > 0) {
+    const { data: props } = await supabase
+      .from("properties")
+      .select("id,name")
+      .in("id", ids);
+    propNames = Object.fromEntries((props ?? []).map((p) => [p.id, p.name]));
+  }
 
-    const { data: tasks, error } = await ctx.supabase
-      .from("cleaning_tasks")
-      .select("*")
-      .eq("task_date", date)
-      .order("estimated_time_label", { ascending: true });
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
+  const enriched = (tasks ?? []).map((t) => ({
+    ...t,
+    property_name: propNames[t.property_id] ?? "—",
+  }));
 
-    const ids = [...new Set((tasks ?? []).map((t) => t.property_id))];
-    let propNames: Record<string, string> = {};
-    if (ids.length > 0) {
-      const { data: props } = await ctx.supabase
-        .from("properties")
-        .select("id,name")
-        .in("id", ids);
-      propNames = Object.fromEntries((props ?? []).map((p) => [p.id, p.name]));
-    }
+  return Response.json({ tasks: enriched, date });
+}
 
-    const enriched = (tasks ?? []).map((t) => ({
-      ...t,
-      property_name: propNames[t.property_id] ?? "—",
-    }));
+export async function POST(req: Request) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const { supabase } = gate.ctx;
 
-    return { tasks: enriched, date };
-  },
-});
+  let body: {
+    property_id?: string;
+    task_date?: string;
+    notes?: string;
+    guests?: number;
+    assigned_to?: string | null;
+    cleaning_price?: number | null;
+  };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "JSON inválido" }, { status: 400 });
+  }
 
-export const POST = apiHandler({
-  module: "aseos",
-  body: postBodySchema,
-  handler: async ({ body, ctx }) => {
-    const guests = body.guests ?? 1;
+  const property_id = body.property_id?.trim();
+  const task_date = body.task_date?.trim();
+  if (!property_id || !task_date) {
+    return Response.json(
+      { error: "Faltan property_id o task_date" },
+      { status: 400 },
+    );
+  }
 
-    let price = body.cleaning_price ?? null;
-    if (price == null) {
-      const { data: row } = await ctx.supabase
-        .from("app_settings")
-        .select("value")
-        .eq("key", "cleaning_pricing")
-        .maybeSingle();
-      const rules = parseCleaningPricing(row?.value);
-      price = computeCleaningPrice(guests, rules);
-    }
+  const guests = Number(body.guests ?? 1);
+  if (!Number.isFinite(guests) || guests < 1) {
+    return Response.json({ error: "guests inválido" }, { status: 400 });
+  }
 
-    const { data, error } = await ctx.supabase
-      .from("cleaning_tasks")
-      .insert({
-        property_id: body.property_id,
-        reservation_id: null,
-        task_date: body.task_date,
-        type: "manual",
-        status: "pending",
-        guests,
-        source: "manual",
-        guest_name: "",
-        notes: body.notes?.trim() ?? "",
-        bed_setup_notes: "",
-        cleaning_price: price,
-        estimated_time_label: "Tarea manual",
-        assigned_to: body.assigned_to?.trim() || null,
-      })
-      .select("*")
+  let price = body.cleaning_price ?? null;
+  if (price == null) {
+    const { data: row } = await supabase
+      .from("app_settings")
+      .select("value")
+      .eq("key", "cleaning_pricing")
       .maybeSingle();
+    const rules = parseCleaningPricing(row?.value);
+    price = computeCleaningPrice(guests, rules);
+  }
 
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
-    return { task: data };
-  },
-});
+  const { data, error } = await supabase
+    .from("cleaning_tasks")
+    .insert({
+      property_id,
+      reservation_id: null,
+      task_date,
+      type: "manual",
+      status: "pending",
+      guests,
+      source: "manual",
+      guest_name: "",
+      notes: body.notes?.trim() ?? "",
+      bed_setup_notes: "",
+      cleaning_price: price,
+      estimated_time_label: "Tarea manual",
+      assigned_to: body.assigned_to?.trim() || null,
+    })
+    .select("*")
+    .maybeSingle();
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+  return Response.json({ task: data });
+}

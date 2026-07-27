@@ -14,10 +14,7 @@ export async function GET(req: Request) {
     const admin = createServiceRoleClient();
     const { error } = await regenerateAllCleaningTasks(admin);
     if (error) {
-      return Response.json(
-        { ok: false, error: error.message },
-        { status: 500 },
-      );
+      return Response.json({ ok: false, error: error.message }, { status: 500 });
     }
     const today = new Date().toISOString().slice(0, 10);
     await notifySupervisorsDailyCleaningDigest(admin, today);

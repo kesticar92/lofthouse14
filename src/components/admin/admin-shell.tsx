@@ -5,11 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { fetchAdminSession, logoutAdmin } from "@/lib/auth-client";
-import {
-  ADMIN_MODULE_LABELS,
-  ADMIN_MODULE_PATHS,
-  type AdminModuleKey,
-} from "@/lib/api/admin-modules";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { AdminNotificationBell } from "@/components/admin/admin-notification-bell";
@@ -19,8 +14,6 @@ type NavItem = {
   label: string;
   icon: React.ReactNode;
   desc: string;
-  module?: AdminModuleKey;
-  adminOnly?: boolean;
 };
 
 export const ADMIN_NAV: NavItem[] = [
@@ -28,13 +21,7 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin",
     label: "Inicio",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M3 11.5 12 4l9 7.5" />
         <path d="M6.5 10.5V20h11V10.5" />
       </svg>
@@ -42,17 +29,10 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Resumen general del panel",
   },
   {
-    href: ADMIN_MODULE_PATHS.cotizaciones,
-    label: ADMIN_MODULE_LABELS.cotizaciones,
-    module: "cotizaciones",
+    href: "/admin/cotizaciones",
+    label: "Cotizaciones",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M12 3v18" />
         <path d="M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3.5 5 3.5 5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5" />
       </svg>
@@ -60,17 +40,10 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Calcula y guarda cotizaciones",
   },
   {
-    href: ADMIN_MODULE_PATHS.inventario,
-    label: ADMIN_MODULE_LABELS.inventario,
-    module: "inventario",
+    href: "/admin/inventario",
+    label: "Inventario",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <rect x="4" y="4" width="16" height="16" rx="2" />
         <path d="m8 12 2.5 2.5L16 9" />
       </svg>
@@ -78,17 +51,10 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Revisión de artículos por loft",
   },
   {
-    href: ADMIN_MODULE_PATHS.reservas,
-    label: ADMIN_MODULE_LABELS.reservas,
-    module: "reservas",
+    href: "/admin/reservas",
+    label: "Reservas",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <rect x="3" y="5" width="18" height="16" rx="2" />
         <path d="M3 9h18M8 3v4M16 3v4" />
       </svg>
@@ -96,17 +62,10 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Ocupación, iCal Airbnb y exportación",
   },
   {
-    href: ADMIN_MODULE_PATHS.gastos,
-    label: ADMIN_MODULE_LABELS.gastos,
-    module: "gastos",
+    href: "/admin/gastos",
+    label: "Gastos",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M4 7h16v10H4z" />
         <path d="M8 11h8M8 15h5" />
         <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
@@ -115,42 +74,14 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Facturas, fotos y backup en Drive",
   },
   {
-    href: ADMIN_MODULE_PATHS.aseos,
-    label: ADMIN_MODULE_LABELS.aseos,
-    module: "aseos",
+    href: "/admin/aseos",
+    label: "Aseos del día",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3 6.3 17.7" />
       </svg>
     ),
     desc: "Limpieza y preparación desde reservas",
-  },
-  {
-    href: ADMIN_MODULE_PATHS.usuarios,
-    label: ADMIN_MODULE_LABELS.usuarios,
-    module: "usuarios",
-    adminOnly: true,
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      >
-        <circle cx="9" cy="7" r="4" />
-        <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        <path d="M21 21v-2a4 4 0 0 0-3-3.87" />
-      </svg>
-    ),
-    desc: "Gestión de accesos y permisos",
   },
 ];
 
@@ -160,7 +91,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<string>("");
   const [role, setRole] = useState<string>("");
-  const [allowedModules, setAllowedModules] = useState<string[]>([]);
   const [openMenu, setOpenMenu] = useState(false);
 
   useEffect(() => {
@@ -174,21 +104,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       }
       setUser(session.user);
       setRole(session.role);
-      setAllowedModules(session.allowedModules);
       setReady(true);
     })();
     return () => {
       cancelled = true;
     };
   }, [router, pathname]);
-
-  const visibleNav = ADMIN_NAV.filter((n) => {
-    if (n.adminOnly && role !== "super_admin" && role !== "admin") {
-      return false;
-    }
-    if (!n.module) return true;
-    return allowedModules.includes(n.module);
-  });
 
   if (!ready) {
     return (
@@ -265,7 +186,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           )}
         >
           <nav className="flex flex-col gap-1 lg:sticky lg:top-[88px]">
-            {visibleNav.map((n) => {
+            {ADMIN_NAV.map((n) => {
               const active =
                 pathname === n.href ||
                 (n.href !== "/admin" && pathname?.startsWith(n.href));

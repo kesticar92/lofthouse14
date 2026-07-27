@@ -1,90 +1,91 @@
-import { z } from "zod";
+import { requireStaff } from "@/lib/api/require-staff";
 
-import { ApiHandlerError, apiHandler } from "@/lib/api/handler";
-import type { TablesUpdate } from "@/types/database.types";
+export async function PATCH(
+  req: Request,
+  ctx: { params: Promise<{ id: string }> },
+) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const { supabase, user } = gate.ctx;
+  const { id } = await ctx.params;
+  if (!id) {
+    return Response.json({ error: "Falta id" }, { status: 400 });
+  }
 
-const paramsSchema = z.object({
-  id: z.string().min(1),
-});
+  let body: {
+    status?: string;
+    assigned_to?: string | null;
+    notes?: string;
+    cleaning_price?: number | null;
+    bed_setup_notes?: string;
+  };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "JSON inválido" }, { status: 400 });
+  }
 
-const patchBodySchema = z.object({
-  status: z.enum(["pending", "in_progress", "done"]).optional(),
-  assigned_to: z.string().nullable().optional(),
-  notes: z.string().optional(),
-  cleaning_price: z.number().nullable().optional(),
-  bed_setup_notes: z.string().optional(),
-});
+  const { data: cur, error: curErr } = await supabase
+    .from("cleaning_tasks")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (curErr) {
+    return Response.json({ error: curErr.message }, { status: 500 });
+  }
+  if (!cur) {
+    return Response.json({ error: "No encontrada" }, { status: 404 });
+  }
 
-export const PATCH = apiHandler({
-  module: "aseos",
-  params: paramsSchema,
-  body: patchBodySchema,
-  handler: async ({ params, body, ctx }) => {
-    const { supabase, user } = ctx;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const isSuper =
+    profile?.role === "super_admin" || profile?.role === "admin";
 
-    const { data: cur, error: curErr } = await supabase
-      .from("cleaning_tasks")
-      .select("*")
-      .eq("id", params.id)
-      .maybeSingle();
-    if (curErr) throw new ApiHandlerError(curErr.message, { status: 500 });
-    if (!cur) {
-      throw new ApiHandlerError("Tarea no encontrada", {
-        status: 404,
-        code: "NOT_FOUND",
+  const patch: Record<string, unknown> = {};
+  if (body.status !== undefined) {
+    if (!["pending", "in_progress", "done"].includes(body.status)) {
+      return Response.json({ error: "status inválido" }, { status: 400 });
+    }
+    patch.status = body.status;
+  }
+  if (body.notes !== undefined) patch.notes = body.notes;
+  if (body.bed_setup_notes !== undefined) {
+    patch.bed_setup_notes = body.bed_setup_notes;
+  }
+  if (body.cleaning_price !== undefined) {
+    if (!isSuper) {
+      return Response.json({ error: "Prohibido: solo supervisor edita precio" }, {
+        status: 403,
       });
     }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-    const isSuper =
-      profile?.role === "super_admin" || profile?.role === "admin";
-
-    const patch: TablesUpdate<"cleaning_tasks"> = {};
-    if (body.status !== undefined) patch.status = body.status;
-    if (body.notes !== undefined) patch.notes = body.notes;
-    if (body.bed_setup_notes !== undefined) {
-      patch.bed_setup_notes = body.bed_setup_notes;
+    patch.cleaning_price = body.cleaning_price;
+  }
+  if (body.assigned_to !== undefined) {
+    if (!isSuper) {
+      return Response.json(
+        { error: "Prohibido: solo supervisor asigna personal" },
+        { status: 403 },
+      );
     }
-    if (body.cleaning_price !== undefined) {
-      if (!isSuper) {
-        throw new ApiHandlerError("Prohibido: solo supervisor edita precio", {
-          status: 403,
-          code: "FORBIDDEN",
-        });
-      }
-      patch.cleaning_price = body.cleaning_price;
-    }
-    if (body.assigned_to !== undefined) {
-      if (!isSuper) {
-        throw new ApiHandlerError(
-          "Prohibido: solo supervisor asigna personal",
-          {
-            status: 403,
-            code: "FORBIDDEN",
-          },
-        );
-      }
-      patch.assigned_to = body.assigned_to;
-    }
+    patch.assigned_to = body.assigned_to;
+  }
 
-    if (Object.keys(patch).length === 0) {
-      throw new ApiHandlerError("Sin cambios", {
-        status: 400,
-        code: "BAD_REQUEST",
-      });
-    }
+  if (Object.keys(patch).length === 0) {
+    return Response.json({ error: "Sin cambios" }, { status: 400 });
+  }
 
-    const { data, error } = await supabase
-      .from("cleaning_tasks")
-      .update(patch)
-      .eq("id", params.id)
-      .select("*")
-      .maybeSingle();
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
-    return { task: data };
-  },
-});
+  const { data, error } = await supabase
+    .from("cleaning_tasks")
+    .update(patch)
+    .eq("id", id)
+    .select("*")
+    .maybeSingle();
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+  return Response.json({ task: data });
+}

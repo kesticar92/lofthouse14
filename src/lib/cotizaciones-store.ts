@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * @deprecated Cotizaciones y tarifas viven en Supabase. Solo se usa para migración
- * one-shot desde localStorage (ver admin/cotizaciones y migrate-banner).
- */
-
 import { KEYS, safeGet, safeSet } from "./storage";
 import type { QuoteInput, QuoteResult, PricingConfig } from "./pricing";
 
@@ -12,12 +7,7 @@ export type CotizacionGuardada = {
   id: string;
   creadaEn: string; // ISO datetime
   cliente: string;
-  /** Documento de identidad o NIT del cliente. Opcional para compatibilidad
-   * con cotizaciones guardadas antes de exigirlo. */
-  documento?: string;
   telefono: string;
-  /** Correo del cliente (opcional). */
-  email?: string;
   observaciones: string;
   input: QuoteInput;
   config: PricingConfig;

@@ -29,7 +29,7 @@ const jsonLd = {
   url: siteUrl,
   image: [
     `${siteUrl}/logo-lofthouse.png`,
-    ...site.gallery.map((p) => `${siteUrl}${p.src}`),
+    ...site.gallery.map((p) => `${siteUrl}${p}`),
   ],
   telephone: site.phoneTel,
   address: {
@@ -71,6 +71,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: site.name,
     description: site.description,
+  },
+  alternates: {
+    canonical: "/",
   },
   robots: {
     index: true,

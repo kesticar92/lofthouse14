@@ -1,0 +1,131 @@
+{
+    "origen": "Booking.com",
+    "total_reseñas": 25,
+    "reseñas": [
+        {
+            "nombre": "Daniela",
+            "calificacion": "10",
+            "comentario": "Bien ubicado y como se ve en las fotos. El aire es portátil y se desconecta."
+        },
+        {
+            "nombre": "Rincón",
+            "calificacion": "10",
+            "comentario": "El sitio es super bonito, limpio, amplio y los anfitriones super amables.  Execelente mini apartamento para hospedarse varios días, no existe ruido ni molestias uno descansa perfectamente."
+        },
+        {
+            "nombre": "Andrea",
+            "calificacion": "10",
+            "comentario": "Ubicación"
+        },
+        {
+            "nombre": "Humberto",
+            "calificacion": "9,0",
+            "comentario": "Una muy buena atención Hace calor"
+        },
+        {
+            "nombre": "Mauricio",
+            "calificacion": "9,0",
+            "comentario": "La comodidad de los espacios Le falta más dotación de implementó para cocinar. Por otra parte, de noche el sector es muy solo y da desconfianza"
+        },
+        {
+            "nombre": "Magda",
+            "calificacion": "9,0",
+            "comentario": "Es agradable, limpio y muy cómodo Que no tenga un parqueadero seguro"
+        },
+        {
+            "nombre": "Fraga",
+            "calificacion": "10",
+            "comentario": "La ubicación y es perfecto para pareja"
+        },
+        {
+            "nombre": "Oscar",
+            "calificacion": "10",
+            "comentario": "Tiene todo lo necesario NA"
+        },
+        {
+            "nombre": "Yasmin",
+            "calificacion": "10",
+            "comentario": "Privacidad No hay mucha ventilación"
+        },
+        {
+            "nombre": "Tovar",
+            "calificacion": "8,0",
+            "comentario": "Lo pendiente que estuvo el administrador El baño pegado a las camas"
+        },
+        {
+            "nombre": "Alejandro",
+            "calificacion": "10",
+            "comentario": "ubicación con fácil acceso y transporte a lugares turísticos de la ciudad y a zonas comerciales, de restaurantes Todo estuvo muy bien"
+        },
+        {
+            "nombre": "Claudia",
+            "calificacion": "10",
+            "comentario": "Lo que mas me gustó fue que el apartamento estaba muy limpio y cómodo perfecto para una visita"
+        },
+        {
+            "nombre": "Jairo",
+            "calificacion": "8,0",
+            "comentario": "Ubicación, limpieza, comodidad, El parqueadero muy lejos"
+        },
+        {
+            "nombre": "Estefany",
+            "calificacion": "10",
+            "comentario": "La atención espectacular 👌 Kevin todo el personal atentos la limpieza super recomendado"
+        },
+        {
+            "nombre": "Michel",
+            "calificacion": "10",
+            "comentario": "La ubicación. La ventilación en el primer piso."
+        },
+        {
+            "nombre": "Mónica",
+            "calificacion": "10",
+            "comentario": "Limpieza, ubicación y atención"
+        },
+        {
+            "nombre": "Maritza",
+            "calificacion": "10",
+            "comentario": "La ubicación Tener que bajar las sabanas y toallas a la entrada"
+        },
+        {
+            "nombre": "Acosta",
+            "calificacion": "10",
+            "comentario": "Muy limpio y central Todo muy bien"
+        },
+        {
+            "nombre": "Lila",
+            "calificacion": "10",
+            "comentario": "Muy recomendado el alojamiento, excelente lugar para hospedarse!!! Muy cómodo y tranquilo."
+        },
+        {
+            "nombre": "Gina",
+            "calificacion": "9,0",
+            "comentario": "Muy buena ubicación"
+        },
+        {
+            "nombre": "Carolina",
+            "calificacion": "9,0",
+            "comentario": "El aseo Que no tenía parking"
+        },
+        {
+            "nombre": "Natalia",
+            "calificacion": "8,0",
+            "comentario": "Me gusto mucho la ubicación, el barrio es hermoso y tranquilo. El ruido de la puerta constantemente, hubiera preferido una habitación lejos de la puerta principal para más tranquilidad."
+        },
+        {
+            "nombre": "Guerra",
+            "calificacion": "9,0",
+            "comentario": "La comodidad de la habitación Faltaba un poco de aseo en la habitación"
+        },
+        {
+            "nombre": "Fabian",
+            "calificacion": "10",
+            "comentario": "El espacio es perfecto, el servicio es muy bueno, la ubicación es muy conveniente, cerca de restaurantes"
+        },
+        {
+            "nombre": "Torres",
+            "calificacion": "10",
+            "comentario": "Un supermercado servicio en todo sentido las chicas q hacen el aseo súper serviciales y el anfitrión muy atento, la seguridad interna y del hospedaje excelente. En general un excelente hospedaje. Volveríamos a hospedarnos allí sin dudarlo No hay punto malo"
+        }
+    ]
+}

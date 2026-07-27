@@ -62,7 +62,9 @@ export function buildPropertyIcs(opts: {
     const uid = `${r.id}@lofthouse14.com`;
     const sum = `${r.source} - ${r.status}`;
     const desc =
-      r.status === "blocked" || !r.guest_name.trim() ? "Blocked" : r.guest_name;
+      r.status === "blocked" || !r.guest_name.trim()
+        ? "Blocked"
+        : r.guest_name;
     chunks.push(
       veventBlock({
         uid,

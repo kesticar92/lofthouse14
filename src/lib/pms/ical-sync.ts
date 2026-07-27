@@ -54,11 +54,7 @@ export function inferAirbnbStatusFromSummary(
   ) {
     return "blocked";
   }
-  if (
-    s.includes("reserved") ||
-    s.includes("reservation") ||
-    s.includes("reserva")
-  ) {
+  if (s.includes("reserved") || s.includes("reservation") || s.includes("reserva")) {
     return "confirmed";
   }
   return "confirmed";
@@ -91,9 +87,7 @@ export function parseAirbnbIcalEvents(cal: CalendarResponse): ParsedIcalStay[] {
   return out;
 }
 
-export async function fetchAndParseIcal(
-  url: string,
-): Promise<ParsedIcalStay[]> {
+export async function fetchAndParseIcal(url: string): Promise<ParsedIcalStay[]> {
   const res = await fetch(url, { redirect: "follow" });
   if (!res.ok) {
     throw new Error(`iCal HTTP ${res.status}`);
@@ -103,15 +97,11 @@ export async function fetchAndParseIcal(
   return parseAirbnbIcalEvents(cal);
 }
 
-/** Upsert reservas importadas (Airbnb). Sin datos de huésped en iCal.
- * `icalSourceId` permite vincular cada reserva al iCal del que provino, de modo
- * que al eliminar el iCal (FK ON DELETE CASCADE) desaparezcan también sus
- * reservas y no quede rastro visual en el timeline. */
+/** Upsert reservas importadas (Airbnb). Sin datos de huésped en iCal. */
 export async function upsertAirbnbStays(
   admin: SupabaseClient,
   propertyId: string,
   stays: ParsedIcalStay[],
-  icalSourceId?: string | null,
 ): Promise<{ upserted: number; errors: string[] }> {
   const errors: string[] = [];
   let upserted = 0;
@@ -129,11 +119,10 @@ export async function upsertAirbnbStays(
       status: s.status,
       notes: "",
       ical_summary: s.ical_summary,
-      ical_source_id: icalSourceId ?? null,
     };
     const { data: existing, error: selErr } = await admin
       .from("reservations")
-      .select("id, ical_source_id")
+      .select("id")
       .eq("property_id", propertyId)
       .eq("external_id", s.external_id)
       .maybeSingle();
@@ -142,22 +131,15 @@ export async function upsertAirbnbStays(
       continue;
     }
     if (existing?.id) {
-      const update: Record<string, unknown> = {
-        check_in: row.check_in,
-        check_out: row.check_out,
-        status: row.status,
-        ical_summary: row.ical_summary,
-        updated_at: new Date().toISOString(),
-      };
-      // Backfill best-effort: si la reserva legacy no tiene vínculo y este sync
-      // sí trae sourceId, la adoptamos para que un futuro borrado del iCal la
-      // limpie también.
-      if (!existing.ical_source_id && icalSourceId) {
-        update.ical_source_id = icalSourceId;
-      }
       const { error: upErr } = await admin
         .from("reservations")
-        .update(update)
+        .update({
+          check_in: row.check_in,
+          check_out: row.check_out,
+          status: row.status,
+          ical_summary: row.ical_summary,
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", existing.id);
       if (upErr) errors.push(upErr.message);
       else upserted++;
@@ -178,12 +160,7 @@ export async function syncIcalSource(
 ): Promise<{ ok: boolean; message: string; upserted: number }> {
   try {
     const stays = await fetchAndParseIcal(url);
-    const { upserted, errors } = await upsertAirbnbStays(
-      admin,
-      propertyId,
-      stays,
-      sourceId,
-    );
+    const { upserted, errors } = await upsertAirbnbStays(admin, propertyId, stays);
     const now = new Date().toISOString();
     await admin
       .from("ical_sources")

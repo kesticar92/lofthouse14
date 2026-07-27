@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { QueryProvider } from "@/components/providers/query-provider";
-import { ConfirmProvider, ToastProvider } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Panel administrador",
@@ -14,11 +12,5 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <QueryProvider>
-      <ToastProvider>
-        <ConfirmProvider>{children}</ConfirmProvider>
-      </ToastProvider>
-    </QueryProvider>
-  );
+  return <>{children}</>;
 }

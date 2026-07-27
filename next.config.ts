@@ -91,6 +91,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  images: {
+    formats: ['image/avif', 'image/webp'], // Next las convertirá automáticamente a estos formatos modernos
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "me7aitdbxq.ufs.sh",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      }
+    ],
+  },
 };
 
 export default nextConfig;

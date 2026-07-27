@@ -1,25 +1,31 @@
-import { z } from "zod";
+import { requireStaff } from "@/lib/api/require-staff";
 
-import { ApiHandlerError, apiHandler } from "@/lib/api/handler";
+export async function PATCH(
+  req: Request,
+  ctx: { params: Promise<{ id: string }> },
+) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const { supabase, user } = gate.ctx;
+  const { id } = await ctx.params;
+  if (!id) {
+    return Response.json({ error: "Falta id" }, { status: 400 });
+  }
 
-const paramsSchema = z.object({
-  id: z.string().min(1),
-});
+  let body: { read?: boolean };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "JSON inválido" }, { status: 400 });
+  }
 
-const bodySchema = z.object({
-  read: z.boolean().optional(),
-});
-
-export const PATCH = apiHandler({
-  params: paramsSchema,
-  body: bodySchema,
-  handler: async ({ params, body, ctx }) => {
-    const { error } = await ctx.supabase
-      .from("notifications")
-      .update({ read: body.read ?? true })
-      .eq("id", params.id)
-      .eq("user_id", ctx.user.id);
-    if (error) throw new ApiHandlerError(error.message, { status: 500 });
-    return { updated: true };
-  },
-});
+  const { error } = await supabase
+    .from("notifications")
+    .update({ read: body.read ?? true })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+  return Response.json({ ok: true });
+}

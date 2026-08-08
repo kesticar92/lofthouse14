@@ -10,10 +10,25 @@ import { Loader2 } from "lucide-react"; // Importamos un icono de carga
 import bookingReviewsData from "@/app/scrapper/reviews/reseñas_booking.json";
 import googleReviewsData from "@/app/scrapper/reviews/reseñas_google.json";
 
+type GoogleReviewRow = {
+  id: number;
+  nombre: string;
+  calificacion: string;
+  comentario: string;
+};
+
+type BookingReviewRow = {
+  nombre: string;
+  calificacion: string;
+  comentario: string;
+};
+
 // Formatear reseñas de Google
-const formattedGoogle: Testimonial[] = googleReviewsData
-  .filter((r: any) => r.comentario && r.comentario.trim().length > 0)
-  .map((r: any) => ({
+const formattedGoogle: Testimonial[] = (
+  googleReviewsData as GoogleReviewRow[]
+)
+  .filter((r) => r.comentario && r.comentario.trim().length > 0)
+  .map((r) => ({
     text: r.comentario,
     image: "/default-avatar.png",
     name: r.nombre,
@@ -23,9 +38,11 @@ const formattedGoogle: Testimonial[] = googleReviewsData
   }));
 
 // Formatear reseñas de Booking
-const formattedBooking: Testimonial[] = bookingReviewsData.reseñas
-  .filter((r: any) => r.comentario && r.comentario.trim().length > 0)
-  .map((r: any) => {
+const formattedBooking: Testimonial[] = (
+  bookingReviewsData.reseñas as BookingReviewRow[]
+)
+  .filter((r) => r.comentario && r.comentario.trim().length > 0)
+  .map((r) => {
     const ratingVal = parseFloat(r.calificacion.replace(",", "."));
     const rating = isNaN(ratingVal) ? 5 : ratingVal / 2;
     return {

@@ -25,6 +25,8 @@ import { site } from "@/lib/site";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import places from "@/data/places_updated.json";
 
+type PlaceItem = (typeof places)[number];
+
 const categories = ["Todos", "Gastronomía", "Cultura", "Ocio"];
 
 // Sub-componente para controles de mapa estilizados con Glassmorphism
@@ -63,19 +65,12 @@ function MapControls() {
   );
 }
 
-const _SAFELIST = [
-  "bg-green-500",
-  "bg-blue-500",
-  "bg-amber-500",
-  "bg-zinc-900",
-];
-
 function MapController({
   activePlace,
   placesList,
 }: {
   activePlace: number | null;
-  placesList: any[];
+  placesList: PlaceItem[];
 }) {
   const { map, isLoaded } = useMap();
 

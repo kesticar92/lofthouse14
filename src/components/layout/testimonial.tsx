@@ -116,7 +116,7 @@ export const TestimonialsColumn = (props: TestimonialsColumnProps) => {
                   key={i}
                 >
                   <div className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed mb-6 italic">
-                    "{testimonial.text}"
+                    &ldquo;{testimonial.text}&rdquo;
                   </div>
 
                   <div className="flex items-center justify-between mt-auto">

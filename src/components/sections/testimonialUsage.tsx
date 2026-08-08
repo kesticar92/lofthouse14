@@ -24,9 +24,7 @@ type BookingReviewRow = {
 };
 
 // Formatear reseñas de Google
-const formattedGoogle: Testimonial[] = (
-  googleReviewsData as GoogleReviewRow[]
-)
+const formattedGoogle: Testimonial[] = (googleReviewsData as GoogleReviewRow[])
   .filter((r) => r.comentario && r.comentario.trim().length > 0)
   .map((r) => ({
     text: r.comentario,

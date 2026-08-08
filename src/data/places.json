@@ -48,7 +48,7 @@
     "hours": "12:00 PM - 3:00 AM",
     "image": "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop",
     "lng": -76.533519,
-    "lat": 3.455600,
+    "lat": 3.4556,
     "color": "bg-amber-500"
   },
   {
@@ -60,8 +60,8 @@
     "reviews": 124,
     "hours": "Check-in 3:00 PM",
     "image": "/logo-lofthouse.png",
-    "lng": -76.541170,
-    "lat": 3.444730,
+    "lng": -76.54117,
+    "lat": 3.44473,
     "isHome": true,
     "color": "bg-zinc-900"
   },
@@ -75,7 +75,7 @@
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
     "lng": -76.541334,
-    "lat": 3.448670,
+    "lat": 3.44867,
     "color": "bg-green-500"
   },
   {
@@ -88,7 +88,7 @@
     "hours": "9:00 AM - 6:00 PM",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
     "lng": -76.537612,
-    "lat": 3.446700,
+    "lat": 3.4467,
     "color": "bg-blue-500"
   },
   {
@@ -100,7 +100,7 @@
     "reviews": 850,
     "hours": "Varía según evento",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.538350,
+    "lng": -76.53835,
     "lat": 3.447545,
     "color": "bg-blue-500"
   },
@@ -152,7 +152,7 @@
     "reviews": 1500,
     "hours": "3:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538740,
+    "lng": -76.53874,
     "lat": 3.448074,
     "color": "bg-amber-500"
   },
@@ -178,7 +178,7 @@
     "reviews": 900,
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
-    "lng": -76.543590,
+    "lng": -76.54359,
     "lat": 3.447781,
     "color": "bg-green-500"
   },
@@ -231,7 +231,7 @@
     "hours": "5:00 PM - 11:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
     "lng": -76.539655,
-    "lat": 3.447230,
+    "lat": 3.44723,
     "color": "bg-amber-500"
   },
   {
@@ -243,8 +243,8 @@
     "reviews": 780,
     "hours": "11:00 AM - 7:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.541010,
-    "lat": 3.448240,
+    "lng": -76.54101,
+    "lat": 3.44824,
     "color": "bg-amber-500"
   },
   {
@@ -295,8 +295,8 @@
     "reviews": 430,
     "hours": "Varía según evento",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.545890,
-    "lat": 3.435770,
+    "lng": -76.54589,
+    "lat": 3.43577,
     "color": "bg-blue-500"
   },
   {
@@ -321,7 +321,7 @@
     "reviews": 1800,
     "hours": "8:00 PM - 3:00 AM",
     "image": "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop",
-    "lng": -76.545100,
+    "lng": -76.5451,
     "lat": 3.431602,
     "color": "bg-green-500"
   },
@@ -334,7 +334,7 @@
     "reviews": 2700,
     "hours": "12:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.545800,
+    "lng": -76.5458,
     "lat": 3.431802,
     "color": "bg-amber-500"
   },
@@ -347,8 +347,8 @@
     "reviews": 950,
     "hours": "9:00 AM - 8:00 PM",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.542000,
-    "lat": 3.429010,
+    "lng": -76.542,
+    "lat": 3.42901,
     "color": "bg-blue-500"
   },
   {
@@ -373,8 +373,8 @@
     "reviews": 380,
     "hours": "Varía según evento",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.544100,
-    "lat": 3.433500,
+    "lng": -76.5441,
+    "lat": 3.4335,
     "color": "bg-blue-500"
   },
   {
@@ -399,7 +399,7 @@
     "reviews": 1200,
     "hours": "5:00 PM - 2:00 AM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.545600,
+    "lng": -76.5456,
     "lat": 3.431405,
     "color": "bg-amber-500"
   },
@@ -412,8 +412,8 @@
     "reviews": 4200,
     "hours": "8:00 AM - 6:00 PM",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.541150,
-    "lat": 3.435450,
+    "lng": -76.54115,
+    "lat": 3.43545,
     "color": "bg-blue-500"
   },
   {
@@ -438,7 +438,7 @@
     "reviews": 890,
     "hours": "12:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538250,
+    "lng": -76.53825,
     "lat": 3.450625,
     "color": "bg-amber-500"
   },
@@ -451,8 +451,8 @@
     "reviews": 340,
     "hours": "7:00 PM - 11:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538800,
-    "lat": 3.449850,
+    "lng": -76.5388,
+    "lat": 3.44985,
     "color": "bg-amber-500"
   },
   {
@@ -464,7 +464,7 @@
     "reviews": 1600,
     "hours": "7:00 AM - 8:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538350,
+    "lng": -76.53835,
     "lat": 3.450125,
     "color": "bg-amber-500"
   },
@@ -477,8 +477,8 @@
     "reviews": 2100,
     "hours": "12:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538100,
-    "lat": 3.450410,
+    "lng": -76.5381,
+    "lat": 3.45041,
     "color": "bg-amber-500"
   },
   {
@@ -490,8 +490,8 @@
     "reviews": 3200,
     "hours": "12:00 PM - 11:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538900,
-    "lat": 3.450500,
+    "lng": -76.5389,
+    "lat": 3.4505,
     "color": "bg-amber-500"
   },
   {
@@ -503,8 +503,8 @@
     "reviews": 4100,
     "hours": "12:00 PM - 11:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538400,
-    "lat": 3.450200,
+    "lng": -76.5384,
+    "lat": 3.4502,
     "color": "bg-amber-500"
   },
   {
@@ -516,8 +516,8 @@
     "reviews": 1100,
     "hours": "12:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538500,
-    "lat": 3.450850,
+    "lng": -76.5385,
+    "lat": 3.45085,
     "color": "bg-amber-500"
   },
   {
@@ -529,8 +529,8 @@
     "reviews": 850,
     "hours": "12:00 PM - 11:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538750,
-    "lat": 3.450700,
+    "lng": -76.53875,
+    "lat": 3.4507,
     "color": "bg-amber-500"
   },
   {
@@ -542,8 +542,8 @@
     "reviews": 620,
     "hours": "6:00 PM - 2:00 AM",
     "image": "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop",
-    "lng": -76.538450,
-    "lat": 3.450350,
+    "lng": -76.53845,
+    "lat": 3.45035,
     "color": "bg-green-500"
   },
   {
@@ -555,8 +555,8 @@
     "reviews": 730,
     "hours": "12:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.538650,
-    "lat": 3.450550,
+    "lng": -76.53865,
+    "lat": 3.45055,
     "color": "bg-amber-500"
   },
   {
@@ -568,8 +568,8 @@
     "reviews": 9200,
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.541620,
-    "lat": 3.451670,
+    "lng": -76.54162,
+    "lat": 3.45167,
     "color": "bg-blue-500"
   },
   {
@@ -581,8 +581,8 @@
     "reviews": 5100,
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
-    "lng": -76.542200,
-    "lat": 3.451800,
+    "lng": -76.5422,
+    "lat": 3.4518,
     "color": "bg-green-500"
   },
   {
@@ -594,8 +594,8 @@
     "reviews": 840,
     "hours": "10:00 AM - 3:00 PM",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.544500,
-    "lat": 3.450700,
+    "lng": -76.5445,
+    "lat": 3.4507,
     "color": "bg-blue-500"
   },
   {
@@ -607,8 +607,8 @@
     "reviews": 22400,
     "hours": "9:00 AM - 4:30 PM",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
-    "lng": -76.556620,
-    "lat": 3.446850,
+    "lng": -76.55662,
+    "lat": 3.44685,
     "color": "bg-green-500"
   },
   {
@@ -620,8 +620,8 @@
     "reviews": 11500,
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.545850,
-    "lat": 3.449830,
+    "lng": -76.54585,
+    "lat": 3.44983,
     "color": "bg-blue-500"
   },
   {
@@ -633,8 +633,8 @@
     "reviews": 1300,
     "hours": "10:00 AM - 6:00 PM",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.546300,
-    "lat": 3.449200,
+    "lng": -76.5463,
+    "lat": 3.4492,
     "color": "bg-blue-500"
   },
   {
@@ -646,8 +646,8 @@
     "reviews": 850,
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
-    "lng": -76.551500,
-    "lat": 3.449100,
+    "lng": -76.5515,
+    "lat": 3.4491,
     "color": "bg-green-500"
   },
   {
@@ -659,8 +659,8 @@
     "reviews": 920,
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
-    "lng": -76.553200,
-    "lat": 3.448500,
+    "lng": -76.5532,
+    "lat": 3.4485,
     "color": "bg-green-500"
   },
   {
@@ -672,8 +672,8 @@
     "reviews": 2600,
     "hours": "12:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.558500,
-    "lat": 3.445200,
+    "lng": -76.5585,
+    "lat": 3.4452,
     "color": "bg-amber-500"
   },
   {
@@ -685,8 +685,8 @@
     "reviews": 3400,
     "hours": "12:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.535800,
-    "lat": 3.454250,
+    "lng": -76.5358,
+    "lat": 3.45425,
     "color": "bg-amber-500"
   },
   {
@@ -698,8 +698,8 @@
     "reviews": 1800,
     "hours": "11:00 AM - 9:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.535000,
-    "lat": 3.455200,
+    "lng": -76.535,
+    "lat": 3.4552,
     "color": "bg-amber-500"
   },
   {
@@ -711,8 +711,8 @@
     "reviews": 2100,
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
-    "lng": -76.535500,
-    "lat": 3.454200,
+    "lng": -76.5355,
+    "lat": 3.4542,
     "color": "bg-green-500"
   },
   {
@@ -725,7 +725,7 @@
     "hours": "10:00 AM - 8:00 PM",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
     "lng": -76.535915,
-    "lat": 3.455210,
+    "lat": 3.45521,
     "color": "bg-green-500"
   },
   {
@@ -737,8 +737,8 @@
     "reviews": 18500,
     "hours": "Abierto 24 horas",
     "image": "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop",
-    "lng": -76.533800,
-    "lat": 3.453000,
+    "lng": -76.5338,
+    "lat": 3.453,
     "color": "bg-green-500"
   },
   {
@@ -750,8 +750,8 @@
     "reviews": 14200,
     "hours": "8:00 AM - 5:00 PM",
     "image": "https://images.unsplash.com/photo-1562281302-809108dfdd14?w=400&h=300&fit=crop",
-    "lng": -76.533030,
-    "lat": 3.454280,
+    "lng": -76.53303,
+    "lat": 3.45428,
     "color": "bg-blue-500"
   },
   {
@@ -763,8 +763,8 @@
     "reviews": 2200,
     "hours": "12:00 PM - 10:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.534200,
-    "lat": 3.456050,
+    "lng": -76.5342,
+    "lat": 3.45605,
     "color": "bg-amber-500"
   },
   {
@@ -776,8 +776,8 @@
     "reviews": 1300,
     "hours": "12:00 PM - 11:00 PM",
     "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
-    "lng": -76.533800,
-    "lat": 3.456500,
+    "lng": -76.5338,
+    "lat": 3.4565,
     "color": "bg-amber-500"
   },
   {
@@ -789,8 +789,8 @@
     "reviews": 4600,
     "hours": "8:00 PM - 4:00 AM",
     "image": "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop",
-    "lng": -76.533900,
-    "lat": 3.456100,
+    "lng": -76.5339,
+    "lat": 3.4561,
     "color": "bg-green-500"
   }
 ]

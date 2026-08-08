@@ -4,8 +4,7 @@ export async function GET(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
   const { supabase, user } = gate.ctx;
-  const unreadOnly =
-    new URL(req.url).searchParams.get("unread") === "1";
+  const unreadOnly = new URL(req.url).searchParams.get("unread") === "1";
 
   let q = supabase
     .from("notifications")

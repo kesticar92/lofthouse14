@@ -42,8 +42,7 @@ export async function PATCH(
     .select("role")
     .eq("id", user.id)
     .maybeSingle();
-  const isSuper =
-    profile?.role === "super_admin" || profile?.role === "admin";
+  const isSuper = profile?.role === "super_admin" || profile?.role === "admin";
 
   const patch: Record<string, unknown> = {};
   if (body.status !== undefined) {
@@ -58,9 +57,12 @@ export async function PATCH(
   }
   if (body.cleaning_price !== undefined) {
     if (!isSuper) {
-      return Response.json({ error: "Prohibido: solo supervisor edita precio" }, {
-        status: 403,
-      });
+      return Response.json(
+        { error: "Prohibido: solo supervisor edita precio" },
+        {
+          status: 403,
+        },
+      );
     }
     patch.cleaning_price = body.cleaning_price;
   }

@@ -96,12 +96,13 @@ export function PmsCalendarHub({
             ))}
           </select>
           <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
-            Todas las URLs de importación Airbnb de <strong>{selectedName}</strong>{" "}
-            alimentan <strong>la misma</strong> propiedad en el PMS. El iCal de
-            exportación (abajo) reúne reservas y bloqueos de{" "}
-            <strong>todas las fuentes</strong> guardadas aquí (Airbnb, Booking,
-            manual, etc.) para que puedas pegar <strong>la misma URL</strong> en
-            cada anuncio de Airbnb y bloqueen fechas de forma coherente.
+            Todas las URLs de importación Airbnb de{" "}
+            <strong>{selectedName}</strong> alimentan <strong>la misma</strong>{" "}
+            propiedad en el PMS. El iCal de exportación (abajo) reúne reservas y
+            bloqueos de <strong>todas las fuentes</strong> guardadas aquí
+            (Airbnb, Booking, manual, etc.) para que puedas pegar{" "}
+            <strong>la misma URL</strong> en cada anuncio de Airbnb y bloqueen
+            fechas de forma coherente.
           </p>
         </div>
         <button
@@ -164,7 +165,9 @@ export function PmsCalendarHub({
                     key={s.id}
                     className="border-b border-black/5 last:border-0 dark:border-white/5"
                   >
-                    <td className="py-2 pr-2 align-top text-zinc-500">{i + 1}</td>
+                    <td className="py-2 pr-2 align-top text-zinc-500">
+                      {i + 1}
+                    </td>
                     <td className="max-w-[280px] py-2 pr-2 align-top">
                       <span className="break-all font-mono text-[11px] text-zinc-800 dark:text-zinc-200">
                         {truncateUrl(s.url, 72)}
@@ -229,11 +232,11 @@ export function PmsCalendarHub({
           Exportar (un solo iCal consolidado)
         </h3>
         <p className="mt-1 text-xs text-amber-950/90 dark:text-amber-50/90">
-          Esta URL incluye <strong>todas</strong> las reservas activas y bloqueos
-          de <strong>{selectedName}</strong> en el PMS (cualquier OTA o manual).
-          Pégala en «Importar calendario» en <strong>cada</strong> anuncio de
-          Airbnb (u otra OTA que acepte iCal) para que bloqueen las mismas
-          fechas. No sustituye la lectura desde Airbnb: sigue siendo solo
+          Esta URL incluye <strong>todas</strong> las reservas activas y
+          bloqueos de <strong>{selectedName}</strong> en el PMS (cualquier OTA o
+          manual). Pégala en «Importar calendario» en <strong>cada</strong>{" "}
+          anuncio de Airbnb (u otra OTA que acepte iCal) para que bloqueen las
+          mismas fechas. No sustituye la lectura desde Airbnb: sigue siendo solo
           bloqueo con delay de minutos.
         </p>
         <div className="mt-3 break-all rounded-lg border border-black/10 bg-white/80 px-3 py-2 font-mono text-[11px] text-zinc-900 dark:border-white/10 dark:bg-zinc-900/80 dark:text-zinc-100">

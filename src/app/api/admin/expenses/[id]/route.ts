@@ -96,11 +96,13 @@ export async function PATCH(
   }
   if (body.currency !== undefined) patch.currency = body.currency.trim();
   if (body.category !== undefined) patch.category = body.category.trim();
-  if (body.vendor_name !== undefined) patch.vendor_name = body.vendor_name.trim();
+  if (body.vendor_name !== undefined)
+    patch.vendor_name = body.vendor_name.trim();
   if (body.description !== undefined) {
     patch.description = body.description.trim();
   }
-  if (body.expense_date !== undefined) patch.expense_date = body.expense_date.trim();
+  if (body.expense_date !== undefined)
+    patch.expense_date = body.expense_date.trim();
   if (body.notes !== undefined) patch.notes = body.notes.trim();
 
   const { data, error } = await supabase
@@ -142,7 +144,9 @@ export async function DELETE(
     .map((r) => r.storage_path as string)
     .filter(Boolean);
   if (paths.length > 0) {
-    const { error: rmErr } = await supabase.storage.from("expenses").remove(paths);
+    const { error: rmErr } = await supabase.storage
+      .from("expenses")
+      .remove(paths);
     if (rmErr) {
       return Response.json(
         { error: `No se pudo borrar archivos: ${rmErr.message}` },

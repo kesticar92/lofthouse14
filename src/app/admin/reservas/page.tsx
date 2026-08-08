@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  AdminShell,
-  AdminCard,
-} from "@/components/admin/admin-shell";
+import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
 import { PmsCalendarHub } from "@/components/admin/pms/pms-calendar-hub";
 import { ReservationsTimeline } from "@/components/admin/pms/reservations-timeline";
 import { usePmsModule } from "@/hooks/usePms";
@@ -167,8 +164,7 @@ export default function AdminReservasPage() {
       return { ok: false, error: r.error };
     }
     setMsg(
-      r.data?.sync?.message?.trim() ||
-        "Enlace iCal añadido y sincronizado.",
+      r.data?.sync?.message?.trim() || "Enlace iCal añadido y sincronizado.",
     );
     await pms.refresh();
     return { ok: true };
@@ -186,7 +182,11 @@ export default function AdminReservasPage() {
     const text = await res.text();
     let j: { ok?: boolean; error?: string; message?: string } = {};
     try {
-      j = JSON.parse(text) as { ok?: boolean; error?: string; message?: string };
+      j = JSON.parse(text) as {
+        ok?: boolean;
+        error?: string;
+        message?: string;
+      };
     } catch {
       const er = text || res.statusText;
       setErr(er);
@@ -333,11 +333,11 @@ export default function AdminReservasPage() {
             Reservas & ocupación
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-600 dark:text-zinc-300">
-            Calendario tipo timeline para los{" "}
-            <strong>14 lofts</strong> (el 4 es bodega) y el listado{" "}
-            <strong>casa completa</strong> en Airbnb: importación iCal (solo
-            lectura), arrastre de reservas entre alojamientos, reservas manuales y
-            exportación iCal (delay de minutos, no en tiempo real).
+            Calendario tipo timeline para los <strong>14 lofts</strong> (el 4 es
+            bodega) y el listado <strong>casa completa</strong> en Airbnb:
+            importación iCal (solo lectura), arrastre de reservas entre
+            alojamientos, reservas manuales y exportación iCal (delay de
+            minutos, no en tiempo real).
           </p>
         </div>
 
@@ -485,7 +485,10 @@ export default function AdminReservasPage() {
 
       {showRes && (
         <Modal title="Nueva reserva" onClose={() => setShowRes(false)}>
-          <form className="space-y-3" onSubmit={(e) => void submitReservation(e)}>
+          <form
+            className="space-y-3"
+            onSubmit={(e) => void submitReservation(e)}
+          >
             <Field label="Propiedad">
               <select
                 className="w-full rounded-lg border border-black/10 bg-white px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
@@ -597,8 +600,9 @@ export default function AdminReservasPage() {
                 <option value="lofthouse14.com">lofthouse14.com</option>
               </select>
               <p className="mt-1 text-[11px] font-normal text-zinc-500 dark:text-zinc-400">
-                Airbnb llega por iCal. Directa y referido son reservas que cargas
-                tú: solo &quot;Referido&quot; registra a quién pagar comisión.
+                Airbnb llega por iCal. Directa y referido son reservas que
+                cargas tú: solo &quot;Referido&quot; registra a quién pagar
+                comisión.
               </p>
             </Field>
             {resForm.source === "referral" ? (

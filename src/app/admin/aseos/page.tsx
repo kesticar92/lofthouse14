@@ -43,7 +43,12 @@ type CleaningTask = {
   estimated_time_label: string;
 };
 
-type StaffRow = { id: string; full_name: string; email: string | null; role: string };
+type StaffRow = {
+  id: string;
+  full_name: string;
+  email: string | null;
+  role: string;
+};
 
 type Pricing = {
   base_cop: number;
@@ -73,7 +78,9 @@ export default function AseosPage() {
     };
   } | null>(null);
   const [staff, setStaff] = useState<StaffRow[]>([]);
-  const [properties, setProperties] = useState<{ id: string; name: string }[]>([]);
+  const [properties, setProperties] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [pricing, setPricing] = useState<Pricing | null>(null);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState<string | null>(null);
@@ -129,11 +136,7 @@ export default function AseosPage() {
     setErr(null);
     setLoading(true);
     try {
-      await Promise.all([
-        loadTasks(d),
-        loadSummary(d),
-        loadPricing(),
-      ]);
+      await Promise.all([loadTasks(d), loadSummary(d), loadPricing()]);
       const [rs, rp] = await Promise.all([
         fetch("/api/admin/staff-directory", { credentials: "include" }),
         fetch("/api/admin/pms/properties", { credentials: "include" }),
@@ -160,10 +163,7 @@ export default function AseosPage() {
     void refreshAll();
   }, [fecha, refreshAll]);
 
-  async function patchTask(
-    id: string,
-    patch: Record<string, unknown>,
-  ) {
+  async function patchTask(id: string, patch: Record<string, unknown>) {
     setErr(null);
     const res = await fetch(`/api/admin/cleaning-tasks/${id}`, {
       method: "PATCH",
@@ -250,9 +250,8 @@ export default function AseosPage() {
               Operación de aseo
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-zinc-600 dark:text-zinc-300">
-              Tareas generadas desde{" "}
-              <strong>reservas confirmadas</strong>: limpieza el día del check-out
-              y preparación el día del check-in.{" "}
+              Tareas generadas desde <strong>reservas confirmadas</strong>:
+              limpieza el día del check-out y preparación el día del check-in.{" "}
               <Link
                 href="/admin/reservas"
                 className="font-semibold text-amber-900 underline dark:text-amber-400"
@@ -301,10 +300,7 @@ export default function AseosPage() {
 
         {tab === "lista" && (
           <>
-            <AdminCard
-              title="Resumen rápido"
-              subtitle={fecha}
-            >
+            <AdminCard title="Resumen rápido" subtitle={fecha}>
               {loading || !summary ? (
                 <p className="text-sm text-zinc-500">Cargando…</p>
               ) : (
@@ -406,8 +402,8 @@ export default function AseosPage() {
                 <p className="text-sm text-zinc-500">Cargando tareas…</p>
               ) : delDia.length === 0 ? (
                 <p className="text-sm text-zinc-500">
-                  No hay tareas para esta fecha. Las reservas confirmadas generan
-                  preparación y limpieza automáticamente.
+                  No hay tareas para esta fecha. Las reservas confirmadas
+                  generan preparación y limpieza automáticamente.
                 </p>
               ) : (
                 <ul className="space-y-3">
@@ -440,7 +436,9 @@ export default function AseosPage() {
                             </p>
                           ) : null}
                           {t.notes ? (
-                            <p className="mt-1 text-xs text-zinc-500">{t.notes}</p>
+                            <p className="mt-1 text-xs text-zinc-500">
+                              {t.notes}
+                            </p>
                           ) : null}
                           <p className="mt-1 text-sm font-medium text-amber-900 dark:text-amber-300">
                             {fmtCop(Number(t.cleaning_price ?? 0))}
@@ -529,7 +527,10 @@ export default function AseosPage() {
             {!pricing ? (
               <p className="text-sm text-zinc-500">Cargando…</p>
             ) : isSupervisor ? (
-              <form className="grid max-w-lg gap-4" onSubmit={(e) => void savePricing(e)}>
+              <form
+                className="grid max-w-lg gap-4"
+                onSubmit={(e) => void savePricing(e)}
+              >
                 <Field label="Valor base limpieza / preparación (COP)">
                   <input
                     type="number"
@@ -549,7 +550,9 @@ export default function AseosPage() {
                     value={pricing.guest_threshold}
                     onChange={(e) =>
                       setPricing((p) =>
-                        p ? { ...p, guest_threshold: Number(e.target.value) } : p,
+                        p
+                          ? { ...p, guest_threshold: Number(e.target.value) }
+                          : p,
                       )
                     }
                   />
@@ -562,7 +565,10 @@ export default function AseosPage() {
                     onChange={(e) =>
                       setPricing((p) =>
                         p
-                          ? { ...p, extra_per_guest_cop: Number(e.target.value) }
+                          ? {
+                              ...p,
+                              extra_per_guest_cop: Number(e.target.value),
+                            }
                           : p,
                       )
                     }
@@ -577,8 +583,9 @@ export default function AseosPage() {
               </form>
             ) : (
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Solo supervisores (admin) pueden editar tarifas. Valores actuales: base{" "}
-                {fmtCop(pricing.base_cop)}, umbral {pricing.guest_threshold}, extra{" "}
+                Solo supervisores (admin) pueden editar tarifas. Valores
+                actuales: base {fmtCop(pricing.base_cop)}, umbral{" "}
+                {pricing.guest_threshold}, extra{" "}
                 {fmtCop(pricing.extra_per_guest_cop)}.
               </p>
             )}

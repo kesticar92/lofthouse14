@@ -54,7 +54,11 @@ export function inferAirbnbStatusFromSummary(
   ) {
     return "blocked";
   }
-  if (s.includes("reserved") || s.includes("reservation") || s.includes("reserva")) {
+  if (
+    s.includes("reserved") ||
+    s.includes("reservation") ||
+    s.includes("reserva")
+  ) {
     return "confirmed";
   }
   return "confirmed";
@@ -87,7 +91,9 @@ export function parseAirbnbIcalEvents(cal: CalendarResponse): ParsedIcalStay[] {
   return out;
 }
 
-export async function fetchAndParseIcal(url: string): Promise<ParsedIcalStay[]> {
+export async function fetchAndParseIcal(
+  url: string,
+): Promise<ParsedIcalStay[]> {
   const res = await fetch(url, { redirect: "follow" });
   if (!res.ok) {
     throw new Error(`iCal HTTP ${res.status}`);
@@ -160,7 +166,11 @@ export async function syncIcalSource(
 ): Promise<{ ok: boolean; message: string; upserted: number }> {
   try {
     const stays = await fetchAndParseIcal(url);
-    const { upserted, errors } = await upsertAirbnbStays(admin, propertyId, stays);
+    const { upserted, errors } = await upsertAirbnbStays(
+      admin,
+      propertyId,
+      stays,
+    );
     const now = new Date().toISOString();
     await admin
       .from("ical_sources")

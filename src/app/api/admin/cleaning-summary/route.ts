@@ -15,8 +15,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const today =
     searchParams.get("date")?.trim() ?? new Date().toISOString().slice(0, 10);
-  const month =
-    searchParams.get("month")?.trim() ?? today.slice(0, 7);
+  const month = searchParams.get("month")?.trim() ?? today.slice(0, 7);
 
   const { start: mStart, end: mEnd } = monthRange(month);
 

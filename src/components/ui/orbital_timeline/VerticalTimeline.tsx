@@ -6,7 +6,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./cards";
 import { Badge } from "./badge";
 import { cn } from "@/lib/cn";
 import { TimelineItem } from "./RadialOrbitalTimeline";
-import { Clock as ClockIcon, ArrowRight as ArrowRightIcon } from "@phosphor-icons/react";
+import {
+  Clock as ClockIcon,
+  ArrowRight as ArrowRightIcon,
+} from "@phosphor-icons/react";
 
 /**
  * Simple vertical timeline for mobile devices.
@@ -23,12 +26,17 @@ export default function VerticalTimeline({
       {/* Vertical line */}
       <div className="absolute left-8 top-0 w-px h-full bg-zinc-200 dark:bg-zinc-700" />
       {timelineData.map((item) => (
-        <div key={item.id} className="relative flex items-start mb-12 last:mb-0">
+        <div
+          key={item.id}
+          className="relative flex items-start mb-12 last:mb-0"
+        >
           {/* Circle connector */}
           <div
             className={cn(
               "flex items-center justify-center w-6 h-6 rounded-full ring-2 ring-amber-500",
-              item.status === "completed" ? "bg-amber-500" : "bg-white dark:bg-zinc-800"
+              item.status === "completed"
+                ? "bg-amber-500"
+                : "bg-white dark:bg-zinc-800",
             )}
           >
             {/* Icon placeholder */}
@@ -36,7 +44,7 @@ export default function VerticalTimeline({
               size={16}
               className={cn(
                 "text-white",
-                item.status === "completed" ? "" : "text-amber-500"
+                item.status === "completed" ? "" : "text-amber-500",
               )}
             />
           </div>

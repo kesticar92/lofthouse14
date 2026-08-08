@@ -2,7 +2,12 @@
 
 import { createPortal } from "react-dom";
 import { useMemo, useRef, useState } from "react";
-import { addDays, nightCount, parseISODate, toISODateString } from "@/lib/pms/date-range";
+import {
+  addDays,
+  nightCount,
+  parseISODate,
+  toISODateString,
+} from "@/lib/pms/date-range";
 import { reservationBarClasses, sourceLabel } from "@/lib/pms/colors";
 import { detectSuspiciousGaps } from "@/lib/pms/gaps";
 import type {
@@ -76,7 +81,11 @@ export function ReservationsTimeline({
   blocks: AvailabilityBlockRow[];
   viewFrom: string;
   viewDays: number;
-  onBlockRange: (propertyId: string, start: string, endInclusive: string) => void;
+  onBlockRange: (
+    propertyId: string,
+    start: string,
+    endInclusive: string,
+  ) => void;
   onReservationPatch?: (payload: {
     id: string;
     property_id: string;
@@ -88,14 +97,15 @@ export function ReservationsTimeline({
   const days = useMemo(
     () =>
       Array.from({ length: viewDays }, (_, i) =>
-        toISODateString(new Date(parseISODate(viewFrom).getTime() + i * 86400000)),
+        toISODateString(
+          new Date(parseISODate(viewFrom).getTime() + i * 86400000),
+        ),
       ),
     [viewFrom, viewDays],
   );
 
   const propertyNames = useMemo(
-    () =>
-      Object.fromEntries(properties.map((p) => [p.id, p.name] as const)),
+    () => Object.fromEntries(properties.map((p) => [p.id, p.name] as const)),
     [properties],
   );
 
@@ -149,110 +159,110 @@ export function ReservationsTimeline({
     barScreenRect: DOMRect,
     barWidthPx: number,
   ) {
-      if (mode === "block" || !onReservationPatch) return;
-      if (r.status === "cancelled") return;
-      e.preventDefault();
-      e.stopPropagation();
+    if (mode === "block" || !onReservationPatch) return;
+    if (r.status === "cancelled") return;
+    e.preventDefault();
+    e.stopPropagation();
 
-      const ghostLabel = r.guest_name?.trim() || sourceLabel(r.source);
-      const ghostClass = reservationBarClasses(r.source, r.status);
-      const initial: DragState = {
-        id: r.id,
-        pointerId: e.pointerId,
-        originClientX: e.clientX,
-        checkIn: r.check_in,
-        checkOut: r.check_out,
-        propertyId: r.property_id,
-        deltaDays: 0,
-        hoverPropertyId: r.property_id,
-        ghostW: Math.max(CELL, barWidthPx),
-        grabDX: e.clientX - barScreenRect.left,
-        grabDy: e.clientY - barScreenRect.top,
-        ghostLabel,
-        ghostClass,
-        clientX: e.clientX,
-        clientY: e.clientY,
+    const ghostLabel = r.guest_name?.trim() || sourceLabel(r.source);
+    const ghostClass = reservationBarClasses(r.source, r.status);
+    const initial: DragState = {
+      id: r.id,
+      pointerId: e.pointerId,
+      originClientX: e.clientX,
+      checkIn: r.check_in,
+      checkOut: r.check_out,
+      propertyId: r.property_id,
+      deltaDays: 0,
+      hoverPropertyId: r.property_id,
+      ghostW: Math.max(CELL, barWidthPx),
+      grabDX: e.clientX - barScreenRect.left,
+      grabDy: e.clientY - barScreenRect.top,
+      ghostLabel,
+      ghostClass,
+      clientX: e.clientX,
+      clientY: e.clientY,
+    };
+    dragRef.current = initial;
+    setDrag(initial);
+    document.body.style.userSelect = "none";
+
+    const move = (ev: PointerEvent) => {
+      const d = dragRef.current;
+      if (!d || ev.pointerId !== d.pointerId) return;
+      const deltaDays = Math.round((ev.clientX - d.originClientX) / CELL);
+      const hover = rowFromPoint(ev.clientX, ev.clientY) ?? d.hoverPropertyId;
+      const next: DragState = {
+        ...d,
+        deltaDays,
+        hoverPropertyId: hover,
+        clientX: ev.clientX,
+        clientY: ev.clientY,
       };
-      dragRef.current = initial;
-      setDrag(initial);
-      document.body.style.userSelect = "none";
+      dragRef.current = next;
+      setDrag(next);
+    };
 
-      const move = (ev: PointerEvent) => {
-        const d = dragRef.current;
-        if (!d || ev.pointerId !== d.pointerId) return;
-        const deltaDays = Math.round((ev.clientX - d.originClientX) / CELL);
-        const hover = rowFromPoint(ev.clientX, ev.clientY) ?? d.hoverPropertyId;
-        const next: DragState = {
-          ...d,
-          deltaDays,
-          hoverPropertyId: hover,
-          clientX: ev.clientX,
-          clientY: ev.clientY,
-        };
-        dragRef.current = next;
-        setDrag(next);
-      };
+    const finish = async (ev: PointerEvent) => {
+      if (ev.pointerId !== initial.pointerId) return;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", cancel);
+      dragListenersRef.current = null;
 
-      const finish = async (ev: PointerEvent) => {
-        if (ev.pointerId !== initial.pointerId) return;
-        window.removeEventListener("pointermove", move);
-        window.removeEventListener("pointerup", finish);
-        window.removeEventListener("pointercancel", cancel);
-        dragListenersRef.current = null;
+      const d = dragRef.current;
+      dragRef.current = null;
+      setDrag(null);
+      document.body.style.removeProperty("user-select");
 
-        const d = dragRef.current;
-        dragRef.current = null;
-        setDrag(null);
-        document.body.style.removeProperty("user-select");
+      if (!d || !onReservationPatch) return;
 
-        if (!d || !onReservationPatch) return;
+      const newCheckIn = addDays(d.checkIn, d.deltaDays);
+      const newCheckOut = addDays(d.checkOut, d.deltaDays);
+      const newProp = d.hoverPropertyId;
+      const unchanged =
+        newProp === d.propertyId &&
+        newCheckIn === d.checkIn &&
+        newCheckOut === d.checkOut;
+      if (unchanged) return;
 
-        const newCheckIn = addDays(d.checkIn, d.deltaDays);
-        const newCheckOut = addDays(d.checkOut, d.deltaDays);
-        const newProp = d.hoverPropertyId;
-        const unchanged =
-          newProp === d.propertyId &&
-          newCheckIn === d.checkIn &&
-          newCheckOut === d.checkOut;
-        if (unchanged) return;
-
-        const res = await onReservationPatch({
-          id: d.id,
-          property_id: newProp,
-          check_in: newCheckIn,
-          check_out: newCheckOut,
-        });
-        if (!res.ok) {
-          window.alert(res.error ?? "No se pudo mover la reserva");
-        }
-      };
-
-      const cancel = (ev: PointerEvent) => {
-        if (ev.pointerId !== initial.pointerId) return;
-        window.removeEventListener("pointermove", move);
-        window.removeEventListener("pointerup", finish);
-        window.removeEventListener("pointercancel", cancel);
-        dragListenersRef.current = null;
-        clearDragUi();
-      };
-
-      dragListenersRef.current = {
-        cleanup: () => {
-          window.removeEventListener("pointermove", move);
-          window.removeEventListener("pointerup", finish);
-          window.removeEventListener("pointercancel", cancel);
-        },
-      };
-
-      window.addEventListener("pointermove", move);
-      window.addEventListener("pointerup", finish);
-      window.addEventListener("pointercancel", cancel);
-
-      try {
-        e.currentTarget.setPointerCapture(e.pointerId);
-      } catch {
-        /* noop */
+      const res = await onReservationPatch({
+        id: d.id,
+        property_id: newProp,
+        check_in: newCheckIn,
+        check_out: newCheckOut,
+      });
+      if (!res.ok) {
+        window.alert(res.error ?? "No se pudo mover la reserva");
       }
+    };
+
+    const cancel = (ev: PointerEvent) => {
+      if (ev.pointerId !== initial.pointerId) return;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", cancel);
+      dragListenersRef.current = null;
+      clearDragUi();
+    };
+
+    dragListenersRef.current = {
+      cleanup: () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", finish);
+        window.removeEventListener("pointercancel", cancel);
+      },
+    };
+
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", cancel);
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* noop */
+    }
   }
 
   const totalW = viewDays * CELL;
@@ -261,11 +271,13 @@ export function ReservationsTimeline({
     <div className="space-y-3">
       {onReservationPatch ? (
         <p className="text-xs text-zinc-600 dark:text-zinc-400">
-          <strong className="text-zinc-800 dark:text-zinc-200">Arrastrar:</strong>{" "}
-          mantén pulsada una reserva, muévela horizontalmente para cambiar fechas
-          (misma duración) o hacia otra fila para asignarla a otro loft. Útil para
-          repartir grupos que entraron como <em>casa completa</em> en Airbnb
-          entre varios alojamientos.
+          <strong className="text-zinc-800 dark:text-zinc-200">
+            Arrastrar:
+          </strong>{" "}
+          mantén pulsada una reserva, muévela horizontalmente para cambiar
+          fechas (misma duración) o hacia otra fila para asignarla a otro loft.
+          Útil para repartir grupos que entraron como <em>casa completa</em> en
+          Airbnb entre varios alojamientos.
         </p>
       ) : null}
 
@@ -391,7 +403,8 @@ export function ReservationsTimeline({
                 {blocks
                   .filter((b) => b.property_id === p.id)
                   .map((b) => {
-                    const vs = b.start_date < viewFrom ? viewFrom : b.start_date;
+                    const vs =
+                      b.start_date < viewFrom ? viewFrom : b.start_date;
                     const ve = b.end_date > viewEndEx ? viewEndEx : b.end_date;
                     if (vs >= ve) return null;
                     const off = dayOffset(viewFrom, vs);
@@ -412,10 +425,13 @@ export function ReservationsTimeline({
                     );
                   })}
                 {reservations
-                  .filter((r) => r.property_id === p.id && r.status !== "cancelled")
+                  .filter(
+                    (r) => r.property_id === p.id && r.status !== "cancelled",
+                  )
                   .map((r) => {
                     const vs = r.check_in < viewFrom ? viewFrom : r.check_in;
-                    const ve = r.check_out > viewEndEx ? viewEndEx : r.check_out;
+                    const ve =
+                      r.check_out > viewEndEx ? viewEndEx : r.check_out;
                     if (vs >= ve) return null;
                     const off = dayOffset(viewFrom, vs);
                     const w = nightCount(vs, ve);
@@ -434,9 +450,7 @@ export function ReservationsTimeline({
                         ? `Comisión estimada: ${formatMoneyCop(Number(r.commission_amount))}`
                         : null,
                       r.notes ? `Notas: ${r.notes}` : null,
-                      r.ical_summary
-                        ? `iCal SUMMARY: ${r.ical_summary}`
-                        : null,
+                      r.ical_summary ? `iCal SUMMARY: ${r.ical_summary}` : null,
                       onReservationPatch
                         ? "Arrastra para mover entre lofts o fechas."
                         : null,
@@ -494,7 +508,9 @@ export function ReservationsTimeline({
               width: drag.ghostW,
             }}
           >
-            <span className="line-clamp-2 leading-tight">{drag.ghostLabel}</span>
+            <span className="line-clamp-2 leading-tight">
+              {drag.ghostLabel}
+            </span>
             {drag.deltaDays !== 0 ||
             drag.hoverPropertyId !== drag.propertyId ? (
               <span className="ml-1 line-clamp-2 text-[9px] font-normal opacity-95">

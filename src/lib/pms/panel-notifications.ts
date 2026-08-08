@@ -69,16 +69,12 @@ export async function notifySupervisorsDailyCleaningDigest(
   const lines = tasks.slice(0, 12).map((t) => {
     const pname = nameMap[t.property_id] ?? "Propiedad";
     const gn = (t as { guest_name?: string }).guest_name?.trim() || "—";
-    const ty =
-      t.type === "cleaning" ? "Limpieza" : "Preparación";
+    const ty = t.type === "cleaning" ? "Limpieza" : "Preparación";
     return `· ${ty} ${pname} — ${gn}`;
   });
-  const more =
-    tasks.length > 12 ? `\n… y ${tasks.length - 12} más` : "";
+  const more = tasks.length > 12 ? `\n… y ${tasks.length - 12} más` : "";
   const title =
-    cleaning + prep > 3
-      ? "Varias tareas de aseo hoy"
-      : "Tareas de aseo hoy";
+    cleaning + prep > 3 ? "Varias tareas de aseo hoy" : "Tareas de aseo hoy";
   const message = `Hoy (${todayISO}): ${cleaning} limpieza(s), ${prep} preparación(es).\n${lines.join("\n")}${more}`;
 
   await notifyStaffUsers(

@@ -34,7 +34,10 @@ export async function retryDriveBackupForExpenseFile(
     .from("expenses")
     .download(row.storage_path);
   if (dlErr || !blob) {
-    return { ok: false, error: dlErr?.message ?? "No se pudo leer desde Storage" };
+    return {
+      ok: false,
+      error: dlErr?.message ?? "No se pudo leer desde Storage",
+    };
   }
   const buffer = Buffer.from(await blob.arrayBuffer());
 
@@ -46,8 +49,7 @@ export async function retryDriveBackupForExpenseFile(
       .from("expense_files")
       .update({
         drive_backup_status: "failed",
-        drive_last_error:
-          "Google Drive no configurado (variables de entorno).",
+        drive_last_error: "Google Drive no configurado (variables de entorno).",
         drive_retry_count: prevRetries + 1,
       })
       .eq("id", fileId);
@@ -56,10 +58,7 @@ export async function retryDriveBackupForExpenseFile(
 
   try {
     const expenseId = row.expense_id as string;
-    const folderId = await ensureExpenseDriveFolderPath(
-      expenseDate,
-      expenseId,
-    );
+    const folderId = await ensureExpenseDriveFolderPath(expenseDate, expenseId);
     const name = sanitizeExpenseFilename(
       (row.original_filename as string) || "archivo",
     );

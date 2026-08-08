@@ -158,8 +158,7 @@ export async function POST(req: Request) {
     notes: body.notes?.trim() ?? "",
     ical_summary: null as string | null,
     referrer_name: source === "referral" ? referrer_name : "",
-    commission_amount:
-      source === "referral" ? commission_amount : null,
+    commission_amount: source === "referral" ? commission_amount : null,
   };
 
   const { data, error } = await supabase

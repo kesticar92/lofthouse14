@@ -240,7 +240,8 @@ export default function AdminGastosPage() {
         credentials: "include",
       });
       const j = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((j as { error?: string }).error ?? res.statusText);
+      if (!res.ok)
+        throw new Error((j as { error?: string }).error ?? res.statusText);
       setDetailId(null);
       setMsg("Gasto eliminado.");
       await refresh();
@@ -398,7 +399,8 @@ export default function AdminGastosPage() {
                   accept="image/*,.pdf,application/pdf"
                   className="hidden"
                   onChange={(e) => {
-                    if (e.target.files?.length) addFilesFromList(e.target.files);
+                    if (e.target.files?.length)
+                      addFilesFromList(e.target.files);
                     e.target.value = "";
                   }}
                 />
@@ -409,7 +411,8 @@ export default function AdminGastosPage() {
                   capture="environment"
                   className="hidden"
                   onChange={(e) => {
-                    if (e.target.files?.length) addFilesFromList(e.target.files);
+                    if (e.target.files?.length)
+                      addFilesFromList(e.target.files);
                     e.target.value = "";
                   }}
                 />
@@ -474,7 +477,10 @@ export default function AdminGastosPage() {
             </form>
           </AdminCard>
 
-          <AdminCard title="Últimos gastos" subtitle="Clic en una fila para ver archivos y Drive.">
+          <AdminCard
+            title="Últimos gastos"
+            subtitle="Clic en una fila para ver archivos y Drive."
+          >
             {loading ? (
               <p className="text-sm text-zinc-500">Cargando…</p>
             ) : expenses.length === 0 ? (
@@ -509,7 +515,10 @@ export default function AdminGastosPage() {
                           <td className="py-2 pr-2">
                             {ex.vendor_name || "—"}
                             {anyFail ? (
-                              <span className="ml-1 text-rose-600" title="Backup Drive">
+                              <span
+                                className="ml-1 text-rose-600"
+                                title="Backup Drive"
+                              >
                                 ⚠
                               </span>
                             ) : null}
@@ -549,7 +558,12 @@ export default function AdminGastosPage() {
             ) : detailExpense ? (
               <div className="space-y-4 text-sm">
                 <p>
-                  <strong>{fmtMoney(Number(detailExpense.amount), detailExpense.currency)}</strong>{" "}
+                  <strong>
+                    {fmtMoney(
+                      Number(detailExpense.amount),
+                      detailExpense.currency,
+                    )}
+                  </strong>{" "}
                   · {detailExpense.expense_date}
                 </p>
                 <p className="text-zinc-600 dark:text-zinc-300">
@@ -574,7 +588,9 @@ export default function AdminGastosPage() {
                         className="rounded-lg border border-black/10 p-2 dark:border-white/10"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="font-medium">{f.original_filename}</span>
+                          <span className="font-medium">
+                            {f.original_filename}
+                          </span>
                           <span
                             className={cn(
                               "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase",

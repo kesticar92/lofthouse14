@@ -23,7 +23,8 @@ const posts = [
     url: "https://www.instagram.com/reel/DZxlocpsg5n/",
     thumbnailUrl: "/gallery/screenshot_4.webp",
     isVideo: true,
-    caption: "A veces no hace falta salir de tu ciudad para vivir una experiencia diferente.",
+    caption:
+      "A veces no hace falta salir de tu ciudad para vivir una experiencia diferente.",
   },
   {
     id: 3,
@@ -43,20 +44,23 @@ const posts = [
   },
 ];
 
-type Network = "all"
+type Network = "all";
 
 export function SocialWall() {
   const [activeFilter, setActiveFilter] = useState<Network>("all");
 
-  const filtered = activeFilter === "all"
-    ? posts
-    : posts.filter((p) => p.network === activeFilter);
+  const filtered =
+    activeFilter === "all"
+      ? posts
+      : posts.filter((p) => p.network === activeFilter);
 
   return (
-    <section id="social-wall" className="w-full py-12 px-4 md:py-20 md:px-20 bg-zinc-50 dark:bg-zinc-950">
+    <section
+      id="social-wall"
+      className="w-full py-12 px-4 md:py-20 md:px-20 bg-zinc-50 dark:bg-zinc-950"
+    >
       {/* Header */}
       <div className="text-center mb-10">
-
         <p className="text-sm font-medium tracking-[0.2em] uppercase text-zinc-500 dark:text-zinc-400 mb-4">
           Síguenos
         </p>
@@ -64,12 +68,13 @@ export function SocialWall() {
           Social Media<span className="text-amber-600"> Wall</span>
         </h2>
 
-
         <p className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto text-base leading-relaxed mb-8">
           Desde el descanso en nuestras habitaciones hasta los rincones más
           especiales — sigue las{" "}
-          <strong className="font-semibold text-zinc-900 dark:text-zinc-200">historias</strong> de
-          LoftHouse 14 en redes sociales.
+          <strong className="font-semibold text-zinc-900 dark:text-zinc-200">
+            historias
+          </strong>{" "}
+          de LoftHouse 14 en redes sociales.
         </p>
 
         {/* CTA */}
@@ -80,7 +85,9 @@ export function SocialWall() {
           className="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-zinc-400 text-zinc-700 dark:text-zinc-300 text-sm tracking-wide hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 transition-all duration-300"
         >
           <InstagramLogo size={20} weight="bold" />
-          <span className="underline underline-offset-4 decoration-2">Ver perfil completo</span>
+          <span className="underline underline-offset-4 decoration-2">
+            Ver perfil completo
+          </span>
         </a>
       </div>
 

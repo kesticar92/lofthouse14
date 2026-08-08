@@ -3,13 +3,21 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { BedDouble, UtensilsCrossed, Wifi, Sparkles, Sofa,Armchair } from "lucide-react";
+import {
+  BedDouble,
+  UtensilsCrossed,
+  Wifi,
+  Sparkles,
+  Sofa,
+  Armchair,
+} from "lucide-react";
 
 const features = [
   {
     id: 1,
     title: "Descanso Premium",
-    description: "Camas de alta calidad, lencería suave y un ambiente insonorizado diseñado para garantizarte un sueño profundo y verdaderamente reparador.",
+    description:
+      "Camas de alta calidad, lencería suave y un ambiente insonorizado diseñado para garantizarte un sueño profundo y verdaderamente reparador.",
     image: "/gallery/cuarto_1_resultado.webp",
     icon: <BedDouble className="size-6 text-white" />,
     className: "md:col-span-2 md:row-span-2",
@@ -17,7 +25,8 @@ const features = [
   {
     id: 2,
     title: "Cocinas Equipadas",
-    description: "Prepara tus recetas favoritas con total comodidad y electrodomésticos modernos.",
+    description:
+      "Prepara tus recetas favoritas con total comodidad y electrodomésticos modernos.",
     image: "/gallery/cocina_1_resultado.webp",
     icon: <UtensilsCrossed className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-1",
@@ -25,7 +34,8 @@ const features = [
   {
     id: 3,
     title: "Zonas de Estar",
-    description: "Espacios acogedores perfectos para relajarte o disfrutar una película.",
+    description:
+      "Espacios acogedores perfectos para relajarte o disfrutar una película.",
     image: "/gallery/sofa_1_resultado.webp",
     icon: <Sofa className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-1",
@@ -33,7 +43,8 @@ const features = [
   {
     id: 4,
     title: "Teletrabajo Cómodo",
-    description: "Internet de alta velocidad y espacios iluminados para mantener tu productividad.",
+    description:
+      "Internet de alta velocidad y espacios iluminados para mantener tu productividad.",
     image: "/gallery/cuarto_4_resultado.webp",
     icon: <Wifi className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-5",
@@ -41,7 +52,8 @@ const features = [
   {
     id: 5,
     title: "Detalles que Enamoran",
-    description: "Decoración contemporánea, estética cuidada e iluminación cálida que te harán sentir mejor que en casa.",
+    description:
+      "Decoración contemporánea, estética cuidada e iluminación cálida que te harán sentir mejor que en casa.",
     image: "/gallery/cuarto_romantico.webp",
     icon: <Sparkles className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-5",
@@ -49,17 +61,20 @@ const features = [
   {
     id: 6,
     title: "Sofá Cama Versátil",
-    description: "Nuestros sofás cama se convierten en cómodas camas adicionales en segundos, perfectos para grupos o familias que necesitan espacio extra sin sacrificar comodidad.",
+    description:
+      "Nuestros sofás cama se convierten en cómodas camas adicionales en segundos, perfectos para grupos o familias que necesitan espacio extra sin sacrificar comodidad.",
     image: "/gallery/cama-sofaCama.webp",
     icon: <Armchair className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-5",
-  }
+  },
 ];
-
 
 export function Experiences() {
   return (
-    <section id="experiencias" className="scroll-mt-28 w-full px-4 md:px-12 py-30 lg:py-28 bg-zinc-50 dark:bg-zinc-950 ">
+    <section
+      id="experiencias"
+      className="scroll-mt-28 w-full px-4 md:px-12 py-30 lg:py-28 bg-zinc-50 dark:bg-zinc-950 "
+    >
       <div className="mx-auto ">
         <motion.div
           initial={{ opacity: 1, y: 16 }}
@@ -72,7 +87,9 @@ export function Experiences() {
             CONFORT EN CADA RINCÓN
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
-            Descubre los espacios que hemos diseñado meticulosamente para ofrecerte una estadía inigualable. Cada loft es un oasis urbano equipado con todo lo que necesitas.
+            Descubre los espacios que hemos diseñado meticulosamente para
+            ofrecerte una estadía inigualable. Cada loft es un oasis urbano
+            equipado con todo lo que necesitas.
           </p>
         </motion.div>
 
@@ -86,7 +103,7 @@ export function Experiences() {
               transition={{ delay: i * 0.1, duration: 0.5 }}
               className={cn(
                 "flex group relative overflow-hidden rounded-3xl bg-zinc-200 dark:bg-zinc-800 shadow-lg min-h-[350px] md:min-h-[250px]",
-                feature.className
+                feature.className,
               )}
             >
               <Image

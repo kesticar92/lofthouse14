@@ -21,7 +21,13 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin",
     label: "Inicio",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <path d="M3 11.5 12 4l9 7.5" />
         <path d="M6.5 10.5V20h11V10.5" />
       </svg>
@@ -32,7 +38,13 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin/cotizaciones",
     label: "Cotizaciones",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <path d="M12 3v18" />
         <path d="M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3.5 5 3.5 5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5" />
       </svg>
@@ -43,7 +55,13 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin/inventario",
     label: "Inventario",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <rect x="4" y="4" width="16" height="16" rx="2" />
         <path d="m8 12 2.5 2.5L16 9" />
       </svg>
@@ -54,7 +72,13 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin/reservas",
     label: "Reservas",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <rect x="3" y="5" width="18" height="16" rx="2" />
         <path d="M3 9h18M8 3v4M16 3v4" />
       </svg>
@@ -65,7 +89,13 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin/gastos",
     label: "Gastos",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <path d="M4 7h16v10H4z" />
         <path d="M8 11h8M8 15h5" />
         <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
@@ -77,7 +107,13 @@ export const ADMIN_NAV: NavItem[] = [
     href: "/admin/aseos",
     label: "Aseos del día",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
         <path d="M12 4v16M4 12h16M6.3 6.3l11.4 11.4M17.7 6.3 6.3 17.7" />
       </svg>
     ),

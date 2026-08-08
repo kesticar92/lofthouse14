@@ -1,6 +1,11 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { ArrowRightIcon, LinkIcon, ClockIcon, WhatsappLogo } from "@phosphor-icons/react";
+import {
+  ArrowRightIcon,
+  LinkIcon,
+  ClockIcon,
+  WhatsappLogo,
+} from "@phosphor-icons/react";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import { Card, CardContent, CardHeader, CardTitle } from "./cards";
@@ -30,10 +35,10 @@ export default function RadialOrbitalTimeline({
   timelineData,
 }: RadialOrbitalTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
-    {}
+    {},
   );
 
-  const isMobile = useMediaQuery('(max-width: 1024px)');
+  const isMobile = useMediaQuery("(max-width: 1024px)");
 
   const [viewMode] = useState<"orbital">("orbital");
   const [rotationAngle, setRotationAngle] = useState<number>(0);
@@ -66,7 +71,6 @@ export default function RadialOrbitalTimeline({
       }
     };
   }, [autoRotate, viewMode]);
-
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === containerRef.current || e.target === orbitRef.current) {
@@ -125,17 +129,21 @@ export default function RadialOrbitalTimeline({
     const radius = 240;
     const radian = (angle * Math.PI) / 180;
 
-    const x = parseFloat((radius * Math.cos(radian) + centerOffset.x).toFixed(3));
-    const y = parseFloat((radius * Math.sin(radian) + centerOffset.y).toFixed(3));
+    const x = parseFloat(
+      (radius * Math.cos(radian) + centerOffset.x).toFixed(3),
+    );
+    const y = parseFloat(
+      (radius * Math.sin(radian) + centerOffset.y).toFixed(3),
+    );
 
     const zIndex = Math.round(100 + 50 * Math.cos(radian));
-    
+
     const opacity = parseFloat(
-    Math.max(
-      0.8,
-      Math.min(1, 0.8 + 0.2 * ((1 + Math.sin(radian)) / 2))
-    ).toFixed(3)
-  );
+      Math.max(
+        0.8,
+        Math.min(1, 0.8 + 0.2 * ((1 + Math.sin(radian)) / 2)),
+      ).toFixed(3),
+    );
 
     return { x, y, angle, zIndex, opacity };
   };
@@ -151,15 +159,14 @@ export default function RadialOrbitalTimeline({
     return relatedItems.includes(itemId);
   };
 
-  return (
-    isMobile ? (
-      <VerticalTimeline timelineData={timelineData} />
-    ) : (
-      <div
-        className="w-full h-full flex flex-col items-center justify-center bg-transparent overflow-visible"
-        ref={containerRef}
-        onClick={handleContainerClick}
-      >
+  return isMobile ? (
+    <VerticalTimeline timelineData={timelineData} />
+  ) : (
+    <div
+      className="w-full h-full flex flex-col items-center justify-center bg-transparent overflow-visible"
+      ref={containerRef}
+      onClick={handleContainerClick}
+    >
       <div className="relative w-full max-w-4xl h-full flex items-center justify-center pointer-events-none">
         <div
           className="absolute w-full h-full flex items-center justify-center pointer-events-auto"
@@ -219,7 +226,9 @@ export default function RadialOrbitalTimeline({
                 <div
                   className={cn(
                     "absolute rounded-full -inset-2 transition-opacity duration-700",
-                    isPulsing || (isFirstStep && !activeNodeId) ? "animate-pulse opacity-100" : "opacity-0"
+                    isPulsing || (isFirstStep && !activeNodeId)
+                      ? "animate-pulse opacity-100"
+                      : "opacity-0",
                   )}
                   style={{
                     background: `radial-gradient(circle, rgba(245,158,11,0.3) 0%, rgba(245,158,11,0) 70%)`,
@@ -241,19 +250,28 @@ export default function RadialOrbitalTimeline({
                         : isFirstStep
                           ? "bg-amber-600 text-white border-amber-400 shadow-[0_0_20px_rgba(217,119,6,0.3)]"
                           : "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-white/10 shadow-sm",
-                    isRelated && !isExpanded && "animate-pulse"
+                    isRelated && !isExpanded && "animate-pulse",
                   )}
                 >
-                  <Icon size={26} weight={isExpanded || isRelated || isFirstStep ? "fill" : "regular"} />
+                  <Icon
+                    size={26}
+                    weight={
+                      isExpanded || isRelated || isFirstStep
+                        ? "fill"
+                        : "regular"
+                    }
+                  />
                 </div>
 
                 {/* Node Label */}
                 <div
                   className={cn(
                     "absolute top-16 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold tracking-[0.2em] transition-all duration-300 uppercase",
-                    isExpanded ? "text-amber-600 dark:text-amber-500 scale-110 opacity-100" :
-                      isFirstStep ? "text-amber-700 dark:text-amber-400 opacity-100" :
-                        "text-zinc-500 dark:text-zinc-400 opacity-80"
+                    isExpanded
+                      ? "text-amber-600 dark:text-amber-500 scale-110 opacity-100"
+                      : isFirstStep
+                        ? "text-amber-700 dark:text-amber-400 opacity-100"
+                        : "text-zinc-500 dark:text-zinc-400 opacity-80",
                   )}
                 >
                   {item.title}
@@ -265,9 +283,7 @@ export default function RadialOrbitalTimeline({
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-amber-500/50"></div>
                     <CardHeader className="pb-3 pt-5 px-5">
                       <div className="flex justify-between items-center mb-1">
-                        <Badge
-                          className="px-2.5 py-0.5 text-[9px] font-bold tracking-[0.1em] rounded-full border-none bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                        >
+                        <Badge className="px-2.5 py-0.5 text-[9px] font-bold tracking-[0.1em] rounded-full border-none bg-amber-500/10 text-amber-600 dark:text-amber-400">
                           PASO {item.id}
                         </Badge>
                         <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
@@ -290,8 +306,17 @@ export default function RadialOrbitalTimeline({
                             asChild
                             className="w-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold tracking-wide rounded-xl py-6 shadow-lg shadow-emerald-500/20 group transition-all"
                           >
-                            <a href={waLink()} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
-                              <WhatsappLogo size={20} weight="fill" className="group-hover:scale-110 transition-transform" />
+                            <a
+                              href={waLink()}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-2"
+                            >
+                              <WhatsappLogo
+                                size={20}
+                                weight="fill"
+                                className="group-hover:scale-110 transition-transform"
+                              />
                               ESCRIBIR A WHATSAPP
                             </a>
                           </Button>
@@ -302,7 +327,11 @@ export default function RadialOrbitalTimeline({
                       <div className="mt-5 pt-4 border-t border-zinc-100 dark:border-white/5">
                         <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.1em] text-zinc-400">
                           <span className="flex items-center gap-1.5">
-                            <ClockIcon size={14} className="text-amber-500" weight="fill" />
+                            <ClockIcon
+                              size={14}
+                              className="text-amber-500"
+                              weight="fill"
+                            />
                             Tiempo estimado
                           </span>
                           <span className="text-amber-600 dark:text-amber-400 font-mono">
@@ -314,7 +343,10 @@ export default function RadialOrbitalTimeline({
                       {item.relatedIds.length > 0 && !isFirstStep && (
                         <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-white/5">
                           <div className="flex items-center mb-3">
-                            <LinkIcon size={14} className="text-zinc-400 mr-1.5" />
+                            <LinkIcon
+                              size={14}
+                              className="text-zinc-400 mr-1.5"
+                            />
                             <h4 className="text-[9px] uppercase tracking-[0.2em] font-bold text-zinc-400">
                               Siguiente Paso
                             </h4>
@@ -322,9 +354,10 @@ export default function RadialOrbitalTimeline({
                           <div className="flex flex-wrap gap-2">
                             {item.relatedIds.map((relatedId) => {
                               const relatedItem = timelineData.find(
-                                (i) => i.id === relatedId
+                                (i) => i.id === relatedId,
                               );
-                              if (!relatedItem || relatedItem.id <= item.id) return null;
+                              if (!relatedItem || relatedItem.id <= item.id)
+                                return null;
                               return (
                                 <Button
                                   key={relatedId}
@@ -355,7 +388,6 @@ export default function RadialOrbitalTimeline({
           })}
         </div>
       </div>
-      </div>
-    )
+    </div>
   );
 }

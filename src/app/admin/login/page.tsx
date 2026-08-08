@@ -135,9 +135,7 @@ function LoginForm() {
               />
               <button
                 type="button"
-                aria-label={
-                  show ? "Ocultar contraseña" : "Mostrar contraseña"
-                }
+                aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
                 onClick={() => setShow((v) => !v)}
                 className="rounded-xl border border-black/10 bg-white/80 px-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 hover:bg-white dark:border-white/10 dark:bg-zinc-900/70 dark:text-zinc-300"
               >

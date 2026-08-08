@@ -1,7 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { TestimonialsColumn, Testimonial } from "@/components/layout/testimonial";
-import { motion } from "framer-motion"; 
+import {
+  TestimonialsColumn,
+  Testimonial,
+} from "@/components/layout/testimonial";
+import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react"; // Importamos un icono de carga
 
 import bookingReviewsData from "@/app/scrapper/reviews/reseñas_booking.json";
@@ -67,9 +70,12 @@ const Testimonials = ({ data }: TestimonialsProps) => {
   const thirdColumn = reviews.filter((_, i) => i % 3 === 2);
 
   return (
-    <section id="testimonios" className="py-12 px-4 md:py-20 md:px-20 relative overflow-hidden">
+    <section
+      id="testimonios"
+      className="py-12 px-4 md:py-20 md:px-20 relative overflow-hidden"
+    >
       <div className="absolute inset-0 -z-10 bg-zinc-50 dark:bg-black/20" />
-      
+
       <div className="container z-10 mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -81,7 +87,7 @@ const Testimonials = ({ data }: TestimonialsProps) => {
           <h2 className="font-display text-4xl md:text-6xl tracking-tight text-zinc-900 dark:text-[#f2f0eb]">
             LO QUE <span className="text-amber-600">DICEN</span> LOS HUÉSPEDES
           </h2>
-                    <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
+          <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
             Reseñas resumidas del estilo de experiencia que buscamos ofrecer
             cada día.
           </p>
@@ -95,12 +101,26 @@ const Testimonials = ({ data }: TestimonialsProps) => {
         ) : reviews.length > 0 ? (
           // Renderizado solo si hay reseñas de la API
           <div className="flex justify-center gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)] max-h-[700px] overflow-hidden">
-            <TestimonialsColumn key="col1" testimonials={firstColumn} duration={25} />
+            <TestimonialsColumn
+              key="col1"
+              testimonials={firstColumn}
+              duration={25}
+            />
             {secondColumn.length > 0 && (
-              <TestimonialsColumn key="col2" testimonials={secondColumn} className="hidden sm:block" duration={35} />
+              <TestimonialsColumn
+                key="col2"
+                testimonials={secondColumn}
+                className="hidden sm:block"
+                duration={35}
+              />
             )}
             {thirdColumn.length > 0 && (
-              <TestimonialsColumn key="col3" testimonials={thirdColumn} className="hidden md:block" duration={30} />
+              <TestimonialsColumn
+                key="col3"
+                testimonials={thirdColumn}
+                className="hidden md:block"
+                duration={30}
+              />
             )}
           </div>
         ) : (

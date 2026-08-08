@@ -64,7 +64,8 @@ export async function PATCH(
   const property_id = (body.property_id ?? cur.property_id).trim();
   const check_in = (body.check_in ?? cur.check_in).trim();
   const check_out = (body.check_out ?? cur.check_out).trim();
-  const nextStatus = body.status !== undefined ? body.status.trim() : cur.status;
+  const nextStatus =
+    body.status !== undefined ? body.status.trim() : cur.status;
 
   if (!["confirmed", "blocked", "cancelled"].includes(nextStatus)) {
     return Response.json({ error: "status inválido" }, { status: 400 });
@@ -76,13 +77,9 @@ export async function PATCH(
       : normalizeReservationSource(cur.source);
 
   const nextGuestName =
-    body.guest_name !== undefined
-      ? body.guest_name.trim()
-      : cur.guest_name;
+    body.guest_name !== undefined ? body.guest_name.trim() : cur.guest_name;
   const nextGuestPhone =
-    body.guest_phone !== undefined
-      ? body.guest_phone.trim()
-      : cur.guest_phone;
+    body.guest_phone !== undefined ? body.guest_phone.trim() : cur.guest_phone;
   const nextGuests =
     body.guests !== undefined ? Number(body.guests) : cur.guests;
   if (
@@ -91,15 +88,13 @@ export async function PATCH(
   ) {
     return Response.json({ error: "guests inválido" }, { status: 400 });
   }
-  const nextPrice =
-    body.price !== undefined ? body.price : cur.price;
-  const nextNotes =
-    body.notes !== undefined ? body.notes.trim() : cur.notes;
+  const nextPrice = body.price !== undefined ? body.price : cur.price;
+  const nextNotes = body.notes !== undefined ? body.notes.trim() : cur.notes;
 
   const nextReferrerRaw =
     body.referrer_name !== undefined
       ? body.referrer_name.trim()
-      : (cur as { referrer_name?: string }).referrer_name ?? "";
+      : ((cur as { referrer_name?: string }).referrer_name ?? "");
 
   let nextCommission: number | null =
     (cur as { commission_amount?: number | null }).commission_amount ?? null;
@@ -118,10 +113,8 @@ export async function PATCH(
     }
   }
 
-  const effectiveReferrer =
-    nextSource === "referral" ? nextReferrerRaw : "";
-  const effectiveCommission =
-    nextSource === "referral" ? nextCommission : null;
+  const effectiveReferrer = nextSource === "referral" ? nextReferrerRaw : "";
+  const effectiveCommission = nextSource === "referral" ? nextCommission : null;
 
   if (nextSource === "referral" && !effectiveReferrer) {
     return Response.json(

@@ -1,9 +1,8 @@
-/** Ajusta en `.env.local` (ver `.env.example`). */
+/** Contacto oficial (WhatsApp y teléfono). */
 
-const n = (v: string | undefined, fallback: string) =>
-  (v && v.replace(/\D/g, "")) || fallback;
-
-const defaultWa = "573174246076";
+export const WHATSAPP_E164 = "+573174246076";
+export const WHATSAPP_DIGITS = "573174246076";
+export const PHONE_DISPLAY = "+57 317 424 6076";
 
 export const site = {
   name: "LOFTHOUSE 14",
@@ -13,17 +12,16 @@ export const site = {
   country: "Colombia",
   timezone: "America/Bogota",
   neighborhood: "Miraflores — Parque del Perro",
-  google_url:"https://maps.app.goo.gl/A58akDr7bfvnSkbW7",
+  google_url: "https://maps.app.goo.gl/A58akDr7bfvnSkbW7",
   addressLine: "Carrera 26 # 2 - 91",
-  coordinates: { longitude: -76.54356082617328, latitude: 3.4369468662280838 }, 
+  coordinates: { longitude: -76.54356082617328, latitude: 3.4369468662280838 },
   description:
     "14 alojamientos tipo loft / apartaestudio en Miraflores (Cali), cerca de gastronomía, cultura y servicios. Reservas claras por WhatsApp: fechas, huéspedes, capacidad, pago y verificación de identidad para ingreso autónomo.",
-  whatsappNumber: n(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER, defaultWa),
+  whatsappNumber: WHATSAPP_DIGITS,
   whatsappDefaultMessage:
     "Hola LOFTHOUSE 14, quiero información para reservar (fechas y número de personas).",
-  phoneDisplay:
-    process.env.NEXT_PUBLIC_PHONE_DISPLAY || "+57 317 424 6076",
-  phoneTel: "+573174246076",
+  phoneDisplay: PHONE_DISPLAY,
+  phoneTel: WHATSAPP_E164,
   email: process.env.NEXT_PUBLIC_EMAIL || "lofthouse14cali@gmail.com",
   /** Para mapas / JSON-LD */
   mapQuery: "Carrera 26 2-91, Miraflores, Cali, Valle del Cauca, Colombia",

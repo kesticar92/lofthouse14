@@ -142,6 +142,8 @@ type MapProps = {
   onViewportChange?: (viewport: MapViewport) => void;
   /** Show a loading indicator on the map */
   loading?: boolean;
+  /** Enlace externo si WebGL falla (p. ej. Google Maps del sitio). */
+  fallbackMapsUrl?: string;
 } & Omit<MapLibreGL.MapOptions, "container" | "style">;
 
 function DefaultLoader() {
@@ -166,6 +168,68 @@ function getViewport(map: MapLibreGL.Map): MapViewport {
   };
 }
 
+/** MapLibre requires WebGL; embedded browsers (p. ej. Simple Browser) often block it. */
+function webglSupported(): boolean {
+  if (typeof document === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl2", { failIfMajorPerformanceCaveat: false }) ??
+      canvas.getContext("webgl", { failIfMajorPerformanceCaveat: false });
+    return gl != null;
+  } catch {
+    return false;
+  }
+}
+
+const DEFAULT_FALLBACK_CENTER: [number, number] = [
+  -76.54356082617328, 3.4369468662280838,
+];
+
+function MapWebGLFallback({
+  className,
+  center,
+  mapsUrl,
+}: {
+  className?: string;
+  center: [number, number];
+  mapsUrl?: string;
+}) {
+  const [lng, lat] = center;
+  const embedSrc = `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+  const openUrl =
+    mapsUrl ?? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+
+  return (
+    <div
+      className={cn(
+        "bg-muted/30 relative flex h-full w-full flex-col overflow-hidden rounded-[inherit]",
+        className,
+      )}
+    >
+      <iframe
+        title="Ubicación LOFTHOUSE 14"
+        src={embedSrc}
+        className="min-h-[240px] flex-1 border-0"
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        allowFullScreen
+      />
+      <div className="border-border bg-background/95 text-muted-foreground border-t px-3 py-2 text-center text-xs">
+        Vista estática (WebGL no disponible en este visor).{" "}
+        <a
+          href={openUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-foreground font-medium underline underline-offset-2"
+        >
+          Abrir mapa en Google Maps
+        </a>
+      </div>
+    </div>
+  );
+}
+
 const Map = forwardRef<MapRef, MapProps>(function Map(
   {
     children,
@@ -176,12 +240,14 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     viewport,
     onViewportChange,
     loading = false,
+    fallbackMapsUrl,
     ...props
   },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<MapLibreGL.Map | null>(null);
+  const [webglUnavailable, setWebglUnavailable] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
   const currentStyleRef = useRef<MapStyleOption | null>(null);
@@ -212,24 +278,59 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     }
   }, []);
 
+  const fallbackCenter = useMemo((): [number, number] => {
+    const fromViewport = viewport?.center;
+    if (
+      fromViewport &&
+      fromViewport.length === 2 &&
+      Number.isFinite(fromViewport[0]) &&
+      Number.isFinite(fromViewport[1])
+    ) {
+      return fromViewport;
+    }
+    const fromProps = props.center;
+    if (
+      Array.isArray(fromProps) &&
+      fromProps.length === 2 &&
+      Number.isFinite(fromProps[0]) &&
+      Number.isFinite(fromProps[1])
+    ) {
+      return fromProps as [number, number];
+    }
+    return DEFAULT_FALLBACK_CENTER;
+  }, [viewport?.center, props.center]);
+
   // Initialize the map
   useEffect(() => {
     if (!containerRef.current) return;
+
+    if (!webglSupported()) {
+      setWebglUnavailable(true);
+      return;
+    }
 
     const initialStyle =
       resolvedTheme === "dark" ? mapStyles.dark : mapStyles.light;
     currentStyleRef.current = initialStyle;
 
-    const map = new MapLibreGL.Map({
-      container: containerRef.current,
-      style: initialStyle,
-      renderWorldCopies: false,
-      attributionControl: {
-        compact: true,
-      },
-      ...props,
-      ...viewport,
-    });
+    let map: MapLibreGL.Map;
+    try {
+      map = new MapLibreGL.Map({
+        container: containerRef.current,
+        style: initialStyle,
+        renderWorldCopies: false,
+        failIfMajorPerformanceCaveat: false,
+        attributionControl: {
+          compact: true,
+        },
+        ...props,
+        ...viewport,
+      });
+    } catch (err) {
+      console.warn("[Map] WebGL / MapLibre init failed:", err);
+      setWebglUnavailable(true);
+      return;
+    }
 
     const styleDataHandler = () => {
       clearStyleTimeout();
@@ -320,6 +421,18 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     }),
     [mapInstance, isLoaded, isStyleLoaded],
   );
+
+  if (webglUnavailable) {
+    return (
+      <MapContext.Provider value={{ map: null, isLoaded: false }}>
+        <MapWebGLFallback
+          className={className}
+          center={fallbackCenter}
+          mapsUrl={fallbackMapsUrl}
+        />
+      </MapContext.Provider>
+    );
+  }
 
   return (
     <MapContext.Provider value={contextValue}>
@@ -580,7 +693,7 @@ function MarkerPopup({
 
   useEffect(() => {
     if (!map || forceOpen === undefined) return;
-    
+
     if (forceOpen) {
       const t = setTimeout(() => {
         if (!popup.isOpen()) {

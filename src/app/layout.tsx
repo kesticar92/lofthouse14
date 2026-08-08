@@ -112,6 +112,18 @@ export default function RootLayout({
         </noscript>
         <ThemeProvider>{children}</ThemeProvider>
         <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-R9M0QWD1H3"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-R9M0QWD1H3');
+          `}
+        </Script>
+        <Script
           id="ld-json-lofthouse"
           type="application/ld+json"
           strategy="afterInteractive"

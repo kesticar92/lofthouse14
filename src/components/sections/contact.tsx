@@ -28,8 +28,10 @@ export function Contact() {
   }
 
   return (
-    <section id="reservas" className="grid grid-cols-1 lg:grid-cols-2 w-full items-center gap-10 py-12 px-4 md:py-20 md:px-20 min-h-screen">
-      
+    <section
+      id="reservas"
+      className="grid grid-cols-1 lg:grid-cols-2 w-full items-center gap-10 py-12 px-4 md:py-20 md:px-20 min-h-screen"
+    >
       {/* COLUMNA IZQUIERDA: Imagen */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -59,8 +61,9 @@ export function Contact() {
             Solicita <span className="text-amber-600">Disponibilidad</span>
           </h2>
           <p className="text-base text-zinc-600 dark:text-zinc-300">
-            Reserva a tu ritmo. Envía tu solicitud para confirmar disponibilidad.
-            Una vez verificados tus datos y el pago, activaremos tu llave digital para un acceso 100% autónomo a tu espacio.
+            Reserva a tu ritmo. Envía tu solicitud para confirmar
+            disponibilidad. Una vez verificados tus datos y el pago, activaremos
+            tu llave digital para un acceso 100% autónomo a tu espacio.
           </p>
         </div>
 
@@ -137,29 +140,46 @@ export function Contact() {
         {/* Bloque de Información Adicional (Redes, Teléfono, etc.) */}
         <div className="pt-8 border-t border-zinc-200 dark:border-zinc-800 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <p className="text-xs uppercase tracking-widest text-zinc-500 mb-1">WhatsApp</p>
-            <a className="hover:text-amber-600 transition-colors text-zinc-900 dark:text-white font-bold" href={waLink("") } target="_blank" rel="noopener noreferrer">
-              {site.phoneDisplay || "+57 310 123 4567"}
+            <p className="text-xs uppercase tracking-widest text-zinc-500 mb-1">
+              WhatsApp
+            </p>
+            <a
+              className="hover:text-amber-600 transition-colors text-zinc-900 dark:text-white font-bold"
+              href={waLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {site.phoneDisplay}
             </a>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-widest text-zinc-500 mb-1">Dirección</p>
-            <a className="hover:text-amber-600 transition-colors text-zinc-900 dark:text-white font-bold uppercase" href={site.google_url} target="_blank" rel="noopener noreferrer">
+            <p className="text-xs uppercase tracking-widest text-zinc-500 mb-1">
+              Dirección
+            </p>
+            <a
+              className="hover:text-amber-600 transition-colors text-zinc-900 dark:text-white font-bold uppercase"
+              href={site.google_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {site.addressLine || "Calle 14"}, Cali, Colombia
             </a>
           </div>
           <div className="sm:col-span-2 flex gap-4 pt-2">
-            <a href="#" className="flex items-center gap-2 text-zinc-900 dark:text-white text-xs font-bold uppercase tracking-widest hover:text-amber-600 transition-colors">
+            <a
+              href="#"
+              className="flex items-center gap-2 text-zinc-900 dark:text-white text-xs font-bold uppercase tracking-widest hover:text-amber-600 transition-colors"
+            >
               <svg viewBox="0 0 32 32" fill="currentColor" className="w-5 h-5">
                 <path d="M16 1.5c-4.4 0-8 3.6-8 8 0 4.1 3 7.6 7 8.3v5.7c0 .8.7 1.5 1.5 1.5s1.5-.7 1.5-1.5v-5.7c4-.7 7-4.2 7-8.3 0-4.4-3.6-8-8-8zm0 14c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z"></path>
               </svg>
-              <span className="underline underline-offset-4 decoration-2">Airbnb</span>
+              <span className="underline underline-offset-4 decoration-2">
+                Airbnb
+              </span>
             </a>
           </div>
         </div>
-
       </motion.div>
-
     </section>
   );
 }

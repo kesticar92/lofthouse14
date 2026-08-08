@@ -103,7 +103,7 @@ const sections = [
     content: [
       {
         heading: "Convivencia y ruido",
-        body: "Se prohíben fiestas, eventos o reuniones que superen la capacidad del alojamiento. El silencio nocturno debe respetarse entre las 10:00 PM y las 8:00 AM. El incumplimiento puede resultar en la terminación inmediata de la estadía.",
+        body: "Se prohíben fiestas, eventos o reuniones que superen la capacidad del alojamiento. El silencio nocturno debe respetarse entre las 11:00 PM y las 6:00 AM. El incumplimiento puede resultar en la terminación inmediata de la estadía.",
       },
       {
         heading: "No fumar",

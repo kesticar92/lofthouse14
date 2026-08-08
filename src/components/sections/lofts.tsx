@@ -5,58 +5,66 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { site, waLink } from "@/lib/site";
 import { useState } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 import { cn } from "@/lib/cn";
 
-const perks = [
-  "WiFi",
-  "Aire acondicionado",
-  "Cocina equipada",
-  "Smart TV"
-];
+import { PricingDetailsAccordion } from "@/components/sections/pricing-details-accordion";
+
+const perks = ["WiFi", "Aire acondicionado", "Cocina equipada", "Smart TV"];
 
 const lofts = [
   {
     name: "Tu refugio personal",
     subName: "1 loft",
-    description: "El espacio ideal para ti o para compartir en pareja. Un loft privado, moderno y totalmente equipado, diseñado para ser tu base de descanso después de recorrer San Fernando y vivir el ritmo de Cali.",
-    capacity: "1 a 3 personas",
-    price: "Desde $150.000 por noche",
+    description:
+      "El espacio ideal para ti o para compartir en pareja. Un loft privado, moderno y totalmente equipado, diseñado para ser tu base de descanso después de recorrer San Fernando y vivir el ritmo de Cali.",
+    capacity: "Ideal 2 personas · Máx. 5",
+    price: "Desde $80.000 por noche",
+    priceNote: "Tarifa base para 2 personas en temporada baja",
     image: "/gallery/cocina_1_resultado.webp",
   },
   {
     name: "Juntos, pero con espacio",
     subName: "2 lofts",
-    description: "La opción perfecta para familias o grupos pequeños que buscan comodidad. Disfruten de la ciudad juntos durante el día y descansen en lofts contiguos en la noche. Toda la cercanía, sin sacrificar la privacidad de nadie.",
-    capacity: "4 a 6 personas",
-    price: "Desde $300.000 por noche",
+    description:
+      "La opción perfecta para familias o grupos pequeños que buscan comodidad. Disfruten de la ciudad juntos durante el día y descansen en lofts contiguos en la noche. Toda la cercanía, sin sacrificar la privacidad de nadie.",
+    capacity: "2 a 10 personas",
+    price: "Desde $160.000 por noche",
+    priceNote: "Según temporada y ocupación por loft",
     image: "/gallery/cuarto_1_resultado.webp",
   },
   {
     name: "El punto de encuentro",
     subName: "3 lofts",
-    description: "Pensado para familias grandes que quieren compartir la experiencia caleña al máximo. Mantén a todo tu grupo en el mismo edificio, distribuidos estratégicamente en tres espacios independientes con el mismo nivel de confort.",
-    capacity: "7 a 9 personas",
-    price: "Desde $450.000 por noche",
+    description:
+      "Pensado para familias grandes que quieren compartir la experiencia caleña al máximo. Mantén a todo tu grupo en el mismo edificio, distribuidos estratégicamente en tres espacios independientes con el mismo nivel de confort.",
+    capacity: "3 a 15 personas",
+    price: "Desde $240.000 por noche",
+    priceNote: "Según temporada y ocupación por loft",
     image: "/gallery/sofa_1_resultado.webp",
   },
   {
     name: "Experiencia para grandes grupos",
     subName: "+4 lofts",
-    description: "¿Viajas con una delegación, equipo deportivo o una gran familia? Simplifica la logística reservando múltiples lofts. Asegúrate de que todo el grupo se hospede en el mismo lugar, con la tranquilidad y ubicación estratégica que necesitan.",
-    capacity: "10 a 60 personas",
-    price: "Precio a consultar.",
+    description:
+      "¿Viajas con una delegación, equipo deportivo o una gran familia? Simplifica la logística reservando múltiples lofts. Asegúrate de que todo el grupo se hospede en el mismo lugar, con la tranquilidad y ubicación estratégica que necesitan.",
+    capacity: "4 a 63 personas",
+    price: "Precio a consultar",
+    priceNote: "Cotización personalizada según fechas y lofts",
     image: "/gallery/cuarto_4_resultado.webp",
-  }
+  },
 ];
 
 export function Lofts() {
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const activeLoft = lofts[activeIndex];
 
   return (
-    <section id="lofts" className="grid grid-cols-1 lg:grid-cols-2 w-full items-center gap-10 py-12 px-4 md:py-20 md:px-20">
+    <section
+      id="lofts"
+      className="grid grid-cols-1 lg:grid-cols-2 w-full items-center gap-10 py-12 px-4 md:py-20 md:px-20"
+    >
       <div className="flex flex-col items-start justify-center">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -78,7 +86,7 @@ export function Lofts() {
                   "relative flex-1 h-20 rounded-xl text-xl font-bold transition-colors overflow-hidden",
                   activeIndex === i
                     ? "text-white"
-                    : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                    : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700",
                 )}
                 onClick={() => setActiveIndex(i)}
               >
@@ -114,29 +122,23 @@ export function Lofts() {
                     {activeLoft.name}
                   </h3>
                 </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-zinc-900 dark:text-[#f2f0eb]">
-                    {activeLoft.price}
-                  </p>
-                  <span className="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
-                    Sujeto a temporada
-                  </span>
-                </div>
               </div>
+
+              <PricingDetailsAccordion
+                price={activeLoft.price}
+                priceNote={activeLoft.priceNote}
+                capacity={activeLoft.capacity}
+              />
 
               <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
                 {activeLoft.description}
               </p>
 
-              <div className="flex items-center gap-2 text-zinc-900 dark:text-amber-500 font-bold">
-                <span className="p-1 bg-amber-100 dark:bg-amber-900/30 rounded">
-                  {activeLoft.capacity}
-                </span>
-              </div>
-
-              <div className="pt-6">
+              <div className="pt-2">
                 <Link
-                  href={waLink(`Hola, quiero consultar las fechas disponibles para ${activeLoft.subName} en LOFTHOUSE 14.`)}
+                  href={waLink(
+                    `Hola, quiero consultar las fechas disponibles para ${activeLoft.subName} en LOFTHOUSE 14.`,
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 py-4 text-sm font-bold text-white transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900 dark:hover:bg-white sm:w-auto sm:px-10 shadow-lg"
@@ -150,7 +152,7 @@ export function Lofts() {
       </div>
 
       {/* Galería con Glassmorphism */}
-      <div className="w-full h-[400px] md:h-[600px] lg:h-[700px] max-h-[80vh] rounded-3xl overflow-hidden relative group shadow-2xl lg:mr-6">        
+      <div className="w-full h-[400px] md:h-[600px] lg:h-[700px] max-h-[80vh] rounded-3xl overflow-hidden relative group shadow-2xl lg:mr-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeLoft.image}
@@ -178,7 +180,7 @@ export function Lofts() {
             initial="hidden"
             whileInView="visible"
             variants={{
-              visible: { transition: { staggerChildren: 0.1 } }
+              visible: { transition: { staggerChildren: 0.1 } },
             }}
             className="flex flex-wrap gap-3 justify-center px-4"
           >
@@ -187,12 +189,14 @@ export function Lofts() {
                 key={p}
                 variants={{
                   hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 }
+                  visible: { opacity: 1, y: 0 },
                 }}
               >
                 <GlassPanel className="flex items-center justify-center gap-2 px-4 py-2 border-white/20 text-white backdrop-blur-md">
                   <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
-                  <span className="text-sm font-semibold tracking-wide">{p}</span>
+                  <span className="text-sm font-semibold tracking-wide">
+                    {p}
+                  </span>
                 </GlassPanel>
               </motion.li>
             ))}

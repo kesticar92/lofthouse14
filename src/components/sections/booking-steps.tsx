@@ -134,9 +134,9 @@ export function BookingSteps() {
         >
           <Link
             href="#reservas"
-            className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-8 py-3.5 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900 dark:hover:bg-white"
+            className="inline-flex rounded-full bg-zinc-900 px-8 py-3 text-sm font-bold text-white hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900"
           >
-            Iniciar reserva
+            Calcular y reservar
           </Link>
         </motion.div>
       </div>

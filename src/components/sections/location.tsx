@@ -19,11 +19,14 @@ import {
   Plus,
   Minus,
   Compass,
+  ChevronDown,
+  Hand,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import places from "@/data/places_updated.json";
+import { PlacePhoto } from "@/components/sections/place-photo";
 
 type PlaceItem = (typeof places)[number];
 
@@ -99,6 +102,26 @@ function MapController({
   return null;
 }
 
+function useIsMobileMapLayout() {
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  return mobile;
+}
+
+function scrollToNextSection() {
+  document
+    .getElementById("preguntas-frecuentes")
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 export function Location() {
   const [routeCoordinates, setRouteCoordinates] = useState<
     [number, number][] | null
@@ -107,6 +130,9 @@ export function Location() {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [activePlace, setActivePlace] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [mobileMapActive, setMobileMapActive] = useState(false);
+  const isMobileLayout = useIsMobileMapLayout();
+  const mapInteractive = !isMobileLayout || mobileMapActive;
 
   const filteredPlaces = places.filter(
     (p) =>
@@ -135,7 +161,7 @@ export function Location() {
   return (
     <section
       id="ubicacion"
-      className="scroll-mt-28 h-screen w-full flex flex-col lg:flex-row bg-white dark:bg-zinc-950 overflow-hidden relative"
+      className="scroll-mt-28 relative flex h-auto min-h-0 w-full flex-col overflow-hidden bg-white dark:bg-zinc-950 lg:h-screen lg:flex-row"
     >
       {/* Sidebar Panel */}
       {/* Mobile Overlay Background */}
@@ -209,11 +235,11 @@ export function Location() {
                 )}
               >
                 <div className="relative size-20 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
-                  <Image
+                  <PlacePhoto
                     fill
                     src={place.image}
                     alt={place.name}
-                    className="object-cover"
+                    sizes="80px"
                   />
                 </div>
                 <div className="flex-1 flex flex-col justify-center gap-1">
@@ -258,25 +284,35 @@ export function Location() {
       </div>
 
       {/* Map Viewport */}
-      <div className="w-full lg:flex-1 h-[100svh] lg:h-full order-1 lg:order-2 relative pe-0 lg:pe-12 rounded-none lg:rounded-bl-3xl lg:rounded-tl-3xl overflow-hidden">
+      <div className="relative order-1 h-[min(56svh,520px)] w-full overflow-hidden pe-0 lg:order-2 lg:h-full lg:min-h-0 lg:flex-1 lg:rounded-bl-3xl lg:rounded-tl-3xl lg:pe-12">
         {/* Floating Toggle Button for Mobile */}
         <button
           onClick={() => setIsSidebarOpen(true)}
           className={cn(
-            "lg:hidden absolute bottom-8 left-1/2 -translate-x-1/2 z-20 px-6 py-3.5 rounded-full font-bold shadow-2xl text-sm border flex items-center gap-2 transition-transform duration-500",
+            "lg:hidden absolute bottom-6 left-1/2 z-20 -translate-x-1/2 px-6 py-3.5 rounded-full font-bold shadow-2xl text-sm border flex items-center gap-2 transition-transform duration-500",
             "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-800 dark:border-white/20",
-            isSidebarOpen ? "translate-y-24" : "translate-y-0",
+            isSidebarOpen ? "translate-y-24 opacity-0 pointer-events-none" : "translate-y-0",
+            mobileMapActive ? "bottom-20" : "bottom-6",
           )}
         >
           <Navigation className="size-4" />
           Ver lugares
         </button>
 
-        <Map
-          center={[site.coordinates.longitude, site.coordinates.latitude]}
-          zoom={15}
-          fallbackMapsUrl={site.google_url}
+        <div
+          className={cn(
+            "absolute inset-0",
+            !mapInteractive && "pointer-events-none",
+          )}
+          aria-hidden={!mapInteractive}
         >
+          <Map
+            center={[site.coordinates.longitude, site.coordinates.latitude]}
+            zoom={15}
+            fallbackMapsUrl={site.google_url}
+            cooperativeGestures={isMobileLayout && mobileMapActive}
+            className="h-full w-full"
+          >
           <MapController
             activePlace={activePlace}
             placesList={filteredPlaces}
@@ -352,12 +388,12 @@ export function Location() {
                     </p>
                   )}
 
-                  <div className="relative h-32 w-full rounded-xl overflow-hidden mt-2">
-                    <Image
+                  <div className="relative mt-2 h-32 w-full overflow-hidden rounded-xl transition-transform duration-500 hover:scale-[1.02]">
+                    <PlacePhoto
                       fill
                       src={place.image}
                       alt={place.name}
-                      className="object-cover transition-transform hover:scale-105 duration-500"
+                      sizes="288px"
                     />
                     <div className="absolute top-2 left-2">
                       <span
@@ -392,10 +428,51 @@ export function Location() {
               </MarkerPopup>
             </MapMarker>
           ))}
-        </Map>
+          </Map>
+        </div>
+
+        {isMobileLayout && !mobileMapActive && !isSidebarOpen && (
+          <div
+            className="absolute inset-0 z-[25] flex flex-col justify-end bg-gradient-to-t from-zinc-950/75 via-zinc-950/25 to-transparent p-4 pb-20 pointer-events-none"
+            style={{ touchAction: "pan-y" }}
+          >
+            <p className="mb-3 text-center text-xs font-medium text-white/90 pointer-events-none">
+              Desliza con un dedo para seguir bajando la página
+            </p>
+            <div className="flex flex-col gap-2 pointer-events-auto">
+              <button
+                type="button"
+                onClick={() => setMobileMapActive(true)}
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-white/25 bg-white/95 py-3.5 text-sm font-bold text-zinc-900 shadow-lg backdrop-blur-sm"
+              >
+                <Hand className="size-4" />
+                Tocar para explorar el mapa
+              </button>
+              <button
+                type="button"
+                onClick={scrollToNextSection}
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-zinc-900/80 py-3 text-sm font-semibold text-white shadow-lg backdrop-blur-sm"
+              >
+                Continuar en la web
+                <ChevronDown className="size-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isMobileLayout && mobileMapActive && (
+          <button
+            type="button"
+            onClick={() => setMobileMapActive(false)}
+            className="lg:hidden absolute top-4 left-4 z-30 flex items-center gap-1.5 rounded-full border border-white/30 bg-zinc-900/85 px-4 py-2.5 text-xs font-bold text-white shadow-lg backdrop-blur-md"
+          >
+            Listo, seguir bajando
+            <ChevronDown className="size-3.5" />
+          </button>
+        )}
 
         {/* Floating Controls Overlay */}
-        <div className="absolute bottom-10 left-10 flex flex-col gap-4 z-10">
+        <div className="absolute bottom-10 left-10 z-10 flex flex-col gap-4 max-lg:hidden">
           {isLoadingRoute && (
             <GlassPanel className="p-4 flex items-center gap-4 border-amber-500 shadow-xl animate-in slide-in-from-left duration-300">
               <Loader2 className="size-5 animate-spin text-amber-600" />
@@ -411,6 +488,19 @@ export function Location() {
           )}
         </div>
       </div>
+
+      {isMobileLayout && (
+        <div className="order-2 w-full border-t border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-950 lg:hidden">
+          <button
+            type="button"
+            onClick={scrollToNextSection}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-100 py-3.5 text-sm font-semibold text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100"
+          >
+            Siguiente: preguntas frecuentes
+            <ChevronDown className="size-4" />
+          </button>
+        </div>
+      )}
     </section>
   );
 }

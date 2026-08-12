@@ -3,7 +3,7 @@ import { site } from "@/lib/site";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-black/10 bg-zinc-950 text-zinc-200 dark:border-white/10">
+    <footer className="relative z-20 border-t border-black/10 bg-zinc-950 pb-28 pr-4 text-zinc-200 max-md:pr-[5rem] dark:border-white/10 md:pb-14">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-14 md:flex-row md:justify-between">
         <div className="max-w-md space-y-4">
           <p className="font-display text-3xl tracking-wide text-[#f2f0eb]">
@@ -55,10 +55,18 @@ export function SiteFooter() {
             <ul className="mt-3 space-y-2 text-sm">
               <li>
                 <Link
-                  href="#reservas"
+                  href="/#reservas"
                   className="text-amber-400 hover:underline"
                 >
-                  Ir a reservas
+                  Configurar estadía
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#galeria"
+                  className="relative inline-block py-1 text-amber-400 hover:underline"
+                >
+                  Galería y redes
                 </Link>
               </li>
               <li>

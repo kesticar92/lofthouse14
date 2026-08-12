@@ -1,62 +1,103 @@
-[
-  {
-    "id": 1,
-    "nombre": "Juan david De la cruz",
-    "calificacion": "5\/5",
-    "comentario": "Súper recomendado, muy buena ubicación, exelente atención, súper acogedor, nosotros volvemos!!"
-  },
-  {
-    "id": 2,
-    "nombre": "ANGELA CRUZ VASQUEZ",
-    "calificacion": "5\/5",
-    "comentario": "Excelente servicio, está muy bien ubicado. David y Kevin fueron súper amables y atentos en todo momento. Sin duda alguna volveré aquí❤️"
-  },
-  {
-    "id": 3,
-    "nombre": "Ana Bravo",
-    "calificacion": "5\/5",
-    "comentario": "Execelente lugar, súper recomendado, agradable y acogedor. Para volver , me encantó."
-  },
-  {
-    "id": 4,
-    "nombre": "angie paola garces martinez",
-    "calificacion": "5\/5",
-    "comentario": "Kevin y David excelentes antifriones las instalaciones excelentes hermosas todo muy limpio tranquilo el espacio limpio lindo hermoso"
-  },
-  {
-    "id": 5,
-    "nombre": "Harry A Cordoba",
-    "calificacion": "5\/5",
-    "comentario": "Muy recomendado LoftHouse!. Si lo que buscas es tranquilidad, amabilidad y una muy buena atención, este es el sitio ideal para tu hospedaje, sin pensarlo dos veces!. Realmente sus habitaciones son muy comodas, muy bien ambientadas, por lo … Más información"
-  },
-  {
-    "id": 6,
-    "nombre": "Isabella Yela",
-    "calificacion": "5\/5",
-    "comentario": "Es un excelente lugar, cómodo, tranquilo y acogedor. Su anfitrión es muy gentil y amable, sin duda una linda estadía. … Más información"
-  },
-  {
-    "id": 7,
-    "nombre": "yefferson david tobar velasco",
-    "calificacion": "5\/5",
-    "comentario": "Excelente lugar, excelente ubicación, buenos anfitriones, super recomendado."
-  },
-  {
-    "id": 8,
-    "nombre": "Bryan Ceballos renteria",
-    "calificacion": "5\/5",
-    "comentario": "Excelente servicio lo recomiendo siempre la atencion fue expectacular habitaciones muy aseadas Habitaciones5.0Servicio5.0Ubicación5.0 Aspectos destacados del hotelDe lujo · Vista increíble · Romántico · Tranquilo · Apto para niños · Buen precio · Alta tecnología"
-  },
-  {
-    "id": 9,
-    "nombre": "Karen Velasco",
-    "calificacion": "5\/5",
-    "comentario": "Excelentes anfitriones Esta muy bien ubicado, cercano a lindos restaurantes, en una zona muy turística de vistas geniales. Excelente servicio, muchas gracias💕"
-  },
-  {
-    "id": 10,
-    "nombre": "Jeynner Giraldo Gutierrez",
-    "calificacion": "5\/5",
-    "comentario": "Una gran experiencia, habitaciones limpias y atención de excelente calidad. Habitaciones5.0Servicio5.0Ubicación5.0 Aspectos destacados del hotelDe lujo · Romántico"
-  }
-]
+{
+  "origen": "Google",
+  "actualizado": "2026-08-12",
+  "total_reseñas": 16,
+  "reseñas": [
+    {
+      "nombre": "ROBINSON SOTELO ZAMBRANO",
+      "calificacion": "5/5",
+      "comentario": "Un lugar muy bien ubicado y con una muy buena atención por parte del anfitrión , recomendado",
+      "id": 1
+    },
+    {
+      "nombre": "Diana Carolina Correa Agredo",
+      "calificacion": "5/5",
+      "comentario": "La habitación estaba impecable, muy cómoda y bien equipada. Todo funcionaba perfectamente y el descanso fue excelente. Muy recomendable.",
+      "id": 2
+    },
+    {
+      "nombre": "Lorena Dosman",
+      "calificacion": "5/5",
+      "comentario": "Un lugar muy limpio, cómodo, excelente servicio y amabilidad, respetando normas de convivencia. Excelente ubicación p",
+      "id": 3
+    },
+    {
+      "nombre": "Ana Bravo",
+      "calificacion": "5/5",
+      "comentario": "Execelente lugar, súper recomendado, agradable y acogedor. Para volver , me encantó.",
+      "id": 4
+    },
+    {
+      "nombre": "Harry A Cordoba",
+      "calificacion": "N/A",
+      "comentario": "Muy recomendado LoftHouse!. Si lo que buscas es tranquilidad, amabilidad y una muy buena atención, este es el sitio ideal para tu hospedaje, sin pensarlo dos veces!. Realmente sus habitaciones son muy comodas, muy bien ambientadas, por lo…",
+      "id": 5
+    },
+    {
+      "nombre": "Jhon",
+      "calificacion": "5/5",
+      "comentario": "Un lugar muy agradable, tranquilo y muy buena la ubicación. Al igual que la persona que aconpañó todo el proceso",
+      "id": 6
+    },
+    {
+      "nombre": "Isabella Yela",
+      "calificacion": "5/5",
+      "comentario": "Es un excelente lugar, cómodo, tranquilo y acogedor. Su anfitrión es muy gentil y amable, sin duda una linda estadía.",
+      "id": 7
+    },
+    {
+      "nombre": "Juan david De la cruz",
+      "calificacion": "5/5",
+      "comentario": "Súper recomendado, muy buena ubicación, exelente atención, súper acogedor, nosotros volvemos!!",
+      "id": 8
+    },
+    {
+      "nombre": "Jhoana Calderon",
+      "calificacion": "5/5",
+      "comentario": "Me encantó, el lugar la limpieza, la autonomía que no en todos lados puedes tener , super atentos siempre de lo que pudieramos necesitar, la habitación cómoda, limpia con cocina, nevera nos encantó 💚 aquí volvemos 😊",
+      "id": 9
+    },
+    {
+      "nombre": "Sergio Alberto Martinez Bohórquez",
+      "calificacion": "4/5",
+      "comentario": "Las habitaciones son muy cómodas, lo único es la falta de ventanas, pero cuenta con aire acondicionado, el servicio muy bueno y su administrador está pendiente de todo, muy limpio y cómodo.",
+      "id": 10
+    },
+    {
+      "nombre": "wrb.fr",
+      "calificacion": "N/A",
+      "comentario": "[null,0,null,\"h_57atT4GdH9geYP9pufgQk\",null,\"EvgDKYQi49-NlUMIDwAAAAEAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGABCVCmEIuPfjZVD6AEAACAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",null,null,[[[1,0]],0,null,0,0],null,true]",
+      "id": 11
+    },
+    {
+      "nombre": "af.httprm",
+      "calificacion": "N/A",
+      "comentario": "-8612172947566019610",
+      "id": 12
+    },
+    {
+      "nombre": "wrb.fr",
+      "calificacion": "N/A",
+      "comentario": "/MapsViewportService.GetViewportMetadata",
+      "id": 13
+    },
+    {
+      "nombre": "af.httprm",
+      "calificacion": "N/A",
+      "comentario": "-1894036402616752092",
+      "id": 14
+    },
+    {
+      "nombre": "wrb.fr",
+      "calificacion": "N/A",
+      "comentario": "/MapsMerchantStatusService.GetMerchantStatus",
+      "id": 15
+    },
+    {
+      "nombre": "af.httprm",
+      "calificacion": "N/A",
+      "comentario": "-1073461056593846919",
+      "id": 16
+    }
+  ]
+}

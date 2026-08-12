@@ -8,18 +8,14 @@ import { ThemeToggle } from "./theme-toggle";
 import { site, waLink } from "@/lib/site";
 import { motion, AnimatePresence } from "framer-motion";
 
-/** Mismo orden que las secciones en `src/app/page.tsx` */
+/** Navegación del embudo: solo lo esencial hacia la reserva. */
 const PAGE_NAV = [
-  { href: "#inicio", label: "Inicio" },
-  { href: "#lofts", label: "Nuestros lofts" },
-  { href: "#experiencias", label: "Experiencias" },
-  { href: "#propuesta", label: "¿Por qué nosotros?" },
-  { href: "#proceso", label: "Cómo reservar" },
-  { href: "#testimonios", label: "Testimonios" },
-  { href: "#social-wall", label: "Social media wall" },
+  { href: "#reservas", label: "Configurar estadía" },
+  { href: "#lofts", label: "Lofts" },
+  { href: "#testimonios", label: "Reseñas" },
   { href: "#ubicacion", label: "Ubicación" },
-  { href: "#preguntas-frecuentes", label: "Preguntas frecuentes" },
-  { href: "#reservas", label: "Reservas" },
+  { href: "#preguntas-frecuentes", label: "Ayuda" },
+  { href: "#galeria", label: "Galería y redes" },
 ] as const;
 
 export function Header() {
@@ -100,8 +96,9 @@ export function Header() {
         </Link>
 
         <div className="flex items-center justify-end justify-self-end gap-2 md:gap-4">
-          <Link href="#reservas">
+          <Link href="#preguntas-frecuentes">
             <button
+              type="button"
               className={cn(
                 "hidden lg:block rounded-xl px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider transition duration-300 border",
                 scrolled
@@ -109,11 +106,12 @@ export function Header() {
                   : "bg-transparent text-white border-white/20 hover:bg-white/10",
               )}
             >
-              contactanos
+              Ayuda
             </button>
           </Link>
           <Link href="#reservas">
             <button
+              type="button"
               className={cn(
                 "hidden sm:block rounded-xl px-5 py-2.5 text-center text-xs font-bold uppercase tracking-wider transition border shadow-sm",
                 scrolled
@@ -121,7 +119,7 @@ export function Header() {
                   : "bg-amber-500 text-white border-amber-500 hover:bg-amber-600 shadow-amber-500/20",
               )}
             >
-              Reservar loft
+              Configurar estadía
             </button>
           </Link>
           <ThemeToggle />
@@ -142,9 +140,9 @@ export function Header() {
               {/* Columna 1: recorrido de la página (orden visual) */}
               <div className="space-y-4 md:col-span-2 lg:col-span-2">
                 <h4 className="text-xs font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                  Recorrer la página
+                  Reserva guiada
                 </h4>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+                <ul className="grid grid-cols-1 gap-y-2 sm:grid-cols-2">
                   {PAGE_NAV.map((item) => (
                     <li key={item.href}>
                       <Link
@@ -156,6 +154,20 @@ export function Header() {
                       </Link>
                     </li>
                   ))}
+                </ul>
+                <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                  Más contenido
+                </p>
+                <ul className="mt-2 space-y-1 text-sm">
+                  <li>
+                    <Link
+                      href="/politicas"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="text-zinc-600 hover:underline dark:text-zinc-400"
+                    >
+                      Políticas
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
@@ -201,21 +213,11 @@ export function Header() {
                     comodidad, privacidad y total seguridad.
                   </p>
                 </div>
-                <div className="mt-4 pt-4 border-t border-amber-500/10 flex justify-between items-center">
-                  <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-500 tracking-wider">
-                    Reserva directa
-                  </span>
-                  <Link
-                    href="#reservas"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-xs font-bold text-zinc-900 dark:text-white underline hover:text-amber-600 dark:hover:text-amber-500 transition-colors"
-                  >
-                    Reservar ahora
-                  </Link>
+                <div className="mt-4 pt-4 border-t border-amber-500/10">
                   <Link
                     href="/admin/login"
                     onClick={() => setIsMenuOpen(false)}
-                    className="rounded-full border border-black/15 px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-700 hover:bg-black/5 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5"
+                    className="flex w-full items-center justify-center rounded-full border border-black/15 px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-700 hover:bg-black/5 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5"
                   >
                     Acceso administrador
                   </Link>

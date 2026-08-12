@@ -1,21 +1,18 @@
 import { Header } from "@/components/layout/header";
 import { ShareBar } from "@/components/layout/share-bar";
 import { Hero } from "@/components/sections/hero";
-import { ValueProps } from "@/components/sections/value-props";
-
 import { Lofts } from "@/components/sections/lofts";
-import { Experiences } from "@/components/sections/experiences";
-
 import { Location } from "@/components/sections/location";
-
-import { Contact } from "@/components/sections/contact";
-
 import { SiteFooter } from "@/components/sections/site-footer";
-import { RadialOrbitalTimelineDemo } from "../components/sections/radialTimeline";
-import TestimonialsUsage from "../components/sections/testimonialUsage";
-import { SocialWall } from "../components/sections/socialWall";
+import { GuidedReservation } from "@/components/sections/guided-reservation";
+import TestimonialsUsage from "@/components/sections/testimonialUsage";
 import { FaqSection } from "@/components/sections/faq";
+import { Gallery } from "@/components/sections/gallery";
+import { SocialWall } from "@/components/sections/socialWall";
 
+/**
+ * Embudo → reseñas → ubicación → FAQ → galería y redes al cierre.
+ */
 export default function Home() {
   return (
     <>
@@ -23,15 +20,13 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <GuidedReservation />
         <Lofts />
-        <Experiences />
-        <ValueProps />
-        <RadialOrbitalTimelineDemo />
         <TestimonialsUsage />
-        <SocialWall />
         <Location />
         <FaqSection />
-        <Contact />
+        <Gallery />
+        <SocialWall />
       </main>
       <SiteFooter />
       <ShareBar />

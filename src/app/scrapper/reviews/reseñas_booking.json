@@ -1,131 +1,618 @@
 {
   "origen": "Booking.com",
-  "total_reseñas": 25,
+  "total_reseñas": 80,
+  "actualizado": "2026-08-12",
   "reseñas": [
     {
       "nombre": "Daniela",
       "calificacion": "10",
+      "comentario_positivo": "Bien ubicado y como se ve en las fotos.",
+      "comentario_negativo": "El aire es portátil y se desconecta.",
+      "fecha": "2026-06-05",
       "comentario": "Bien ubicado y como se ve en las fotos. El aire es portátil y se desconecta."
     },
     {
       "nombre": "Rincón",
       "calificacion": "10",
-      "comentario": "El sitio es super bonito, limpio, amplio y los anfitriones super amables.  Execelente mini apartamento para hospedarse varios días, no existe ruido ni molestias uno descansa perfectamente."
+      "comentario_positivo": "El sitio es super bonito, limpio, amplio y los anfitriones super amables. Execelente mini apartamento para hospedarse varios días, no existe ruido ni molestias uno descansa perfectamente.",
+      "comentario_negativo": "",
+      "fecha": "2026-05-27",
+      "comentario": "El sitio es super bonito, limpio, amplio y los anfitriones super amables. Execelente mini apartamento para hospedarse varios días, no existe ruido ni molestias uno descansa perfectamente."
     },
     {
       "nombre": "Andrea",
       "calificacion": "10",
+      "comentario_positivo": "Ubicación",
+      "comentario_negativo": "",
+      "fecha": "2026-05-18",
       "comentario": "Ubicación"
     },
     {
       "nombre": "Humberto",
       "calificacion": "9,0",
+      "comentario_positivo": "Una muy buena atención",
+      "comentario_negativo": "Hace calor",
+      "fecha": "2026-05-16",
       "comentario": "Una muy buena atención Hace calor"
     },
     {
       "nombre": "Mauricio",
       "calificacion": "9,0",
+      "comentario_positivo": "La comodidad de los espacios",
+      "comentario_negativo": "Le falta más dotación de implementó para cocinar. Por otra parte, de noche el sector es muy solo y da desconfianza",
+      "fecha": "2026-04-19",
       "comentario": "La comodidad de los espacios Le falta más dotación de implementó para cocinar. Por otra parte, de noche el sector es muy solo y da desconfianza"
     },
     {
       "nombre": "Magda",
       "calificacion": "9,0",
+      "comentario_positivo": "Es agradable, limpio y muy cómodo",
+      "comentario_negativo": "Que no tenga un parqueadero seguro",
+      "fecha": "2026-04-14",
       "comentario": "Es agradable, limpio y muy cómodo Que no tenga un parqueadero seguro"
     },
     {
       "nombre": "Fraga",
       "calificacion": "10",
+      "comentario_positivo": "La ubicación y es perfecto para pareja",
+      "comentario_negativo": "",
+      "fecha": "2026-04-02",
       "comentario": "La ubicación y es perfecto para pareja"
     },
     {
       "nombre": "Oscar",
       "calificacion": "10",
-      "comentario": "Tiene todo lo necesario NA"
+      "comentario_positivo": "Tiene todo lo necesario",
+      "comentario_negativo": "NA",
+      "fecha": "2026-03-30",
+      "comentario": "Tiene todo lo necesario"
     },
     {
       "nombre": "Yasmin",
       "calificacion": "10",
+      "comentario_positivo": "Privacidad",
+      "comentario_negativo": "No hay mucha ventilación",
+      "fecha": "2026-03-21",
       "comentario": "Privacidad No hay mucha ventilación"
     },
     {
       "nombre": "Tovar",
       "calificacion": "8,0",
+      "comentario_positivo": "Lo pendiente que estuvo el administrador",
+      "comentario_negativo": "El baño pegado a las camas",
+      "fecha": "2026-02-11",
       "comentario": "Lo pendiente que estuvo el administrador El baño pegado a las camas"
     },
     {
       "nombre": "Alejandro",
       "calificacion": "10",
+      "comentario_positivo": "ubicación con fácil acceso y transporte a lugares turísticos de la ciudad y a zonas comerciales, de restaurantes",
+      "comentario_negativo": "Todo estuvo muy bien",
+      "fecha": "2026-02-02",
       "comentario": "ubicación con fácil acceso y transporte a lugares turísticos de la ciudad y a zonas comerciales, de restaurantes Todo estuvo muy bien"
     },
     {
       "nombre": "Claudia",
       "calificacion": "10",
+      "comentario_positivo": "Lo que mas me gustó fue que el apartamento estaba muy limpio y cómodo perfecto para una visita",
+      "comentario_negativo": "",
+      "fecha": "2026-01-25",
       "comentario": "Lo que mas me gustó fue que el apartamento estaba muy limpio y cómodo perfecto para una visita"
     },
     {
       "nombre": "Jairo",
       "calificacion": "8,0",
+      "comentario_positivo": "Ubicación, limpieza, comodidad,",
+      "comentario_negativo": "El parqueadero muy lejos",
+      "fecha": "2026-01-08",
       "comentario": "Ubicación, limpieza, comodidad, El parqueadero muy lejos"
     },
     {
       "nombre": "Estefany",
       "calificacion": "10",
+      "comentario_positivo": "La atención espectacular 👌 Kevin todo el personal atentos la limpieza super recomendado",
+      "comentario_negativo": "",
+      "fecha": "2026-01-06",
       "comentario": "La atención espectacular 👌 Kevin todo el personal atentos la limpieza super recomendado"
     },
     {
       "nombre": "Michel",
       "calificacion": "10",
+      "comentario_positivo": "La ubicación.",
+      "comentario_negativo": "La ventilación en el primer piso.",
+      "fecha": "2026-01-03",
       "comentario": "La ubicación. La ventilación en el primer piso."
     },
     {
       "nombre": "Mónica",
       "calificacion": "10",
+      "comentario_positivo": "Limpieza, ubicación y atención",
+      "comentario_negativo": "",
+      "fecha": "2025-12-27",
       "comentario": "Limpieza, ubicación y atención"
     },
     {
       "nombre": "Maritza",
       "calificacion": "10",
+      "comentario_positivo": "La ubicación",
+      "comentario_negativo": "Tener que bajar las sabanas y toallas a la entrada",
+      "fecha": "2025-12-08",
       "comentario": "La ubicación Tener que bajar las sabanas y toallas a la entrada"
     },
     {
       "nombre": "Acosta",
       "calificacion": "10",
+      "comentario_positivo": "Muy limpio y central",
+      "comentario_negativo": "Todo muy bien",
+      "fecha": "2025-12-06",
       "comentario": "Muy limpio y central Todo muy bien"
     },
     {
       "nombre": "Lila",
       "calificacion": "10",
+      "comentario_positivo": "Muy recomendado el alojamiento, excelente lugar para hospedarse!!! Muy cómodo y tranquilo.",
+      "comentario_negativo": "",
+      "fecha": "2025-12-05",
       "comentario": "Muy recomendado el alojamiento, excelente lugar para hospedarse!!! Muy cómodo y tranquilo."
     },
     {
       "nombre": "Gina",
       "calificacion": "9,0",
+      "comentario_positivo": "Muy buena ubicación",
+      "comentario_negativo": "",
+      "fecha": "2025-12-05",
       "comentario": "Muy buena ubicación"
     },
     {
       "nombre": "Carolina",
       "calificacion": "9,0",
+      "comentario_positivo": "El aseo",
+      "comentario_negativo": "Que no tenía parking",
+      "fecha": "2025-12-05",
       "comentario": "El aseo Que no tenía parking"
     },
     {
       "nombre": "Natalia",
       "calificacion": "8,0",
+      "comentario_positivo": "Me gusto mucho la ubicación, el barrio es hermoso y tranquilo.",
+      "comentario_negativo": "El ruido de la puerta constantemente, hubiera preferido una habitación lejos de la puerta principal para más tranquilidad.",
+      "fecha": "2025-11-17",
       "comentario": "Me gusto mucho la ubicación, el barrio es hermoso y tranquilo. El ruido de la puerta constantemente, hubiera preferido una habitación lejos de la puerta principal para más tranquilidad."
     },
     {
       "nombre": "Guerra",
       "calificacion": "9,0",
+      "comentario_positivo": "La comodidad de la habitación",
+      "comentario_negativo": "Faltaba un poco de aseo en la habitación",
+      "fecha": "2025-11-17",
       "comentario": "La comodidad de la habitación Faltaba un poco de aseo en la habitación"
     },
     {
       "nombre": "Fabian",
       "calificacion": "10",
+      "comentario_positivo": "El espacio es perfecto, el servicio es muy bueno, la ubicación es muy conveniente, cerca de restaurantes",
+      "comentario_negativo": "",
+      "fecha": "2025-11-16",
       "comentario": "El espacio es perfecto, el servicio es muy bueno, la ubicación es muy conveniente, cerca de restaurantes"
     },
     {
       "nombre": "Torres",
       "calificacion": "10",
+      "comentario_positivo": "Un supermercado servicio en todo sentido las chicas q hacen el aseo súper serviciales y el anfitrión muy atento, la seguridad interna y del hospedaje excelente. En general un excelente hospedaje. Volveríamos a hospedarnos allí sin dudarlo",
+      "comentario_negativo": "No hay punto malo",
+      "fecha": "2025-11-16",
       "comentario": "Un supermercado servicio en todo sentido las chicas q hacen el aseo súper serviciales y el anfitrión muy atento, la seguridad interna y del hospedaje excelente. En general un excelente hospedaje. Volveríamos a hospedarnos allí sin dudarlo No hay punto malo"
+    },
+    {
+      "nombre": "Carlos",
+      "calificacion": "10",
+      "comentario_positivo": "Amabilidad y ubicación",
+      "comentario_negativo": "Nada",
+      "fecha": "2025-11-14",
+      "comentario": "Amabilidad y ubicación Nada"
+    },
+    {
+      "nombre": "Ramirez",
+      "calificacion": "10",
+      "comentario_positivo": "Un barrio muy tranquilo",
+      "comentario_negativo": "",
+      "fecha": "2025-11-09",
+      "comentario": "Un barrio muy tranquilo"
+    },
+    {
+      "nombre": "Vargas",
+      "calificacion": "10",
+      "comentario_positivo": "El lugar muy bien ubicado, disponibilidad de restaurantes, supermercados y una hermosa zona de Cali.",
+      "comentario_negativo": "Nada, todo estuvo perfecto.",
+      "fecha": "2025-11-04",
+      "comentario": "El lugar muy bien ubicado, disponibilidad de restaurantes, supermercados y una hermosa zona de Cali. Nada, todo estuvo perfecto."
+    },
+    {
+      "nombre": "Diego",
+      "calificacion": "10",
+      "comentario_positivo": "Versatilidad y sector, habitación cómoda",
+      "comentario_negativo": "",
+      "fecha": "2025-10-30",
+      "comentario": "Versatilidad y sector, habitación cómoda"
+    },
+    {
+      "nombre": "Paula",
+      "calificacion": "10",
+      "comentario_positivo": "Me gustó mucho la ubicación, es cómodo y fácil de llegar",
+      "comentario_negativo": "",
+      "fecha": "2025-10-27",
+      "comentario": "Me gustó mucho la ubicación, es cómodo y fácil de llegar"
+    },
+    {
+      "nombre": "Cristian",
+      "calificacion": "10",
+      "comentario_positivo": "El espacio y cumplieron con la expectativa del loft muy cómoda, sencillo, acceso a todo. Encantado",
+      "comentario_negativo": ".",
+      "fecha": "2025-10-27",
+      "comentario": "El espacio y cumplieron con la expectativa del loft muy cómoda, sencillo, acceso a todo. Encantado ."
+    },
+    {
+      "nombre": "Juan",
+      "calificacion": "8,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "El aseo del baño",
+      "fecha": "2025-10-27",
+      "comentario": "El aseo del baño"
+    },
+    {
+      "nombre": "Geovanny",
+      "calificacion": "9,0",
+      "comentario_positivo": "Todas las facilidades",
+      "comentario_negativo": "Una sábana manchada",
+      "fecha": "2025-10-20",
+      "comentario": "Todas las facilidades Una sábana manchada"
+    },
+    {
+      "nombre": "Andrea",
+      "calificacion": "10",
+      "comentario_positivo": "Super recomendados, ordenando, limpio, tranquilo, cómodo, amplio, el sector genial, buena oferta gastronómica, movilidad, central, cerca a todo, muy amables los anfitriones, todo lo que ofrecen es real, Anima volver a hospedarse",
+      "comentario_negativo": "",
+      "fecha": "2025-10-13",
+      "comentario": "Super recomendados, ordenando, limpio, tranquilo, cómodo, amplio, el sector genial, buena oferta gastronómica, movilidad, central, cerca a todo, muy amables los anfitriones, todo lo que ofrecen es real, Anima volver a hospedarse"
+    },
+    {
+      "nombre": "Silvia",
+      "calificacion": "9,0",
+      "comentario_positivo": "La ubicación era muy central, el espacio está bien distribuido.",
+      "comentario_negativo": "La comodidad de las camas puede ser mejor.",
+      "fecha": "2025-10-02",
+      "comentario": "La ubicación era muy central, el espacio está bien distribuido. La comodidad de las camas puede ser mejor."
+    },
+    {
+      "nombre": "Quintero",
+      "calificacion": "10",
+      "comentario_positivo": "Su tranquilidad",
+      "comentario_negativo": "",
+      "fecha": "2025-09-22",
+      "comentario": "Su tranquilidad"
+    },
+    {
+      "nombre": "Ramirez",
+      "calificacion": "7,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "Es un espacio muy pequeño y el aire acondicionado suena mucho, es un espacio muy oscuro, todo el tiempo hay que mantener la luz encendida",
+      "fecha": "2026-07-12",
+      "comentario": "Es un espacio muy pequeño y el aire acondicionado suena mucho, es un espacio muy oscuro, todo el tiempo hay que mantener la luz encendida"
+    },
+    {
+      "nombre": "Herrera",
+      "calificacion": "7,0",
+      "comentario_positivo": "La ubicación",
+      "comentario_negativo": "El aire acondicionado está obsoleto, hace demasiado calor, no funciona",
+      "fecha": "2026-05-19",
+      "comentario": "La ubicación El aire acondicionado está obsoleto, hace demasiado calor, no funciona"
+    },
+    {
+      "nombre": "Tatiana",
+      "calificacion": "4,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "No me gusto que cuando llegue no habia nadie que me entregara el lugar, se que es con un codigo pero senti que cualquiera puede tener el codigo y al llegar a media noche podría cualquier persona ingresar. Me dio mucho temor que el primer anfitrion me indico que me asignaria otra persona y luego no me contestara.",
+      "fecha": "2026-03-02",
+      "comentario": "No me gusto que cuando llegue no habia nadie que me entregara el lugar, se que es con un codigo pero senti que cualquiera puede tener el codigo y al llegar a media noche podría cualquier persona ingresar. Me dio mucho temor que el primer anfitrion me indico que me asignaria otra persona y luego no me contestara."
+    },
+    {
+      "nombre": "Victoria",
+      "calificacion": "6,0",
+      "comentario_positivo": "La ubicación es muy buena, cerca de muchos lugares para comer y pasear. El barrio es muy seguro. El personal excelente y muy a disposición para lo que necesites.",
+      "comentario_negativo": "No tiene ventilación, por lo que para estancia corta está bien, pero para más de 3-4 días no lo recomendaría. Cobran un depósito por seguridad del que no advierten al hacer la reserva. Además, cobran un extra de limpieza pero al salir te piden que recojas un poco el apartamento y saques la basura, esto no lo comprendí",
+      "fecha": "2026-02-06",
+      "comentario": "La ubicación es muy buena, cerca de muchos lugares para comer y pasear. El barrio es muy seguro. El personal excelente y muy a disposición para lo que necesites. No tiene ventilación, por lo que para estancia corta está bien, pero para más de 3-4 días no lo recomendaría. Cobran un depósito por seguridad del que no advierten al hacer la reserva. Además, cobran un extra de limpieza pero al salir te piden que recojas un poco el apartamento y saques la basura, esto no lo comprendí"
+    },
+    {
+      "nombre": "Johanna",
+      "calificacion": "7,0",
+      "comentario_positivo": "La ubicación del lugar, el personal estuvo pendiente todo el tiempo a nuestras solicitudes. Las camas cómodas.",
+      "comentario_negativo": "Es un lugar con poca ventilación y se percibe muy encerrado. Amenities insuficientes, específicamente jabón y papel higiénico.",
+      "fecha": "2025-11-10",
+      "comentario": "La ubicación del lugar, el personal estuvo pendiente todo el tiempo a nuestras solicitudes. Las camas cómodas. Es un lugar con poca ventilación y se percibe muy encerrado. Amenities insuficientes, específicamente jabón y papel higiénico."
+    },
+    {
+      "nombre": "Jennifer",
+      "calificacion": "7,0",
+      "comentario_positivo": "Muy cómodo, buena ubicación",
+      "comentario_negativo": "Había fallas en las tuberías",
+      "fecha": "2025-11-05",
+      "comentario": "Muy cómodo, buena ubicación Había fallas en las tuberías"
+    },
+    {
+      "nombre": "David",
+      "calificacion": "10",
+      "comentario_positivo": "In a leafy suburb, very quiet, large apartment near a vast amount of places to eat. Very safe vibe Kevin was sooooo helpful, nothing too much trouble",
+      "comentario_negativo": "All good",
+      "fecha": "2026-04-25",
+      "comentario": "In a leafy suburb, very quiet, large apartment near a vast amount of places to eat. Very safe vibe Kevin was sooooo helpful, nothing too much trouble All good"
+    },
+    {
+      "nombre": "Beth",
+      "calificacion": "10",
+      "comentario_positivo": "Really easy check in. Room is really nice and has everything you need :) Kevin was super helpful and responded to us really quickly",
+      "comentario_negativo": "Nothing",
+      "fecha": "2026-02-19",
+      "comentario": "Really easy check in. Room is really nice and has everything you need :) Kevin was super helpful and responded to us really quickly Nothing"
+    },
+    {
+      "nombre": "Alyssa",
+      "calificacion": "10",
+      "comentario_positivo": "quiet & clean, friendly staff, good location",
+      "comentario_negativo": "not much space to put your stuff in the bathroom",
+      "fecha": "2026-02-02",
+      "comentario": "quiet & clean, friendly staff, good location not much space to put your stuff in the bathroom"
+    },
+    {
+      "nombre": "Hexc",
+      "calificacion": "9,0",
+      "comentario_positivo": "Nice quiet area",
+      "comentario_negativo": "",
+      "fecha": "2025-12-08",
+      "comentario": "Nice quiet area"
+    },
+    {
+      "nombre": "Orsini",
+      "calificacion": "9,0",
+      "comentario_positivo": "clean",
+      "comentario_negativo": "no windows",
+      "fecha": "2025-11-14",
+      "comentario": "clean no windows"
+    },
+    {
+      "nombre": "Manuel",
+      "calificacion": "9,0",
+      "comentario_positivo": "Bequem, tolle Lage, gutes Bett, Kevin war freundlich und hilfsbereit, sehr ruhige Gegend und Unterkunft, familiär",
+      "comentario_negativo": "Küche ist sehr klein und es gibt wenig Ausstattung",
+      "fecha": "2026-06-21",
+      "comentario": "Bequem, tolle Lage, gutes Bett, Kevin war freundlich und hilfsbereit, sehr ruhige Gegend und Unterkunft, familiär Küche ist sehr klein und es gibt wenig Ausstattung"
+    },
+    {
+      "nombre": "Anna",
+      "calificacion": "10",
+      "comentario_positivo": "Bellissimo quartiere e host molto disponibile!",
+      "comentario_negativo": "",
+      "fecha": "2025-12-28",
+      "comentario": "Bellissimo quartiere e host molto disponibile!"
+    },
+    {
+      "nombre": "Jimenez",
+      "calificacion": "4,0",
+      "comentario_positivo": "La zona es bonita! Es seguro y privado, está cerca del parque de los perros, donde está rodeado de restaurantes y bares. Pero si lo que buscas es conocer la vida de Cali ahí no es.",
+      "comentario_negativo": "No hay agua caliente, no hay ventilación, el apartamento está completamente cerrado, no hay ventanas, \"el aire acondicionado es obsoleto ya que hace mucho ruido, se conecta cerca de las escaleras y obstruyendo el paso por su tamaño, sale un gran tubo que se dirige a el techo del baño, eso causa que el baño esté super caliente con aire caliente producto del aire acondicionado\". En la cama supleatoria que pusieron se acostó mi esposo el cual tenía animalitos que le picaron. Al final pague el doble, ya que como dice Booking \"quizá allá pago adicional\" y así fue, pagué limpieza impuesto por cancelación etc etc. Pague el doble",
+      "fecha": "2026-02-26",
+      "comentario": "La zona es bonita! Es seguro y privado, está cerca del parque de los perros, donde está rodeado de restaurantes y bares. Pero si lo que buscas es conocer la vida de Cali ahí no es. No hay agua caliente, no hay ventilación, el apartamento está completamente cerrado, no hay ventanas, \"el aire acondicionado es obsoleto ya que hace mucho ruido, se conecta cerca de las escaleras y obstruyendo el paso por su tamaño, sale un gran tubo que se dirige a el techo del baño, eso causa que el baño esté super caliente con aire caliente producto del aire acondicionado\". En la cama supleatoria que pusieron se acostó mi esposo el cual tenía animalitos que le picaron. Al final pague el doble, ya que como dice Booking \"quizá allá pago adicional\" y así fue, pagué limpieza impuesto por cancelación etc etc. Pague el doble"
+    },
+    {
+      "nombre": "Eric",
+      "calificacion": "5,0",
+      "comentario_positivo": "L’emplacement",
+      "comentario_negativo": "On était à côté de la musique, donc matin et soir + pas de « personnel » sur place pour les paiements donc via bold avec des frais même pour la machine à laver, c’est dommage Il y a une cuisine mais pas de hotte pour l’odeur et pas de fenêtre + lit très dur",
+      "fecha": "2025-10-25",
+      "comentario": "L’emplacement On était à côté de la musique, donc matin et soir + pas de « personnel » sur place pour les paiements donc via bold avec des frais même pour la machine à laver, c’est dommage Il y a une cuisine mais pas de hotte pour l’odeur et pas de fenêtre + lit très dur"
+    },
+    {
+      "nombre": "Suarez",
+      "calificacion": "8,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-07-22"
+    },
+    {
+      "nombre": "Felipe",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-06-29"
+    },
+    {
+      "nombre": "Robinson",
+      "calificacion": "8,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-06-19"
+    },
+    {
+      "nombre": "Benavides",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-10-06"
+    },
+    {
+      "nombre": "Guzman",
+      "calificacion": "8,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-04-29"
+    },
+    {
+      "nombre": "Javier",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-04-10"
+    },
+    {
+      "nombre": "Alejandra",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-04-05"
+    },
+    {
+      "nombre": "Miguel",
+      "calificacion": "9,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-04-04"
+    },
+    {
+      "nombre": "Bryam",
+      "calificacion": "8,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-03-26"
+    },
+    {
+      "nombre": "Ivan",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-03-23"
+    },
+    {
+      "nombre": "Cesar",
+      "calificacion": "8,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-03-21"
+    },
+    {
+      "nombre": "Olarte",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-03-17"
+    },
+    {
+      "nombre": "Moreno",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-03-01"
+    },
+    {
+      "nombre": "Maribel",
+      "calificacion": "9,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-01-30"
+    },
+    {
+      "nombre": "Castellanos",
+      "calificacion": "9,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-01-05"
+    },
+    {
+      "nombre": "Paz",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-12-24"
+    },
+    {
+      "nombre": "Alejandro",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-12-10"
+    },
+    {
+      "nombre": "Luz",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-11-29"
+    },
+    {
+      "nombre": "Ligia",
+      "calificacion": "8,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-11-09"
+    },
+    {
+      "nombre": "Lucía",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-10-20"
+    },
+    {
+      "nombre": "Perdomo",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-10-13"
+    },
+    {
+      "nombre": "Karoll",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-10-07"
+    },
+    {
+      "nombre": "Muñoz",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-09-22"
+    },
+    {
+      "nombre": "Galeano",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-08-27"
+    },
+    {
+      "nombre": "Horminzo",
+      "calificacion": "5,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-04-27"
+    },
+    {
+      "nombre": "Vanesa",
+      "calificacion": "5,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-04-12"
+    },
+    {
+      "nombre": "Ole",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2026-04-04"
+    },
+    {
+      "nombre": "Diego",
+      "calificacion": "8,0",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-12-11"
+    },
+    {
+      "nombre": "Piny",
+      "calificacion": "10",
+      "comentario_positivo": "",
+      "comentario_negativo": "",
+      "fecha": "2025-11-01"
     }
   ]
 }

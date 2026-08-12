@@ -31,3 +31,21 @@ body {
 ::selection {
   background: rgba(217, 119, 6, 0.25);
 }
+
+@keyframes testimonial-scroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.testimonial-scroll-column:hover .testimonial-scroll-track {
+  animation-play-state: paused;
+}
+
+.testimonial-touch-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(161, 161, 170, 0.5) transparent;
+}

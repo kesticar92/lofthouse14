@@ -7,13 +7,14 @@
     "rating": 4.6,
     "reviews": 15420,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnJHSOCFcHzRiXsyr1LqFiXrwrUs1DFgY0NEMeoljFA1c-d6_X2n_ub_t-IicjlgZQwCQFh--OBU8DkncN8gYWoIiwJuiAC53SfJZMyjDiI9aYOqbHrQS1cwrS_BauRwKa7rxb4=w640-h480-k-no",
     "lng": -76.545759,
     "lat": 3.431623,
     "color": "bg-green-500",
     "addressLine": "Cra. 34 # 3-2, San Fernando, Cali",
     "description": "Concurrido parque rodeado de restaurantes y bares, famoso por la estatua de un perro y su vibrante vida nocturna.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJdQAwEIOmMI4RBfU5_E5Tjtg"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJdQAwEIOmMI4RBfU5_E5Tjtg",
+    "imageSource": "google_maps"
   },
   {
     "id": 2,
@@ -23,13 +24,14 @@
     "rating": 4.8,
     "reviews": 9850,
     "hours": "10:00 AM - 7:00 PM",
-    "image": "https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkiBtsXU8u9SZRY2AJLHqj4nhhdYIeGi_kuPBKz_eevimrQ24r6zJfVyq04BQVSCUGNzYwKxeprSe3g4KNAeKiyojteYHdhKLXc2bibHw1vVwvXhppK5FT2UKC8i6Tf5cH1SuIe_g=w640-h480-k-no",
     "lng": -76.544747,
     "lat": 3.450379,
     "color": "bg-blue-500",
     "addressLine": "Av. Colombia # 5-105 Oeste, Cali",
     "description": "Importante museo de arte moderno con cinemateca y salas de exposición, ubicado a orillas del río Cali.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJF06VcnmmMI4Razg9LryeTHo"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJF06VcnmmMI4Razg9LryeTHo",
+    "imageSource": "google_maps"
   },
   {
     "id": 3,
@@ -39,13 +41,14 @@
     "rating": 4.7,
     "reviews": 3240,
     "hours": "Varía según evento",
-    "image": "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlmJAZQNi9X4Wydo9-GuO9DUS8-A00_ScvNP2sNuRZVpfBtxvgUeb4Pr2nD6iame7gmrAJhvzhm5gYYBfoMo8UfsnNEhIGeo7fUtWJSOWE5BvXR4zPM14CWHWthQMt40hiczaeI=w640-h480-k-no",
     "lng": -76.546377,
     "lat": 3.444735,
     "color": "bg-blue-500",
     "addressLine": "Cra. 37 Bis # 6 Oeste, Cali",
     "description": "Teatro al aire libre que acoge conciertos, festivales y eventos culturales gratuitos para la comunidad.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJbTt8z3-mMI4RXxSenRyRGS0"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJbTt8z3-mMI4RXxSenRyRGS0",
+    "imageSource": "google_maps"
   },
   {
     "id": 4,
@@ -55,13 +58,14 @@
     "rating": 4.5,
     "reviews": 6730,
     "hours": "12:00 PM - 3:00 AM",
-    "image": "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkldYlB4CJZwEaoDMEBAMFWiFZAstgoSaOR4IXrWmRmVu7OxI6DEXQlf2yB8rukrLyxI-nxMnVFVkerWAnjIW3xnmViSC3SWdFXMPY7HF8GgfZjTQRj0Z8sWlYWSUHUV5t3Mx11pQ=w640-h480-k-no",
     "lng": -76.533519,
     "lat": 3.4556,
     "color": "bg-amber-500",
     "addressLine": "Cra. 34 # 3-111, San Fernando, Cali",
     "description": "Bar y restaurante temático inspirado en Nueva Orleans, conocido por su música en vivo y ambiente festivo.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJt_4PXmymMI4RKLzhxmy3Ui8"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJt_4PXmymMI4RKLzhxmy3Ui8",
+    "imageSource": "google_maps"
   },
   {
     "id": 5,
@@ -88,13 +92,14 @@
     "rating": 4.8,
     "reviews": 4500,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnD8J3LmF-Njg4fusVhbdB1iRy9bULH3YIHrG_o3OCs3_IabSQgoMpOM7pBr51WsMzmXNLnYbdc7mdc0wl0Z5fuDKXmOJofAmx2tgThtFXlwET7Spal4m-D_BSv6GsvxcErpEw58A=w640-h480-k-no",
     "lng": -76.541334,
     "lat": 3.44867,
     "color": "bg-green-500",
     "addressLine": "Cra. 10 con Calle 1, San Antonio, Cali",
     "description": "Mirador histórico con una antigua capilla, ideal para disfrutar de vistas panorámicas, cuenteros y artesanías.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJCQkGWXymMI4RpohMqy-H8IY"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJCQkGWXymMI4RpohMqy-H8IY",
+    "imageSource": "google_maps"
   },
   {
     "id": 7,
@@ -104,13 +109,14 @@
     "rating": 4.9,
     "reviews": 1200,
     "hours": "9:00 AM - 6:00 PM",
-    "image": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWn9pFH-R_THftvW0ktqzaaqZPVAyb0OO460wnglaiYTtjN2L2xajXMH1aZnMl92VnRNOBGRNfU6SSBLyB8q-yguzhLocY76lxVl0WOXjCS1PdcASAnaVBorYoFqigu6tIPFIRt9=w640-h480-k-no",
     "lng": -76.537612,
     "lat": 3.4467,
     "color": "bg-blue-500",
     "addressLine": "Cra. 5 # 2-70, San Antonio, Cali",
     "description": "Histórico taller de impresión tipográfica y artes gráficas, ícono de la resistencia cultural y el diseño caleño.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJn6HMkXymMI4R6PB_CgOZSpU"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJn6HMkXymMI4R6PB_CgOZSpU",
+    "imageSource": "google_maps"
   },
   {
     "id": 8,
@@ -120,13 +126,14 @@
     "rating": 4.7,
     "reviews": 850,
     "hours": "Varía según evento",
-    "image": "https://images.unsplash.com/photo-1507924538820-ede94a04019d?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlq6Yyh9NEx3YM_2eESGvPBS-3nnj5ZqJIgURfVFBUe2-oKRuHZHrylllQNz4f82o3bo_8Vfq4iWCN1MkqPig9pxfOfVEMwwImjponHxStdfaT0j0q2KVlFuLEbFa97UFM39AWf=w640-h480-k-no",
     "lng": -76.53835,
     "lat": 3.447545,
     "color": "bg-blue-500",
     "addressLine": "Cra. 10 # 3-40, San Antonio, Cali",
     "description": "Sala de teatro independiente que se enfoca en la dramaturgia contemporánea y la exploración escénica.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJk1N233ymMI4R6KWBcXBEb2U"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJk1N233ymMI4R6KWBcXBEb2U",
+    "imageSource": "google_maps"
   },
   {
     "id": 9,
@@ -136,13 +143,14 @@
     "rating": 4.6,
     "reviews": 640,
     "hours": "Varía según evento",
-    "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkZQpHDeSmvsI7HVYYKgQZZp-4Dq8X_EOZh2stRJx99WiQK4bHXRuUdwbwy6VFPEX0dQNSdNfM0_CbX3f91rAivWBIEjYd_mVSiYI-z7FuKhSnGFktb48fq3uhJYlzjvgj8RsYH=w640-h480-k-no",
     "lng": -76.538561,
     "lat": 3.446549,
     "color": "bg-blue-500",
     "addressLine": "Calle 4 # 10-48, San Antonio, Cali",
     "description": "Espacio cultural íntimo dedicado a la promoción de las artes escénicas locales y obras experimentales.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ7X5VLn2mMI4RvO3pLWFrvVU"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ7X5VLn2mMI4RvO3pLWFrvVU",
+    "imageSource": "google_maps"
   },
   {
     "id": 10,
@@ -152,13 +160,14 @@
     "rating": 4.8,
     "reviews": 2100,
     "hours": "1:00 PM - 9:00 PM",
-    "image": "https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWk-un2yx1irusttfJBvcBRtLFTr8ZduolA0Ii6EjEvktS5Bo5qSUBefR8NYmVuiil6h6mErmyQPni5BK_FDQeZjnudHkkHnR-sJ3HcuMbiO9b7oAtwyE8M-W8gWSiBPVZJLL6ZG=w640-h480-k-no",
     "lng": -76.539217,
     "lat": 3.447464,
     "color": "bg-amber-500",
     "addressLine": "Cra. 6 # 3-03, San Antonio, Cali",
     "description": "Café temático inspirado en la obra de García Márquez, famoso por sus deliciosos postres y ambiente bohemio.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJUc7luHymMI4RGc6SX1WxLzU"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJUc7luHymMI4RGc6SX1WxLzU",
+    "imageSource": "google_maps"
   },
   {
     "id": 11,
@@ -168,13 +177,14 @@
     "rating": 4.9,
     "reviews": 1800,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmmhMDr2SHk8Ak65b8Zg5b4GZIaI8fMXxE7sB9UL6WSMaJXfoKDNB0SbL2QsC5kXSqT-2Rk0Z3_Kay7TzNQwxDNY-Sq9KRLFA8J04Z6v065CVfOWgUIHOY94Q1LWKDLgSj8JiXuUA=w640-h480-k-no",
     "lng": -76.541235,
     "lat": 3.446713,
     "color": "bg-amber-500",
     "addressLine": "Calle 4 # 10-34, San Antonio, Cali",
     "description": "Restaurante de autor que mezcla sabores tradicionales con alta cocina en una encantadora casa colonial.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJf_HpQnmmMI4Rx-Qd4QfBKPs"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJf_HpQnmmMI4Rx-Qd4QfBKPs",
+    "imageSource": "google_maps"
   },
   {
     "id": 12,
@@ -184,13 +194,14 @@
     "rating": 4.7,
     "reviews": 1500,
     "hours": "3:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkYufqynrZzMUVYMi0EgqBCKLQvbVh6o6IiyWbQV72a7qCGV2dOspoMkv5bq3ACr8OCFmNk35XJ9bVuKRNDGJvDVwfT60cQew0VAaGM2Y9XZmnVhDK9rtAbVoUoWGwEGvr8bN8K=w640-h480-k-no",
     "lng": -76.53874,
     "lat": 3.448074,
     "color": "bg-amber-500",
     "addressLine": "Cra. 10 # 1-15, San Antonio, Cali",
     "description": "Café y galería con ambiente bohemio, decorado con antigüedades, perfecto para charlas tranquilas.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJgfgz-XymMI4RlO-ofSrwptQ"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJgfgz-XymMI4RlO-ofSrwptQ",
+    "imageSource": "google_maps"
   },
   {
     "id": 13,
@@ -200,13 +211,14 @@
     "rating": 4.6,
     "reviews": 2300,
     "hours": "4:00 PM - 11:00 PM",
-    "image": "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnHZ2ScJ6GOCVdQPVVgC0eLG8K8LEsd7m2UmY9IrvfW4E5XNGt3FCUHeRFWUdJIfCB15zUUw4oMIatstEt8r76h_V7e6vyKFe9NgINrILPWSnIvD3IR-4yl_DAJRNuJ3uM25XxVHWA_fKyu=w640-h480-k-no",
     "lng": -76.542289,
     "lat": 3.447833,
     "color": "bg-amber-500",
     "addressLine": "Cra. 4 # 2-51, San Antonio, Cali",
     "description": "Clásico café bar con balcón, ideal para disfrutar de música alternativa y bebidas en un entorno relajado.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJAxRrycunMI4Rf_q_kU6jgMU"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJAxRrycunMI4Rf_q_kU6jgMU",
+    "imageSource": "google_maps"
   },
   {
     "id": 14,
@@ -216,13 +228,14 @@
     "rating": 4.5,
     "reviews": 900,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWljzxhdn2bxgIiwa6X35hl5FnEoEsCZ7eZg53PhXdk_QJy0DgH3fju7bJL2ppWPcVu2v4ZZKmzPcP9KtE77UFWJi3Fc8w7luehcim9XUpx5XylRPGcawY5wCRTvCvtMf1grfdUQ=w640-h480-k-no",
     "lng": -76.54359,
     "lat": 3.447781,
     "color": "bg-green-500",
     "addressLine": "Cra. 4 # 1-00, San Antonio, Cali",
     "description": "Parque histórico rodeado de vegetación y antiguas estructuras hidráulicas, perfecto para caminar.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ93DDrX-mMI4RINaYz8jBXdM"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ93DDrX-mMI4RINaYz8jBXdM",
+    "imageSource": "google_maps"
   },
   {
     "id": 15,
@@ -232,13 +245,14 @@
     "rating": 4.8,
     "reviews": 8500,
     "hours": "8:00 PM - 4:00 AM",
-    "image": "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnSpnq4zFeQfAMHh7kyahyu1BtOzOzwXet4LN3UrgPa5NZukGB3o4x6Fy_Ec_HunWzEEBWIYQF0C0fyxh6kOEgmAcRrnn_RqH0uw88vSN2xylTjBISLKWGd1HBmYESfGxddp31KOsOAa3GE=w640-h480-k-no",
     "lng": -76.537233,
     "lat": 3.442301,
     "color": "bg-green-500",
     "addressLine": "Calle 5 # 13-27, Cali",
     "description": "Mítica y auténtica salsoteca caleña, donde locales y turistas se reúnen para bailar salsa hasta la madrugada.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJH8stsGKmMI4RugOt1OSJs8o"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJH8stsGKmMI4RugOt1OSJs8o",
+    "imageSource": "google_maps"
   },
   {
     "id": 16,
@@ -248,13 +262,14 @@
     "rating": 4.7,
     "reviews": 1100,
     "hours": "12:00 PM - 9:00 PM",
-    "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmISaTj90rGpr97xrV-YbDjCjU9XKF5g3KQhbEz1H0fAmUsh95S4vIFVPKFt8UXm1LPBc2Rp3a9Ph5l6C_0Cj9OeIhCguPxn-NcafKWDs36iB3pw-IEot5x3QsQRWSqS37laQRcGrQP2E6g=w640-h480-k-no",
     "lng": -76.538575,
     "lat": 3.447953,
     "color": "bg-amber-500",
     "addressLine": "Cra. 4 # 3-17, San Antonio, Cali",
     "description": "Restaurante vegetariano pionero que ofrece platos saludables, creativos y deliciosos.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJPz3YgHymMI4R3xH1F0kVT1g"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJPz3YgHymMI4R3xH1F0kVT1g",
+    "imageSource": "google_maps"
   },
   {
     "id": 17,
@@ -264,13 +279,14 @@
     "rating": 4.6,
     "reviews": 1300,
     "hours": "3:00 PM - 11:00 PM",
-    "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmobgJpY5ZYVIxT4XQFNqR3rfzuMokc_HIooABOfZ7a7P4S87ssGJIFs50n8AhlEi1LtdWH3GB95z307g4w5GvTMY1mgBtH-3NEtY-gchcjGTXjV8VQTe5L1cdEHjYgVmJSYi-4ji2X2Xq7=w640-h480-k-no",
     "lng": -76.540101,
     "lat": 3.448202,
     "color": "bg-amber-500",
     "addressLine": "Cra. 4 # 4-61, San Antonio, Cali",
     "description": "Tienda artesanal que ofrece productos indígenas, ropa y coloridos recuerdos culturales de Sudamérica.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ3V2jT3ymMI4RcHZTrRjNkSs"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ3V2jT3ymMI4RcHZTrRjNkSs",
+    "imageSource": "google_maps"
   },
   {
     "id": 18,
@@ -280,13 +296,14 @@
     "rating": 4.8,
     "reviews": 950,
     "hours": "5:00 PM - 11:00 PM",
-    "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWle4RsnGAZvbTlUgZcidWLIdrRibn2dZUQrwC0wQg7kgp52TisUZbPdTeD-pTTafGlrdG7k8crrqk-aQ-T1FPu9o3fDmn7pQ5gimN-cuYKu4M1mSmpMejQKI2R5c-3xLwePBXA=w640-h480-k-no",
     "lng": -76.539655,
     "lat": 3.44723,
     "color": "bg-amber-500",
     "addressLine": "Calle 3 # 10-18, San Antonio, Cali",
     "description": "Pizzería artesanal destacada por sus masas madre e ingredientes frescos y creativos.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJL2wlN3ymMI4RppaWwV2B-DY"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJL2wlN3ymMI4RppaWwV2B-DY",
+    "imageSource": "google_maps"
   },
   {
     "id": 19,
@@ -296,13 +313,14 @@
     "rating": 4.9,
     "reviews": 780,
     "hours": "11:00 AM - 7:00 PM",
-    "image": "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmTMv5L-U4XDb0xleHU8rJpk2pqsCcJazRSpa0E0AsZf3isZc07PjypeHh7E3lcegncar1XzXIEHNI-cwzueaWcsdTrv1bAnUpGKymY7JdG_A0Xjz_5J0zdTbDk2e3BzEiI5OPXXhNPJItJ=w640-h480-k-no",
     "lng": -76.54101,
     "lat": 3.44824,
     "color": "bg-amber-500",
     "addressLine": "Cra. 10 # 3-05, San Antonio, Cali",
     "description": "El lugar perfecto para refrescarse probando la lulada y el champús, bebidas típicas del Valle del Cauca.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ1Z0hnwanMI4RmAxkV50VLGg"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ1Z0hnwanMI4RmAxkV50VLGg",
+    "imageSource": "google_maps"
   },
   {
     "id": 20,
@@ -312,13 +330,14 @@
     "rating": 4.8,
     "reviews": 520,
     "hours": "2:00 PM - 9:00 PM",
-    "image": "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl0Omhm82zabrnLTSakgaZt5UEgzf6n8L8zD8kuz8uvkomwk5oI32uIc9J-4ZWm4W_EXArGuFjEleb8VZemGWz1ONM0IJexFl3TmF5NxL8T9zCBrsajO8Hg-lE2S5ByWTH2DDZv=w640-h480-k-no",
     "lng": -76.538125,
     "lat": 3.446215,
     "color": "bg-blue-500",
     "addressLine": "Cra. 4 # 2-63, San Antonio, Cali",
     "description": "Escuela de baile especializada en salsa estilo caleño, con clases dinámicas para todos los niveles.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJcwvbSXymMI4Ry1HODR1CEYQ"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJcwvbSXymMI4Ry1HODR1CEYQ",
+    "imageSource": "google_maps"
   },
   {
     "id": 21,
@@ -328,13 +347,14 @@
     "rating": 4.6,
     "reviews": 5100,
     "hours": "4:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1526522574368-d5572c3974b4?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlig9p5c3StCcfEdtDmgGaTDBGWRo4LB2x2AeUECheJJZGMwHlnAz479xna_KzTXDg_uxg5oaQsj7AHJgjy9-Q6bLfFO8Zf5YR_xSPtcCN7WHAdObeUlewCwcD68FxTDM2Vl7HU=w640-h480-k-no",
     "lng": -76.536965,
     "lat": 3.442994,
     "color": "bg-green-500",
     "addressLine": "Calle 5 con Cra. 16, Cali",
     "description": "Parque cultural y artesanal con decenas de puestos de venta, donde se realizan actividades y bailes al aire libre.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJL5aj5YemMI4Rfqc0hSouONo"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJL5aj5YemMI4Rfqc0hSouONo",
+    "imageSource": "google_maps"
   },
   {
     "id": 22,
@@ -344,13 +364,14 @@
     "rating": 4.7,
     "reviews": 12500,
     "hours": "Varía según evento",
-    "image": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmwiOfj3_AEB9UwNtes3T7yUQdsFs8e4bMRImOlEvxIK1KqWkNMX7YvzU6cBoWIrrVPf4ZEQSl0n9AlTxGtSQLIWaaLRtnwYMRDxqBw9aL6qIiLScTcXTn0JRCdmZszOVWub7_Pdm47YgQ=w640-h480-k-no",
     "lng": -76.540455,
     "lat": 3.429945,
     "color": "bg-green-500",
     "addressLine": "Cra. 34 # 5-86, San Fernando, Cali",
     "description": "El principal estadio de la ciudad, hogar de equipos locales y escenario de grandes eventos deportivos y musicales.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJCboMxJumMI4Rv5EMgm1KxUo"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJCboMxJumMI4Rv5EMgm1KxUo",
+    "imageSource": "google_maps"
   },
   {
     "id": 23,
@@ -360,13 +381,14 @@
     "rating": 4.7,
     "reviews": 430,
     "hours": "Varía según evento",
-    "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkKiHNt28F9MryS0hmP3QdUXq-8dIXsLImeQcYDZtaQOmXRi9dLDFME3rFbR9w3gUDRhpSVghFTwulCeO-_Ld83FvaKdyWsC6wKDsU60menlMZSOGjqHcEMskVYkF1r6g=w640-h480-k-no",
     "lng": -76.54589,
     "lat": 3.43577,
     "color": "bg-blue-500",
     "addressLine": "Calle 4 # 35-30, San Fernando, Cali",
     "description": "Grupo teatral con fuerte impacto social y comunitario, ofreciendo obras de reflexión en su propia sala.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJn9nA84KmMI4ROdod-4WTjv8"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJn9nA84KmMI4ROdod-4WTjv8",
+    "imageSource": "google_maps"
   },
   {
     "id": 24,
@@ -376,13 +398,14 @@
     "rating": 4.8,
     "reviews": 3200,
     "hours": "8:00 PM - 3:00 AM",
-    "image": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkKtniNmX-B5XUpRB9kwkihzeaEh_uB5jfOfe3iY9j-IlVrxeLleS7rlkaDrINQRMkqKm19gCiNCFowDh2R4ILVcSMeH_5L-qmq588KuLd3sYJjUIDFpNgMHOiQD7uG0OhxM13U=w640-h480-k-no",
     "lng": -76.542475,
     "lat": 3.432655,
     "color": "bg-green-500",
     "addressLine": "Calle 5 # 38-71, San Fernando, Cali",
     "description": "Tradicional y famoso club de salsa y son cubano, muy frecuentado por amantes del baile clásico y la bohemia.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ13DE7J6mMI4Ry90fp5BlBME"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ13DE7J6mMI4Ry90fp5BlBME",
+    "imageSource": "google_maps"
   },
   {
     "id": 25,
@@ -392,13 +415,14 @@
     "rating": 4.6,
     "reviews": 1800,
     "hours": "8:00 PM - 3:00 AM",
-    "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWk-DXgmbvcUW7M8Lw2qpNOJz83faBGtzPlqssuoNR7dm7UhvVjoRspNbUNchz19t9AQeo-qedCOM6UM-aJ_v0SzHGdt7yQzYvhBL4SzeCyuzop_dEOjZy6RPeu8r_jckHgV0kyU=w640-h480-k-no",
     "lng": -76.5451,
     "lat": 3.431602,
     "color": "bg-green-500",
     "addressLine": "Calle 5 # 34-40, San Fernando, Cali",
     "description": "Un rincón salsero lleno de historia, ideal para disfrutar de la buena música antillana y bailar en pareja.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJG9o2kJaoMI4R5wN1vuFMNiM"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJG9o2kJaoMI4R5wN1vuFMNiM",
+    "imageSource": "google_maps"
   },
   {
     "id": 26,
@@ -408,13 +432,14 @@
     "rating": 4.5,
     "reviews": 2700,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkhhJWXzEQWX4XsUa9PexH1xM0VGceIY-v8EQaHNEOZYBrIgtVFxes8PJ6pXxv_cl68YF8LR-A1SqpSQuZMxHSS9OVEXHxGoQzyl3xj3PtYY0rOvqNZL5bsnln6iCCszqmIJQootg=w640-h480-k-no",
     "lng": -76.5458,
     "lat": 3.431802,
     "color": "bg-amber-500",
     "addressLine": "Cra. 34 # 3-51, San Fernando, Cali",
     "description": "Restaurante tradicional famoso por su comida rápida colombiana, como empanadas y aborrajados.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ8X_RDoOmMI4R0OTDwQkSlmg"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ8X_RDoOmMI4R0OTDwQkSlmg",
+    "imageSource": "google_maps"
   },
   {
     "id": 27,
@@ -424,13 +449,14 @@
     "rating": 4.9,
     "reviews": 950,
     "hours": "9:00 AM - 8:00 PM",
-    "image": "https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlqzAUmrXcigiOB7yNOVg52DHmjzvWF-ymP9bbWd7vWBC-4m9MU1jicT7amRBeZdkjn4VUNI7gEBu7LNXbj42q74518KSr2L51grK3D6RdUq7vj3_TutG3Ho7Rdc99tKdOq50-a=w640-h480-k-no",
     "lng": -76.542,
     "lat": 3.42901,
     "color": "bg-blue-500",
     "addressLine": "Cra. 34 # 3-47, San Fernando, Cali",
     "description": "Academia de la mundialmente famosa compañía de salsa Swing Latino, donde se forman campeones de baile.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJCX-3ApqmMI4R0hIQ4AJroIc"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJCX-3ApqmMI4R0hIQ4AJroIc",
+    "imageSource": "google_maps"
   },
   {
     "id": 28,
@@ -440,13 +466,14 @@
     "rating": 4.7,
     "reviews": 3100,
     "hours": "10:00 AM - 7:00 PM",
-    "image": "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnoBp02Nh31CHDo9XlZ_OLRq8go-bF4PdtEEar69sTsx1mUR7mhkr6sxgjAbv2blgwx2Kpmtr4AMcJQ-QPRvuCQKS3n2XS4maw9f0AcfZJDvFIn2jSCjsF6sFiqEcBEqOgRhSdG=w640-h480-k-no",
     "lng": -76.536555,
     "lat": 3.428515,
     "color": "bg-amber-500",
     "addressLine": "Cra. 34 # 3-64, San Fernando, Cali",
     "description": "Local para deleitarse con un cholado, una explosión de sabores con fruta fresca, hielo raspado y siropes dulces.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJH-NYFVOnMI4R1qZN3T0wcfQ"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJH-NYFVOnMI4R1qZN3T0wcfQ",
+    "imageSource": "google_maps"
   },
   {
     "id": 29,
@@ -456,13 +483,14 @@
     "rating": 4.6,
     "reviews": 380,
     "hours": "Varía según evento",
-    "image": "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlODTIZH0EocgzJMLlRhWSqC3DvwBeeKDGzm4xejVZUh5AeMudVkK83L6es7cacmTJ0Git7Qgauw1griXtvbDSY2TGlkIXSo7HhQxzWa7BFNDWVv03DjegxxWADq7bPGsZNJqgQ=w640-h480-k-no",
     "lng": -76.5441,
     "lat": 3.4335,
     "color": "bg-blue-500",
     "addressLine": "Cra. 36 # 4A-31, San Fernando, Cali",
     "description": "Centro cultural clave para el jazz y el teatro contemporáneo en la ciudad, sede del festival Ajazzgo.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ0-YN4pymMI4RYqGId8BccbU"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ0-YN4pymMI4RYqGId8BccbU",
+    "imageSource": "google_maps"
   },
   {
     "id": 30,
@@ -488,13 +516,14 @@
     "rating": 4.5,
     "reviews": 1200,
     "hours": "5:00 PM - 2:00 AM",
-    "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWm_ZlUEYxOvosYYRDMQWjro0vcThGI48o8QlRFu1pg9vYHOXR7DouDiUkD12blNPeNzkd6Sti0cf3IKIHqbMJaQ32nFxX4eRlOfBA7q5VEyfjWBbu2eZAoNihQgDBF-zPlQdv16=w640-h480-k-no",
     "lng": -76.5456,
     "lat": 3.431405,
     "color": "bg-amber-500",
     "addressLine": "Cra. 34 # 3-55, San Fernando, Cali",
     "description": "Gastrobar juvenil con buena comida y un ambiente relajado para disfrutar con amigos.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJkagC44KmMI4Rso523rcB6ZA"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJkagC44KmMI4Rso523rcB6ZA",
+    "imageSource": "google_maps"
   },
   {
     "id": 32,
@@ -504,13 +533,14 @@
     "rating": 4.8,
     "reviews": 4200,
     "hours": "8:00 AM - 6:00 PM",
-    "image": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkoa4B6MeSL9LoNUnGpeG50Lq6Odqd6XHUcwNoYPGC2xV_IcBSa1uzAheHsNp86DAD-6wtMSzwA5a1by8i_dzyyG0pFeoIWZ0jcX9L_LcfizP9lAkMLKJpyKTaJBXPFYzFkeeAarLRP4qSt=w640-h480-k-no",
     "lng": -76.54115,
     "lat": 3.43545,
     "color": "bg-blue-500",
     "addressLine": "Calle 5 # 24A-91, Cali",
     "description": "Centro de conocimiento con extensas salas de lectura, un museo interactivo de ciencia y observatorio.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJr5g7qIWmMI4RJIgR1w2PRhY"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJr5g7qIWmMI4RJIgR1w2PRhY",
+    "imageSource": "google_maps"
   },
   {
     "id": 33,
@@ -520,13 +550,14 @@
     "rating": 4.6,
     "reviews": 2900,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1416169607655-0c2b3ce2e1cc?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkZnEuxBHiDF_DGoXY-gpqc5X_UzENURlLFgKFyt2ovy1TeqcB3rMAtPqK0EtA6NfjT5Afeltfn-IVPTq89mtcXwZs1Ic716kwXC4LlSB2aoj946tZXzygT1pqhPQlM9awRe07v=w640-h480-k-no",
     "lng": -76.538561,
     "lat": 3.450375,
     "color": "bg-green-500",
     "addressLine": "Cra. 3 Oeste con Calle 2 Oeste, El Peñón, Cali",
     "description": "Parque arbolado y tranquilo, famoso por ser punto de encuentro para exhibiciones de arte al aire libre dominicales.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJcxEc8XumMI4RIbXzaHzhIs0"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJcxEc8XumMI4RIbXzaHzhIs0",
+    "imageSource": "google_maps"
   },
   {
     "id": 34,
@@ -536,13 +567,14 @@
     "rating": 4.7,
     "reviews": 890,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmEinHFJ3oUoBnNLfgA4V0VIylcmuwHxdr6E0zG9Uk0OQkzcSc85X9B9K1bk6UzirQKekxiynYBrTleQEltRjIYQjvp5aK9ND2DGJqFnN_AWNUl_uftyiKgbV_4EvnCYdg5avPU=w640-h480-k-no",
     "lng": -76.53825,
     "lat": 3.450625,
     "color": "bg-amber-500",
     "addressLine": "Calle 2 Oeste # 1-52, El Peñón, Cali",
     "description": "Restaurante que te transporta a Medio Oriente con su auténtica comida turca y atmósfera elegante.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJz_qKlnumMI4RJI_CTi8DZyQ"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJz_qKlnumMI4RJI_CTi8DZyQ",
+    "imageSource": "google_maps"
   },
   {
     "id": 35,
@@ -552,13 +584,14 @@
     "rating": 4.9,
     "reviews": 340,
     "hours": "7:00 PM - 11:00 PM",
-    "image": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnKL5aPYzzHOjHt2UuO5TLDF96ezkD5sf9HpSMavD28BoEc9JNL4bpt54nQlWUqCDszQ8iVqCF_F0TrVTt7ukay3U95eyBOuDabzwVjwiVAha4hw29yc4R-vj_H7wsqmWjOegAl5Q=w640-h480-k-no",
     "lng": -76.5388,
     "lat": 3.44985,
     "color": "bg-amber-500",
     "addressLine": "Calle 2 Oeste # 2-14, El Peñón, Cali",
     "description": "Experiencia gastronómica única donde la preparación de los platos se convierte en un show privado.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJrfhFKX2mMI4RawEyfNArm8I"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJrfhFKX2mMI4RawEyfNArm8I",
+    "imageSource": "google_maps"
   },
   {
     "id": 36,
@@ -568,13 +601,14 @@
     "rating": 4.8,
     "reviews": 1600,
     "hours": "7:00 AM - 8:00 PM",
-    "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWk8WccaPukrBPyY8I5xtXKJqYmoDRI_yTDlbs9c96pCWBdljPjCB7JLqQY_kt2nnvPyEi-5sH0Z9tp3alhH2MqwZklLj1x4YPJwMHp8iFWX6JFk6Dbh3w5nksIc0TSTGnf0zPAV=w640-h480-k-no",
     "lng": -76.53835,
     "lat": 3.450125,
     "color": "bg-amber-500",
     "addressLine": "Calle 2 Oeste # 2-30, El Peñón, Cali",
     "description": "Sofisticada pastelería y café, ideal para disfrutar de postres finos en una tarde tranquila.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJvw5k2HymMI4RaF98IqxC83U"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJvw5k2HymMI4RaF98IqxC83U",
+    "imageSource": "google_maps"
   },
   {
     "id": 37,
@@ -584,13 +618,14 @@
     "rating": 4.7,
     "reviews": 2100,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnSHrD6tq8aDetzK6ikHn63zEtGeTk1tRVNo4DhO17jIhKoeV3CwERG1Yzvs9a_BhXLda3VpyFhMEmEw9HIt_g6pHkQYUhVkBvu9RwaPIIGXYMa4R26aWH_RAjgHXaWfZxIOQpvvJs59H9G=w640-h480-k-no",
     "lng": -76.5381,
     "lat": 3.45041,
     "color": "bg-amber-500",
     "addressLine": "Calle 2 Oeste # 1-18, El Peñón, Cali",
     "description": "Restaurante italiano de gran tradición, ofreciendo pastas artesanales en uno de los barrios más exclusivos.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ7atf13umMI4RDKyT0Ba_hhA"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ7atf13umMI4RDKyT0Ba_hhA",
+    "imageSource": "google_maps"
   },
   {
     "id": 38,
@@ -600,13 +635,14 @@
     "rating": 4.6,
     "reviews": 3200,
     "hours": "12:00 PM - 11:00 PM",
-    "image": "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlFF37fnTh6z11Bav2u5p52YuLxN91sZL6modvcr-wRNrjjZxKOWqRQTCC0qcEUf4P5m3LYF5mnhwJ4JGMgigYldoJsv36QmQNVDU9ncHG789y_WUd8ea727rHFPZPaYhpkYOq9=w640-h480-k-no",
     "lng": -76.5389,
     "lat": 3.4505,
     "color": "bg-amber-500",
     "addressLine": "Calle 2 Oeste # 1-33, El Peñón, Cali",
     "description": "Pizzería de ambiente rústico-chic, famosa por sus pizzas napolitanas al horno de leña.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJrw_ZKUOnMI4RusmnINtW3jo"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJrw_ZKUOnMI4RusmnINtW3jo",
+    "imageSource": "google_maps"
   },
   {
     "id": 39,
@@ -616,13 +652,14 @@
     "rating": 4.8,
     "reviews": 4100,
     "hours": "12:00 PM - 11:00 PM",
-    "image": "https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkClfHiOJe7i3h8m6w7ejTfvKcFTp1IUzj_tNlyZbnroYdd1OILgh43uGi5TwAyAasHBICHjLAM70HiqN2_390HprMsftS1YXlZSfLod4SGKcbxI44nY6KNlfonNP35wvCgATu-zcW_6j4Q=w640-h480-k-no",
     "lng": -76.5384,
     "lat": 3.4502,
     "color": "bg-amber-500",
     "addressLine": "Cra. 2 Oeste # 1-27, El Peñón, Cali",
     "description": "Restaurante italiano sumamente romántico y elegante, perfecto para celebraciones y cenas especiales.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJd77fzG2mMI4RAM7aPdf64kM"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJd77fzG2mMI4RAM7aPdf64kM",
+    "imageSource": "google_maps"
   },
   {
     "id": 40,
@@ -632,13 +669,14 @@
     "rating": 4.7,
     "reviews": 1100,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlFgx0KcWpAUDmS2FtutHzlqnnOZNLdCcNAfx_P6ARbJWtS9xzuYbu9qG97lA670WlUwc309Rhrf8fqGjH1BlGnoCLnHflZ4cwWe_z1gr7n-jBslTAPPXKz50p0TgT2CxPwuTf0WQ=w640-h480-k-no",
     "lng": -76.5385,
     "lat": 3.45085,
     "color": "bg-amber-500",
     "addressLine": "Calle 2 Oeste # 1-56, El Peñón, Cali",
     "description": "Propuesta de autor que mezcla cocina mediterránea con ingredientes locales de alta calidad.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJxWSFAXahMI4RLa2zm9FN1bs"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJxWSFAXahMI4RLa2zm9FN1bs",
+    "imageSource": "google_maps"
   },
   {
     "id": 41,
@@ -648,13 +686,14 @@
     "rating": 4.6,
     "reviews": 850,
     "hours": "12:00 PM - 11:00 PM",
-    "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl5jAYzf-8apWnx7dKg6iwFS-YSjS2PUEkt2ef8BVeaBPGJPIhuEyCLsopN4OIeJ_anvvm1uTl96Dk3ozZTd0E9Isb9Js8C0qpceqeOOD5SGg_wJNEmxWil8ZxO1V_etF8qQd4xkw=w640-h480-k-no",
     "lng": -76.53875,
     "lat": 3.4507,
     "color": "bg-amber-500",
     "addressLine": "Calle 2 Oeste # 1-13, El Peñón, Cali",
     "description": "Excelente opción para los amantes de las carnes a la parrilla, con una cuidada selección de vinos.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJPUNFw76nMI4R23ST6Vxe92A"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJPUNFw76nMI4R23ST6Vxe92A",
+    "imageSource": "google_maps"
   },
   {
     "id": 42,
@@ -664,13 +703,14 @@
     "rating": 4.7,
     "reviews": 620,
     "hours": "6:00 PM - 2:00 AM",
-    "image": "https://images.unsplash.com/photo-1560512823-829485b8bf24?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlsf7bNiHFZUns3Jx9fbGXBfskYzQW879mAex2RB16a9WziLEB69yTQBD6wjREvmSWIMg6Yyriro8Rol1Ijk9TogAletTithaJ-Oi8s6VsHYtnBrS2kW-tJ7NoDZJIbuEAZscuL=w640-h480-k-no",
     "lng": -76.53845,
     "lat": 3.45035,
     "color": "bg-green-500",
     "addressLine": "Cra. 3 Oeste # 1-34, El Peñón, Cali",
     "description": "Bar de atmósfera europea especializado en licores importados, coctelería de autor y música alternativa.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJjScSunumMI4RFT0EoLtVggA"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJjScSunumMI4RFT0EoLtVggA",
+    "imageSource": "google_maps"
   },
   {
     "id": 43,
@@ -680,13 +720,14 @@
     "rating": 4.8,
     "reviews": 730,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1515443961218-a51367888e4b?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl2JSLakvs4DlOzbfdakc66P0Ev4JrzWO8LCAKPpTsoFYXb6R7wqVI32BUxNSiJQisSAT5corMfJj3oWIiFIbfJsKPNPhxn05AmCJFFnw2vlE-ukFHzcDB2NbWbb4EbHRbO5eMF=w640-h480-k-no",
     "lng": -76.53865,
     "lat": 3.45055,
     "color": "bg-amber-500",
     "addressLine": "Calle 2 Oeste # 1-45, El Peñón, Cali",
     "description": "Restaurante español donde puedes disfrutar de ricas tapas y, en ocasiones, espectáculos de flamenco.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ_1GvPYOmMI4REabs-Qo_MbA"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ_1GvPYOmMI4REabs-Qo_MbA",
+    "imageSource": "google_maps"
   },
   {
     "id": 44,
@@ -696,13 +737,14 @@
     "rating": 4.7,
     "reviews": 9200,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1526129318478-62ed807ebdf9?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnTQHsMzNulGtckUqWXU78sL5yekdarfHQ4B0zYfu1LIinMj-fqzT-Bd7kw3e3uCV3ymKk6Jxgq0D-po_-Kb7tFeymXY_7anfuyzQMtXwFdJGGnLStWfwgcP9D3IV2DKgec7Yw=w640-h480-k-no",
     "lng": -76.54162,
     "lat": 3.45167,
     "color": "bg-blue-500",
     "addressLine": "Av. 4 Norte # 1 Oeste, Cali",
     "description": "Emblemática escultura de bronce creada por Hernando Tejada, vigilando pacíficamente la ribera del río Cali.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJpy-GKnqmMI4RYqdZ5O83vmw"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJpy-GKnqmMI4RYqdZ5O83vmw",
+    "imageSource": "google_maps"
   },
   {
     "id": 45,
@@ -712,13 +754,14 @@
     "rating": 4.6,
     "reviews": 5100,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmc2oacd2vMMS2ocYmqPs6czJ95wRIJLFUn_Cl6lXzAHjDIw0YFya8uI_5K6KI3ADXrlnm4_Ftz87XaD_mp4amuHql4cVdEfxbq3QRwy26LGvLItSuHXv6SIIv4e6t801-A3mPc=w640-h480-k-no",
     "lng": -76.5422,
     "lat": 3.4518,
     "color": "bg-green-500",
     "addressLine": "Av. 4 Norte a lo largo del Río Cali",
     "description": "Colección de coloridas esculturas de gatas intervenidas por artistas, que acompañan al Gato en el parque lineal.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJYUrZnnmmMI4Rz-7fPwfUIkQ"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJYUrZnnmmMI4Rz-7fPwfUIkQ",
+    "imageSource": "google_maps"
   },
   {
     "id": 46,
@@ -728,13 +771,14 @@
     "rating": 4.8,
     "reviews": 840,
     "hours": "10:00 AM - 3:00 PM",
-    "image": "https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmwAI5kCDV6wVsQHjWoHM6CuCqQx8D2al3TZV_OdX4dODn0Qw2eHOKGvEqnU1jhagArRi67zVwgVZ1iQymW-kxyGcjThztlst1dj_L4GXhY1Ub9JrNW94EMpVCiXGqpkJR35YLl1JxWFod3=w640-h480-k-no",
     "lng": -76.5445,
     "lat": 3.4507,
     "color": "bg-blue-500",
     "addressLine": "Av. 4 Norte # 1 Oeste-59, Cali",
     "description": "Casa de valor patrimonial utilizada por el Museo La Tertulia para exposiciones y actividades artísticas.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJpZ2Pr3mmMI4Ri1moM1wlbmI"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJpZ2Pr3mmMI4Ri1moM1wlbmI",
+    "imageSource": "google_maps"
   },
   {
     "id": 47,
@@ -744,13 +788,14 @@
     "rating": 4.8,
     "reviews": 22400,
     "hours": "9:00 AM - 4:30 PM",
-    "image": "https://images.unsplash.com/photo-1534567110243-8875d64ca8ff?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkYyU5otAv59QK-X5vuHQdUGeo_BILdRydX3EHnd1qtN93zgzigFztsTGHzvO3SIHe4PqUVk5YWPCbEUV_Gt11BK5gMaIA9XVDKvsfx9is-GuS1kaSE60arZW_uEsg17LyNUAdW=w640-h480-k-no",
     "lng": -76.55662,
     "lat": 3.44685,
     "color": "bg-green-500",
     "addressLine": "Cra. 2 Oeste # Calle 14, Santa Teresita, Cali",
     "description": "Considerado uno de los mejores zoológicos de América Latina, con un entorno natural y enfoque en conservación.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ8fdiI9KlMI4RszoGxUrtBSw"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ8fdiI9KlMI4RszoGxUrtBSw",
+    "imageSource": "google_maps"
   },
   {
     "id": 48,
@@ -760,13 +805,14 @@
     "rating": 4.6,
     "reviews": 11500,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1555993539-1732b0258235?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmLvnYWQHBQUXH9gYDOux0sUHkfIV3Nv9ojXdp77rBI_RkcKKjMWrHiyf1sD8V7igB0MdFefzAreqOW5oGp6n2HGAzAp4wnqAERgIOO25puHMd6-ulc0vuXBB6-zzn6X1NS1mI_i2tmiLra=w640-h480-k-no",
     "lng": -76.54585,
     "lat": 3.44983,
     "color": "bg-blue-500",
     "addressLine": "Cra. 3 Oeste con Calle 9 Oeste, Cali",
     "description": "Mirador icónico con la estatua del fundador de Cali, que ofrece hermosas vistas panorámicas de la ciudad.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJAd3YMXmmMI4R4nP5ZrBes6U"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJAd3YMXmmMI4R4nP5ZrBes6U",
+    "imageSource": "google_maps"
   },
   {
     "id": 49,
@@ -776,13 +822,14 @@
     "rating": 4.9,
     "reviews": 1300,
     "hours": "10:00 AM - 6:00 PM",
-    "image": "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWngJ7Jqtq2KqAVGX21dG2mgYTizhZQAC-8pzrzd6C3P-jLU-VzrNywqx2b6zizjK-WvkFCVj7QodxcvCq31XYjqNUZYsAWfMxeKeO9h-kz1FGs8id27rqek5-fguYGMlRZoHd4=w640-h480-k-no",
     "lng": -76.5463,
     "lat": 3.4492,
     "color": "bg-blue-500",
     "addressLine": "Av. Belalcázar # 5A-55 Oeste, Cali",
     "description": "Fascinante museo dedicado a la historia del cine colombiano, con cámaras antiguas y memorabilia.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ4yGt7XimMI4RNPJEKquXnZY"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ4yGt7XimMI4RNPJEKquXnZY",
+    "imageSource": "google_maps"
   },
   {
     "id": 50,
@@ -792,13 +839,14 @@
     "rating": 4.6,
     "reviews": 850,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWm4CX46jczEfLlcAzKDG8Tf5POjkjGOd3EpNtfNu8ehMyAdtXiRGuL_wMMc2T2mvQa2vZVp6Dhg4bD9Z3yJ7a3g2u9E2_BFgN6vWP-TxWYZtZ2fdvB7wQAJNUFWS6f1LXQKe-ZiaA=w640-h480-k-no",
     "lng": -76.5515,
     "lat": 3.4491,
     "color": "bg-green-500",
     "addressLine": "Calle 5 Oeste con Cra. 1, Santa Rita, Cali",
     "description": "Parque residencial muy pacífico, lleno de naturaleza y senderos, ideal para el esparcimiento familiar.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJT6Wyx32lMI4RBouJnM1AM94"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJT6Wyx32lMI4RBouJnM1AM94",
+    "imageSource": "google_maps"
   },
   {
     "id": 51,
@@ -808,13 +856,14 @@
     "rating": 4.7,
     "reviews": 920,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkX3xs7liqq-6pXI-9yG0VJ8n5OtohO7GwwqF0OgVMM6SK4IgZJY6YhUcFmKy4rLKE5o1AiX4sSpfCHt6sfl_3lFItiymO25pO-oZdg1wDauVVWisacC5cbJxl9T1U4McGfM6wI=w640-h480-k-no",
     "lng": -76.5532,
     "lat": 3.4485,
     "color": "bg-green-500",
     "addressLine": "Cra. 2 Oeste con Calle 13, Santa Teresita, Cali",
     "description": "Un respiro verde muy cerca del Zoológico y del río, en un sector residencial exclusivo y tranquilo.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJsW216dOlMI4Ru7yOVQs-_98"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJsW216dOlMI4Ru7yOVQs-_98",
+    "imageSource": "google_maps"
   },
   {
     "id": 52,
@@ -824,13 +873,14 @@
     "rating": 4.8,
     "reviews": 2600,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlsFEw7rfP5ZRuZviWn1j3plajukOWk2R75NTLwD1v4nMulZAwhXHShCsGKoBtgYsJZSpaBV0cm5cY_FC1oFE5YJG4y31421SEgQqsSXOPMY0MDo7HOTbbmT5nO-9ETdyy-P9orTFNpUkyV=w640-h480-k-no",
     "lng": -76.5585,
     "lat": 3.4452,
     "color": "bg-amber-500",
     "addressLine": "Cra. 2 Oeste # 14-71, Santa Teresita, Cali",
     "description": "Restaurante de alta categoría ubicado en una hermosa casa de hacienda rodeada de jardines exuberantes.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJg_T4YdGlMI4RMfryI0BHI4o"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJg_T4YdGlMI4RMfryI0BHI4o",
+    "imageSource": "google_maps"
   },
   {
     "id": 53,
@@ -840,13 +890,14 @@
     "rating": 4.8,
     "reviews": 3400,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlWT-JJTxxfvqxlbXEcHyPy155T-pUbEg8R7XUtUzJn0FYJLEakcV4cu0yQA1ocRdGEhuVPbxQkTKgR4tzZpI_ajY3jdiueOzagQJi89XJdyMmxxHYMaQG-ekyO02ATGtrsW2v_IgceeHNL=w640-h480-k-no",
     "lng": -76.5358,
     "lat": 3.45425,
     "color": "bg-amber-500",
     "addressLine": "Av. 3 Norte # 7-19, Centenario, Cali",
     "description": "Innovador restaurante que fusiona ingredientes del Pacífico colombiano con la alta gastronomía internacional.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJLR-42m2mMI4RWDa9u_w4SQE"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJLR-42m2mMI4RWDa9u_w4SQE",
+    "imageSource": "google_maps"
   },
   {
     "id": 54,
@@ -856,13 +907,14 @@
     "rating": 4.6,
     "reviews": 1800,
     "hours": "11:00 AM - 9:00 PM",
-    "image": "https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWknwdlokQjHdIEeBKCI4GJqSmYcDntz6wG0yMW9vj9MWGDWn_PYBAmbk0pvsf8G3UChWGkKHoOhxjSKKpC6yGfpgRuIn1RpYpuaFxLn4HE6lxloayWQVukF8bGNTMWBPpOg5-lVcw=w640-h480-k-no",
     "lng": -76.535,
     "lat": 3.4552,
     "color": "bg-amber-500",
     "addressLine": "Av. 4 Norte # 7-61, Centenario, Cali",
     "description": "Restaurante tradicional que lleva años ofreciendo deliciosas especialidades de la comida árabe en Cali.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJSV-CVWWmMI4Rn-OH1CMrPt8"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJSV-CVWWmMI4Rn-OH1CMrPt8",
+    "imageSource": "google_maps"
   },
   {
     "id": 55,
@@ -888,13 +940,14 @@
     "rating": 4.4,
     "reviews": 4500,
     "hours": "10:00 AM - 8:00 PM",
-    "image": "https://images.unsplash.com/photo-1567449303078-57ad995bd17f?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkll5K6vameG4xSz7j8g3ld0EmxreUf7fiFIVL60t-0LUP5lSJ1uiYp0PjWtfp9abEPZ_7KHw_lSetZeQfKPY-46oKlBP6AWVzdIQwJXqWjp9-p_5jJT1fBQsZunwdTK1eTMJrDDUaTT3AV=w640-h480-k-no",
     "lng": -76.535915,
     "lat": 3.45521,
     "color": "bg-green-500",
     "addressLine": "Av. 4 Norte # 7N-46, Cali",
     "description": "Complejo comercial moderno con diversas opciones de compras, entretenimiento y buena gastronomía.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJAc8K_W-mMI4Rtdz5s2kb_gE"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJAc8K_W-mMI4Rtdz5s2kb_gE",
+    "imageSource": "google_maps"
   },
   {
     "id": 57,
@@ -904,13 +957,14 @@
     "rating": 4.8,
     "reviews": 18500,
     "hours": "Abierto 24 horas",
-    "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmcIuHpUZX6f1vhDGhy3di7_hhuLg31mAP8Pw0HFnS2-wcDjNPfgbWdzYheFQKbJUNGfxD9zDZ3EngpkPcnCtjNiiAUfYIbMytz_ETL7iwmA1kiaPGAUUYaHIZCCVg8FkbjZAgi_jUPAPk=w640-h480-k-no",
     "lng": -76.5338,
     "lat": 3.453,
     "color": "bg-green-500",
     "addressLine": "Av. Colombia, ribera del Río Cali",
     "description": "Hermoso corredor peatonal sobre un túnel urbano, ideal para caminar al atardecer y disfrutar de la brisa.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJw0uqVQCnMI4Rb_UE-5ykBEw"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJw0uqVQCnMI4Rb_UE-5ykBEw",
+    "imageSource": "google_maps"
   },
   {
     "id": 58,
@@ -920,13 +974,14 @@
     "rating": 4.7,
     "reviews": 14200,
     "hours": "8:00 AM - 5:00 PM",
-    "image": "https://images.unsplash.com/photo-1548276145-69a9521d5c34?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWktce78-kyQAAhbI5sS8C_lcSjdpWOdaX6v1nfzw8g75yC2-CpRfGLdfuVhm5-eHe_HOkKk9NIqseNN96ynQdWUyvdyNzv2bQiQ2JNzGuYGPu_rzAgpnARwXNU-V6w3BGPIZ28=w640-h480-k-no",
     "lng": -76.53303,
     "lat": 3.45428,
     "color": "bg-blue-500",
     "addressLine": "Cra. 1 con Calle 13, Cali",
     "description": "Impresionante iglesia de estilo neogótico, símbolo arquitectónico y postal obligada de la ciudad de Cali.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJfTSDWm-mMI4RcFiTP-0ymxc"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJfTSDWm-mMI4RcFiTP-0ymxc",
+    "imageSource": "google_maps"
   },
   {
     "id": 59,
@@ -936,13 +991,14 @@
     "rating": 4.8,
     "reviews": 2200,
     "hours": "12:00 PM - 10:00 PM",
-    "image": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWka2pFiXJ5NXKQHsAA3raHSPgUEo22CTx6hbniID2L_DPDQw-81qrbQqxRoWHGWxC3G7xWW1SbFsf4v4h-DHXaAx0kMjdwTGRrzwWhp7afCYCEKvpuTwDGevppKB5tPfivGpluD2gaNmaCD=w640-h480-k-no",
     "lng": -76.5342,
     "lat": 3.45605,
     "color": "bg-amber-500",
     "addressLine": "Calle 15A Norte # 9N-31, Granada, Cali",
     "description": "Un homenaje a la comida típica del Valle del Cauca, ofreciendo sabores de tradición en un ambiente acogedor.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJLaisTGymMI4RBkiy6WJ1cQM"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJLaisTGymMI4RBkiy6WJ1cQM",
+    "imageSource": "google_maps"
   },
   {
     "id": 60,
@@ -952,13 +1008,14 @@
     "rating": 4.7,
     "reviews": 1300,
     "hours": "12:00 PM - 11:00 PM",
-    "image": "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnlA0LmN7f3TyTrSDSa0N9t3ae3KsMJkQdVRa63uSSvNAmO2NBE2ApklzuwD9v-fjkFG7bfaDBNfTt2RbH2f2O0mDO5a99HfZF2CoDUlflaWOMbe7Br7P00e7uGJAjokzQxbCwNNw=w640-h480-k-no",
     "lng": -76.5338,
     "lat": 3.4565,
     "color": "bg-amber-500",
     "addressLine": "Calle 14 Norte # 9N-50, Granada, Cali",
     "description": "Bistró de autor con una propuesta culinaria atrevida, cuidando mucho la estética y la fusión de sabores.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ_XcppSOnMI4RfIiWfYY2MuA"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJ_XcppSOnMI4RfIiWfYY2MuA",
+    "imageSource": "google_maps"
   },
   {
     "id": 61,
@@ -968,12 +1025,13 @@
     "rating": 4.8,
     "reviews": 4600,
     "hours": "8:00 PM - 4:00 AM",
-    "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=400&h=300&fit=crop&auto=format",
+    "image": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWk-14wolKbhZOsf2iAQpPFyqrGGPcWs4jy5HmYpkmLP4jGE9gdQvtDLlJKSYErMVXGdxwghJXrFP2Yjk59oUVzx4ZtCk228hCT1dtDvl0OE_cl_Mc8pg_HLouLavYwR7SUQ3IR4dQ=w640-h480-k-no",
     "lng": -76.5339,
     "lat": 3.4561,
     "color": "bg-green-500",
     "addressLine": "Av. 5 Norte # 16-46, Granada, Cali",
     "description": "Legendario bar conocido como el 'Templo del Sabor', imperdible para quienes buscan salsa pura en vivo.",
-    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJRdq9B2ymMI4RVDeRcxtxHHc"
+    "google_maps_link": "https://www.google.com/maps/place/?q=place_id:ChIJRdq9B2ymMI4RVDeRcxtxHHc",
+    "imageSource": "google_maps"
   }
 ]

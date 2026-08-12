@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/cn";
+import { motion } from "framer-motion";
 import { site, waLink } from "@/lib/site";
 import Link from "next/link";
+import { FaqColumn } from "@/components/layout/faq-column";
 
 const faqItems = [
   {
@@ -13,7 +12,7 @@ const faqItems = [
   },
   {
     q: "¿Cuántas personas caben en un loft?",
-    a: "Cada loft está pensado para 2 personas, con capacidad máxima de hasta 5. Si reservas varios lofts, sumamos capacidades según la combinación que elijas (grupos grandes hasta 63 personas consultando disponibilidad).",
+    a: `Cada loft está pensado para 2 personas, con capacidad máxima de hasta ${site.maxGuestsPerLoft}. Si reservas varios lofts, sumamos capacidades (hasta ${site.maxGuests} huéspedes en total).`,
   },
   {
     q: "¿Cómo funcionan los huéspedes adicionales?",
@@ -133,61 +132,50 @@ const faqItems = [
   },
 ] as const;
 
-export function FaqSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+const firstColumn = faqItems.filter((_, i) => i % 3 === 0);
+const secondColumn = faqItems.filter((_, i) => i % 3 === 1);
+const thirdColumn = faqItems.filter((_, i) => i % 3 === 2);
 
+export function FaqSection() {
   return (
     <section
       id="preguntas-frecuentes"
-      className="scroll-mt-28 border-t border-zinc-200 bg-[#f2f0eb]/40 px-4 py-16 dark:border-zinc-800 dark:bg-zinc-950 md:px-20 md:py-24"
+      className="scroll-mt-28 relative w-full overflow-hidden border-t border-zinc-200 bg-[#f2f0eb]/40 py-16 dark:border-zinc-800 dark:bg-zinc-950 md:py-24"
     >
-      <div className="mx-auto max-w-3xl">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800 dark:text-amber-500">
-          Preguntas frecuentes
-        </p>
-        <h2 className="mt-2 font-display text-4xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
-          Resolvemos tus dudas
-        </h2>
-        <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-          Tarifas, reservas, ingreso autónomo, pagos y normas de convivencia. Si
-          tu caso es particular, escríbenos.
-        </p>
+      <div className="relative z-10 mx-auto w-full max-w-[1600px] px-4 md:px-12 lg:px-20">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mx-auto max-w-3xl text-center"
+        >
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800 dark:text-amber-500">
+            Preguntas frecuentes
+          </p>
+          <h2 className="mt-2 font-display text-4xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
+            Resolvemos tus dudas
+          </h2>
+          <p className="mt-3 text-base text-zinc-600 dark:text-zinc-300">
+            Tarifas, reservas, ingreso autónomo, pagos y normas de convivencia.
+          </p>
+        </motion.div>
 
-        <ul className="mt-10 space-y-3">
-          {faqItems.map((item, index) => {
-            const isOpen = openIndex === index;
-            return (
-              <li
-                key={item.q}
-                className="overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/60"
-              >
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
-                  aria-expanded={isOpen}
-                >
-                  <span className="font-semibold text-zinc-900 dark:text-[#f2f0eb]">
-                    {item.q}
-                  </span>
-                  <ChevronDown
-                    className={cn(
-                      "size-5 shrink-0 text-zinc-500 transition-transform",
-                      isOpen && "rotate-180",
-                    )}
-                  />
-                </button>
-                {isOpen ? (
-                  <p className="border-t border-zinc-100 px-5 py-4 text-sm leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-300">
-                    {item.a}
-                  </p>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
+        <div className="mt-12 flex w-full gap-4 sm:gap-5 md:gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
+          <FaqColumn items={[...firstColumn]} duration={26} />
+          <FaqColumn
+            items={[...secondColumn]}
+            duration={34}
+            className="hidden sm:block"
+          />
+          <FaqColumn
+            items={[...thirdColumn]}
+            duration={30}
+            className="hidden lg:block"
+          />
+        </div>
 
-        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href={waLink("Hola, tengo una pregunta sobre LOFTHOUSE 14")}
             target="_blank"

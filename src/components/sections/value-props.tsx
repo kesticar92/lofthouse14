@@ -4,49 +4,21 @@ import { motion } from "framer-motion";
 import { site } from "@/lib/site";
 import { UserFocusIcon, MapPinIcon, BookOpenIcon } from "@phosphor-icons/react";
 import { GlassPanel } from "../ui/glass-panel";
-/*
-<div className="grid gap-6 md:grid-cols-3">
-          {items.map((item, i) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 1, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ delay: i * 0.08, duration: 0.45 }}
-            >
-              <SpotlightCard className="h-full space-y-4">
-                <div className="text-2xl">{item.icon}</div>
-                <h3 className="font-display text-2xl tracking-wide text-[#f2f0eb] ">
-                  {item.title.toUpperCase()}
-                </h3>
-                <p className="text-sm leading-relaxed text-zinc-300">
-                  {item.body}
-                </p>
 
-              </SpotlightCard>
-            </motion.div>
-          ))}
-        </div>
-
-*/
 const items = [
   {
     title: "Flexibilidad única",
-    body: "¿Un viaje de negocios en solitario o una delegación entera? Tenemos la capacidad de hospedar desde 1 hasta 60 personas en lofts independientes. Mantén a todo tu grupo en el mismo lugar sin sacrificar la privacidad de nadie.",
-    tagline: "Tu espacio, tu ritmo, tu grupo. (pensar bien esto)",
+    body: `Desde una persona hasta ${site.maxGuests} huéspedes en lofts independientes. Tu grupo en el mismo edificio, cada quien con su espacio.`,
     icon: <MapPinIcon size={32} color="#FFFFFF" weight="duotone" />,
   },
   {
     title: "El corazón de Cali, a tus pies",
-    body: "Olvídate de los largos trayectos. Estás en San Fernando, a pasos del Parque del Perro. La mejor gastronomía, el ritmo de la salsa y los centros deportivos de la ciudad suceden justo fuera de tu puerta.",
-    tagline:
-      "Vive Cali como un local, con la comodidad de un hogar.(**pensar bien esto)",
+    body: "Miraflores y el Parque del Perro: gastronomía, salsa y servicios a pocos minutos.",
     icon: <UserFocusIcon size={40} color="#FFFFFF" weight="duotone" />,
   },
   {
-    title: "Tu refugio después del caos urbano",
-    body: "Ambientes modernos, impecables y totalmente equipados. Disfruta de camas premium para un descanso real, cocinas listas para usar y espacios optimizados tanto para relajarte como para trabajar en remoto sin interrupciones.",
-    tagline: "Tu oasis privado en el corazón de la ciudad.(**pensar bien esto)",
+    title: "Tu refugio después del día",
+    body: "Lofts equipados, camas cómodas y cocina lista para estadías cortas o de varias semanas.",
     icon: <BookOpenIcon size={32} color="#FFFFFF" weight="duotone" />,
   },
 ];
@@ -64,7 +36,6 @@ export function ValueProps() {
         }}
         aria-hidden
       />
-      {/* Velo: más oscuro donde va el titular (izquierda) sin tapar del todo la foto */}
       <div
         className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/75 md:bg-gradient-to-r md:from-black/85 md:via-black/60 md:to-black/40"
         aria-hidden
@@ -80,18 +51,11 @@ export function ValueProps() {
         >
           <div className="rounded-2xl border border-white/10 bg-black/25 px-5 py-6 backdrop-blur-md md:border-transparent md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none">
             <h2 className="font-display text-4xl tracking-wide text-[#f2f0eb] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] md:text-5xl">
-              ¿POR QUÉ SOMOS
+              ¿Por qué LOFTHOUSE 14?
             </h2>
-            <h2 className="font-display text-4xl tracking-wide text-amber-400 drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] md:text-5xl">
-              LA MEJOR OPCIÓN?
-            </h2>
-            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-[#f2f0eb]/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
-              {site.brandLine.toUpperCase()}
-            </p>
             <p className="mt-4 text-base font-medium leading-relaxed text-[#f2f0eb] drop-shadow-[0_1px_10px_rgba(0,0,0,0.9)] sm:text-lg">
-              Diseñamos cada loft pensando en tu comodidad, privacidad y
-              conexión con la ciudad. Ya sea que viajes solo o con 60 personas,
-              aquí tienes tu espacio.
+              {site.brandLine}. Capacidad hasta {site.maxGuests} huéspedes en
+              el conjunto, con privacidad por loft.
             </p>
           </div>
         </motion.div>
@@ -105,17 +69,15 @@ export function ValueProps() {
           {items.map((item) => (
             <GlassPanel
               key={item.title}
-              className="px-6 items-center transition duration-500 ease-in-out hover:scale-[1.02] "
+              className="space-y-2 px-6 py-5 transition duration-300 hover:scale-[1.01]"
             >
-              <span className="text-xl font-bold m-2 flex-1 ">
-                <h3 className=" border-orange-500 border-b-4">{item.title}</h3>
-              </span>
-              <span className="text-base m-1 flex-1">
-                <p>{item.body}</p>
-              </span>
-              <span className="text-base m-1  flex-1">
-                <p>{item.tagline}</p>
-              </span>
+              <div className="flex items-start gap-3">
+                <span className="shrink-0">{item.icon}</span>
+                <div>
+                  <h3 className="text-lg font-bold">{item.title}</h3>
+                  <p className="mt-1 text-base leading-relaxed">{item.body}</p>
+                </div>
+              </div>
             </GlassPanel>
           ))}
         </motion.div>

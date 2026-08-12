@@ -40,8 +40,11 @@ const items = [
 
 export function Upsell() {
   return (
-    <section className="pb-24 pt-4 md:pb-32">
-      <div className="mx-auto max-w-6xl px-4">
+    <section
+      id="servicios-extra"
+      className="scroll-mt-28 bg-[#f2f0eb]/30 px-4 pb-20 pt-8 dark:bg-zinc-950/60 md:px-20 md:pb-28 md:pt-12"
+    >
+      <div className="mx-auto max-w-6xl">
         <motion.div
           initial={{ opacity: 1, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}

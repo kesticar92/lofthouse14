@@ -3,6 +3,7 @@ import { Bebas_Neue, Montserrat } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { LegacyHashRedirect } from "@/components/layout/legacy-hash-redirect";
 import { site } from "@/lib/site";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lofthouse14.com";
@@ -110,7 +111,10 @@ export default function RootLayout({
             </p>
           </div>
         </noscript>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <LegacyHashRedirect />
+          {children}
+        </ThemeProvider>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-R9M0QWD1H3"
           strategy="afterInteractive"

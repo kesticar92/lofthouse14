@@ -1,6 +1,7 @@
 {
   "origen": "Airbnb",
   "actualizado": "2026-08-12",
+  "total_reseñas": 231,
   "listings": [
     {
       "id": "1479067707167069626",
@@ -119,6 +120,14 @@
       "fecha": "2026-07-31",
       "listing_id": "1479132160057282907",
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/42c0d10c-f3a1-4a60-8982-3a8dacb1572a.jpeg"
+    },
+    {
+      "nombre": "Daniel",
+      "calificacion": "4",
+      "comentario": "todo bien, lugar y sector tranquilo",
+      "fecha": "2026-07-30",
+      "listing_id": "1479093662409217655",
+      "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/green?im_w=240&im_t=D&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=015f1a&script=latin"
     },
     {
       "nombre": "Gómez Franco",
@@ -299,17 +308,17 @@
     {
       "nombre": "Juan",
       "calificacion": "5",
-      "comentario": "el hospedaje queda en una zona muy tranquila, muy cerca de restaurantes, supermercados  etc.<br/>cumplia con lo anunciando.",
+      "comentario": "un espacio tranquilo muy cerca de restaurantes, supermercados. <br/>el acceso fue fácil, siempre hubo buena comunicación.",
       "fecha": "2026-06-28",
-      "listing_id": "1479136330467996180",
+      "listing_id": "1479067707167069626",
       "avatar": "https://a0.muscache.com/im/pictures/user/1bc9ce4c-665e-44cf-9ddd-19a12053f701.jpg"
     },
     {
       "nombre": "Juan",
       "calificacion": "5",
-      "comentario": "un espacio tranquilo muy cerca de restaurantes, supermercados. <br/>el acceso fue fácil, siempre hubo buena comunicación.",
+      "comentario": "el hospedaje queda en una zona muy tranquila, muy cerca de restaurantes, supermercados  etc.<br/>cumplia con lo anunciando.",
       "fecha": "2026-06-28",
-      "listing_id": "1479067707167069626",
+      "listing_id": "1479136330467996180",
       "avatar": "https://a0.muscache.com/im/pictures/user/1bc9ce4c-665e-44cf-9ddd-19a12053f701.jpg"
     },
     {
@@ -465,6 +474,14 @@
       "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/magenta?im_w=240&im_t=D&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=901e7c&script=latin"
     },
     {
+      "nombre": "Erick Fernando",
+      "calificacion": "5",
+      "comentario": "excelente todo",
+      "fecha": "2026-05-08",
+      "listing_id": "1479098441611219286",
+      "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/green?im_w=240&im_t=E&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=015f1a&script=latin"
+    },
+    {
       "nombre": "Majo",
       "calificacion": "5",
       "comentario": "Kevin es súper amable, está dispuesto a encontrar soluciones, el alojamiento muy lindo, la zona muy tranquila, todo fue mucho mejor de lo que se ve en las imágenes, súper recomendado.",
@@ -476,25 +493,9 @@
       "nombre": "Erick Fernando",
       "calificacion": "5",
       "comentario": "excelente todo",
-      "fecha": "2026-05-08",
-      "listing_id": "1479098441611219286",
-      "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/green?im_w=240&im_t=E&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=015f1a&script=latin"
-    },
-    {
-      "nombre": "Erick Fernando",
-      "calificacion": "5",
-      "comentario": "excelente todo",
       "fecha": "2026-05-06",
       "listing_id": "1479098441611219286",
       "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/green?im_w=240&im_t=E&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=015f1a&script=latin"
-    },
-    {
-      "nombre": "Isabella",
-      "calificacion": "5",
-      "comentario": "Kevin es muy buen anfitrión siempre está atento a lo que se necesite, la ubicación del lugar es excelente, fácil acceso y buenos lugares alrededor.",
-      "fecha": "2026-05-05",
-      "listing_id": "1556929420516931269",
-      "avatar": "https://a0.muscache.com/im/pictures/user/f1c3c0fc-ec69-4a17-b69b-2e056c751d43.jpg"
     },
     {
       "nombre": "Yenny",
@@ -503,6 +504,14 @@
       "fecha": "2026-05-05",
       "listing_id": "1479067707167069626",
       "avatar": "https://a0.muscache.com/im/pictures/user/e96e508d-5235-48c6-a95d-eaea59339783.jpg"
+    },
+    {
+      "nombre": "Isabella",
+      "calificacion": "5",
+      "comentario": "Kevin es muy buen anfitrión siempre está atento a lo que se necesite, la ubicación del lugar es excelente, fácil acceso y buenos lugares alrededor.",
+      "fecha": "2026-05-05",
+      "listing_id": "1556929420516931269",
+      "avatar": "https://a0.muscache.com/im/pictures/user/f1c3c0fc-ec69-4a17-b69b-2e056c751d43.jpg"
     },
     {
       "nombre": "Angela",
@@ -545,14 +554,6 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/dc46a7dc-6403-45c1-b90b-09e90537d666.jpeg"
     },
     {
-      "nombre": "Claudia",
-      "calificacion": "5",
-      "comentario": "Nuestra estadía este fin de semana fue excelente. El alojamiento superó nuestras expectativas en todos los aspectos: la privacidad es total, lo que permitió un descanso muy tranquilo; el nivel de aseo es impecable, se nota el cuidado y la dedicación en cada detalle; la seguridad nos hizo sentir completamente cómodos en todo momento; y la ubicación es ideal, con fácil acceso a todo lo necesario.<br/>Definitivamente es un lugar al que volveríamos sin dudarlo y que recomendamos ampliamente para quienes buscan una experiencia cómoda, segura y agradable.",
-      "fecha": "2026-04-26",
-      "listing_id": "1556929420516931269",
-      "avatar": "https://a0.muscache.com/im/pictures/user/63548e5d-8356-4e74-811e-ca1afee79c2a.jpg"
-    },
-    {
       "nombre": "Juan Manuel",
       "calificacion": "5",
       "comentario": "La ubicación, la forma de entrar todo nos pareció excelente. Súper recomendado",
@@ -561,12 +562,12 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/c1799a24-4a8b-40fc-9492-2edb729f60d7.jpeg"
     },
     {
-      "nombre": "Natalia",
+      "nombre": "Claudia",
       "calificacion": "5",
-      "comentario": "Los loft son muy prácticos, cómodos, agradables y limpios. Todo estaba en perfecto estado. El anfitrión fue muy amable en general y colaborativo",
-      "fecha": "2026-04-20",
+      "comentario": "Nuestra estadía este fin de semana fue excelente. El alojamiento superó nuestras expectativas en todos los aspectos: la privacidad es total, lo que permitió un descanso muy tranquilo; el nivel de aseo es impecable, se nota el cuidado y la dedicación en cada detalle; la seguridad nos hizo sentir completamente cómodos en todo momento; y la ubicación es ideal, con fácil acceso a todo lo necesario.<br/>Definitivamente es un lugar al que volveríamos sin dudarlo y que recomendamos ampliamente para quienes buscan una experiencia cómoda, segura y agradable.",
+      "fecha": "2026-04-26",
       "listing_id": "1556929420516931269",
-      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/56e22572-7a94-48e1-a9ac-6ce80b29b459.jpeg"
+      "avatar": "https://a0.muscache.com/im/pictures/user/63548e5d-8356-4e74-811e-ca1afee79c2a.jpg"
     },
     {
       "nombre": "Jonathan",
@@ -575,6 +576,14 @@
       "fecha": "2026-04-20",
       "listing_id": "1479067707167069626",
       "avatar": "https://a0.muscache.com/im/pictures/user/71db1fc6-bb73-40d1-a5c3-a466aba6e5ef.jpg"
+    },
+    {
+      "nombre": "Natalia",
+      "calificacion": "5",
+      "comentario": "Los loft son muy prácticos, cómodos, agradables y limpios. Todo estaba en perfecto estado. El anfitrión fue muy amable en general y colaborativo",
+      "fecha": "2026-04-20",
+      "listing_id": "1556929420516931269",
+      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/56e22572-7a94-48e1-a9ac-6ce80b29b459.jpeg"
     },
     {
       "nombre": "Juan Diego",
@@ -761,20 +770,20 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/989882b1-651a-439c-a772-3d9f6afbe86f.jpeg"
     },
     {
-      "nombre": "Harold",
-      "calificacion": "5",
-      "comentario": "excellent stay. great location and easy to find/clear instructions. highly recommend.",
-      "fecha": "2026-03-02",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/pictures/user/6a19f8cd-8ba5-407b-9030-85395b37c04c.jpg"
-    },
-    {
       "nombre": "Daniela Andrea",
       "calificacion": "5",
       "comentario": "Es un lugar muy tranquilo, una zona segura en donde uno se siente a gusto, queda cerca casi de todas los sitios turísticos, es muy bonito el apartamento y tiene todo lo necesario para una estadía agradable.",
       "fecha": "2026-03-02",
       "listing_id": "1479109531777089919",
       "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/magenta?im_w=240&im_t=D&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=901e7c&script=latin"
+    },
+    {
+      "nombre": "Harold",
+      "calificacion": "5",
+      "comentario": "excellent stay. great location and easy to find/clear instructions. highly recommend.",
+      "fecha": "2026-03-02",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/pictures/user/6a19f8cd-8ba5-407b-9030-85395b37c04c.jpg"
     },
     {
       "nombre": "Marcela",
@@ -841,20 +850,20 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/85e6ad01-bf67-43c5-9e2e-3466f31cc1f6.jpeg"
     },
     {
-      "nombre": "Julio Cesar",
-      "calificacion": "4",
-      "comentario": "Un lugar agradable",
-      "fecha": "2026-02-22",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/d268e382-36d1-4711-99f4-b9d348c9c2fe.jpeg"
-    },
-    {
       "nombre": "Juan Camilo",
       "calificacion": "5",
       "comentario": "excelente lugar para quedarse buena privacidad estaba bastante limpio y bien organizado lugar tranquilo buena zona para comer cerca de varios restaurantes y zonas de recreación nocturna amables y rápidos en contestar fácil de llegar instrucciones claras y precisas en general muy buen sitio para quedarse",
       "fecha": "2026-02-22",
       "listing_id": "1479112631395383703",
       "avatar": "https://a0.muscache.com/im/pictures/user/2a653bf0-2137-4455-bbfc-dce836767433.jpg"
+    },
+    {
+      "nombre": "Julio Cesar",
+      "calificacion": "4",
+      "comentario": "Un lugar agradable",
+      "fecha": "2026-02-22",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/d268e382-36d1-4711-99f4-b9d348c9c2fe.jpeg"
     },
     {
       "nombre": "Edwin",
@@ -897,12 +906,12 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/965ce22e-0117-4ca9-8502-14bfd074a749.jpeg"
     },
     {
-      "nombre": "Astrid Liliana",
+      "nombre": "David",
       "calificacion": "5",
-      "comentario": "Excelente atención, sitio y comodidad.",
+      "comentario": "A pesar de que tuvimos un inconveniente con el aire acondicionado, nos solucionaron satisfactoriamente y eso nos agrado mucho, el lugar muy cómodo y el sitio muy tranquilo, sin duda volvería",
       "fecha": "2026-02-08",
-      "listing_id": "1556929420516931269",
-      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/a8660b34-1572-4999-a8ce-fb4bd714be21.jpeg"
+      "listing_id": "1479067707167069626",
+      "avatar": "https://a0.muscache.com/im/pictures/user/c97b6da1-a7af-4d84-8b4b-22970ff5f7b0.jpg"
     },
     {
       "nombre": "Daniel",
@@ -913,12 +922,12 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/e599dcee-f5bb-4d1d-b816-e92b4359a4dd.jpeg"
     },
     {
-      "nombre": "David",
+      "nombre": "Astrid Liliana",
       "calificacion": "5",
-      "comentario": "A pesar de que tuvimos un inconveniente con el aire acondicionado, nos solucionaron satisfactoriamente y eso nos agrado mucho, el lugar muy cómodo y el sitio muy tranquilo, sin duda volvería",
+      "comentario": "Excelente atención, sitio y comodidad.",
       "fecha": "2026-02-08",
-      "listing_id": "1479067707167069626",
-      "avatar": "https://a0.muscache.com/im/pictures/user/c97b6da1-a7af-4d84-8b4b-22970ff5f7b0.jpg"
+      "listing_id": "1556929420516931269",
+      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/a8660b34-1572-4999-a8ce-fb4bd714be21.jpeg"
     },
     {
       "nombre": "Mariaclacoach",
@@ -945,20 +954,20 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/5cfffae0-8aad-4a96-8907-fab63ce007d8.jpg"
     },
     {
-      "nombre": "Valery Bautista",
-      "calificacion": "5",
-      "comentario": "Excelente experiencia.<br/>El alojamiento está muy bien ubicado, lo cual hizo el viaje mucho más cómodo. El anfitrión es una persona muy amable, siempre estuvo pendiente de lo que necesitábamos y la comunicación fue excelente desde el inicio hasta el final. Nos hizo sentir muy tranquilos y bien atendidos. Sin duda, una experiencia excelente y un lugar totalmente recomendado.",
-      "fecha": "2026-01-26",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/magenta?im_w=240&im_t=V&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=901e7c&script=latin"
-    },
-    {
       "nombre": "Angélica",
       "calificacion": "5",
       "comentario": "El loft es justo lo que se ve en las fotos,  limpio, cómodo y la zona se siente muy segura, da para caminar de noche sin problema, está cerca al parque del perro que tiene muchos restaurantes, es caminable a supermercados también y no queda lejos de las zonas más turísticas como san antonio, volvería sin problema!",
       "fecha": "2026-01-26",
       "listing_id": "1479126878054446583",
       "avatar": "https://a0.muscache.com/im/pictures/user/User-29131839/original/2f05d3fc-3976-4764-9218-90bda27b60bb.jpeg"
+    },
+    {
+      "nombre": "Valery Bautista",
+      "calificacion": "5",
+      "comentario": "Excelente experiencia.<br/>El alojamiento está muy bien ubicado, lo cual hizo el viaje mucho más cómodo. El anfitrión es una persona muy amable, siempre estuvo pendiente de lo que necesitábamos y la comunicación fue excelente desde el inicio hasta el final. Nos hizo sentir muy tranquilos y bien atendidos. Sin duda, una experiencia excelente y un lugar totalmente recomendado.",
+      "fecha": "2026-01-26",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/magenta?im_w=240&im_t=V&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=901e7c&script=latin"
     },
     {
       "nombre": "Alejandro",
@@ -985,20 +994,20 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/d22e3f4a-c179-44ba-8741-de643e7f8ad2.jpeg"
     },
     {
-      "nombre": "Jhon Jairo",
-      "calificacion": "5",
-      "comentario": "Un lugar muy tranquilo para descansar la zona muy buena y con mucho para hacer.",
-      "fecha": "2026-01-23",
-      "listing_id": "1556929420516931269",
-      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/63bc190b-eff3-4186-970f-11b76a0472f1.jpeg"
-    },
-    {
       "nombre": "Lizeth",
       "calificacion": "5",
       "comentario": "Fue un buen lugar para descansar. El aire acondicionado mantenía la habitación fresca. No dejaba la habitación fría, ni tampoco era muy caliente. También está muy bien ubicada. Puedes llegar a muchos sitios turísticos caminando y hay muchos restaurantes buenos por la zona. Es muy conveniente. El anfitrión con el que me comuniqué es muy amable.",
       "fecha": "2026-01-23",
       "listing_id": "1479093662409217655",
       "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/purple?im_w=240&im_t=L&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=503eb2&script=latin"
+    },
+    {
+      "nombre": "Jhon Jairo",
+      "calificacion": "5",
+      "comentario": "Un lugar muy tranquilo para descansar la zona muy buena y con mucho para hacer.",
+      "fecha": "2026-01-23",
+      "listing_id": "1556929420516931269",
+      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/63bc190b-eff3-4186-970f-11b76a0472f1.jpeg"
     },
     {
       "nombre": "Ginnet Carolina",
@@ -1065,30 +1074,6 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User-549843488/original/e8572420-0def-43d3-b522-6dae31543fda.jpeg"
     },
     {
-      "nombre": "Lina Giselle",
-      "calificacion": "5",
-      "comentario": "Espectacular la zona del alojamiento muy comoda con muchas zonas de entretenimiento",
-      "fecha": "2026-01-06",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/pictures/user/8e9ffb58-acf5-478e-90af-7db9bf38e08b.jpg"
-    },
-    {
-      "nombre": "Lina Giselle",
-      "calificacion": "5",
-      "comentario": "A mi familia y a mi nos encantó gracias por estar tan pendiente de nosotros!! Muy recomendado",
-      "fecha": "2026-01-06",
-      "listing_id": "1479067707167069626",
-      "avatar": "https://a0.muscache.com/im/pictures/user/8e9ffb58-acf5-478e-90af-7db9bf38e08b.jpg"
-    },
-    {
-      "nombre": "Lina Giselle",
-      "calificacion": "5",
-      "comentario": "A mi familia y a mi nos encantó gracias por estar tan pendiente de nosotros!! Muy recomendado",
-      "fecha": "2026-01-06",
-      "listing_id": "1479093662409217655",
-      "avatar": "https://a0.muscache.com/im/pictures/user/8e9ffb58-acf5-478e-90af-7db9bf38e08b.jpg"
-    },
-    {
       "nombre": "Suyapa Marcela",
       "calificacion": "5",
       "comentario": "Excelente atención",
@@ -1147,10 +1132,26 @@
     {
       "nombre": "Lina Giselle",
       "calificacion": "5",
+      "comentario": "Espectacular la zona del alojamiento muy comoda con muchas zonas de entretenimiento",
+      "fecha": "2026-01-06",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/pictures/user/8e9ffb58-acf5-478e-90af-7db9bf38e08b.jpg"
+    },
+    {
+      "nombre": "Lina Giselle",
+      "calificacion": "5",
       "comentario": "Espectacular, nos encanto la ubicación del barrio y los alrededores",
       "fecha": "2026-01-03",
       "listing_id": "1479136330467996180",
       "avatar": "https://a0.muscache.com/im/pictures/user/8e9ffb58-acf5-478e-90af-7db9bf38e08b.jpg"
+    },
+    {
+      "nombre": "Stephen",
+      "calificacion": "4",
+      "comentario": "I stayed here for two nights over New Year’s during my first trip to Cali. Overall, it was a good value for the price and worked well for a very short stay. The hosts were kind, professional, and extremely responsive, which I really appreciated. A few things to note: Netflix wasn’t available due to too many users on the account, the bathroom stayed warm because of an open ceiling space, and there were no kitchen linens. It’s also important to note there is no hot water, which was listed in the description and my oversight when booking. The location felt more suburban, with supermarkets nearby and fewer restaurants. Overall, a solid, affordable option for a brief stay with great hosts.",
+      "fecha": "2026-01-02",
+      "listing_id": "1479067707167069626",
+      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/6a2a5bc0-2493-4a01-8287-62d2dc00622b.jpeg"
     },
     {
       "nombre": "Estelle",
@@ -1217,14 +1218,6 @@
       "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/orange?im_w=240&im_t=A&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=8f3400&script=latin"
     },
     {
-      "nombre": "Jambou",
-      "calificacion": "5",
-      "comentario": "Gracias para todo",
-      "fecha": "2025-12-26",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/pictures/user/30f727ec-6492-482f-be83-cfba4c9804fb.jpg"
-    },
-    {
       "nombre": "Lauren",
       "calificacion": "5",
       "comentario": "Muy buen sitio, tranquilo, ubicación excelente cerca. Kevin muy amable, respondía a todas mis preguntas y tenía buenas recomendaciones",
@@ -1239,6 +1232,14 @@
       "fecha": "2025-12-26",
       "listing_id": "1479111006313182708",
       "avatar": "https://a0.muscache.com/im/pictures/user/437539b6-19d1-4eb0-9344-881536bdc921.jpg"
+    },
+    {
+      "nombre": "Jambou",
+      "calificacion": "5",
+      "comentario": "Gracias para todo",
+      "fecha": "2025-12-26",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/pictures/user/30f727ec-6492-482f-be83-cfba4c9804fb.jpg"
     },
     {
       "nombre": "Sharon",
@@ -1377,20 +1378,20 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/21c73212-b577-4254-b50f-a84f08ef5128.jpg"
     },
     {
-      "nombre": "Nestor Ivan",
-      "calificacion": "5",
-      "comentario": "todo estuvo muy bien en el lugar, muy cómodo y amplio, justo para una visita de trabajo.",
-      "fecha": "2025-11-28",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/pictures/user/27430e93-a4a6-4bd3-bdcc-8b744b518877.jpg"
-    },
-    {
       "nombre": "⁨Nuria Livia-⁩",
       "calificacion": "4",
       "comentario": "Gracias. <br/>Alojamiento sencillo. Barrio bonito. Pratico a pied y en bus.<br/>Appartamiento Sin ventanas, donde se puede ver asi a fuera ni abrir. Solo uno pequeño en el techo y una muymuy alta pequeña que queda abierta un poco siempre. <br/>Servicio y comunication perfecta.",
       "fecha": "2025-11-28",
       "listing_id": "1479112631395383703",
       "avatar": "https://a0.muscache.com/im/pictures/user/633fa60e-1b48-491e-97bf-db3c065ea33a.jpg"
+    },
+    {
+      "nombre": "Nestor Ivan",
+      "calificacion": "5",
+      "comentario": "todo estuvo muy bien en el lugar, muy cómodo y amplio, justo para una visita de trabajo.",
+      "fecha": "2025-11-28",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/pictures/user/27430e93-a4a6-4bd3-bdcc-8b744b518877.jpg"
     },
     {
       "nombre": "Jorge",
@@ -1641,20 +1642,20 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/52612c08-4490-42fe-b079-941b515b7656.jpg"
     },
     {
-      "nombre": "Eduardo",
-      "calificacion": "3",
-      "comentario": "El lugar está bien para una estancia corta <br/>Si dice en las especificaciones pero no revise y no incluye agua caliente 👀<br/>Hubo algunos problemas con la energía y el agua durante mi estancia pero el host trato de resolver todo al momento.<br/>No me pareció un alojamiento entero es más bien un cuarto con cocina privada que se divide con las escaleras.<br/>El host es muy amable y trata de resolverte todas tus dudas. Siempre está pendiente de las cámaras de seguridad en todo momento y se encuentra en el lugar en el día haciendo labores del lugar.<br/>Me hospedaría de nuevo ya que es cómoda la ubicación y está cerca del MÍO, supermercados como d1, Carulla y más.<br/>Ahhhhh se escucha todo de las habitaciones de lado.",
-      "fecha": "2025-10-01",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/bef65186-2f6e-4940-b0c2-fba6352e764e.jpeg"
-    },
-    {
       "nombre": "Vachae",
       "calificacion": "5",
       "comentario": "Kevin was very attentive very professional. If I needed anything, he always helped me out very fast to respond. They will make you feel right at home. That was my first experience out of country and I loved it. I’ll be be soon",
       "fecha": "2025-10-01",
       "listing_id": "1479132160057282907",
       "avatar": "https://a0.muscache.com/im/pictures/user/156a30d4-151e-4586-81df-2282f348173d.jpg"
+    },
+    {
+      "nombre": "Eduardo",
+      "calificacion": "3",
+      "comentario": "El lugar está bien para una estancia corta <br/>Si dice en las especificaciones pero no revise y no incluye agua caliente 👀<br/>Hubo algunos problemas con la energía y el agua durante mi estancia pero el host trato de resolver todo al momento.<br/>No me pareció un alojamiento entero es más bien un cuarto con cocina privada que se divide con las escaleras.<br/>El host es muy amable y trata de resolverte todas tus dudas. Siempre está pendiente de las cámaras de seguridad en todo momento y se encuentra en el lugar en el día haciendo labores del lugar.<br/>Me hospedaría de nuevo ya que es cómoda la ubicación y está cerca del MÍO, supermercados como d1, Carulla y más.<br/>Ahhhhh se escucha todo de las habitaciones de lado.",
+      "fecha": "2025-10-01",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/pictures/user/User/original/bef65186-2f6e-4940-b0c2-fba6352e764e.jpeg"
     },
     {
       "nombre": "YuRy",
@@ -1873,14 +1874,6 @@
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/f83c402b-5acd-450f-aac2-ea40b7d344f0.jpeg"
     },
     {
-      "nombre": "Diana",
-      "calificacion": "4",
-      "comentario": "El hospedaje está muy bien ubicado, en mi caso estuvo perfecto para un viaje corto y puntual, es una opción muy práctica por ubicación y costo. Los anfitriones están muy atentos todo el tiempo, me brindaron información muy clara y oportuna.",
-      "fecha": "2025-08-17",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/pictures/user/ffd24cb0-d6ac-4346-93b7-277cb97f7d47.jpg"
-    },
-    {
       "nombre": "Jorge",
       "calificacion": "5",
       "comentario": "Excelente lugar super recomendado, vuelvo sin pensarlo,excelente atención.<br/>Muy bueno todo organizado y limpio.👍🏻🫶🏼🥇",
@@ -1895,6 +1888,14 @@
       "fecha": "2025-08-17",
       "listing_id": "1479107553677450117",
       "avatar": "https://a0.muscache.com/im/pictures/user/78812de1-4a61-4b71-a955-282c9e6feab1.jpg"
+    },
+    {
+      "nombre": "Diana",
+      "calificacion": "4",
+      "comentario": "El hospedaje está muy bien ubicado, en mi caso estuvo perfecto para un viaje corto y puntual, es una opción muy práctica por ubicación y costo. Los anfitriones están muy atentos todo el tiempo, me brindaron información muy clara y oportuna.",
+      "fecha": "2025-08-17",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/pictures/user/ffd24cb0-d6ac-4346-93b7-277cb97f7d47.jpg"
     },
     {
       "nombre": "Coronado",
@@ -1921,20 +1922,20 @@
       "avatar": "https://a0.muscache.com/im/Portrait/Avatars/v2/rausch?im_w=240&im_t=A&im_s=86&im_f=AirbnbCerealLatinMedium.ttf&im_c=a21039&script=latin"
     },
     {
-      "nombre": "Juan Andres",
-      "calificacion": "5",
-      "comentario": "Es un aparta estudio demasiado cómodo, cuenta con gran ubicación cerca al parque del perro, el anfitrión es amable y cumple con lo indicado en sus publicaciones",
-      "fecha": "2025-08-07",
-      "listing_id": "1479136330467996180",
-      "avatar": "https://a0.muscache.com/im/pictures/user/User-470993540/original/8b6026a0-f1f5-4432-b973-625564448839.jpeg"
-    },
-    {
       "nombre": "Valentina",
       "calificacion": "5",
       "comentario": "Kevin fue muy amable desde el momento que realizamos la reservación, las instalaciones están en perfecto estado, es un lugar agradable, olía delicioso, fue muy fácil llegar y queda muy cerca al parque del perro, caminamos por la zona hasta tarde y no hubo problema. definitivamente volvería !!",
       "fecha": "2025-08-07",
       "listing_id": "1479130784607746030",
       "avatar": "https://a0.muscache.com/im/pictures/user/User/original/2be4fd7c-5bc5-4484-b7ff-4d78a1c1e074.jpeg"
+    },
+    {
+      "nombre": "Juan Andres",
+      "calificacion": "5",
+      "comentario": "Es un aparta estudio demasiado cómodo, cuenta con gran ubicación cerca al parque del perro, el anfitrión es amable y cumple con lo indicado en sus publicaciones",
+      "fecha": "2025-08-07",
+      "listing_id": "1479136330467996180",
+      "avatar": "https://a0.muscache.com/im/pictures/user/User-470993540/original/8b6026a0-f1f5-4432-b973-625564448839.jpeg"
     }
   ]
 }

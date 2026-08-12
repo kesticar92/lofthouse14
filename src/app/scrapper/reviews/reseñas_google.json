@@ -1,103 +1,395 @@
 {
   "origen": "Google",
   "actualizado": "2026-08-12",
-  "total_reseñas": 16,
+  "total_reseñas": 56,
   "reseñas": [
+    {
+      "nombre": "R Quiles",
+      "calificacion": "5/5",
+      "comentario": "Lofthouse 14 is a very comfortable apartment. It has everything you need for an extended stay. There is a kitchen, bathroom, AC, TV and up to 5 guests can stay together. Kevin and the rest of the team are ready to help with any issue that arises. They are very good at giving you recommendations about places to visit, restaurants and stores. If you need anything, the got your back! I highly recommend staying at Lofhouse 14 near the renown area of “El Parque del Perro” which is renowned for its variety and local cuisine. If you come to Cali this is a very well centralized spot and it has access to museums and public transportation. Everything you need is a short walk away.",
+      "fecha": "2026-07-29",
+      "id": 1
+    },
+    {
+      "nombre": "Rafael Rizo",
+      "calificacion": "4/5",
+      "comentario": "Good location and good price.",
+      "fecha": "2026-04-14",
+      "id": 2
+    },
     {
       "nombre": "ROBINSON SOTELO ZAMBRANO",
       "calificacion": "5/5",
-      "comentario": "Un lugar muy bien ubicado y con una muy buena atención por parte del anfitrión , recomendado",
-      "id": 1
+      "comentario": "A very well-located place with excellent service from the host; highly recommended.",
+      "fecha": "2026-07-13",
+      "id": 3
     },
     {
       "nombre": "Diana Carolina Correa Agredo",
       "calificacion": "5/5",
-      "comentario": "La habitación estaba impecable, muy cómoda y bien equipada. Todo funcionaba perfectamente y el descanso fue excelente. Muy recomendable.",
-      "id": 2
+      "comentario": "The room was spotless, very comfortable, and well-equipped. Everything worked perfectly, and I slept wonderfully. Highly recommended.",
+      "fecha": "2026-07-29",
+      "id": 4
     },
     {
       "nombre": "Lorena Dosman",
       "calificacion": "5/5",
-      "comentario": "Un lugar muy limpio, cómodo, excelente servicio y amabilidad, respetando normas de convivencia. Excelente ubicación p",
-      "id": 3
+      "comentario": "A very clean and comfortable place with excellent service and friendliness, respecting the rules of coexistence. Excellent location.",
+      "fecha": "2026-07-13",
+      "id": 5
     },
     {
       "nombre": "Ana Bravo",
       "calificacion": "5/5",
-      "comentario": "Execelente lugar, súper recomendado, agradable y acogedor. Para volver , me encantó.",
-      "id": 4
+      "comentario": "Excellent place, highly recommended, pleasant and welcoming. I'll definitely be back, I loved it.",
+      "fecha": "2026-02-13",
+      "id": 6
     },
     {
       "nombre": "Harry A Cordoba",
-      "calificacion": "N/A",
-      "comentario": "Muy recomendado LoftHouse!. Si lo que buscas es tranquilidad, amabilidad y una muy buena atención, este es el sitio ideal para tu hospedaje, sin pensarlo dos veces!. Realmente sus habitaciones son muy comodas, muy bien ambientadas, por lo…",
-      "id": 5
+      "calificacion": "5/5",
+      "comentario": "Highly recommend LoftHouse! If you're looking for peace and quiet, friendly service, and excellent hospitality, this is the perfect place to stay, without a doubt! The rooms are truly comfortable and beautifully decorated, so I highly recommend it. I will definitely stay at LoftHouse again next time.",
+      "fecha": "2026-02-13",
+      "id": 7
     },
     {
       "nombre": "Jhon",
       "calificacion": "5/5",
       "comentario": "Un lugar muy agradable, tranquilo y muy buena la ubicación. Al igual que la persona que aconpañó todo el proceso",
-      "id": 6
+      "fecha": "2026-07-13",
+      "id": 8
     },
     {
       "nombre": "Isabella Yela",
       "calificacion": "5/5",
-      "comentario": "Es un excelente lugar, cómodo, tranquilo y acogedor. Su anfitrión es muy gentil y amable, sin duda una linda estadía.",
-      "id": 7
+      "comentario": "Es un excelente lugar, cómodo, tranquilo y acogedor. Su anfitrión es muy gentil y amable, sin duda una linda estadía. Recomendadisimo",
+      "fecha": "2026-04-14",
+      "id": 9
     },
     {
       "nombre": "Juan david De la cruz",
       "calificacion": "5/5",
       "comentario": "Súper recomendado, muy buena ubicación, exelente atención, súper acogedor, nosotros volvemos!!",
-      "id": 8
+      "fecha": "2026-02-13",
+      "id": 10
     },
     {
       "nombre": "Jhoana Calderon",
       "calificacion": "5/5",
       "comentario": "Me encantó, el lugar la limpieza, la autonomía que no en todos lados puedes tener , super atentos siempre de lo que pudieramos necesitar, la habitación cómoda, limpia con cocina, nevera nos encantó 💚 aquí volvemos 😊",
-      "id": 9
+      "fecha": "2026-05-14",
+      "id": 11
     },
     {
       "nombre": "Sergio Alberto Martinez Bohórquez",
       "calificacion": "4/5",
       "comentario": "Las habitaciones son muy cómodas, lo único es la falta de ventanas, pero cuenta con aire acondicionado, el servicio muy bueno y su administrador está pendiente de todo, muy limpio y cómodo.",
-      "id": 10
-    },
-    {
-      "nombre": "wrb.fr",
-      "calificacion": "N/A",
-      "comentario": "[null,0,null,\"h_57atT4GdH9geYP9pufgQk\",null,\"EvgDKYQi49-NlUMIDwAAAAEAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGABCVCmEIuPfjZVD6AEAACAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",null,null,[[[1,0]],0,null,0,0],null,true]",
-      "id": 11
-    },
-    {
-      "nombre": "af.httprm",
-      "calificacion": "N/A",
-      "comentario": "-8612172947566019610",
+      "fecha": "2026-07-13",
       "id": 12
     },
     {
-      "nombre": "wrb.fr",
-      "calificacion": "N/A",
-      "comentario": "/MapsViewportService.GetViewportMetadata",
+      "nombre": "Alejandra Claros",
+      "calificacion": "5/5",
+      "comentario": "Excelente lugar ,muy buena ubicación barrio tranquilo y queda cerca de todo . Hay que volver ....",
+      "fecha": "2026-06-13",
       "id": 13
     },
     {
-      "nombre": "af.httprm",
-      "calificacion": "N/A",
-      "comentario": "-1894036402616752092",
+      "nombre": "Bryan Ceballos renteria",
+      "calificacion": "5/5",
+      "comentario": "Excelente servicio lo recomiendo siempre la atencion fue expectacular habitaciones muy aseadas",
+      "fecha": "2026-05-14",
       "id": 14
     },
     {
-      "nombre": "wrb.fr",
-      "calificacion": "N/A",
-      "comentario": "/MapsMerchantStatusService.GetMerchantStatus",
+      "nombre": "Karen Velasco",
+      "calificacion": "5/5",
+      "comentario": "Excelentes anfitriones Esta muy bien ubicado, cercano a lindos restaurantes, en una zona muy turística de vistas geniales. Excelente servicio, muchas gracias💕",
+      "fecha": "2026-02-13",
       "id": 15
     },
     {
-      "nombre": "af.httprm",
-      "calificacion": "N/A",
-      "comentario": "-1073461056593846919",
+      "nombre": "Jeynner Giraldo Gutierrez",
+      "calificacion": "5/5",
+      "comentario": "Una gran experiencia, habitaciones limpias y atención de excelente calidad.",
+      "fecha": "2026-05-14",
       "id": 16
+    },
+    {
+      "nombre": "Jhon Suan",
+      "calificacion": "5/5",
+      "comentario": "Todo super bien. Un lugar independiente, bien ubicado, atención excelente de las personas que están a cargo.",
+      "fecha": "2026-02-13",
+      "id": 17
+    },
+    {
+      "nombre": "John Martinez",
+      "calificacion": "5/5",
+      "comentario": "Excelente servicio, muy lindas sus instalaciones, volveré pronto súper recomendado",
+      "fecha": "2026-04-14",
+      "id": 18
+    },
+    {
+      "nombre": "Jeison Frederick Cardoso Echeverri",
+      "calificacion": "5/5",
+      "comentario": "Excelente experiencia. El alojamiento es tal cual como se muestra en las fotos: muy limpio, cómodo y bien organizado. La ubicación es súper práctica, con fácil acceso y todo lo necesario cerca.",
+      "fecha": "2026-02-13",
+      "id": 19
+    },
+    {
+      "nombre": "Lia",
+      "calificacion": "5/5",
+      "comentario": "Es un lugar muy agradable , cómodo Con un ambiente espectacular.",
+      "fecha": "2026-02-13",
+      "id": 20
+    },
+    {
+      "nombre": "alejandro lopez",
+      "calificacion": "5/5",
+      "comentario": "Excelentes instalaciones, excelente atención y David el mejor anfitrión le daría pero 6 pero no hay 6, llega hasta 5.",
+      "fecha": "2026-04-14",
+      "id": 21
+    },
+    {
+      "nombre": "Alexander Aguirre Zabala",
+      "calificacion": "5/5",
+      "comentario": "Excelente atención, una oferta gastronómica muy amplia. El anfitrion David es muy amable y servicial.",
+      "fecha": "2026-04-14",
+      "id": 22
+    },
+    {
+      "nombre": "Esneider Villareal",
+      "calificacion": "5/5",
+      "comentario": "Exelente servicio y muy cómodo todo lo recomiendo",
+      "fecha": "2026-02-13",
+      "id": 23
+    },
+    {
+      "nombre": "javier morales",
+      "calificacion": "2/5",
+      "comentario": "Aunque el tema de ubicación y aseo es muy bueno. Tienen un muy grabe problema de temperatura, ya que los aires acondicionados no son de pared, si no de piso y las habitaciones alcanzan muy muy altas temperaturas, en el dia, tango así que se debe de salir de ellas.",
+      "fecha": "2026-05-14",
+      "id": 24
+    },
+    {
+      "nombre": "ANGELA CRUZ VASQUEZ",
+      "calificacion": "5/5",
+      "comentario": "Excelente servicio, está muy bien ubicado. David y Kevin fueron súper amables y atentos en todo momento. Sin duda alguna volveré aquí❤️",
+      "fecha": "2026-02-13",
+      "id": 25
+    },
+    {
+      "nombre": "yefferson david tobar velasco",
+      "calificacion": "5/5",
+      "comentario": "Excellent place, excellent location, great hosts, highly recommended.",
+      "fecha": "2026-02-13",
+      "id": 26
+    },
+    {
+      "nombre": "angie paola garces martinez",
+      "calificacion": "5/5",
+      "comentario": "Kevin y David excelentes antifriones las instalaciones excelentes hermosas todo muy limpio tranquilo el espacio limpio lindo hermoso",
+      "fecha": "2026-02-13",
+      "id": 27
+    },
+    {
+      "nombre": "oscar martinez",
+      "calificacion": "5/5",
+      "comentario": "Excelente instalaciones y buen servicio recomendable",
+      "fecha": "2026-02-13",
+      "id": 28
+    },
+    {
+      "nombre": "Oscar Calderon",
+      "calificacion": "5/5",
+      "comentario": "Un lindo lugar para descanso está en un barrio muy tranquilo espacio amplió para una buena estadia",
+      "fecha": "2026-02-13",
+      "id": 29
+    },
+    {
+      "nombre": "Fausto Castillo viveros",
+      "calificacion": "5/5",
+      "comentario": "Ofrecen un excelente servicio, es un lugar para recomendar siempre",
+      "fecha": "2026-04-14",
+      "id": 30
+    },
+    {
+      "nombre": "alexander reina sanchez",
+      "calificacion": "5/5",
+      "comentario": "Los anfitriones Kevin y David muy atentos….super recomendado.",
+      "fecha": "2026-05-14",
+      "id": 31
+    },
+    {
+      "nombre": "Alejandra Wittingham Orejuela",
+      "calificacion": "5/5",
+      "comentario": "The best experience ever!!! Everything was divine and delicious 💗✨ …",
+      "fecha": "2026-02-13",
+      "id": 32
+    },
+    {
+      "nombre": "Cristhian Torres",
+      "calificacion": "5/5",
+      "comentario": "Excelente ubicación, bonito y excelente servicio",
+      "fecha": "2026-03-15",
+      "id": 33
+    },
+    {
+      "nombre": "stefy reyes",
+      "calificacion": "5/5",
+      "comentario": "Me encantó todo muy bien",
+      "fecha": "2026-02-13",
+      "id": 34
+    },
+    {
+      "nombre": "Liliana Solano",
+      "calificacion": "5/5",
+      "comentario": "Super muy confortable",
+      "fecha": "2026-05-14",
+      "id": 35
+    },
+    {
+      "nombre": "Jessica Martinez Capote",
+      "calificacion": "5/5",
+      "comentario": "Super recomendado, demasiado acogedor",
+      "fecha": "2026-02-13",
+      "id": 36
+    },
+    {
+      "nombre": "Cristian Viana",
+      "calificacion": "5/5",
+      "comentario": "Excelente ubicación…",
+      "fecha": "2026-05-14",
+      "id": 37
+    },
+    {
+      "nombre": "Bryan Steven Morales Valoy",
+      "calificacion": "5/5",
+      "comentario": "Ubicación central y buena zona verde al rededor para caminar.",
+      "fecha": "2026-03-15",
+      "id": 38
+    },
+    {
+      "nombre": "Señor Kia",
+      "calificacion": "5/5",
+      "comentario": "David el mejor anfitrión, a última hora y me resolvió, súper recomendado",
+      "fecha": "2026-02-13",
+      "id": 39
+    },
+    {
+      "nombre": "Paulina Aboul",
+      "calificacion": "5/5",
+      "comentario": "0ahUKEwjt1IPluJqWAxU2jHoBHZg8CiYQ3YcHCBooAA",
+      "fecha": "2026-07-13",
+      "id": 40
+    },
+    {
+      "nombre": "José Darío Cabarcas",
+      "calificacion": "5/5",
+      "comentario": "Súper recomendado",
+      "fecha": "2026-04-14",
+      "id": 41
+    },
+    {
+      "nombre": "Cristian Camilo Monroy Patiño",
+      "calificacion": "5/5",
+      "comentario": "0ahUKEwjt1IPluJqWAxU2jHoBHZg8CiYQ3IcHCDAoAQ",
+      "fecha": "2026-05-14",
+      "id": 42
+    },
+    {
+      "nombre": "Joice Coelho",
+      "calificacion": "5/5",
+      "comentario": "0ahUKEwjt1IPluJqWAxU2jHoBHZg8CiYQ3IcHCDYoAQ",
+      "fecha": "2026-06-13",
+      "id": 43
+    },
+    {
+      "nombre": "Mauricio Useche",
+      "calificacion": "4/5",
+      "comentario": "0ahUKEwjt1IPluJqWAxU2jHoBHZg8CiYQ3IcHCDwoAQ",
+      "fecha": "2026-05-14",
+      "id": 44
+    },
+    {
+      "nombre": "Aslan Rivera",
+      "calificacion": "5/5",
+      "comentario": "Excelente precios, comodidad, ubicación, atención, seguridad. Sin duda alguna se merecen las 5 estrellas.",
+      "fecha": "2026-07-13",
+      "id": 45
+    },
+    {
+      "nombre": "Juan Esteban Calderon Fernandez",
+      "calificacion": "5/5",
+      "comentario": "Todo excelente, el hospedaje es muy bonito, la ubicación es excelente, todo es tal cual las fotos, tiene varias amenidades para poder tener una cálida estadía La atención también fue muy buena y todo funcionó muy bien 10/10",
+      "fecha": "2026-08-11",
+      "id": 46
+    },
+    {
+      "nombre": "Freya",
+      "calificacion": "3/5",
+      "comentario": "El sitio es acogedor la decoración es buena, los sofás son cómodos, el wifi funciona de maravilla... cosas a mejorar: en cocina hizo falta una oyeta pequeña para poder hacer alguna bebida caliente, solo había un sartén de buen tamaño, la sartén pequeñita a mi parecer no es muy útil. La estufa se calienta y los botónes empiezan a volverse duros pero es tolerable. En habitación y sala recomiendo cambiar las cortinas por blackout, ya que el ambiente en el loft que da a la calle es bastante caliente y las cortinas acumulan más calor, las ventanas del segundo piso les caería bien una limpieza por fuera. El baño tenía un olor desagradable como a cañería, deberían colocar una repisa pequeña para poder colocar las cosas personales, me entregaron el inodoro sin bizcocho y fué bastante incómodo cada que se usaba. El aire acondicionado es un ac portátil y no es igual de eficiente a uno de pared y hace bastante ruido, así que el calor del loft que da a la calle es bastante incómodo, el calor comienza a disminuir a las 3 o 4 am. Puede ser que por seguridad el ac no se puede mantener por debajo de 21° pero es entendible. Considero que falta algo de ventilación natural, está muy encerrado y los olores tienden a acumularse. El precio no está mal, pero 30.000 pesos por suplemento de limpieza considero que es elevado ese precio ya que en otros sitios me dan lo mismo pero el precio de suplementos viene incluido o simplemente es de 15.000 o 20.000 pesos. El precio del uso de la lavadora también me pareció alto. En general no está mal, y la ubicación es buena.",
+      "fecha": "2026-08-10",
+      "id": 47
+    },
+    {
+      "nombre": "Nicolás Bernal",
+      "calificacion": "4/5",
+      "comentario": "Es un buen lugar para quedarse",
+      "fecha": "2026-08-07",
+      "id": 48
+    },
+    {
+      "nombre": "Daniel Soba",
+      "calificacion": "5/5",
+      "comentario": "0ahUKEwjC8ufluJqWAxUY-CkDHbO1Fd4Q3YcHCAgoAA",
+      "fecha": "2026-08-05",
+      "id": 49
+    },
+    {
+      "nombre": "Ruben Dario Osses",
+      "calificacion": "5/5",
+      "comentario": "0ahUKEwjC8ufluJqWAxUY-CkDHbO1Fd4Q3YcHCBQoAA",
+      "fecha": "2026-08-05",
+      "id": 50
+    },
+    {
+      "nombre": "Kathe Bueno",
+      "calificacion": "5/5",
+      "comentario": "Muy Confiable.. Un ambiente muy Tranquilo y cada Habitación tiene lo Básico para que tengas una Estadía Cómoda Super Recomendada !!",
+      "fecha": "2026-07-29",
+      "id": 51
+    },
+    {
+      "nombre": "david holguin vasquez",
+      "calificacion": "5/5",
+      "comentario": "Super cómodas las camas muy amables las personas y súper atentos con todo Súper todo",
+      "fecha": "2026-07-29",
+      "id": 52
+    },
+    {
+      "nombre": "Ana Bravo",
+      "calificacion": "5/5",
+      "comentario": "Execelente lugar, súper recomendado, agradable y acogedor. Para volver , me encantó.",
+      "id": 53
+    },
+    {
+      "nombre": "Harry A Cordoba",
+      "calificacion": "5/5",
+      "comentario": "Muy recomendado LoftHouse!. Si lo que buscas es tranquilidad, amabilidad y una muy buena atención, este es el sitio ideal para tu hospedaje, sin pensarlo dos veces!. Realmente sus habitaciones son muy comodas, muy bien ambientadas, por lo",
+      "id": 54
+    },
+    {
+      "nombre": "Isabella Yela",
+      "calificacion": "5/5",
+      "comentario": "Es un excelente lugar, cómodo, tranquilo y acogedor. Su anfitrión es muy gentil y amable, sin duda una linda estadía.",
+      "id": 55
+    },
+    {
+      "nombre": "yefferson david tobar velasco",
+      "calificacion": "5/5",
+      "comentario": "Excelente lugar, excelente ubicación, buenos anfitriones, super recomendado.",
+      "id": 56
     }
   ]
 }

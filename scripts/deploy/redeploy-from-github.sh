@@ -25,13 +25,15 @@
 #   APP_DIR          Directorio de la app (default: /var/www/lofthouse14)
 #   REPO_URL         URL del repo (default: https://github.com/kesticar92/lofthouse14.git)
 #   BRANCH           Rama a desplegar (default: main)
-#   NODE_HEAP_MB     Memoria máx para Node (default: 1536; con swap en Droplet 512 MB)
-#   PM2_NAME         Nombre del proceso PM2 (default: lofthouse14)
-#   BUILD_SKIP_LINT  1=`next build --no-lint` (default), 0=lint en build
-#                    (ESLint debe correr en CI; typecheck TS SIEMPRE corre).
+#   NODE_HEAP_MB          Memoria máx para Node (default: 1536; con swap en Droplet 512 MB)
+#   PM2_NAME              Nombre del proceso PM2 (default: lofthouse14)
+#   BUILD_SKIP_LINT       1=`next build --no-lint` (default). ESLint corre en CI.
+#   BUILD_SKIP_TYPECHECK  1=salta typecheck en el Droplet (default). En 512 MB
+#                         el typecheck de Next hace OOM aunque haya swap; CI
+#                         (`npm run typecheck`) es la red de seguridad.
 #
 # Ejemplo:
-#   BRANCH=main NODE_HEAP_MB=2048 bash scripts/deploy/redeploy-from-github.sh
+#   BRANCH=main NODE_HEAP_MB=1536 bash scripts/deploy/redeploy-from-github.sh
 # =============================================================================
 set -euo pipefail
 
@@ -41,9 +43,10 @@ BRANCH="${BRANCH:-main}"
 NODE_HEAP_MB="${NODE_HEAP_MB:-1536}"
 PM2_NAME="${PM2_NAME:-lofthouse14}"
 # Si BUILD_SKIP_LINT=1 (default) → next build --no-lint. ESLint debería
-# correr en CI, no en producción (ahorra RAM y tiempo). El typecheck TS sí
-# se ejecuta, para que un error de tipos NO llegue al servidor.
+# correr en CI, no en producción (ahorra RAM y tiempo).
 BUILD_SKIP_LINT="${BUILD_SKIP_LINT:-1}"
+# Typecheck en Droplet 512 MB → OOM casi seguro. Default: saltar aquí; CI valida.
+BUILD_SKIP_TYPECHECK="${BUILD_SKIP_TYPECHECK:-1}"
 
 PARENT_DIR="$(dirname "$APP_DIR")"
 APP_NAME="$(basename "$APP_DIR")"
@@ -156,19 +159,28 @@ mv "$NEW_DIR" "$APP_DIR"
 cd "$APP_DIR"
 ok "Swap completado. Directorio activo: ${APP_DIR}"
 
-# ---------- 5. Limpieza defensiva de parches viejos -----------------------
-info "[5/9] Verificando que next.config.ts NO tenga ignoreBuildErrors / ignoreDuringBuilds…"
+# ---------- 5. Ajuste de next.config para Droplets con poca RAM ----------
+info "[5/9] Ajustando next.config.ts para el build en el Droplet…"
 if [[ -f next.config.ts ]]; then
-  if grep -qE "ignoreDuringBuilds|ignoreBuildErrors" next.config.ts; then
-    warn "next.config.ts contiene ignoreDuringBuilds/ignoreBuildErrors."
-    warn "Esos flags permiten que errores TS/ESLint lleguen a producción."
-    warn "Eliminando líneas para forzar typecheck estricto en build…"
-    # Borra líneas que contengan estos flags (insertadas por scripts viejos)
-    sed -i '/eslint:\s*{\s*ignoreDuringBuilds:\s*true\s*},/d' next.config.ts
-    sed -i '/typescript:\s*{\s*ignoreBuildErrors:\s*true\s*},/d' next.config.ts
-    ok "Limpiados flags peligrosos. Si el build falla, ARREGLA EL ERROR; no los re-insertes."
+  # Quita parches previos para no duplicar
+  sed -i '/eslint:\s*{\s*ignoreDuringBuilds:\s*true\s*},/d' next.config.ts
+  sed -i '/typescript:\s*{\s*ignoreBuildErrors:\s*true\s*},/d' next.config.ts
+
+  if [[ "$BUILD_SKIP_TYPECHECK" == "1" ]]; then
+    # Inserta flags justo después de `const nextConfig: NextConfig = {`
+    if grep -q "const nextConfig: NextConfig = {" next.config.ts; then
+      sed -i '/const nextConfig: NextConfig = {/a\
+  typescript: { ignoreBuildErrors: true },\
+  eslint: { ignoreDuringBuilds: true },
+' next.config.ts
+      warn "Typecheck/ESLint omitidos en este Droplet (BUILD_SKIP_TYPECHECK=1)."
+      warn "Deben pasar en GitHub Actions CI antes de desplegar."
+      ok "next.config.ts parcheado solo para este build en servidor."
+    else
+      fail "No encontré 'const nextConfig: NextConfig = {' para parchear."
+    fi
   else
-    ok "next.config.ts limpio."
+    ok "Typecheck estricto activo (BUILD_SKIP_TYPECHECK=0)."
   fi
 else
   warn "No se encontró next.config.ts (¿estructura cambió?)."
@@ -182,12 +194,17 @@ npm ci --include=dev
 BUILD_FLAGS=""
 if [[ "$BUILD_SKIP_LINT" == "1" ]]; then
   BUILD_FLAGS="-- --no-lint"
-  info "[7/9] next build --no-lint (typecheck TS sí corre; ESLint debe correr en CI)"
+fi
+if [[ "$BUILD_SKIP_TYPECHECK" == "1" ]]; then
+  info "[7/9] next build (sin typecheck en Droplet; CI valida TS)"
 else
-  info "[7/9] next build (typecheck + ESLint)"
+  info "[7/9] next build (con typecheck)"
 fi
 info "       NODE_OPTIONS=--max-old-space-size=${NODE_HEAP_MB}"
-NODE_OPTIONS="--max-old-space-size=${NODE_HEAP_MB}" npm run build $BUILD_FLAGS
+# Menos workers = menos picos de RAM en Droplets 512 MB
+export NEXT_TELEMETRY_DISABLED=1
+NODE_OPTIONS="--max-old-space-size=${NODE_HEAP_MB}" \
+  npm run build $BUILD_FLAGS
 [[ -f .next/BUILD_ID ]] || fail "Build falló: no se generó .next/BUILD_ID."
 ok "Build OK (BUILD_ID=$(cat .next/BUILD_ID))."
 

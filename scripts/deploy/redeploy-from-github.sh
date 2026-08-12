@@ -25,7 +25,7 @@
 #   APP_DIR          Directorio de la app (default: /var/www/lofthouse14)
 #   REPO_URL         URL del repo (default: https://github.com/kesticar92/lofthouse14.git)
 #   BRANCH           Rama a desplegar (default: main)
-#   NODE_HEAP_MB     Memoria máx para Node (default: 2048)
+#   NODE_HEAP_MB     Memoria máx para Node (default: 1536; con swap en Droplet 512 MB)
 #   PM2_NAME         Nombre del proceso PM2 (default: lofthouse14)
 #   BUILD_SKIP_LINT  1=`next build --no-lint` (default), 0=lint en build
 #                    (ESLint debe correr en CI; typecheck TS SIEMPRE corre).
@@ -38,7 +38,7 @@ set -euo pipefail
 APP_DIR="${APP_DIR:-/var/www/lofthouse14}"
 REPO_URL="${REPO_URL:-https://github.com/kesticar92/lofthouse14.git}"
 BRANCH="${BRANCH:-main}"
-NODE_HEAP_MB="${NODE_HEAP_MB:-2048}"
+NODE_HEAP_MB="${NODE_HEAP_MB:-1536}"
 PM2_NAME="${PM2_NAME:-lofthouse14}"
 # Si BUILD_SKIP_LINT=1 (default) → next build --no-lint. ESLint debería
 # correr en CI, no en producción (ahorra RAM y tiempo). El typecheck TS sí
@@ -74,6 +74,39 @@ command -v git >/dev/null      || fail "git no está instalado."
 command -v npm >/dev/null      || fail "npm no está instalado."
 command -v node >/dev/null     || fail "node no está instalado."
 command -v pm2 >/dev/null      || fail "pm2 no está instalado (npm i -g pm2)."
+
+# Droplets de 512 MB no pueden hacer `next build` sin swap (OOM en typecheck).
+ensure_swap() {
+  local want_mb=2048
+  local swap_kb
+  swap_kb="$(awk '/SwapTotal:/ {print $2}' /proc/meminfo 2>/dev/null || echo 0)"
+  if [[ "${swap_kb:-0}" -ge $((want_mb * 900)) ]]; then
+    ok "Swap suficiente: $((swap_kb / 1024)) MB"
+    return 0
+  fi
+  warn "Swap insuficiente ($((swap_kb / 1024)) MB). Creando /swapfile de ${want_mb} MB…"
+  if [[ -f /swapfile ]]; then
+    swapon /swapfile 2>/dev/null || true
+  fi
+  swap_kb="$(awk '/SwapTotal:/ {print $2}' /proc/meminfo 2>/dev/null || echo 0)"
+  if [[ "${swap_kb:-0}" -ge $((want_mb * 900)) ]]; then
+    ok "Swap activado: $((swap_kb / 1024)) MB"
+    return 0
+  fi
+  swapoff /swapfile 2>/dev/null || true
+  rm -f /swapfile
+  fallocate -l "${want_mb}M" /swapfile || dd if=/dev/zero of=/swapfile bs=1M count="${want_mb}" status=none
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  grep -q '/swapfile' /etc/fstab 2>/dev/null || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  swap_kb="$(awk '/SwapTotal:/ {print $2}' /proc/meminfo 2>/dev/null || echo 0)"
+  ok "Swap listo: $((swap_kb / 1024)) MB"
+  free -h || true
+}
+
+info "[0/9] Comprobando swap (necesario en Droplets 512 MB)…"
+ensure_swap
 
 if [[ ! -d "$APP_DIR" ]]; then
   warn "No existe ${APP_DIR}. Se creará vacío y se clonará por primera vez."

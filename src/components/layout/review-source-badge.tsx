@@ -68,13 +68,15 @@ function AirbnbBadge({ href }: { href?: string }) {
 
 function BookingBadge() {
   return (
-    <span className={`${badgeShell} border-[#003580]/25`}>
+    <span
+      className={`${badgeShell} border-[#003580]/25 dark:border-sky-400/30`}
+    >
       <Image
         src="/logos/booking.svg"
         alt="Booking.com"
-      width={119}
-      height={20}
-        className="h-[14px] w-auto"
+        width={119}
+        height={20}
+        className="h-[14px] w-auto dark:brightness-0 dark:invert"
         priority={false}
       />
     </span>

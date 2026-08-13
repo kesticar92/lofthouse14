@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { site } from "@/lib/site";
+import { cn } from "@/lib/cn";
 
 const posts = [
   {
@@ -36,37 +37,53 @@ const posts = [
   },
 ] as const;
 
+function TikTokMark({ className }: { className?: string }) {
+  // Nota TikTok: cian + magenta + cuerpo que adapta a día/noche
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={cn("size-5 shrink-0", className)}
+      aria-hidden
+    >
+      <path
+        fill="#25F4EE"
+        d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.3 0 .59.04.87.13V9.01a6.27 6.27 0 0 0-.87-.06A6.34 6.34 0 0 0 3.15 15.3 6.34 6.34 0 0 0 9.49 21.6a6.34 6.34 0 0 0 6.34-6.34V8.77a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15Z"
+        transform="translate(0.4 0.3)"
+        opacity="0.9"
+      />
+      <path
+        fill="#FE2C55"
+        d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.3 0 .59.04.87.13V9.01a6.27 6.27 0 0 0-.87-.06A6.34 6.34 0 0 0 3.15 15.3 6.34 6.34 0 0 0 9.49 21.6a6.34 6.34 0 0 0 6.34-6.34V8.77a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15Z"
+        transform="translate(-0.4 -0.3)"
+        opacity="0.9"
+      />
+      <path
+        fill="currentColor"
+        className="text-zinc-900 dark:text-white"
+        d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.3 0 .59.04.87.13V9.01a6.27 6.27 0 0 0-.87-.06A6.34 6.34 0 0 0 3.15 15.3 6.34 6.34 0 0 0 9.49 21.6a6.34 6.34 0 0 0 6.34-6.34V8.77a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15Z"
+      />
+    </svg>
+  );
+}
+
 function SocialProfileButton({
   href,
-  label,
-  logoSrc,
-  logoWidth,
-  logoHeight,
-  logoClassName,
+  handle,
+  children,
 }: {
   href: string;
-  label: string;
-  logoSrc: string;
-  logoWidth: number;
-  logoHeight: number;
-  logoClassName?: string;
+  handle: string;
+  children: React.ReactNode;
 }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-3 rounded-xl border border-zinc-300/90 bg-white px-4 py-3 text-sm text-zinc-800 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+      className="inline-flex items-center gap-3 rounded-xl border border-zinc-300/90 bg-white px-4 py-3 text-sm font-medium text-zinc-900 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-white/15 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-white/25 dark:hover:bg-zinc-800"
     >
-      <Image
-        src={logoSrc}
-        alt=""
-        width={logoWidth}
-        height={logoHeight}
-        className={logoClassName}
-        aria-hidden
-      />
-      <span>{label}</span>
+      {children}
+      <span className="text-zinc-700 dark:text-zinc-200">{handle}</span>
     </a>
   );
 }
@@ -81,28 +98,30 @@ export function SocialWall() {
         <h2 className="font-display text-4xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
           Instagram y TikTok
         </h2>
-        <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+        <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
           Publicamos lo del día a día en el loft y en Cali. Entra al perfil que
           uses y escríbenos por WhatsApp si quieres reservar.
         </p>
 
         <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-          <SocialProfileButton
-            href={site.instagramUrl}
-            label="@lofthouse.14"
-            logoSrc="/logos/instagram-wordmark.svg"
-            logoWidth={132}
-            logoHeight={40}
-            logoClassName="h-[18px] w-auto"
-          />
-          <SocialProfileButton
-            href={site.tiktokUrl}
-            label="@lofthouse.14"
-            logoSrc="/logos/tiktok-wordmark.svg"
-            logoWidth={160}
-            logoHeight={40}
-            logoClassName="h-[16px] w-auto"
-          />
+          <SocialProfileButton href={site.instagramUrl} handle="@lofthouse.14">
+            {/* Wordmark monócromo: se invierte a blanco en dark */}
+            <Image
+              src="/logos/instagram-wordmark.svg"
+              alt="Instagram"
+              width={132}
+              height={40}
+              className="h-[18px] w-auto dark:invert"
+            />
+          </SocialProfileButton>
+          <SocialProfileButton href={site.tiktokUrl} handle="@lofthouse.14">
+            <span className="inline-flex items-center gap-2 text-zinc-900 dark:text-white">
+              <TikTokMark />
+              <span className="text-[15px] font-bold tracking-tight">
+                TikTok
+              </span>
+            </span>
+          </SocialProfileButton>
         </div>
       </div>
 
@@ -127,7 +146,7 @@ export function SocialWall() {
               </div>
             ) : null}
 
-            <div className="absolute left-3 top-3 rounded-md bg-white/90 p-1 dark:bg-zinc-900/90">
+            <div className="absolute left-3 top-3 rounded-md bg-white/95 p-1 shadow-sm dark:bg-zinc-950/90">
               <Image
                 src="/logos/instagram-glyph.svg"
                 alt="Instagram"

@@ -3,17 +3,20 @@
 import React from "react";
 import Image from "next/image";
 import { cn } from "@/lib/cn";
+import type { GalleryPhoto } from "@/data/gallery-photos";
 
 interface GalleryColumnProps {
-  images: string[];
+  images: GalleryPhoto[];
   className?: string;
   duration?: number;
+  onImageClick?: (photo: GalleryPhoto) => void;
 }
 
 export function GalleryColumn({
   images,
   className,
   duration = 48,
+  onImageClick,
 }: GalleryColumnProps) {
   if (images.length === 0) return null;
 
@@ -27,20 +30,26 @@ export function GalleryColumn({
       >
         {[0, 1].map((loop) => (
           <React.Fragment key={loop}>
-            {images.map((src, i) => (
+            {images.map((photo, i) => (
               <figure
-                key={`${loop}-${src}`}
+                key={`${loop}-${photo.src}`}
                 className="overflow-hidden rounded-2xl border border-black/10 shadow-lg dark:border-white/10"
               >
-                <div className="relative aspect-[4/3] w-full">
+                <button
+                  type="button"
+                  onClick={() => onImageClick?.(photo)}
+                  className="group relative block aspect-[4/3] w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
+                  aria-label={`Abrir ${photo.alt} a pantalla completa`}
+                >
                   <Image
-                    src={src}
-                    alt={`LOFTHOUSE 14 — foto ${i + 1}`}
+                    src={photo.src}
+                    alt={photo.alt}
                     fill
                     sizes="(max-width: 640px) 100vw, 33vw"
-                    className="object-cover"
+                    className="object-cover transition duration-500 group-hover:scale-[1.03]"
                   />
-                </div>
+                  <span className="pointer-events-none absolute inset-0 bg-black/0 transition group-hover:bg-black/15" />
+                </button>
               </figure>
             ))}
           </React.Fragment>

@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "LOFTHOUSE: Simple Browser (vista móvil)",
+      "dependsOn": ["_lofthouseOpenSimpleBrowserMobile"],
+      "problemMatcher": [],
+      "group": "none",
+      "presentation": { "reveal": "never" }
+    },
+    {
+      "label": "_lofthouseOpenSimpleBrowserMobile",
+      "type": "shell",
+      "command": "echo ${input:lofthouseMobileSimpleBrowser}",
+      "problemMatcher": [],
+      "presentation": { "reveal": "never", "echo": false, "focus": false }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "lofthouseMobileSimpleBrowser",
+      "type": "command",
+      "command": "simpleBrowser.show",
+      "args": ["http://localhost:3000/preview-movil"]
+    }
+  ]
+}

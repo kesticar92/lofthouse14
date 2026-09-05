@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f2f0eb;
+  --foreground: #0a0a0a;
+}
+
+.dark {
+  --background: #141210;
+  --foreground: #f2f0eb;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.dark .bg-grid-fade-only {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+}
+
+::selection {
+  background: rgba(217, 119, 6, 0.25);
+}
+
+@keyframes testimonial-scroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.testimonial-scroll-column:hover .testimonial-scroll-track {
+  animation-play-state: paused;
+}
+
+.testimonial-touch-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(161, 161, 170, 0.5) transparent;
+}

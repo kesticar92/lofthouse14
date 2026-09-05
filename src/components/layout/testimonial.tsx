@@ -85,7 +85,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
               width={40}
               height={40}
               src={testimonial.image}
-              alt=""
+              alt={`Foto de ${testimonial.name}, huésped de Lofthouse 14`}
               className="h-10 w-10 shrink-0 rounded-full border border-zinc-200 object-cover dark:border-white/10"
             />
           ) : (

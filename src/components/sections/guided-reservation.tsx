@@ -43,13 +43,14 @@ export function GuidedReservation({
   initialCheckOut = "",
   initialGuests,
 }: GuidedReservationProps) {
+  // Auditoría UX: fechas + huéspedes primero (sin preguntar perfil al entrar).
   const [step, setStep] = useState(() => {
-    if (initialCheckIn && initialCheckOut && initialGuests) return 4;
+    if (initialCheckIn && initialCheckOut && initialGuests) return 2;
     if (initialCheckIn && initialCheckOut) return 2;
     if (initialCheckIn || initialCheckOut || initialGuests) return 1;
-    return 0;
+    return 1;
   });
-  const [profile, setProfile] = useState<TripProfile | null>(null);
+  const [profile, setProfile] = useState<TripProfile | null>("pareja");
   const [name, setName] = useState("");
   const [checkIn, setCheckIn] = useState(initialCheckIn);
   const [checkOut, setCheckOut] = useState(initialCheckOut);
@@ -131,7 +132,7 @@ export function GuidedReservation({
   }
 
   function canAdvance(): boolean {
-    if (step === 0) return profile !== null;
+    if (step === 0) return true; // perfil opcional (auditoría: no bloquear)
     if (step === 1) return Boolean(checkIn && checkOut && quoteResult.ok);
     if (step === 2) return guests >= 1 && lofts >= 1 && quoteResult.ok;
     if (step === 3) {

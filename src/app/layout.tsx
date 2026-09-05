@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { LegacyHashRedirect } from "@/components/layout/legacy-hash-redirect";
 import { JsonLdGraph } from "@/components/layout/json-ld";
+import { ConsentBanner } from "@/components/layout/consent-banner";
 import { site } from "@/lib/site";
 import { getSiteUrl } from "@/lib/site-url";
 import {
@@ -122,7 +123,22 @@ export default function RootLayout({
         <ThemeProvider>
           <LegacyHashRedirect />
           {children}
+          <ConsentBanner />
         </ThemeProvider>
+        <Script id="consent-default" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied',
+              wait_for_update: 500
+            });
+          `}
+        </Script>
         {gtmId ? (
           <>
             <Script id="gtm" strategy="afterInteractive">
@@ -152,8 +168,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
             gtag('js', new Date());
-            gtag('config', '${gaId}');
+            gtag('config', '${gaId}', { anonymize_ip: true });
           `}
             </Script>
           </>

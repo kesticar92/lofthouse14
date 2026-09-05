@@ -30,15 +30,57 @@ export default function EnglishPage() {
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-300">
           14 private lofts with WiFi, air conditioning and a kitchen. From{" "}
-          {formatCOP(site.priceFromCop)} per night for two guests in low season.
-          Self check-in after ID verification. {agg.reviewCount} verified
-          reviews ({agg.ratingValue}/5) on Google, Booking and Airbnb.
+          {formatCOP(site.priceFromCop)} (~USD 20) per night for two guests in
+          low season. Self check-in after ID verification. {agg.reviewCount}{" "}
+          verified reviews ({agg.ratingValue}/5) on Google, Booking and Airbnb.
         </p>
         <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
           Address: {site.addressLine}, Miraflores, Cali, Valle del Cauca.
           WhatsApp {site.phoneDisplay}. Groups up to {site.maxGuests} guests can
-          book multiple lofts in the same building.
+          book multiple lofts in the same building — salsa dancers, digital
+          nomads, medical travelers and families included.
         </p>
+        <h2 className="mt-10 font-display text-2xl text-zinc-900 dark:text-[#f2f0eb]">
+          Why Miraflores
+        </h2>
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-base text-zinc-600 dark:text-zinc-300">
+          <li>Walkable restaurants and nightlife around Parque del Perro</li>
+          <li>Close to San Fernando clinics and Pascual Guerrero stadium</li>
+          <li>Self check-in — no front desk hours</li>
+          <li>Book direct: clearer pricing than OTAs for multi-loft groups</li>
+        </ul>
+        <h2 className="mt-10 font-display text-2xl text-zinc-900 dark:text-[#f2f0eb]">
+          Explore
+        </h2>
+        <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">
+          <Link href="/lofts" className="text-amber-700 underline dark:text-amber-400">
+            All lofts
+          </Link>
+          <Link
+            href="/ubicacion-miraflores-cali"
+            className="text-amber-700 underline dark:text-amber-400"
+          >
+            Location map
+          </Link>
+          <Link
+            href="/hospedaje-salsa-cali"
+            className="text-amber-700 underline dark:text-amber-400"
+          >
+            Salsa stays
+          </Link>
+          <Link
+            href="/hospedaje-nomadas-digitales-cali"
+            className="text-amber-700 underline dark:text-amber-400"
+          >
+            Digital nomads
+          </Link>
+          <Link
+            href="/hospedaje-medico-cali"
+            className="text-amber-700 underline dark:text-amber-400"
+          >
+            Medical travel
+          </Link>
+        </div>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/reservas"

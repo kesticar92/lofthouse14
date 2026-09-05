@@ -4,7 +4,6 @@ import { Hero } from "@/components/sections/hero";
 import { Lofts } from "@/components/sections/lofts";
 import { Location } from "@/components/sections/location";
 import { SiteFooter } from "@/components/sections/site-footer";
-import { GuidedReservation } from "@/components/sections/guided-reservation";
 import TestimonialsUsage from "@/components/sections/testimonialUsage";
 import { FaqSection } from "@/components/sections/faq";
 import { Gallery } from "@/components/sections/gallery";
@@ -31,8 +30,7 @@ export default function Home() {
         <Audiences />
         <ValueProps />
         <Lofts />
-        <TestimonialsUsage />
-        <GuidedReservation />
+        <TestimonialsUsage variant="home" />
         <Location />
         <FaqSection />
         <Gallery />

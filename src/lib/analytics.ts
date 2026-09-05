@@ -6,23 +6,24 @@ export type AnalyticsPayload = Record<
 declare global {
   interface Window {
     gtag?: (
-      command: "event" | "config" | "js",
-      target: string,
-      params?: AnalyticsPayload,
+      command: "event" | "config" | "js" | "consent",
+      targetOrAction: string,
+      params?: AnalyticsPayload | Record<string, string>,
     ) => void;
     fbq?: (
       command: "track" | "init" | "trackCustom",
       event: string,
       params?: AnalyticsPayload,
     ) => void;
-    dataLayer?: unknown[];
+    dataLayer?: Record<string, unknown>[];
   }
 }
 
 export function trackEvent(name: string, params?: AnalyticsPayload) {
   if (typeof window === "undefined") return;
   window.gtag?.("event", name, params);
-  window.dataLayer?.push({ event: name, ...params });
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: name, ...params });
 }
 
 export function trackWhatsApp(placement: string) {
@@ -41,4 +42,10 @@ export function trackBeginCheckout(params?: AnalyticsPayload) {
 export function trackViewItem(params: AnalyticsPayload) {
   trackEvent("view_item", params);
   window.fbq?.("track", "ViewContent", params);
+}
+
+/** Reserva confirmada (cuando el flujo de pago/WhatsApp cierra trato). */
+export function trackPurchase(params: AnalyticsPayload) {
+  trackEvent("purchase", params);
+  window.fbq?.("track", "Purchase", params);
 }

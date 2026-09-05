@@ -33,6 +33,30 @@ export const BLOG_POSTS: BlogPost[] = [
       "Si viajas por trabajo o rotación médica, ten a mano farmacias y supermercados del barrio; no necesitas un mall para resolver la semana. El mapa de ubicación del sitio marca gastronomía, cultura y ocio alrededor de Carrera 26 # 2-91.",
     ],
   },
+  {
+    slug: "salsa-en-cali-donde-hospedarse",
+    title: "Salsa en Cali: dónde hospedarse cerca del Parque del Perro",
+    description:
+      "Guía para bailarines y turistas de salsa: academias, rumba y loft privado en Miraflores. Check-in autónomo y A/C.",
+    date: "2026-09-12",
+    body: [
+      "Cali es capital de la salsa: academias, socials y bares se concentran en el sur y el centro-sur. Si tu prioridad es bailar y dormir bien, un loft en Miraflores te deja a pasos del Parque del Perro sin ruido de hostel.",
+      "Lofthouse 14 ofrece lofts privados con aire acondicionado, ducha y cocina. Ideal para parejas de baile o teams que toman varias unidades en el mismo edificio. El check-in es autónomo: llegas después de la clase o del aeropuerto sin esperar recepción.",
+      "Reserva fechas con anticipación en temporada de festivales. No se permiten fiestas en el inmueble; la rumba está afuera. WhatsApp y el motor de reservas del sitio cierran la cotización en minutos.",
+    ],
+  },
+  {
+    slug: "hospedaje-cerca-clinicas-san-fernando-cali",
+    title: "Hospedaje cerca de clínicas en San Fernando, Cali",
+    description:
+      "Lofts en Miraflores para pacientes y acompañantes: cocina, nevera, WiFi y check-in autónomo cerca de San Fernando.",
+    date: "2026-09-19",
+    body: [
+      "Quien viaja por tratamiento o cirugía necesita nevera, cocina y silencio más que un lobby de hotel. Miraflores y San Fernando concentran clínicas, farmacias y consultorios a un trayecto corto.",
+      "En Lofthouse 14 cada loft es privado: útil para paciente + acompañante (ideal 2, hasta 5). El check-in autónomo permite llegar a la hora de la cita. Estadías de varias noches o semanas se cotizan por WhatsApp.",
+      "Si viene familia adicional, se asignan lofts extra en el mismo predio para no dispersarse por la ciudad. Reserva directo en el sitio o escribe con fechas y número de personas.",
+    ],
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

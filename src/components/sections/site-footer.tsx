@@ -106,6 +106,14 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link
+                  href="/hospedaje-salsa-cali"
+                  className="text-amber-400 hover:underline"
+                >
+                  Salsa / bailarines
+                </Link>
+              </li>
+              <li>
                 <span className="font-semibold text-[#f2f0eb]">Check-in:</span>{" "}
                 {site.checkIn}
               </li>

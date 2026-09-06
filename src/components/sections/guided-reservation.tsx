@@ -22,6 +22,12 @@ import {
 } from "@/lib/configurator-extras";
 import { cn } from "@/lib/cn";
 import { ConfiguratorOrbitalSteps } from "@/components/sections/configurator-orbital-steps";
+import {
+  STAY_DRAFT_EVENT,
+  clearStayDraft,
+  readStayDraft,
+  type StayDraft,
+} from "@/lib/stay-draft";
 
 const STEPS = [
   "Tu viaje",
@@ -53,6 +59,30 @@ export function GuidedReservation() {
     });
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
+
+  useEffect(() => {
+    const applyDraft = (draft: StayDraft | null) => {
+      if (!draft) return;
+      if (draft.checkIn) setCheckIn(draft.checkIn);
+      if (draft.checkOut) setCheckOut(draft.checkOut);
+      if (draft.guests && draft.guests > 0) setGuests(draft.guests);
+      if (typeof draft.step === "number") {
+        setStep(Math.min(STEPS.length - 1, Math.max(0, draft.step)));
+      } else if (draft.checkIn && draft.checkOut) {
+        setStep(1);
+      }
+      clearStayDraft();
+    };
+
+    applyDraft(readStayDraft());
+
+    const onDraft = (event: Event) => {
+      const custom = event as CustomEvent<StayDraft>;
+      applyDraft(custom.detail ?? null);
+    };
+    window.addEventListener(STAY_DRAFT_EVENT, onDraft);
+    return () => window.removeEventListener(STAY_DRAFT_EVENT, onDraft);
+  }, []);
 
   const quoteResult = useMemo(
     () =>
@@ -207,11 +237,12 @@ export function GuidedReservation() {
         <div className="mb-8 flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-10">
           <div className="max-w-xl text-center md:text-left">
             <h2 className="font-display text-4xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
-              Configura tu estadía
+              Cotiza tu estadía
             </h2>
             <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-              Un paso a la vez, como en recepción: tú eliges, nosotros te
-              mostramos el total estimado antes de reservar.
+              Las fechas definen noches y precio estimado. Luego eliges lofts y
+              extras; al final te llevamos a WhatsApp con el resumen para
+              confirmar.
             </p>
           </div>
           <ConfiguratorOrbitalSteps
@@ -270,6 +301,11 @@ export function GuidedReservation() {
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     ¿Qué fechas necesitas?
                   </h3>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    Entrada = día que llegas. Salida = día que te vas. Con eso
+                    calculamos noches y el precio estimado de la estadía (aún no
+                    es una reserva confirmada).
+                  </p>
                   <StayDateRangePicker
                     checkIn={checkIn}
                     checkOut={checkOut}
@@ -279,11 +315,50 @@ export function GuidedReservation() {
                     }}
                     required
                   />
-                  {quoteResult.ok && (
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                      {quoteResult.noches} noche(s) · base alojamiento{" "}
-                      {formatCOP(quoteResult.subtotalAlojamiento)} (
-                      {lofts} loft(s) en el siguiente paso)
+                  {quoteResult.ok ? (
+                    <div className="rounded-2xl bg-zinc-50 p-4 text-sm dark:bg-zinc-800/60">
+                      <p className="font-medium text-zinc-900 dark:text-white">
+                        {quoteResult.noches} noche
+                        {quoteResult.noches === 1 ? "" : "s"} · estimado para{" "}
+                        {lofts} loft{lofts === 1 ? "" : "s"}
+                      </p>
+                      <ul className="mt-2 space-y-1 text-zinc-600 dark:text-zinc-400">
+                        <li className="flex justify-between gap-3">
+                          <span>Alojamiento</span>
+                          <span>{formatCOP(quoteResult.subtotalAlojamiento)}</span>
+                        </li>
+                        {quoteResult.recargoHuespedes > 0 ? (
+                          <li className="flex justify-between gap-3">
+                            <span>Recargo huéspedes</span>
+                            <span>
+                              {formatCOP(quoteResult.recargoHuespedes)}
+                            </span>
+                          </li>
+                        ) : null}
+                        {quoteResult.aseoTotal > 0 ? (
+                          <li className="flex justify-between gap-3">
+                            <span>Aseo (una vez)</span>
+                            <span>{formatCOP(quoteResult.aseoTotal)}</span>
+                          </li>
+                        ) : null}
+                        <li className="flex justify-between gap-3 border-t border-zinc-200 pt-2 font-semibold text-zinc-900 dark:border-zinc-700 dark:text-white">
+                          <span>Total estimado</span>
+                          <span>{formatCOP(quoteResult.totalReserva)}</span>
+                        </li>
+                      </ul>
+                      <p className="mt-2 text-xs text-zinc-500">
+                        En el siguiente paso ajustas personas y lofts; el total
+                        se recalcula. La confirmación final es por WhatsApp.
+                      </p>
+                    </div>
+                  ) : checkIn && checkOut ? (
+                    <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+                      {quoteResult.error ||
+                        "Revisa las fechas para ver el precio estimado."}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-zinc-500">
+                      Elige entrada y salida para ver noches y precio estimado.
                     </p>
                   )}
                 </div>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { site, waLink } from "@/lib/site";
+import { STICKY_BOOKING_VISIBLE_EVENT } from "@/lib/stay-draft";
 import {
   GoogleMapsIcon,
   ShareIosIcon,
@@ -56,9 +57,20 @@ export function ShareBar() {
   const [shareUrl, setShareUrl] = useState(
     process.env.NEXT_PUBLIC_SITE_URL || "https://lofthouse14.com",
   );
+  const [liftForSticky, setLiftForSticky] = useState(false);
 
   useEffect(() => {
     setShareUrl(window.location.href);
+  }, []);
+
+  useEffect(() => {
+    const onSticky = (event: Event) => {
+      const custom = event as CustomEvent<{ visible?: boolean }>;
+      setLiftForSticky(Boolean(custom.detail?.visible));
+    };
+    window.addEventListener(STICKY_BOOKING_VISIBLE_EVENT, onSticky);
+    return () =>
+      window.removeEventListener(STICKY_BOOKING_VISIBLE_EVENT, onSticky);
   }, []);
 
   const shareText = `${site.name} — ${site.tagline}`;
@@ -87,7 +99,10 @@ export function ShareBar() {
 
   return (
     <div
-      className="fixed bottom-6 right-4 z-[60] flex flex-col items-center gap-1"
+      className={cn(
+        "fixed right-4 z-[60] flex flex-col items-center gap-1 transition-[bottom] duration-300",
+        liftForSticky ? "bottom-[13.5rem] md:bottom-6" : "bottom-6",
+      )}
       aria-label="Acciones rápidas"
     >
       <div

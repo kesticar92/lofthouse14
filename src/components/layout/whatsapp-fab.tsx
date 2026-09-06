@@ -1,16 +1,36 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { waLink, site } from "@/lib/site";
 import { trackWhatsAppClick } from "@/lib/analytics";
+import { STICKY_BOOKING_VISIBLE_EVENT } from "@/lib/stay-draft";
 import {
   GoogleMapsIcon,
   WhatsAppLogoIcon,
 } from "@/components/layout/share-bar-icons";
+import { cn } from "@/lib/cn";
 
 export function WhatsAppFab() {
+  const [liftForSticky, setLiftForSticky] = useState(false);
+
+  useEffect(() => {
+    const onSticky = (event: Event) => {
+      const custom = event as CustomEvent<{ visible?: boolean }>;
+      setLiftForSticky(Boolean(custom.detail?.visible));
+    };
+    window.addEventListener(STICKY_BOOKING_VISIBLE_EVENT, onSticky);
+    return () =>
+      window.removeEventListener(STICKY_BOOKING_VISIBLE_EVENT, onSticky);
+  }, []);
+
   return (
-    <div className="fixed bottom-5 right-5 z-[60] flex flex-col items-end gap-3">
+    <div
+      className={cn(
+        "fixed right-5 z-[60] flex flex-col items-end gap-3 transition-[bottom] duration-300",
+        liftForSticky ? "bottom-[13.5rem] md:bottom-5" : "bottom-5",
+      )}
+    >
       <motion.a
         href={site.google_url}
         target="_blank"

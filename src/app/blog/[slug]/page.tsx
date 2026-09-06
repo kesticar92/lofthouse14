@@ -50,7 +50,7 @@ export default async function BlogPostPage({ params }: Props) {
           { name: post.title, path: `/blog/${post.slug}` },
         ])}
       />
-      <article className="mx-auto max-w-3xl px-4 pb-20 pt-28 md:px-8">
+      <article className="mx-auto max-w-3xl px-4 pb-20 pt-44 md:px-8">
         <Breadcrumbs
           items={[
             { href: "/", label: "Inicio" },

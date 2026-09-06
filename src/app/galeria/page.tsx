@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function GaleriaPage() {
   return (
     <PublicShell>
-      <div className="pt-24">
+      <div className="pt-40">
         <div className="px-4 pb-6 text-center md:px-20">
           <Link
             href="/reservas"

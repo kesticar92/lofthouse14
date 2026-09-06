@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function MedicoPage() {
   return (
     <PublicShell>
-      <div className="mx-auto max-w-3xl px-4 pb-20 pt-28 md:px-8">
+      <div className="mx-auto max-w-3xl px-4 pb-20 pt-44 md:px-8">
         <Breadcrumbs
           items={[
             { href: "/", label: "Inicio" },

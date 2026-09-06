@@ -29,7 +29,7 @@ export default function ResenasPage() {
           ...reviewGraphJsonLd(),
         ]}
       />
-      <div className="mx-auto max-w-4xl px-4 pt-28 md:px-8">
+      <div className="mx-auto max-w-4xl px-4 pt-44 md:px-8">
         <Breadcrumbs
           items={[
             { href: "/", label: "Inicio" },

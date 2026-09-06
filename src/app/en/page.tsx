@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function EnglishPage() {
   return (
     <PublicShell>
-      <div className="mx-auto max-w-3xl px-4 pb-20 pt-28 md:px-8">
+      <div className="mx-auto max-w-3xl px-4 pb-20 pt-44 md:px-8">
         <p className="text-sm text-zinc-500">
           <Link href="/" className="underline">
             Español

@@ -10,7 +10,6 @@ import { Gallery } from "@/components/sections/gallery";
 import { SocialWall } from "@/components/sections/socialWall";
 import { Audiences } from "@/components/sections/audiences";
 import { ValueProps } from "@/components/sections/value-props";
-import { StickyBookingBar } from "@/components/layout/booking-bar";
 import { GuidedReservation } from "@/components/sections/guided-reservation";
 import { aggregateReviews, homeExtraJsonLd } from "@/lib/seo";
 import { JsonLdGraph } from "@/components/layout/json-ld";
@@ -27,8 +26,6 @@ export default function Home() {
           ratingValue={reviews.ratingValue}
           reviewCount={reviews.reviewCount}
         />
-        {/* Un solo buscador: visible en el hero y sticky al bajar */}
-        <StickyBookingBar />
         <Audiences />
         <ValueProps />
         <Lofts />

@@ -55,7 +55,7 @@ export default async function LoftPage({ params }: Props) {
           hotelRoomJsonLd(unit),
         ]}
       />
-      <article className="mx-auto max-w-5xl px-4 pb-20 pt-28 md:px-8">
+      <article className="mx-auto max-w-5xl px-4 pb-20 pt-44 md:px-8">
         <Breadcrumbs
           items={[
             { href: "/", label: "Inicio" },

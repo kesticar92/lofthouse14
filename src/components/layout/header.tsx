@@ -5,6 +5,7 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import { BookingBar } from "./booking-bar";
 import { site, waLink } from "@/lib/site";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -38,92 +39,87 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300 px-4 md:px-20 py-2",
+        "fixed inset-x-0 top-0 z-50 transition-all duration-300 px-3 md:px-8 lg:px-12 py-2",
         scrolled
-          ? "bg-[#f2f0eb]/85 dark:bg-zinc-950/85 backdrop-blur-md shadow-lg border-b border-black/5 dark:border-white/5"
-          : "bg-transparent shadow-none",
+          ? "bg-[#f2f0eb]/90 dark:bg-zinc-950/90 backdrop-blur-md shadow-lg border-b border-black/5 dark:border-white/5"
+          : "bg-gradient-to-b from-black/45 via-black/20 to-transparent shadow-none",
       )}
     >
-      <div className="items-center grid grid-cols-[auto_1fr_auto] gap-2 md:gap-4 px-3 py-2.5">
-        <div className="flex items-center justify-start gap-2.5">
-          <p
-            className={cn(
-              "hidden lg:block text-xs font-semibold uppercase tracking-wider transition-colors duration-300",
-              scrolled
-                ? "text-zinc-600 dark:text-zinc-400"
-                : "text-[#f2f0eb]/80",
-            )}
-          >
-            Vive Cali desde el lugar correcto
-          </p>
-          <div
-            className={cn(
-              "hidden lg:block h-5 w-px transition-colors duration-300",
-              scrolled ? "bg-zinc-300 dark:bg-zinc-800" : "bg-white/20",
-            )}
-          ></div>
-          <button
-            id="menu_desplegable"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={cn(
-              "flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-sm",
-              scrolled
-                ? "border-zinc-300 text-zinc-700 hover:bg-zinc-200/50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900/50"
-                : "border-white/30 text-white hover:bg-white/10",
-            )}
-          >
-            {isMenuOpen ? (
-              <X className="w-3.5 h-3.5" />
-            ) : (
-              <Menu className="w-3.5 h-3.5" />
-            )}
-            <span>menú</span>
-          </button>
+      <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 md:gap-4 px-1 py-1.5">
+          <div className="flex items-center justify-start gap-2.5">
+            <p
+              className={cn(
+                "hidden xl:block text-xs font-semibold uppercase tracking-wider transition-colors duration-300",
+                scrolled
+                  ? "text-zinc-600 dark:text-zinc-400"
+                  : "text-[#f2f0eb]/80",
+              )}
+            >
+              Vive Cali desde el lugar correcto
+            </p>
+            <div
+              className={cn(
+                "hidden xl:block h-5 w-px transition-colors duration-300",
+                scrolled ? "bg-zinc-300 dark:bg-zinc-800" : "bg-white/20",
+              )}
+            />
+            <button
+              id="menu_desplegable"
+              type="button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={cn(
+                "flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-sm",
+                scrolled
+                  ? "border-zinc-300 text-zinc-700 hover:bg-zinc-200/50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900/50"
+                  : "border-white/30 text-white hover:bg-white/10",
+              )}
+            >
+              {isMenuOpen ? (
+                <X className="w-3.5 h-3.5" />
+              ) : (
+                <Menu className="w-3.5 h-3.5" />
+              )}
+              <span>menú</span>
+            </button>
+          </div>
+
+          <Link href="/" className="justify-self-center">
+            <div
+              className={cn(
+                "border-l-0 border-t-2 border-r-0 border-b-2 px-3 py-1.5 transition-all duration-300",
+                scrolled
+                  ? "border-zinc-900 text-zinc-900 dark:border-[#f2f0eb]/90 dark:text-[#f2f0eb]/90"
+                  : "border-white text-[#f2f0eb]/90",
+              )}
+            >
+              <p className="text-base md:text-2xl lg:text-3xl font-extrabold uppercase tracking-[0.18em] font-display">
+                LOFTHOUSE14
+              </p>
+            </div>
+          </Link>
+
+          <div className="flex items-center justify-end justify-self-end gap-2 md:gap-3">
+            <Link href="/#preguntas-frecuentes">
+              <button
+                type="button"
+                className={cn(
+                  "hidden lg:block rounded-xl px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider transition duration-300 border",
+                  scrolled
+                    ? "bg-transparent text-zinc-800 border-zinc-300 hover:bg-zinc-200/50 dark:text-zinc-200 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
+                    : "bg-transparent text-white border-white/20 hover:bg-white/10",
+                )}
+              >
+                Ayuda
+              </button>
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
 
-        <Link href="/" className="justify-self-center">
-          <div
-            className={cn(
-              "border-l-0 border-t-2 border-r-0 border-b-2 px-3 py-1.5 transition-all duration-300",
-              scrolled
-                ? "border-zinc-900 text-zinc-900 dark:border-[#f2f0eb]/90 dark:text-[#f2f0eb]/90"
-                : "border-white text-[#f2f0eb]/90",
-            )}
-          >
-            <p className="text-base md:text-2xl lg:text-3xl font-extrabold uppercase tracking-[0.18em] font-display">
-              LOFTHOUSE14
-            </p>
-          </div>
-        </Link>
-
-        <div className="flex items-center justify-end justify-self-end gap-2 md:gap-4">
-          <Link href="/#preguntas-frecuentes">
-            <button
-              type="button"
-              className={cn(
-                "hidden lg:block rounded-xl px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider transition duration-300 border",
-                scrolled
-                  ? "bg-transparent text-zinc-800 border-zinc-300 hover:bg-zinc-200/50 dark:text-zinc-200 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
-                  : "bg-transparent text-white border-white/20 hover:bg-white/10",
-              )}
-            >
-              Ayuda
-            </button>
-          </Link>
-          <Link href="/reservas">
-            <button
-              type="button"
-              className={cn(
-                "hidden sm:block rounded-xl px-5 py-2.5 text-center text-xs font-bold uppercase tracking-wider transition border shadow-sm",
-                scrolled
-                  ? "bg-amber-600 text-white border-amber-600 hover:bg-amber-700 shadow-amber-600/10"
-                  : "bg-amber-500 text-white border-amber-500 hover:bg-amber-600 shadow-amber-500/20",
-              )}
-            >
-              Reservar
-            </button>
-          </Link>
-          <ThemeToggle />
+        {/* Configurador de reserva integrado al header */}
+        <div className="px-1 pb-1">
+          <BookingBar variant="header" />
         </div>
       </div>
 

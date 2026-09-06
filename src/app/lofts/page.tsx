@@ -25,7 +25,7 @@ export default function LoftsCatalogPage() {
           { name: "Lofts", path: "/lofts" },
         ])}
       />
-      <div className="mx-auto max-w-6xl px-4 pb-20 pt-28 md:px-8">
+      <div className="mx-auto max-w-6xl px-4 pb-20 pt-44 md:px-8">
         <Breadcrumbs
           items={[
             { href: "/", label: "Inicio" },

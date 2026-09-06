@@ -76,11 +76,11 @@ export function Header() {
         {/* Reserva inline — el corazón del banner */}
         <BookingBar variant="banner" className="min-w-0" />
 
-        {/* Ayuda */}
+        {/* Ayuda: solo desktop; en móvil vive dentro del menú */}
         <Link
           href="/#preguntas-frecuentes"
           aria-label="Ayuda"
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-zinc-700 transition hover:bg-black/5 dark:text-zinc-200 dark:hover:bg-white/10 sm:h-10 sm:w-10"
+          className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-zinc-700 transition hover:bg-black/5 dark:text-zinc-200 dark:hover:bg-white/10 sm:inline-flex sm:h-10 sm:w-10"
         >
           <HelpCircle className="size-4" />
           <span className="sr-only">Ayuda</span>

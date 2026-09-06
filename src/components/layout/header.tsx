@@ -61,8 +61,13 @@ export function Header() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIsMenuOpen(false);
     };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [isMenuOpen]);
 
   const panelMotion = isDesktop
@@ -120,15 +125,19 @@ export function Header() {
           : "border-b border-transparent bg-black/25 backdrop-blur-sm",
       )}
     >
-      <div className="mx-auto flex h-14 max-w-[90rem] items-center gap-2 px-3 md:h-[4.25rem] md:gap-3 md:px-5 lg:px-6">
+      <div className="relative z-[60] mx-auto flex h-14 max-w-[90rem] items-center gap-2 px-3 md:h-[4.25rem] md:gap-3 md:px-5 lg:px-6">
         <button
           type="button"
           id="menu_desplegable"
           aria-expanded={isMenuOpen}
           aria-controls="site-menu"
-          onClick={() => setIsMenuOpen((v) => !v)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsMenuOpen((v) => !v);
+          }}
           className={cn(
-            "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition md:px-3.5 md:text-xs",
+            "relative z-[61] inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition md:px-3.5 md:text-xs",
             chrome,
           )}
         >
@@ -245,7 +254,7 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[2px]"
+              className="fixed inset-0 z-[40] bg-black/35 backdrop-blur-[2px]"
               onClick={() => setIsMenuOpen(false)}
             />
             <motion.div
@@ -258,7 +267,7 @@ export function Header() {
               exit={panelMotion.exit}
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className={cn(
-                "absolute z-[45] max-h-[min(85vh,640px)] overflow-y-auto border border-black/5 bg-[#f2f0eb]/98 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/98",
+                "absolute z-[55] max-h-[min(85vh,640px)] overflow-y-auto border border-black/5 bg-[#f2f0eb]/98 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/98",
                 "inset-x-3 top-[calc(100%+6px)] rounded-2xl",
                 "md:inset-x-auto md:left-0 md:top-full md:h-[calc(100dvh-4.25rem)] md:max-h-none md:w-[min(22rem,90vw)] md:rounded-none md:rounded-br-2xl md:border-l-0 md:p-8",
               )}

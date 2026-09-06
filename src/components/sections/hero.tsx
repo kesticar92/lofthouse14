@@ -251,7 +251,9 @@ export function Hero({
         <ChevronRight className="h-6 w-6" strokeWidth={2.5} />
       </button>
 
-      <div className="pointer-events-none relative z-10 w-full p-6 pb-6 max-sm:pr-[5.75rem] sm:pb-8 md:p-16 md:pb-10">
+      {/* pb extra: deja hueco para el buscador sticky que se solapa desde debajo del hero */}
+      {/* pb amplio: el StickyBookingBar se solapa aquí desde debajo del hero */}
+      <div className="pointer-events-none relative z-10 w-full p-6 pb-44 max-sm:pr-[5.75rem] sm:pb-36 md:p-16 md:pb-32">
         <div className="max-w-3xl text-left">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-200">
             Miraflores · Parque del Perro

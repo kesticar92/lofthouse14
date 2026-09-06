@@ -1,10 +1,14 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { StayDateRangePicker } from "@/components/ui/stay-date-range-picker";
 import { trackBeginCheckout } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
+
+/** Altura aproximada del header fijo (top sticky del buscador). */
+const HEADER_STICKY_TOP = "4.25rem";
+const HEADER_STICKY_PX = 68;
 
 export function BookingBar({ className }: { className?: string }) {
   const router = useRouter();
@@ -65,10 +69,44 @@ export function BookingBar({ className }: { className?: string }) {
   );
 }
 
+/**
+ * Un solo buscador: arranca visualmente dentro del hero (margen negativa)
+ * y se pega bajo el header al hacer scroll. No duplicar en el hero.
+ */
 export function StickyBookingBar() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const top = el.getBoundingClientRect().top;
+      setStuck(top <= HEADER_STICKY_PX + 1);
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   return (
-    <div className="sticky top-[4.25rem] z-40 border-b border-black/5 bg-[#f2f0eb]/90 px-3 py-3 backdrop-blur-md dark:border-white/5 dark:bg-zinc-950/90 md:px-8">
-      <BookingBar />
+    <div
+      ref={wrapRef}
+      style={{ top: HEADER_STICKY_TOP }}
+      className={cn(
+        "sticky z-40 -mt-24 px-3 transition-[background-color,border-color,box-shadow,padding] duration-200 md:-mt-28 md:px-8",
+        stuck
+          ? "border-b border-black/5 bg-[#f2f0eb]/95 py-3 shadow-sm backdrop-blur-md dark:border-white/5 dark:bg-zinc-950/95"
+          : "border-b border-transparent bg-transparent py-0",
+      )}
+    >
+      <BookingBar className={stuck ? undefined : "shadow-2xl"} />
     </div>
   );
 }

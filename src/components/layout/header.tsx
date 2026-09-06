@@ -21,10 +21,7 @@ const PAGE_NAV = [
   { href: "/#galeria", label: "Galería y redes" },
 ] as const;
 
-const GUEST_OPTIONS = Array.from(
-  { length: Math.min(site.maxGuests, 20) },
-  (_, i) => i + 1,
-);
+const GUEST_OPTIONS = Array.from({ length: site.maxGuests }, (_, i) => i + 1);
 
 /**
  * Barra única con contraste sólido:

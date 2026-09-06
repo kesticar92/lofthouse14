@@ -1,15 +1,14 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import {
+  Bath,
   ChevronLeft,
   ChevronRight,
+  ChefHat,
+  Tv,
   Users,
   Wifi,
   Wind,
-  ChefHat,
 } from "lucide-react";
 import { trackBeginCheckout } from "@/lib/analytics";
 import { saveStayDraft } from "@/lib/stay-draft";
@@ -44,13 +43,11 @@ const HIGHLIGHTS = [
   { icon: ChefHat, label: "Cocina" },
   { icon: Wifi, label: "WiFi" },
   { icon: Wind, label: "A/C" },
-  { icon: Users, label: `Hasta ${site.maxGuestsPerLoft}` },
+  { icon: Tv, label: "Smart TV" },
+  { icon: Bath, label: "Baño" },
 ] as const;
 
-const GUEST_OPTIONS = Array.from(
-  { length: Math.min(site.maxGuests, 20) },
-  (_, i) => i + 1,
-);
+const GUEST_OPTIONS = Array.from({ length: site.maxGuests }, (_, i) => i + 1);
 
 /**
  * Card de reserva del hero: fotos clave + fechas (calendario) + huéspedes (selector)

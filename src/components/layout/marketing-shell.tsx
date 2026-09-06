@@ -1,19 +1,17 @@
 import { Header } from "@/components/layout/header";
 import { SiteFooter } from "@/components/sections/site-footer";
 import { ShareBar } from "@/components/layout/share-bar";
-import { StickyBookingBar } from "@/components/layout/sticky-booking-bar";
 
 export function MarketingShell({
   children,
-  showSticky = true,
 }: {
   children: React.ReactNode;
+  /** @deprecated La reserva vive en el header único de escritorio. */
   showSticky?: boolean;
 }) {
   return (
     <>
       <Header />
-      {showSticky ? <StickyBookingBar /> : null}
       <main className="min-h-[70vh]">{children}</main>
       <SiteFooter />
       <ShareBar />

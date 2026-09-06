@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { HeroBookingCard } from "@/components/sections/hero-booking-card";
 
@@ -162,7 +162,7 @@ export function Hero() {
         />
         <div className="relative z-10 px-4 pb-8 pt-20">
           <p className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/35 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
-            <span aria-hidden>★</span> 4.8 · 388 reseñas
+            <span className="text-amber-400" aria-hidden>★</span> 4.8 · 388 reseñas
           </p>
           <h1 className="font-display text-[1.65rem] font-bold uppercase leading-tight text-white drop-shadow-md">
             Lofts en Cali Miraflores — Parque del Perro
@@ -244,14 +244,24 @@ export function Hero() {
         <div className="pointer-events-none relative z-10 w-full p-16 pb-20">
           <div className="max-w-3xl text-left">
             <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
-              <span aria-hidden>★</span> 4.8 · 388 reseñas verificadas
+              <span className="text-base leading-none text-amber-400" aria-hidden>
+                ★
+              </span>
+              <span>4.8 · 388 reseñas</span>
+              <BadgeCheck
+                className="h-4 w-4 text-[#1D9BF0]"
+                fill="currentColor"
+                strokeWidth={0}
+                aria-label="Verificado"
+              />
             </p>
-            <h1 className="font-display text-5xl font-bold uppercase leading-tight text-white drop-shadow-md lg:text-6xl">
-              Lofts en Cali Miraflores — Tu base en el Parque del Perro
+            <h1 className="font-display text-5xl font-bold uppercase leading-[1.05] text-white drop-shadow-md lg:text-6xl">
+              Apartaestudios Dúplex en Cali, Miraflores,{" "}
+              <span className="block">Vive Cali desde El parque del perro</span>
             </h1>
-            <p className="mt-4 text-xl leading-snug text-gray-200 drop-shadow-md">
-              Cocina, WiFi y check-in autónomo. Desde $90.000/noche. Reserva
-              directo con Lofthouse 14.
+            <p className="mt-4 max-w-2xl text-xl leading-snug text-gray-200 drop-shadow-md">
+              Cocina equipada, A/C, Wifi y Check In Autonomo. Desde $90.000 la
+              noche, Reserva Directo con Lofthouse 14
             </p>
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -263,13 +273,13 @@ export function Hero() {
                 href="#reservas"
                 className="pointer-events-auto inline-flex rounded-full border border-transparent bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-lg transition hover:bg-zinc-100 dark:border-white/15 dark:bg-zinc-900/90 dark:text-[#f2f0eb] dark:shadow-black/40 dark:backdrop-blur-md dark:hover:bg-zinc-800"
               >
-                Configurar mi estadía
+                Reserva Ahora
               </Link>
               <Link
-                href="/lofts"
-                className="pointer-events-auto inline-flex rounded-full border border-white/40 bg-white/10 px-6 py-4 text-sm font-bold uppercase tracking-wide text-white backdrop-blur-md transition hover:bg-white/20"
+                href="#lofts"
+                className="pointer-events-auto inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/10 px-6 py-4 text-sm font-bold uppercase tracking-wide text-white backdrop-blur-md transition hover:bg-white/20"
               >
-                Ver lofts
+                ver mas +
               </Link>
             </motion.div>
           </div>

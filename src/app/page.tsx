@@ -1,6 +1,5 @@
 import { Header } from "@/components/layout/header";
 import { ShareBar } from "@/components/layout/share-bar";
-import { StickyBookingBar } from "@/components/layout/sticky-booking-bar";
 import { Hero } from "@/components/sections/hero";
 import { Lofts } from "@/components/sections/lofts";
 import { Location } from "@/components/sections/location";
@@ -19,7 +18,6 @@ export default function Home() {
     <>
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[length:40px_40px] bg-grid-fade opacity-[0.35] dark:bg-grid-fade-dark dark:opacity-20" />
       <Header />
-      <StickyBookingBar />
       <main>
         <Hero />
         <Gallery />

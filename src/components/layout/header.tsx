@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { CalendarDays, Menu, Users, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ThemeToggle } from "./theme-toggle";
 import { site, waLink } from "@/lib/site";
 import { cn } from "@/lib/cn";
+import { trackBeginCheckout } from "@/lib/analytics";
+import { saveStayDraft } from "@/lib/stay-draft";
 
 /** Navegación del embudo: solo lo esencial hacia la reserva. */
 const PAGE_NAV = [
@@ -18,14 +20,26 @@ const PAGE_NAV = [
   { href: "#galeria", label: "Galería y redes" },
 ] as const;
 
+function todayISO() {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
 /**
- * Barra fija única: menú a la izquierda, marca al centro, ayuda + día/noche a la derecha.
- * Menú: izquierda → derecha en escritorio; arriba → abajo en móvil.
+ * Una sola barra fija:
+ * Menú | marca | fechas+huéspedes+Reservar (solo escritorio) | Ayuda + día/noche.
+ * Menú: izquierda → derecha en web; arriba → abajo en móvil.
  */
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState("2");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -63,6 +77,40 @@ export function Header() {
         exit: { opacity: 0, y: -16 },
       };
 
+  const onReserve = (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!checkIn || !checkOut) {
+      setError("Elige entrada y salida.");
+      return;
+    }
+    if (checkOut <= checkIn) {
+      setError("La salida debe ser después de la entrada.");
+      return;
+    }
+    const guestCount = Math.min(63, Math.max(1, Number(guests) || 2));
+    trackBeginCheckout({ guests: guestCount });
+    saveStayDraft({
+      checkIn,
+      checkOut,
+      guests: guestCount,
+      step: 1,
+    });
+    document.getElementById("reservas")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const chrome = scrolled
+    ? "border-zinc-300 text-zinc-800 hover:bg-zinc-200/50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
+    : "border-white/35 text-white hover:bg-white/10";
+
+  const inputClass = scrolled
+    ? "rounded-lg border border-zinc-300 bg-white px-2 py-1.5 text-xs text-zinc-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-[#f2f0eb]"
+    : "rounded-lg border border-white/30 bg-white/15 px-2 py-1.5 text-xs text-white placeholder:text-white/70 backdrop-blur-sm [color-scheme:dark]";
+
+  const labelClass = scrolled
+    ? "text-[9px] font-bold uppercase tracking-wider text-zinc-500"
+    : "text-[9px] font-bold uppercase tracking-wider text-white/75";
+
   return (
     <header
       className={cn(
@@ -72,34 +120,30 @@ export function Header() {
           : "border-b border-transparent bg-black/25 backdrop-blur-sm",
       )}
     >
-      <div className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 md:h-16 md:px-6">
-        <div className="flex items-center justify-start">
-          <button
-            type="button"
-            id="menu_desplegable"
-            aria-expanded={isMenuOpen}
-            aria-controls="site-menu"
-            onClick={() => setIsMenuOpen((v) => !v)}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition md:px-4 md:text-xs",
-              scrolled
-                ? "border-zinc-300 text-zinc-800 hover:bg-zinc-200/50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
-                : "border-white/35 text-white hover:bg-white/10",
-            )}
-          >
-            {isMenuOpen ? (
-              <X className="h-3.5 w-3.5" aria-hidden />
-            ) : (
-              <Menu className="h-3.5 w-3.5" aria-hidden />
-            )}
-            Menú
-          </button>
-        </div>
+      <div className="mx-auto flex h-14 max-w-[90rem] items-center gap-2 px-3 md:h-[4.25rem] md:gap-3 md:px-5 lg:px-6">
+        <button
+          type="button"
+          id="menu_desplegable"
+          aria-expanded={isMenuOpen}
+          aria-controls="site-menu"
+          onClick={() => setIsMenuOpen((v) => !v)}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition md:px-3.5 md:text-xs",
+            chrome,
+          )}
+        >
+          {isMenuOpen ? (
+            <X className="h-3.5 w-3.5" aria-hidden />
+          ) : (
+            <Menu className="h-3.5 w-3.5" aria-hidden />
+          )}
+          Menú
+        </button>
 
-        <Link href="/" className="justify-self-center" aria-label={site.name}>
+        <Link href="/" className="shrink-0" aria-label={site.name}>
           <span
             className={cn(
-              "border-y-2 px-2 py-0.5 font-display text-sm font-extrabold uppercase tracking-[0.18em] transition md:px-3 md:text-xl",
+              "border-y-2 px-1.5 py-0.5 font-display text-xs font-extrabold uppercase tracking-[0.14em] transition sm:px-2 sm:text-sm md:text-base lg:text-lg",
               scrolled
                 ? "border-zinc-900 text-zinc-900 dark:border-[#f2f0eb] dark:text-[#f2f0eb]"
                 : "border-white text-white",
@@ -109,14 +153,81 @@ export function Header() {
           </span>
         </Link>
 
-        <div className="flex items-center justify-end gap-1.5 md:gap-2">
+        {/* Reserva integrada — solo escritorio, misma barra */}
+        <form
+          onSubmit={onReserve}
+          className="relative ml-1 hidden min-w-0 flex-1 items-end gap-2 md:flex"
+        >
+          <label className={cn("flex min-w-0 flex-1 flex-col gap-0.5", labelClass)}>
+            <span className="inline-flex items-center gap-1">
+              <CalendarDays className="h-3 w-3" /> Entrada
+            </span>
+            <input
+              type="date"
+              value={checkIn}
+              min={todayISO()}
+              onChange={(e) => {
+                setCheckIn(e.target.value);
+                setError("");
+              }}
+              className={cn("w-full min-w-0", inputClass)}
+            />
+          </label>
+          <label className={cn("flex min-w-0 flex-1 flex-col gap-0.5", labelClass)}>
+            <span className="inline-flex items-center gap-1">
+              <CalendarDays className="h-3 w-3" /> Salida
+            </span>
+            <input
+              type="date"
+              value={checkOut}
+              min={checkIn || todayISO()}
+              onChange={(e) => {
+                setCheckOut(e.target.value);
+                setError("");
+              }}
+              className={cn("w-full min-w-0", inputClass)}
+            />
+          </label>
+          <label className={cn("flex w-[4.5rem] shrink-0 flex-col gap-0.5", labelClass)}>
+            <span className="inline-flex items-center gap-1">
+              <Users className="h-3 w-3" /> Huéspedes
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={63}
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              className={cn("w-full", inputClass)}
+            />
+          </label>
+          <button
+            type="submit"
+            className={cn(
+              "mb-px shrink-0 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-wide transition",
+              scrolled
+                ? "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-amber-600 dark:hover:bg-amber-500"
+                : "bg-white text-zinc-900 hover:bg-zinc-100",
+            )}
+          >
+            Reservar
+          </button>
+          {error ? (
+            <p
+              className="absolute -bottom-4 left-0 text-[10px] font-medium text-red-500"
+              role="alert"
+            >
+              {error}
+            </p>
+          ) : null}
+        </form>
+
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 md:gap-2">
           <Link
             href="#preguntas-frecuentes"
             className={cn(
               "rounded-full border px-3 py-2 text-[10px] font-semibold uppercase tracking-wider transition md:px-4 md:text-xs",
-              scrolled
-                ? "border-zinc-300 text-zinc-800 hover:bg-zinc-200/50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
-                : "border-white/35 text-white hover:bg-white/10",
+              chrome,
             )}
           >
             Ayuda
@@ -148,10 +259,8 @@ export function Header() {
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className={cn(
                 "absolute z-[45] max-h-[min(85vh,640px)] overflow-y-auto border border-black/5 bg-[#f2f0eb]/98 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/98",
-                // Móvil: panel bajo el header, de arriba hacia abajo
                 "inset-x-3 top-[calc(100%+6px)] rounded-2xl",
-                // Escritorio: panel anclado a la izquierda, entra L→R
-                "md:inset-x-auto md:left-0 md:top-full md:h-[calc(100dvh-4rem)] md:max-h-none md:w-[min(22rem,90vw)] md:rounded-none md:rounded-br-2xl md:border-l-0 md:p-8",
+                "md:inset-x-auto md:left-0 md:top-full md:h-[calc(100dvh-4.25rem)] md:max-h-none md:w-[min(22rem,90vw)] md:rounded-none md:rounded-br-2xl md:border-l-0 md:p-8",
               )}
             >
               <div className="grid gap-6">

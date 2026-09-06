@@ -29,7 +29,8 @@ export function StickyBookingBar() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 360);
+    // Umbral bajo: la barra aparece casi al empezar a bajar, sin esperar medio hero.
+    const onScroll = () => setVisible(window.scrollY > 64);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

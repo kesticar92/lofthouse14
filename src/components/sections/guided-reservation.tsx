@@ -28,6 +28,12 @@ import {
   readStayDraft,
   type StayDraft,
 } from "@/lib/stay-draft";
+import {
+  LOFT_CATEGORIES,
+  availableLoftsForGuests,
+  getLoftCategory,
+  type LoftCategoryId,
+} from "@/data/loft-categories";
 
 const STEPS = [
   "Tu viaje",
@@ -44,6 +50,7 @@ export function GuidedReservation() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
+  const [categoryId, setCategoryId] = useState<LoftCategoryId | null>(null);
   const [lofts, setLofts] = useState(1);
   const [extras, setExtras] = useState<string[]>([]);
   const [mealQuantities, setMealQuantities] = useState<
@@ -74,6 +81,9 @@ export function GuidedReservation() {
             Math.ceil(draft.guests! / site.maxGuestsPerLoft),
           ),
         );
+      }
+      if (draft.categoryId) {
+        setCategoryId(draft.categoryId);
       }
       if (typeof draft.step === "number") {
         setStep(Math.min(STEPS.length - 1, Math.max(0, draft.step)));
@@ -239,10 +249,14 @@ export function GuidedReservation() {
       return `• ${e.label}: ${formatCOP(e.priceCop)} (estimado)`;
     });
 
+    const categoryMeta = categoryId ? getLoftCategory(categoryId) : null;
     const lines = [
       `Hola ${site.name}, quiero reservar:`,
       name.trim() ? `Nombre: ${name.trim()}` : "",
       profileMeta ? `Tipo de viaje: ${profileMeta.title}` : "",
+      categoryMeta
+        ? `Preferencia: ${categoryMeta.name} (${categoryMeta.tagline})`
+        : "",
       checkIn && checkOut ? `Fechas: ${checkIn} → ${checkOut}` : "",
       `Huéspedes: ${guests} · Lofts: ${lofts}`,
       extraLines.length ? `\nExtras:\n${extraLines.join("\n")}` : "",
@@ -412,6 +426,42 @@ export function GuidedReservation() {
                       {profileMeta.hint}
                     </p>
                   ) : null}
+                  <div>
+                    <p className="mb-2 text-sm font-medium">Tipo de loft</p>
+                    <div className="grid gap-2 sm:grid-cols-3">
+                      {LOFT_CATEGORIES.map((cat) => {
+                        const fits = availableLoftsForGuests(cat, guests).length > 0;
+                        const active = categoryId === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            disabled={!fits}
+                            onClick={() => setCategoryId(cat.id)}
+                            className={
+                              "rounded-2xl border px-3 py-3 text-left transition " +
+                              (active
+                                ? "border-amber-500 bg-amber-50 dark:bg-amber-500/10"
+                                : "border-zinc-200 dark:border-zinc-700") +
+                              (fits ? "" : " cursor-not-allowed opacity-40")
+                            }
+                          >
+                            <span className="block text-sm font-semibold text-zinc-900 dark:text-white">
+                              {cat.name}
+                            </span>
+                            <span className="mt-0.5 block text-xs text-zinc-500">
+                              Desde {cat.priceFromCop.toLocaleString("es-CO")} COP
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {categoryId ? (
+                      <p className="mt-2 text-xs text-zinc-500">
+                        {getLoftCategory(categoryId).tagline}
+                      </p>
+                    ) : null}
+                  </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium">

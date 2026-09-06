@@ -1,3 +1,9 @@
+import {
+  categoryForLoftNumber,
+  maxGuestsForLoftNumber,
+  priceForLoftNumber,
+  type LoftCategoryId,
+} from "@/data/loft-categories";
 import { LOFTS_HABITACIONALES } from "@/lib/inventory-catalog";
 
 export type LoftPage = {
@@ -7,6 +13,7 @@ export type LoftPage = {
   shortName: string;
   description: string;
   highlight: string;
+  categoryId: LoftCategoryId;
   maxGuests: number;
   beds: number;
   bedType: string;
@@ -74,11 +81,11 @@ const COPY: Record<
       "En el Loft 03 de Lofthouse 14 cocinas con comodidad y descansas en un espacio moderno del barrio Miraflores. Este alojamiento en Cali conviene a parejas, nómadas digitales y viajeros que valoran privacidad sin hotel tradicional. Estás cerca del Parque del Perro, restaurantes y servicios. WiFi para reuniones, aire acondicionado y check-in autónomo. Capacidad ideal para 2 personas (máx. 5). Reserva sin intermediarios desde $90.000/noche según temporada.",
   },
   5: {
-    name: "Loft 05 — Miraflores con privacidad",
-    highlight: "Distribución íntima para parejas o trabajo remoto",
-    floorHint: "Layout más íntimo dentro del conjunto",
+    name: "Loft 05 — Atrio íntimo (máx. 3)",
+    highlight: "Ventana al atrio · capacidad máxima 3 personas",
+    floorHint: "Layout más íntimo; sin sofá cama extra arriba",
     description:
-      "El Loft 05 en Lofthouse 14 ofrece un layout más íntimo dentro del conjunto de lofts en Miraflores, Cali. Ideal si buscas silencio para trabajar o recuperarte tras una cita médica, sin alejarte del Parque del Perro. Cocina equipada, WiFi, A/C y baño privado. El ingreso es autónomo: verificamos identidad, confirmas anticipo y entras con instrucciones claras. Cotiza fechas por WhatsApp y asegura tu loft con reserva directa.",
+      "El Loft 05 (Loft Atrio) en Lofthouse 14 ofrece un layout más íntimo con ventana al atrio del conjunto en Miraflores, Cali. Capacidad máxima de 3 personas (el resto de lofts admite hasta 5). Ideal si buscas silencio para trabajar o recuperarte tras una cita médica, sin alejarte del Parque del Perro. Cocina equipada, WiFi, A/C y baño privado. Cotiza fechas por WhatsApp y asegura tu loft con reserva directa.",
   },
   6: {
     name: "Loft 06 — Hospedaje cerca de todo",
@@ -148,6 +155,7 @@ const COPY: Record<
 export const LOFTS: LoftPage[] = LOFTS_HABITACIONALES.map((number, index) => {
   const copy = COPY[number];
   const padded = String(number).padStart(2, "0");
+  const category = categoryForLoftNumber(number)!;
   return {
     number,
     slug: `loft-${padded}-cali-miraflores`,
@@ -155,10 +163,11 @@ export const LOFTS: LoftPage[] = LOFTS_HABITACIONALES.map((number, index) => {
     shortName: `Loft ${padded}`,
     description: copy.description,
     highlight: copy.highlight,
-    maxGuests: 5,
+    categoryId: category.id,
+    maxGuests: maxGuestsForLoftNumber(number),
     beds: 1,
     bedType: "Queen / sofá cama según unidad",
-    priceFromCop: 90_000,
+    priceFromCop: priceForLoftNumber(number),
     floorHint: copy.floorHint,
     amenities: SHARED_AMENITIES,
     images: [...IMAGE_SETS[index % IMAGE_SETS.length]],

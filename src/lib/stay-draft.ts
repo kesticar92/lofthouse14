@@ -1,3 +1,5 @@
+import type { LoftCategoryId } from "@/data/loft-categories";
+
 export const STAY_DRAFT_EVENT = "lofthouse:stay-draft";
 export const STAY_DRAFT_STORAGE_KEY = "lofthouse_stay_draft_v1";
 /** La barra sticky de cotización está visible (para subir FABs en móvil). */
@@ -7,6 +9,8 @@ export type StayDraft = {
   checkIn?: string;
   checkOut?: string;
   guests?: number;
+  /** Preferencia de categoría: Vista / Atrio / Cielo. */
+  categoryId?: LoftCategoryId;
   /** Paso sugerido del configurador (1 = fechas). */
   step?: number;
 };

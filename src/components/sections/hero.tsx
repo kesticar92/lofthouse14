@@ -52,7 +52,8 @@ function HeroVideoSlide({
         src={src}
         muted
         playsInline
-        preload={isActive ? "auto" : "metadata"}
+        preload={isActive ? "auto" : "none"}
+        poster="/gallery/immersive/09-fachada_diurna.webp"
         onEnded={() => {
           if (isActive) onEnded?.();
         }}

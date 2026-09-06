@@ -21,7 +21,7 @@ const lofts = [
     capacity: "Ideal 2 personas · Máx. 5",
     price: "Desde $80.000 por noche",
     priceNote: "Tarifa base para 2 personas en temporada baja",
-    image: "/gallery/cocina_1_resultado.webp",
+    image: "/gallery/loft-cocina-equipada-miraflores-cali.webp",
   },
   {
     name: "Juntos, pero con espacio",
@@ -31,7 +31,7 @@ const lofts = [
     capacity: "2 a 10 personas",
     price: "Desde $160.000 por noche",
     priceNote: "Según temporada y ocupación por loft",
-    image: "/gallery/cuarto_1_resultado.webp",
+    image: "/gallery/loft-habitacion-miraflores-cali.webp",
   },
   {
     name: "El punto de encuentro",
@@ -41,7 +41,7 @@ const lofts = [
     capacity: "3 a 15 personas",
     price: "Desde $240.000 por noche",
     priceNote: "Según temporada y ocupación por loft",
-    image: "/gallery/sofa_1_resultado.webp",
+    image: "/gallery/loft-sala-sofa-miraflores-cali.webp",
   },
   {
     name: "Experiencia para grandes grupos",
@@ -51,7 +51,7 @@ const lofts = [
     capacity: "4 a 63 personas",
     price: "Precio a consultar",
     priceNote: "Cotización personalizada según fechas y lofts",
-    image: "/gallery/cuarto_4_resultado.webp",
+    image: "/gallery/loft-dormitorio-entrepiso-miraflores-cali.webp",
   },
 ];
 

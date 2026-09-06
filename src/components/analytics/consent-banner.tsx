@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { CONSENT_EVENT } from "@/components/analytics/behavior-analytics";
 
 const STORAGE_KEY = "lofthouse14_consent_v1";
 
@@ -18,6 +19,9 @@ function applyConsent(state: "granted" | "denied") {
   if (state === "granted" && typeof window.fbq === "function") {
     window.fbq("consent", "grant");
   }
+  window.dispatchEvent(
+    new CustomEvent(CONSENT_EVENT, { detail: { state } }),
+  );
 }
 
 export function ConsentBanner() {
@@ -47,9 +51,12 @@ export function ConsentBanner() {
       className="fixed inset-x-3 bottom-24 z-[60] mx-auto max-w-xl rounded-2xl border border-black/10 bg-[#f2f0eb]/95 p-4 shadow-2xl backdrop-blur-md dark:border-white/10 dark:bg-zinc-950/95 md:bottom-6"
     >
       <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-        Usamos cookies de medición (GA4) y, si aceptas, de marketing (Meta) para
-        mejorar el sitio y medir reservas. Puedes aceptar o rechazar el
-        almacenamiento publicitario.
+        Usamos cookies de medición (GA4
+        {process.env.NEXT_PUBLIC_CLARITY_ID || process.env.NEXT_PUBLIC_HOTJAR_ID
+          ? ", Clarity/Hotjar"
+          : ""}
+        ) y, si aceptas, de marketing (Meta) para mejorar el sitio y medir
+        reservas. Puedes aceptar o rechazar.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Button type="button" size="sm" onClick={() => choose("granted")}>

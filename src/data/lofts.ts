@@ -27,24 +27,24 @@ const SHARED_AMENITIES = [
 
 const IMAGE_SETS = [
   [
-    "/gallery/cocina_1_resultado.webp",
-    "/gallery/immersive/01-cocina_completa_comedor_escalera_izquierda.jpg",
-    "/gallery/immersive/18-sala_cocina_escalera.jpg",
+    "/gallery/loft-cocina-equipada-miraflores-cali.webp",
+    "/gallery/immersive/01-cocina_completa_comedor_escalera_izquierda.webp",
+    "/gallery/immersive/18-sala_cocina_escalera.webp",
   ],
   [
-    "/gallery/cuarto_1_resultado.webp",
-    "/gallery/immersive/21-sofacamas_izquierda.jpg",
-    "/gallery/immersive/07-escalera_5.jpg",
+    "/gallery/loft-habitacion-miraflores-cali.webp",
+    "/gallery/immersive/21-sofacamas_izquierda.webp",
+    "/gallery/immersive/07-escalera_5.webp",
   ],
   [
-    "/gallery/sofa_1_resultado.webp",
-    "/gallery/immersive/19-sofa_cocina_escalera.jpg",
-    "/gallery/immersive/53-comedor_con_cena.jpg",
+    "/gallery/loft-sala-sofa-miraflores-cali.webp",
+    "/gallery/immersive/19-sofa_cocina_escalera.webp",
+    "/gallery/immersive/53-comedor_con_cena.webp",
   ],
   [
-    "/gallery/cuarto_4_resultado.webp",
-    "/gallery/immersive/20-sofaca_escalera_5.jpg",
-    "/gallery/immersive/02-cocina_derecha.jpg",
+    "/gallery/loft-dormitorio-entrepiso-miraflores-cali.webp",
+    "/gallery/immersive/20-sofaca_escalera_5.webp",
+    "/gallery/immersive/02-cocina_derecha.webp",
   ],
 ] as const;
 

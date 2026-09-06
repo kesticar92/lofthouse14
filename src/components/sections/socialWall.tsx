@@ -9,14 +9,14 @@ const posts = [
   {
     id: 1,
     url: "https://www.instagram.com/reel/DS7rZ57EUaw/",
-    thumbnailUrl: "/gallery/screenshot_2.webp",
+    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-02.webp",
     isVideo: true,
     caption: "Entrar, subir y sentir que ya estás en tu lugar.",
   },
   {
     id: 2,
     url: "https://www.instagram.com/reel/DZxlocpsg5n/",
-    thumbnailUrl: "/gallery/screenshot_4.webp",
+    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-04.webp",
     isVideo: true,
     caption:
       "A veces no hace falta salir de tu ciudad para vivir algo distinto.",
@@ -24,14 +24,14 @@ const posts = [
   {
     id: 3,
     url: "https://www.instagram.com/reel/DZdMqSyNjBh/",
-    thumbnailUrl: "/gallery/screenshot_3.webp",
+    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-03.webp",
     isVideo: true,
     caption: "Vive Cali como un local.",
   },
   {
     id: 4,
     url: "https://www.instagram.com/reel/DS_NhgWEQoS/",
-    thumbnailUrl: "/gallery/screenshot_1.webp",
+    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-01.webp",
     isVideo: true,
     caption: "Desde Cristo Rey, Cali se ilumina cada noche.",
   },

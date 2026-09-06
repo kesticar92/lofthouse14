@@ -32,7 +32,7 @@ export function ValueProps() {
       <div
         className="absolute inset-0 -z-20 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/gallery/lofthouse_afuera.webp')",
+          backgroundImage: "url('/gallery/lofthouse-14-fachada-miraflores-cali.webp')",
         }}
         aria-hidden
       />

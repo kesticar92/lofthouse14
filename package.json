@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "reviews:scrape": "cd src/app/scrapper && .venv/bin/python run_all_reviews.py",
-    "reviews:sync-supabase": "tsx scripts/sync-reviews-to-supabase.ts"
+    "reviews:sync-supabase": "tsx scripts/sync-reviews-to-supabase.ts",
+    "images:optimize": "node scripts/optimize-gallery-images.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

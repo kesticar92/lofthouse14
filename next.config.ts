@@ -18,6 +18,10 @@ function contentSecurityPolicy(): string {
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
     "https://connect.facebook.net",
+    "https://www.clarity.ms",
+    "https://scripts.clarity.ms",
+    "https://static.hotjar.com",
+    "https://script.hotjar.com",
   ].join(" ");
 
   // En dev (p. ej. http://192.168.x.x desde el móvil) algunos navegadores
@@ -36,7 +40,7 @@ function contentSecurityPolicy(): string {
         "https://*.ingest.de.sentry.io",
         "https://*.ingest.us.sentry.io",
       ].join(" ")
-    : "'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://*.facebook.com https://*.facebook.net";
+    : "'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://*.facebook.com https://*.facebook.net https://*.clarity.ms https://*.hotjar.com https://*.hotjar.io wss://*.hotjar.com";
 
   const directives = [
     "default-src 'self'",
@@ -46,7 +50,7 @@ function contentSecurityPolicy(): string {
     "font-src 'self' data:",
     "media-src 'self'",
     `connect-src ${connectSrc}`,
-    "frame-src 'self' https://maps.google.com https://www.google.com",
+    "frame-src 'self' https://maps.google.com https://www.google.com https://vars.hotjar.com",
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
@@ -92,10 +96,31 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        source: "/gallery/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/hero/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
     ];
   },
   images: {
-    formats: ["image/avif", "image/webp"], // Next las convertirá automáticamente a estos formatos modernos
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       {
         protocol: "https",

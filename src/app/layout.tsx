@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { LegacyHashRedirect } from "@/components/layout/legacy-hash-redirect";
+import { BehaviorAnalytics } from "@/components/analytics/behavior-analytics";
 import { ConsentBanner } from "@/components/analytics/consent-banner";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
@@ -108,6 +109,7 @@ export default function RootLayout({
           <LegacyHashRedirect />
           {children}
           <ConsentBanner />
+          <BehaviorAnalytics />
         </ThemeProvider>
         <JsonLd data={lodgingBusinessJsonLd()} />
         <JsonLd data={websiteJsonLd()} />

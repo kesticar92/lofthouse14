@@ -18,7 +18,7 @@ const features = [
     title: "Descanso Premium",
     description:
       "Camas de alta calidad, lencería suave y un ambiente insonorizado diseñado para garantizarte un sueño profundo y verdaderamente reparador.",
-    image: "/gallery/cuarto_1_resultado.webp",
+    image: "/gallery/loft-habitacion-miraflores-cali.webp",
     icon: <BedDouble className="size-6 text-white" />,
     className: "md:col-span-2 md:row-span-2",
   },
@@ -27,7 +27,7 @@ const features = [
     title: "Cocinas Equipadas",
     description:
       "Prepara tus recetas favoritas con total comodidad y electrodomésticos modernos.",
-    image: "/gallery/cocina_1_resultado.webp",
+    image: "/gallery/loft-cocina-equipada-miraflores-cali.webp",
     icon: <UtensilsCrossed className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-1",
   },
@@ -36,7 +36,7 @@ const features = [
     title: "Zonas de Estar",
     description:
       "Espacios acogedores perfectos para relajarte o disfrutar una película.",
-    image: "/gallery/sofa_1_resultado.webp",
+    image: "/gallery/loft-sala-sofa-miraflores-cali.webp",
     icon: <Sofa className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-1",
   },
@@ -45,7 +45,7 @@ const features = [
     title: "Teletrabajo Cómodo",
     description:
       "Internet de alta velocidad y espacios iluminados para mantener tu productividad.",
-    image: "/gallery/cuarto_4_resultado.webp",
+    image: "/gallery/loft-dormitorio-entrepiso-miraflores-cali.webp",
     icon: <Wifi className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-5",
   },
@@ -54,7 +54,7 @@ const features = [
     title: "Detalles que Enamoran",
     description:
       "Decoración contemporánea, estética cuidada e iluminación cálida que te harán sentir mejor que en casa.",
-    image: "/gallery/cuarto_romantico.webp",
+    image: "/gallery/loft-habitacion-romantica-cali.webp",
     icon: <Sparkles className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-5",
   },
@@ -63,7 +63,7 @@ const features = [
     title: "Sofá Cama Versátil",
     description:
       "Nuestros sofás cama se convierten en cómodas camas adicionales en segundos, perfectos para grupos o familias que necesitan espacio extra sin sacrificar comodidad.",
-    image: "/gallery/cama-sofaCama.webp",
+    image: "/gallery/loft-sofa-cama-miraflores-cali.webp",
     icon: <Armchair className="size-6 text-white" />,
     className: "md:col-span-1 md:row-span-5",
   },

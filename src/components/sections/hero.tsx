@@ -251,7 +251,7 @@ export function Hero() {
         <div className="relative z-10 w-full px-8 pb-10 pt-28 lg:px-12 lg:pb-12">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6">
             {/* Card con fotos — encima del título y la calificación */}
-            <div className="pointer-events-auto relative z-30 w-full max-w-xl isolate">
+            <div className="pointer-events-auto relative z-30 w-full max-w-md isolate">
               <HeroBookingCard compact />
             </div>
 

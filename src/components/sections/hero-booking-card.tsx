@@ -1,167 +1,67 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Star, Users } from "lucide-react";
+import {
+  Bath,
+  ChevronLeft,
+  ChevronRight,
+  ChefHat,
+  Ticket,
+  Tv,
+  Users,
+  Wifi,
+  Wind,
+} from "lucide-react";
 import { trackBeginCheckout } from "@/lib/analytics";
 import { saveStayDraft } from "@/lib/stay-draft";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { StayDateRangePicker } from "@/components/ui/stay-date-range-picker";
-import {
-  LOFT_CATEGORIES,
-  availableLoftsForGuests,
-  categoryFitsGuests,
-  type LoftCategory,
-  type LoftCategoryId,
-} from "@/data/loft-categories";
+
+const LOFT_SLIDES = [
+  {
+    src: "/gallery/loft-habitacion-miraflores-cali.webp",
+    alt: "Cama y entrepiso de loft en Miraflores Cali",
+    label: "Habitación",
+  },
+  {
+    src: "/gallery/loft-cocina-equipada-miraflores-cali.webp",
+    alt: "Cocina equipada de loft Lofthouse 14",
+    label: "Cocina",
+  },
+  {
+    src: "/gallery/immersive/18-sala_cocina_escalera.webp",
+    alt: "Sala, cocina y escalera del loft",
+    label: "Sala",
+  },
+  {
+    src: "/gallery/loft-dormitorio-entrepiso-miraflores-cali.webp",
+    alt: "Dormitorio en entrepiso del loft",
+    label: "Entrepiso",
+  },
+] as const;
+
+const HIGHLIGHTS = [
+  { icon: ChefHat, label: "Cocina" },
+  { icon: Wifi, label: "WiFi" },
+  { icon: Wind, label: "A/C" },
+  { icon: Tv, label: "Smart TV" },
+  { icon: Bath, label: "Baño" },
+] as const;
 
 const GUEST_OPTIONS = Array.from({ length: site.maxGuests }, (_, i) => i + 1);
 
-const BARCODE_BARS = [3, 1, 2, 1, 3, 1, 1, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2];
-
-function TicketBarcode({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn("loft-ticket-barcode text-current", className)}
-      aria-hidden
-    >
-      {BARCODE_BARS.map((w, i) => (
-        <span key={i} style={{ width: w }} />
-      ))}
-    </div>
-  );
-}
-
-function PerforatedTicket({
-  category,
-  guests,
-  selected,
-  disabled,
-  onSelect,
-  compact,
-}: {
-  category: LoftCategory;
-  guests: number;
-  selected: boolean;
-  disabled: boolean;
-  onSelect: () => void;
-  compact?: boolean;
-}) {
-  const available = availableLoftsForGuests(category, guests);
-  const loftLabel =
-    available.length === category.loftNumbers.length
-      ? category.loftNumbers.map((n) => String(n).padStart(2, "0")).join(" · ")
-      : available.map((n) => String(n).padStart(2, "0")).join(" · ");
-
-  const capacityNote =
-    category.id === "atrio" && guests > 3
-      ? "Loft 05 no cabe con este grupo"
-      : available.length === 1
-        ? `Hasta ${category.maxGuestsByLoft[available[0]!] ?? 5} pers.`
-        : `Hasta ${category.maxGuests} pers. / loft`;
-
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      disabled={disabled}
-      aria-pressed={selected}
-      aria-label={`${category.name}. Desde ${category.priceFromCop.toLocaleString("es-CO")} COP por noche`}
-      className={cn(
-        "loft-ticket group relative flex w-[min(100%,20.5rem)] shrink-0 snap-center text-left transition duration-300",
-        compact ? "min-h-[11.5rem]" : "min-h-[13.5rem]",
-        selected &&
-          "ring-2 ring-amber-500 ring-offset-2 ring-offset-transparent",
-        disabled && "cursor-not-allowed opacity-45 grayscale",
-        !disabled && "hover:-translate-y-0.5",
-      )}
-    >
-      <div
-        className={cn(
-          "relative flex flex-[0_0_74%] flex-col justify-between overflow-hidden",
-          compact ? "px-3.5 py-3" : "px-4 py-3.5",
-        )}
-      >
-        <div className="pointer-events-none absolute inset-0 opacity-[0.18]">
-          <Image
-            src={category.image}
-            alt=""
-            fill
-            sizes="280px"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[var(--ticket-bg)] via-[var(--ticket-bg)]/90 to-[var(--ticket-bg)]" />
-        </div>
-
-        <div className="relative z-[1]">
-          <div className="flex items-center gap-0.5 text-amber-600 dark:text-amber-400">
-            {[0, 1, 2].map((i) => (
-              <Star
-                key={i}
-                className="h-3 w-3 fill-current"
-                strokeWidth={0}
-                aria-hidden
-              />
-            ))}
-          </div>
-          <p className="mt-1.5 font-display text-[1.35rem] font-bold uppercase leading-none tracking-tight text-[var(--ticket-fg)] sm:text-[1.5rem]">
-            {category.name}
-          </p>
-          <p className="mt-1 text-[11px] font-medium leading-snug text-[var(--ticket-muted)]">
-            {category.tagline}
-          </p>
-        </div>
-
-        <div className="relative z-[1] mt-3 space-y-2">
-          <p className="text-sm font-bold tabular-nums text-[var(--ticket-fg)]">
-            Desde {category.priceFromCop.toLocaleString("es-CO")}{" "}
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--ticket-muted)]">
-              COP/noche
-            </span>
-          </p>
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex rounded-full border border-[var(--ticket-line)] bg-[var(--ticket-stub)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--ticket-fg)]">
-              {guests} {guests === 1 ? "persona" : "personas"}
-            </span>
-            <span className="text-[10px] font-medium text-[var(--ticket-muted)]">
-              {capacityNote}
-            </span>
-          </div>
-          {!disabled ? (
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ticket-muted)]">
-              Unidades {loftLabel}
-            </p>
-          ) : (
-            <p className="text-[10px] font-semibold text-red-700 dark:text-red-400">
-              Sin unidades para {guests} huéspedes
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div className="loft-ticket-stub relative flex flex-[0_0_26%] flex-col items-center justify-between py-3">
-        <span
-          className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--ticket-muted)]"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-        >
-          {category.stubCode}
-        </span>
-        <TicketBarcode className="my-2" />
-        <span
-          className="text-[9px] font-bold tracking-widest text-[var(--ticket-muted)]"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-        >
-          L14
-        </span>
-      </div>
-    </button>
-  );
-}
-
 /**
- * Tres tiquetes perforados (Vista / Atrio / Cielo) + fechas/huéspedes → /reservar.
+ * Card de reserva del hero: carrusel de fotos + fechas/huéspedes → /reservar.
+ * Orificios laterales + línea intermitente bajo las fotos (tipo tiquete).
  */
 export function HeroBookingCard({
   className,
@@ -171,21 +71,52 @@ export function HeroBookingCard({
   compact?: boolean;
 }) {
   const router = useRouter();
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
-  const [categoryId, setCategoryId] = useState<LoftCategoryId>("vista");
   const [error, setError] = useState("");
+  const [autoPlay, setAutoPlay] = useState(true);
 
-  const fitMap = useMemo(() => {
-    const map = {} as Record<LoftCategoryId, boolean>;
-    for (const cat of LOFT_CATEGORIES) {
-      map[cat.id] = categoryFitsGuests(cat, guests);
+  const goTo = useCallback((i: number) => {
+    const el = scrollerRef.current;
+    const next =
+      ((i % LOFT_SLIDES.length) + LOFT_SLIDES.length) % LOFT_SLIDES.length;
+    setIndex(next);
+    if (el) {
+      el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
     }
-    return map;
-  }, [guests]);
+  }, []);
 
-  const selectedFits = fitMap[categoryId];
+  const go = useCallback(
+    (dir: -1 | 1) => {
+      setAutoPlay(false);
+      goTo(index + dir);
+    },
+    [goTo, index],
+  );
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const w = el.clientWidth;
+      if (w <= 0) return;
+      const i = Math.round(el.scrollLeft / w);
+      setIndex(Math.min(LOFT_SLIDES.length - 1, Math.max(0, i)));
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!autoPlay) return;
+    const id = window.setInterval(() => {
+      goTo(index + 1);
+    }, 4200);
+    return () => window.clearInterval(id);
+  }, [autoPlay, goTo, index]);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -198,30 +129,150 @@ export function HeroBookingCard({
       setError("La salida debe ser después de la entrada.");
       return;
     }
-    if (!selectedFits) {
-      setError("Esa categoría no tiene lofts para esa cantidad de huéspedes.");
-      return;
-    }
     trackBeginCheckout({ guests });
     saveStayDraft({
       checkIn,
       checkOut,
       guests,
-      categoryId,
       step: 1,
     });
     router.push("/reservar");
   };
 
+  const slide = LOFT_SLIDES[index]!;
+
   return (
-    <div className={cn("relative z-20 w-full overflow-visible", className)}>
-      <form onSubmit={onSubmit} className="space-y-3">
+    <div
+      className={cn(
+        "relative z-20 w-full overflow-visible",
+        "rounded-[1.35rem] border border-zinc-300/90 bg-white shadow-2xl",
+        "dark:border-zinc-600 dark:bg-zinc-950",
+        className,
+      )}
+    >
+      {/* Stub superior */}
+      <div className="flex items-center justify-between gap-2 border-b border-zinc-200 px-3 py-2 dark:border-zinc-800">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+          <Ticket className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+          Tiquete loft
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          {index + 1}/{LOFT_SLIDES.length} · desliza
+        </span>
+      </div>
+
+      {/* Carrusel horizontal */}
+      <div
+        className={cn(
+          "relative bg-zinc-200 dark:bg-zinc-800",
+          compact ? "aspect-[16/9]" : "aspect-[16/10]",
+        )}
+        onPointerDown={() => setAutoPlay(false)}
+      >
         <div
-          className={cn(
-            "rounded-2xl border border-white/20 bg-black/45 p-3 shadow-xl backdrop-blur-md",
-            "dark:border-white/15",
-          )}
+          ref={scrollerRef}
+          className="flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          aria-roledescription="carrusel"
+          aria-label="Fotos del loft — desliza horizontalmente"
         >
+          {LOFT_SLIDES.map((item, i) => (
+            <div
+              key={item.src}
+              className="relative h-full w-full shrink-0 grow-0 basis-full snap-center snap-always"
+            >
+              <Image
+                src={item.src}
+                alt={item.alt}
+                fill
+                priority={i === 0}
+                sizes="(max-width: 768px) 100vw, 440px"
+                className="object-cover"
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-10">
+          <p className="text-xs font-semibold uppercase tracking-wider text-white/95">
+            {slide.label} · Loft Miraflores
+          </p>
+        </div>
+
+        <button
+          type="button"
+          aria-label="Foto anterior"
+          onClick={() => go(-1)}
+          className="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          aria-label="Foto siguiente"
+          onClick={() => go(1)}
+          className="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+
+        <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+          {LOFT_SLIDES.map((s, i) => (
+            <button
+              key={s.src}
+              type="button"
+              aria-label={`Ver ${s.label}`}
+              aria-current={i === index ? "true" : undefined}
+              onClick={() => {
+                setAutoPlay(false);
+                goTo(i);
+              }}
+              className={cn(
+                "h-1.5 rounded-full transition-all",
+                i === index ? "w-5 bg-white" : "w-1.5 bg-white/50",
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/*
+        Perforación: orificios a cada lado + línea intermitente bajo las fotos.
+        Los círculos “recortan” la card (mismo color del hero oscuro detrás).
+      */}
+      <div
+        aria-hidden
+        className="booking-card-perforation relative z-30 flex h-0 items-center"
+      >
+        <span className="booking-card-hole absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full" />
+        <span className="mx-3 block h-0 w-full border-t border-dashed border-zinc-300 dark:border-zinc-600" />
+        <span className="booking-card-hole absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full" />
+      </div>
+
+      <div className={cn("space-y-3", compact ? "p-3" : "p-3.5")}>
+        <div>
+          <p className="font-display text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Tu loft en el Parque del Perro
+          </p>
+          <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-300">
+            Desde {site.priceFromCop.toLocaleString("es-CO")} COP/noche · check-in
+            autónomo
+          </p>
+        </div>
+
+        <ul className="flex flex-wrap gap-2">
+          {HIGHLIGHTS.map(({ icon: Icon, label }) => (
+            <li
+              key={label}
+              className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+            >
+              <Icon className="h-3 w-3" aria-hidden />
+              {label}
+            </li>
+          ))}
+        </ul>
+
+        <form onSubmit={onSubmit} className="space-y-2.5">
           <StayDateRangePicker
             checkIn={checkIn}
             checkOut={checkOut}
@@ -233,24 +284,15 @@ export function HeroBookingCard({
             compact
             required
           />
-          <label className="mt-2.5 flex flex-col gap-1 text-[10px] font-bold uppercase tracking-wider text-white/70">
+
+          <label className="flex flex-col gap-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <span className="inline-flex items-center gap-1">
               <Users className="h-3 w-3" /> Huéspedes
             </span>
             <select
               value={guests}
-              onChange={(e) => {
-                const next = Number(e.target.value);
-                setGuests(next);
-                setError("");
-                if (!categoryFitsGuests(getCategory(categoryId), next)) {
-                  const fallback = LOFT_CATEGORIES.find((c) =>
-                    categoryFitsGuests(c, next),
-                  );
-                  if (fallback) setCategoryId(fallback.id);
-                }
-              }}
-              className="rounded-xl border border-white/25 bg-white/95 px-2.5 py-2 text-sm font-semibold text-zinc-900"
+              onChange={(e) => setGuests(Number(e.target.value))}
+              className="rounded-xl border border-zinc-300 bg-white px-2.5 py-2 text-sm font-semibold text-zinc-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-50"
             >
               {GUEST_OPTIONS.map((n) => (
                 <option key={n} value={n}>
@@ -259,55 +301,24 @@ export function HeroBookingCard({
               ))}
             </select>
           </label>
-        </div>
 
-        <div>
-          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
-            Elige tu tiquete
-          </p>
-          <div
-            className={cn(
-              "-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 pt-1 snap-x snap-mandatory",
-              "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-            )}
-            role="listbox"
-            aria-label="Categorías de loft"
+          {error ? (
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
+              {error}
+            </p>
+          ) : null}
+
+          <button
+            type="submit"
+            className="w-full rounded-full bg-zinc-900 py-3 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400"
           >
-            {LOFT_CATEGORIES.map((cat) => (
-              <PerforatedTicket
-                key={cat.id}
-                category={cat}
-                guests={guests}
-                selected={categoryId === cat.id}
-                disabled={!fitMap[cat.id]}
-                compact={compact}
-                onSelect={() => {
-                  if (!fitMap[cat.id]) return;
-                  setCategoryId(cat.id);
-                  setError("");
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {error ? (
-          <p className="text-xs font-medium text-amber-200" role="alert">
-            {error}
-          </p>
-        ) : null}
-
-        <button
-          type="submit"
-          className="w-full rounded-full bg-amber-500 py-3 text-xs font-bold uppercase tracking-wide text-zinc-950 transition hover:bg-amber-400"
-        >
-          Reservar {getCategory(categoryId).name}
-        </button>
-      </form>
+            Reservar
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
-
-function getCategory(id: LoftCategoryId): LoftCategory {
-  return LOFT_CATEGORIES.find((c) => c.id === id)!;
 }

@@ -5,12 +5,29 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { site } from "@/lib/site";
-import { formatCOP } from "@/lib/pricing";
 import { GALLERY_PHOTOS } from "@/data/gallery-photos";
 import { BookingBar } from "@/components/layout/booking-bar";
 import { WaLink } from "@/components/layout/wa-link";
 import Image from "next/image";
+
+/** Insignia azul estilo Meta Verificado (check blanco sobre círculo azul). */
+function MetaVerifiedBadge({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={cn("shrink-0", className)}
+      aria-hidden
+      role="img"
+    >
+      <title>Verificado</title>
+      <circle cx="12" cy="12" r="12" fill="#1877F2" />
+      <path
+        fill="#fff"
+        d="M10.1 16.6 6.4 12.9l1.4-1.4 2.3 2.3 5.1-5.1 1.4 1.4z"
+      />
+    </svg>
+  );
+}
 
 /** Mismas rutas en /public/hero — comprimidos sin audio (~3–6 MB c/u). */
 export const HERO_VIDEO_SLIDES = [
@@ -221,19 +238,23 @@ export function Hero({
       <div className="pointer-events-none relative z-10 w-full p-6 pb-6 max-sm:pr-[5.75rem] sm:pb-8 md:p-16 md:pb-10">
         <div className="max-w-3xl text-left">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-200">
-            Miraflores · Parque del Perro, Cali
+            Miraflores · Parque del Perro
           </p>
           <h1 className="mt-2 font-display text-4xl font-bold uppercase leading-tight text-white drop-shadow-md md:text-5xl lg:text-6xl">
-            Lofts en Cali Miraflores — Tu base en el Parque del Perro
+            Quédate en Cali. Vívela a tu manera.
           </h1>
           <p className="mt-4 max-w-[calc(100vw-5.75rem-3rem)] text-left text-lg leading-snug text-gray-200 drop-shadow-md sm:max-w-none md:text-xl">
-            14 lofts privados en Miraflores, Cali. WiFi, A/C y cocina equipada.
-            Desde {formatCOP(site.priceFromCop)}/noche. Check-in autónomo.
+            Lofts privados y equipados para escapadas, vacaciones, viajes de
+            negocios y estadías más largas. Tu espacio, tu ritmo y todo Cali a
+            tu alcance.
           </p>
-          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            {ratingValue}/5 · {reviewCount} reseñas verificadas en Google,
-            Booking y Airbnb
+          <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
+            <Star className="h-4 w-4 shrink-0 fill-amber-400 text-amber-400" />
+            <span>
+              {ratingValue}/5 · {reviewCount} reseñas verificadas en Google,
+              Booking y Airbnb
+            </span>
+            <MetaVerifiedBadge className="h-4 w-4" />
           </div>
           <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
             {HERO_PHOTOS.map((photo) => (

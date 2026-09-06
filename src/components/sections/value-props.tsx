@@ -51,7 +51,7 @@ export function ValueProps() {
         >
           <div className="rounded-2xl border border-white/10 bg-black/25 px-5 py-6 backdrop-blur-md md:border-transparent md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none">
             <h2 className="font-display text-4xl tracking-wide text-[#f2f0eb] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] md:text-5xl">
-              ¿Por qué elegir Lofthouse 14 para tu estadía en Cali?
+              ¿Por qué LOFTHOUSE 14?
             </h2>
             <p className="mt-4 text-base font-medium leading-relaxed text-[#f2f0eb] drop-shadow-[0_1px_10px_rgba(0,0,0,0.9)] sm:text-lg">
               {site.brandLine}. Capacidad hasta {site.maxGuests} huéspedes en

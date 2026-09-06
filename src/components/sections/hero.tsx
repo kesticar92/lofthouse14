@@ -3,72 +3,15 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { WaLink } from "@/components/layout/wa-link";
-import Image from "next/image";
-
-/** Insignia azul estilo Meta Verificado (check blanco sobre círculo azul). */
-function MetaVerifiedBadge({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={cn("shrink-0", className)}
-      aria-hidden
-      role="img"
-    >
-      <title>Verificado</title>
-      <circle cx="12" cy="12" r="12" fill="#1877F2" />
-      <path
-        fill="#fff"
-        d="M10.1 16.6 6.4 12.9l1.4-1.4 2.3 2.3 5.1-5.1 1.4 1.4z"
-      />
-    </svg>
-  );
-}
 
 /** Mismas rutas en /public/hero — comprimidos sin audio (~3–6 MB c/u). */
 export const HERO_VIDEO_SLIDES = [
-  {
-    id: "lofthouse",
-    src: "/hero/slide-01.mp4",
-    label: "Fachada Lofthouse 14 en Miraflores, Cali",
-  },
-  {
-    id: "experiencia-1",
-    src: "/hero/slide-02.mp4",
-    label: "Lofts en Cali cerca del Parque del Perro",
-  },
-  {
-    id: "experiencia-2",
-    src: "/hero/slide-03.mp4",
-    label: "Estadía en apartaestudio Miraflores",
-  },
-  {
-    id: "experiencia-3",
-    src: "/hero/slide-04.mp4",
-    label: "Entorno de Miraflores y San Fernando",
-  },
-] as const;
-
-/** Miniaturas del hero: solo cocina equipada. */
-const HERO_PHOTOS = [
-  {
-    src: "/gallery/cocina_1_resultado.webp",
-    alt: "Cocina equipada en loft Lofthouse 14 — Miraflores, Cali",
-  },
-  {
-    src: "/gallery/cocina_2.webp",
-    alt: "Cocina moderna con mesón en loft Cali Parque del Perro",
-  },
-  {
-    src: "/gallery/cocina_3.webp",
-    alt: "Cocina completa con nevera y estufa en Lofthouse 14",
-  },
-  {
-    src: "/gallery/cocina_4.webp",
-    alt: "Detalle de cocina equipada en apartaestudio Miraflores",
-  },
+  { id: "lofthouse", src: "/hero/slide-01.mp4", label: "LOFTHOUSE 14" },
+  { id: "experiencia-1", src: "/hero/slide-02.mp4", label: "Cali" },
+  { id: "experiencia-2", src: "/hero/slide-03.mp4", label: "Estadía" },
+  { id: "experiencia-3", src: "/hero/slide-04.mp4", label: "Entorno" },
 ] as const;
 
 function HeroVideoSlide({
@@ -116,7 +59,7 @@ function HeroVideoSlide({
         className="h-full w-full object-cover object-center"
         aria-hidden
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/35" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/30" />
     </div>
   );
 }
@@ -124,13 +67,7 @@ function HeroVideoSlide({
 const arrowClass =
   "pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/35 text-white shadow-lg backdrop-blur-md transition hover:bg-black/55 active:scale-95 sm:h-12 sm:w-12";
 
-export function Hero({
-  ratingValue,
-  reviewCount,
-}: {
-  ratingValue: number;
-  reviewCount: number;
-}) {
+export function Hero() {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const touchStartX = useRef(0);
@@ -143,7 +80,9 @@ export function Hero({
     const slideWidth = el.clientWidth;
     if (slideWidth <= 0) return;
     const index = Math.round(el.scrollLeft / slideWidth);
-    setActiveIndex(Math.min(HERO_VIDEO_SLIDES.length - 1, Math.max(0, index)));
+    setActiveIndex(
+      Math.min(HERO_VIDEO_SLIDES.length - 1, Math.max(0, index)),
+    );
   }, []);
 
   useEffect(() => {
@@ -160,7 +99,10 @@ export function Hero({
 
   const goToSlide = useCallback((index: number) => {
     const el = scrollerRef.current;
-    const clamped = Math.min(HERO_VIDEO_SLIDES.length - 1, Math.max(0, index));
+    const clamped = Math.min(
+      HERO_VIDEO_SLIDES.length - 1,
+      Math.max(0, index),
+    );
     if (el) {
       const slideWidth = el.clientWidth;
       el.scrollTo({ left: clamped * slideWidth, behavior: "smooth" });
@@ -180,7 +122,8 @@ export function Hero({
 
   const goToPrevSlide = useCallback(() => {
     goToSlide(
-      (activeIndex - 1 + HERO_VIDEO_SLIDES.length) % HERO_VIDEO_SLIDES.length,
+      (activeIndex - 1 + HERO_VIDEO_SLIDES.length) %
+        HERO_VIDEO_SLIDES.length,
     );
   }, [activeIndex, goToSlide]);
 
@@ -202,7 +145,7 @@ export function Hero({
   return (
     <section
       id="inicio"
-      className="relative flex min-h-[100svh] w-full flex-col justify-end overflow-hidden"
+      className="relative flex h-[100svh] min-h-[480px] w-full flex-col justify-end overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -211,7 +154,7 @@ export function Hero({
           ref={scrollerRef}
           className="flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           aria-roledescription="carrusel"
-          aria-label="Fotos y videos de Lofthouse 14 en Miraflores, Cali"
+          aria-label="Publicidad LOFTHOUSE 14"
         >
           {HERO_VIDEO_SLIDES.map((slide, index) => (
             <HeroVideoSlide
@@ -232,10 +175,7 @@ export function Hero({
         type="button"
         aria-label="Video anterior"
         onClick={goToPrevSlide}
-        className={cn(
-          arrowClass,
-          "absolute left-3 top-[38%] z-20 -translate-y-1/2 sm:left-5",
-        )}
+        className={cn(arrowClass, "absolute left-3 top-1/2 z-20 -translate-y-1/2 sm:left-5")}
       >
         <ChevronLeft className="h-6 w-6" strokeWidth={2.5} />
       </button>
@@ -245,62 +185,51 @@ export function Hero({
         onClick={goToNextSlide}
         className={cn(
           arrowClass,
-          "absolute right-3 top-[38%] z-20 -translate-y-1/2 max-sm:right-[4.5rem] sm:right-5",
+          "absolute right-3 top-1/2 z-20 -translate-y-1/2 max-sm:right-[4.5rem] sm:right-5",
         )}
       >
         <ChevronRight className="h-6 w-6" strokeWidth={2.5} />
       </button>
 
-      <div className="pointer-events-none relative z-10 w-full p-6 pb-10 max-sm:pr-[5.75rem] sm:pb-12 md:p-16 md:pb-14">
+      <div className="pointer-events-none absolute inset-x-0 bottom-28 z-20 flex justify-center gap-2 md:bottom-32">
+        {HERO_VIDEO_SLIDES.map((slide, index) => (
+          <button
+            key={slide.id}
+            type="button"
+            aria-label={`Ver video ${index + 1}: ${slide.label}`}
+            aria-current={index === activeIndex ? "true" : undefined}
+            onClick={() => goToSlide(index)}
+            className={cn(
+              "pointer-events-auto h-2 rounded-full transition-all",
+              index === activeIndex
+                ? "w-8 bg-white"
+                : "w-2 bg-white/45 hover:bg-white/70",
+            )}
+          />
+        ))}
+      </div>
+
+      <div className="pointer-events-none relative z-10 w-full p-6 pb-14 max-sm:pr-[5.75rem] sm:pb-12 md:p-16 md:pb-20 md:pr-16">
         <div className="max-w-3xl text-left">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-200">
-            Miraflores · Parque del Perro
-          </p>
-          <h1 className="mt-2 font-display text-4xl font-bold uppercase leading-tight text-white drop-shadow-md md:text-5xl lg:text-6xl">
-            Quédate en Cali. Vívela a tu manera.
+          <h1 className="font-display text-4xl font-bold uppercase leading-tight text-white drop-shadow-md md:text-5xl lg:text-6xl">
+            Bienvenido a tu rincón en Cali
           </h1>
           <p className="mt-4 max-w-[calc(100vw-5.75rem-3rem)] text-left text-lg leading-snug text-gray-200 drop-shadow-md sm:max-w-none md:text-xl">
-            Lofts privados y equipados para escapadas, vacaciones, viajes de
-            negocios y estadías más largas. Tu espacio, tu ritmo y todo Cali a
-            tu alcance.
+            Configura fechas, personas y extras en minutos. Un solo camino hasta
+            tu reserva.
           </p>
-          <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
-            <Star className="h-4 w-4 shrink-0 fill-amber-400 text-amber-400" />
-            <span>
-              {ratingValue}/5 · {reviewCount} reseñas verificadas en Google,
-              Booking y Airbnb
-            </span>
-            <MetaVerifiedBadge className="h-4 w-4" />
-          </div>
-          <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
-            {HERO_PHOTOS.map((photo) => (
-              <Link
-                key={photo.src}
-                href="/galeria"
-                className="pointer-events-auto relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border border-white/30"
-              >
-                <Image
-                  src={photo.src}
-                  alt={photo.alt}
-                  fill
-                  sizes="96px"
-                  className="object-cover"
-                />
-              </Link>
-            ))}
-          </div>
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-6 flex flex-wrap gap-3"
+            className="mt-8"
           >
-            <WaLink
-              placement="hero"
-              className="pointer-events-auto inline-flex rounded-full border border-transparent bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-lg transition hover:bg-zinc-100"
+            <Link
+              href="#reservas"
+              className="pointer-events-auto inline-flex rounded-full border border-transparent bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-lg transition hover:bg-zinc-100 dark:border-white/15 dark:bg-zinc-900/90 dark:text-[#f2f0eb] dark:shadow-black/40 dark:backdrop-blur-md dark:hover:bg-zinc-800"
             >
-              Hablar por WhatsApp
-            </WaLink>
+              Configurar mi estadía
+            </Link>
           </motion.div>
         </div>
       </div>

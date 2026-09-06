@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import {
   TestimonialsColumn,
   carouselDurationForCount,
@@ -58,26 +57,11 @@ function splitIntoColumns(
   return cols;
 }
 
-type TestimonialsUsageProps = {
-  /** En home limitamos cards y omitimos avatares remotos (HTML de ~8MB). */
-  variant?: "home" | "full";
-  limit?: number;
-};
-
-const TestimonialsUsage = ({
-  variant = "full",
-  limit,
-}: TestimonialsUsageProps) => {
-  const homeLimit = limit ?? (variant === "home" ? 12 : undefined);
-  const totalCount = useMemo(() => buildTestimonials().length, []);
-  const bundled = useMemo(() => {
-    const all = buildTestimonials();
-    return homeLimit ? all.slice(0, homeLimit) : all;
-  }, [homeLimit]);
+const TestimonialsUsage = () => {
+  const bundled = useMemo(() => buildTestimonials(), []);
   const [reviews, setReviews] = useState<Testimonial[]>(bundled);
 
   useEffect(() => {
-    if (variant === "home") return;
     fetch("/api/public/reviews", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { testimonials?: Testimonial[] } | null) => {
@@ -88,27 +72,18 @@ const TestimonialsUsage = ({
       .catch(() => {
         /* JSON embebido en bundled */
       });
-  }, [variant]);
+  }, []);
 
-  const displayReviews = useMemo(() => {
-    if (variant !== "home") return reviews;
-    // Sin avatares remotos en home: evita miles de URLs largas en el HTML.
-    return reviews.map((r) => ({ ...r, image: "/default-avatar.png" }));
-  }, [reviews, variant]);
-
-  const sourceCounts = useMemo(
-    () => countBySource(displayReviews),
-    [displayReviews],
-  );
+  const sourceCounts = useMemo(() => countBySource(reviews), [reviews]);
 
   const monthOptions = useMemo(() => {
     const keys = new Set<string>();
-    for (const r of displayReviews) {
+    for (const r of reviews) {
       const mk = monthKey(r.reviewDate);
       if (mk) keys.add(mk);
     }
     return Array.from(keys).sort((a, b) => b.localeCompare(a));
-  }, [displayReviews]);
+  }, [reviews]);
 
   const [platform, setPlatform] = useState<"all" | ReviewSource>("all");
   const [month, setMonth] = useState<string>("all");
@@ -116,14 +91,16 @@ const TestimonialsUsage = ({
 
   const showLoftFilter = platform === "all" || platform === "airbnb";
   const loftForFilter = showLoftFilter ? loft : "all";
-  const showFilters = variant === "full";
 
   const filtered = useMemo(
-    () => applyFilters(displayReviews, platform, month, loftForFilter),
-    [displayReviews, platform, month, loftForFilter],
+    () => applyFilters(reviews, platform, month, loftForFilter),
+    [reviews, platform, month, loftForFilter],
   );
 
-  const filteredCounts = useMemo(() => countBySource(filtered), [filtered]);
+  const filteredCounts = useMemo(
+    () => countBySource(filtered),
+    [filtered],
+  );
 
   const filtersActive =
     platform !== "all" ||
@@ -157,73 +134,72 @@ const TestimonialsUsage = ({
           className="mx-auto mb-10 flex max-w-[840px] flex-col items-center text-center"
         >
           <h2 className="font-display text-3xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] sm:text-4xl md:text-5xl">
-            Lo que dicen nuestros huéspedes — reseñas verificadas
+            La palabra de quienes ya estuvieron{" "}
+            <span className="text-amber-600">aquí</span>
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
-            {variant === "home"
-              ? "Opiniones reales de Google, Booking y Airbnb. En la página de reseñas puedes filtrar por plataforma, mes o loft."
-              : "No editamos ni seleccionamos solo las mejores puntuaciones. Elige la plataforma, el mes o el loft específico y descubre la perspectiva honesta de nuestra comunidad de huéspedes."}
+            No editamos ni seleccionamos solo las mejores puntuaciones. Elige
+            la plataforma, el mes o el loft específico y descubre la perspectiva
+            honesta de nuestra comunidad de huéspedes.
           </p>
         </motion.div>
 
-        {showFilters ? (
-          <div className="mx-auto mb-8 flex max-w-5xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+        <div className="mx-auto mb-8 flex max-w-5xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+          <label className="flex flex-col gap-1 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            Plataforma
+            <select
+              className={selectClass}
+              value={platform}
+              onChange={(e) => {
+                const next = e.target.value as "all" | ReviewSource;
+                setPlatform(next);
+                if (next === "google" || next === "booking") {
+                  setLoft("all");
+                }
+              }}
+              aria-label="Filtrar por plataforma"
+            >
+              {PLATFORM_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            Mes
+            <select
+              className={selectClass}
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              aria-label="Filtrar por mes"
+            >
+              <option value="all">Todos los meses</option>
+              {monthOptions.map((mk) => (
+                <option key={mk} value={mk}>
+                  {formatMonthLabel(mk)}
+                </option>
+              ))}
+            </select>
+          </label>
+          {showLoftFilter ? (
             <label className="flex flex-col gap-1 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              Plataforma
+              Unidad Airbnb
               <select
                 className={selectClass}
-                value={platform}
-                onChange={(e) => {
-                  const next = e.target.value as "all" | ReviewSource;
-                  setPlatform(next);
-                  if (next === "google" || next === "booking") {
-                    setLoft("all");
-                  }
-                }}
-                aria-label="Filtrar por plataforma"
+                value={loft}
+                onChange={(e) => setLoft(e.target.value)}
+                aria-label="Filtrar por loft o casa entera"
               >
-                {PLATFORM_OPTIONS.map((o) => (
+                {loftFilterOptions.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
                   </option>
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              Mes
-              <select
-                className={selectClass}
-                value={month}
-                onChange={(e) => setMonth(e.target.value)}
-                aria-label="Filtrar por mes"
-              >
-                <option value="all">Todos los meses</option>
-                {monthOptions.map((mk) => (
-                  <option key={mk} value={mk}>
-                    {formatMonthLabel(mk)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {showLoftFilter ? (
-              <label className="flex flex-col gap-1 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                Unidad Airbnb
-                <select
-                  className={selectClass}
-                  value={loft}
-                  onChange={(e) => setLoft(e.target.value)}
-                  aria-label="Filtrar por loft o casa entera"
-                >
-                  {loftFilterOptions.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-          </div>
-        ) : null}
+          ) : null}
+        </div>
 
         <p className="mb-6 text-center text-sm text-zinc-600 dark:text-zinc-300">
           {filtersActive ? (
@@ -239,8 +215,7 @@ const TestimonialsUsage = ({
               <span className="font-semibold text-zinc-900 dark:text-white">
                 {sourceCounts.total}
               </span>{" "}
-              {variant === "home" ? "reseñas destacadas" : "reseñas en total"} ·
-              Google{" "}
+              reseñas en total · Google{" "}
               <span className="font-semibold">{sourceCounts.google}</span> ·
               Booking{" "}
               <span className="font-semibold">{sourceCounts.booking}</span> ·
@@ -251,14 +226,14 @@ const TestimonialsUsage = ({
         </p>
 
         {filtered.length > 0 ? (
-          <div className="mx-auto flex w-full min-w-0 justify-center gap-4 [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden sm:gap-5 md:gap-6">
-            <div className="flex w-full justify-center gap-4 sm:hidden">
+          <>
+            <div className="mx-auto flex w-full min-w-0 justify-center gap-4 sm:hidden [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
               <TestimonialsColumn
                 testimonials={colsMobile[0] ?? []}
                 duration={columnDuration(filtered.length)}
               />
             </div>
-            <div className="hidden w-full justify-center gap-4 sm:flex md:hidden">
+            <div className="mx-auto hidden w-full min-w-0 justify-center gap-4 sm:flex md:hidden [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
               {colsTablet.map((col, i) => (
                 <TestimonialsColumn
                   key={`t-${i}`}
@@ -267,7 +242,7 @@ const TestimonialsUsage = ({
                 />
               ))}
             </div>
-            <div className="hidden w-full justify-center gap-4 md:flex">
+            <div className="mx-auto hidden w-full min-w-0 justify-center gap-4 md:flex sm:gap-5 md:gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
               {colsDesktop.map((col, i) => (
                 <TestimonialsColumn
                   key={`d-${i}`}
@@ -276,23 +251,12 @@ const TestimonialsUsage = ({
                 />
               ))}
             </div>
-          </div>
+          </>
         ) : (
           <div className="py-20 text-center text-zinc-500">
             No hay reseñas con estos filtros. Prueba otro mes o unidad.
           </div>
         )}
-
-        {variant === "home" ? (
-          <p className="mt-8 text-center">
-            <Link
-              href="/resenas"
-              className="text-sm font-bold text-amber-700 underline-offset-4 hover:underline dark:text-amber-400"
-            >
-              Ver las {totalCount}+ reseñas con filtros →
-            </Link>
-          </p>
-        ) : null}
       </div>
     </section>
   );

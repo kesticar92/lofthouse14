@@ -12,17 +12,6 @@ export function sanitizeExpenseFilename(name: string): string {
   return (cleaned || "archivo").slice(0, 200);
 }
 
-export function buildDriveFilename(opts: {
-  expenseDateISO: string;
-  expenseId: string;
-  originalFilename: string;
-}): string {
-  const date = opts.expenseDateISO.slice(0, 10);
-  const shortId = opts.expenseId.slice(0, 8);
-  const safe = sanitizeExpenseFilename(opts.originalFilename);
-  return `${date}_${shortId}_${safe}`.slice(0, 240);
-}
-
 export type UploadExpenseFileResult = {
   storage_path: string;
   supabase_url: string | null;

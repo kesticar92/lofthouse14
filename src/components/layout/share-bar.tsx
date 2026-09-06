@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { site, waLink } from "@/lib/site";
-import { trackWhatsApp } from "@/lib/analytics";
 import {
   GoogleMapsIcon,
   ShareIosIcon,
@@ -33,7 +32,6 @@ function AppleActionButton({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={label}
-        onClick={onClick}
         className={cn(base, className)}
       >
         {children}
@@ -56,7 +54,7 @@ function AppleActionButton({
 export function ShareBar() {
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://www.lofthouse14.com",
+    process.env.NEXT_PUBLIC_SITE_URL || "https://lofthouse14.com",
   );
 
   useEffect(() => {
@@ -117,7 +115,6 @@ export function ShareBar() {
 
         <AppleActionButton
           href={waLink()}
-          onClick={() => trackWhatsApp("share-bar")}
           label={`WhatsApp — ${site.name}`}
           className="bg-zinc-100 hover:bg-zinc-200/90 dark:bg-zinc-800 dark:hover:bg-zinc-700"
         >

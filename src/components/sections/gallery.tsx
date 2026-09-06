@@ -58,7 +58,8 @@ export function Gallery() {
           className="mx-auto mb-10 flex max-w-[840px] flex-col items-center text-center"
         >
           <h2 className="font-display text-3xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] sm:text-4xl md:text-5xl">
-            Galería de lofts en Cali Miraflores
+            Así se vive{" "}
+            <span className="text-amber-600">LOFTHOUSE</span>
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
             Toca cualquier foto para verla a pantalla completa, con navegación

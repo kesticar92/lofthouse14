@@ -15,10 +15,6 @@ function contentSecurityPolicy(): string {
     "'unsafe-inline'",
     ...(isDev ? ["'unsafe-eval'" as const] : []),
     "https://browser.sentry-cdn.com",
-    "https://www.googletagmanager.com",
-    "https://www.google-analytics.com",
-    "https://connect.facebook.net",
-    "https://www.clarity.ms",
   ].join(" ");
 
   // En dev (p. ej. http://192.168.x.x desde el móvil) algunos navegadores
@@ -36,16 +32,8 @@ function contentSecurityPolicy(): string {
         "https://*.ingest.sentry.io",
         "https://*.ingest.de.sentry.io",
         "https://*.ingest.us.sentry.io",
-        "https://www.googletagmanager.com",
-        "https://www.google-analytics.com",
-        "https://*.google-analytics.com",
-        "https://analytics.google.com",
-        "https://www.facebook.com",
-        "https://connect.facebook.net",
-        "https://www.clarity.ms",
-        "https://*.clarity.ms",
       ].join(" ")
-    : "'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://www.facebook.com https://connect.facebook.net https://www.clarity.ms https://*.clarity.ms";
+    : "'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io";
 
   const directives = [
     "default-src 'self'",
@@ -55,7 +43,7 @@ function contentSecurityPolicy(): string {
     "font-src 'self' data:",
     "media-src 'self'",
     `connect-src ${connectSrc}`,
-    "frame-src 'self' https://maps.google.com https://www.google.com https://www.googletagmanager.com",
+    "frame-src 'self' https://maps.google.com https://www.google.com",
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
@@ -100,20 +88,6 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: securityHeaders,
-      },
-    ];
-  },
-  async redirects() {
-    return [
-      {
-        source: "/ubicacion",
-        destination: "/ubicacion-miraflores-cali",
-        permanent: true,
-      },
-      {
-        source: "/ubicacion/",
-        destination: "/ubicacion-miraflores-cali",
-        permanent: true,
       },
     ];
   },

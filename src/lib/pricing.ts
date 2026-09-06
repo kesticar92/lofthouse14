@@ -3,7 +3,7 @@
  * "Calculadora_Tarifas_Lofthouse.xlsx" (hojas Configuracion + Calculadora).
  *
  * Valores por defecto (editables en Admin → Configuración):
- *  - Lunes a Jueves:      90.000 COP por noche (base 1–2 huéspedes)
+ *  - Lunes a Jueves:      80.000 COP por noche (base 1–2 huéspedes)
  *  - Viernes a Domingo:  100.000 COP por noche (base 1–2 huéspedes)
  *  - Recargo por huésped adicional (3º–5º):  30.000 COP por huésped × noche
  *  - Aseo 1–2 noches (por loft):  30.000 COP
@@ -27,7 +27,7 @@ export type PricingConfig = {
 };
 
 export const DEFAULT_PRICING: PricingConfig = {
-  tarifaLJ: 90_000,
+  tarifaLJ: 80_000,
   tarifaVD: 100_000,
   recargoHuesped: 30_000,
   aseoCorta: 30_000,

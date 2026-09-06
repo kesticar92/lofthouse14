@@ -20,9 +20,6 @@
 # production
 /build
 
-# local agent artifacts
-/agent-tools
-
 # misc
 .DS_Store
 # Fuentes de video (se despliegan los .mp4; los .mov son locales)

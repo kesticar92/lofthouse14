@@ -19,7 +19,7 @@ const lofts = [
     description:
       "El espacio ideal para ti o para compartir en pareja. Un loft privado, moderno y totalmente equipado, diseñado para ser tu base de descanso después de recorrer San Fernando y vivir el ritmo de Cali.",
     capacity: "Ideal 2 personas · Máx. 5",
-    price: "Desde $90.000 por noche",
+    price: "Desde $80.000 por noche",
     priceNote: "Tarifa base para 2 personas en temporada baja",
     image: "/gallery/cocina_1_resultado.webp",
   },
@@ -74,7 +74,7 @@ export function Lofts() {
           className="w-full flex justify-center items-start flex-col px-6"
         >
           <h2 className="font-display text-4xl md:text-5xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
-            Nuestros lofts en Cali — Precios y disponibilidad
+            ¿Cuántos lofts necesitas?
           </h2>
 
           {/* Selector de Lofts con estilo elegante */}
@@ -134,13 +134,7 @@ export function Lofts() {
                 {activeLoft.description}
               </p>
 
-              <div className="pt-2 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/lofts"
-                  className="inline-flex w-full items-center justify-center rounded-full border border-zinc-300 py-4 text-sm font-bold text-zinc-800 transition hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-100 dark:hover:bg-zinc-800 sm:w-auto sm:px-10"
-                >
-                  Ver todos los lofts
-                </Link>
+              <div className="pt-2">
                 <Link
                   href={waLink(
                     `Hola, quiero consultar las fechas disponibles para ${activeLoft.subName} en LOFTHOUSE 14.`,

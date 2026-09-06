@@ -1,8 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getSiteUrl } from "@/lib/site-url";
 
 export default function robots(): MetadataRoute.Robots {
-  const sitemap = `${getSiteUrl()}/sitemap.xml`;
   return {
     rules: [
       {
@@ -10,12 +8,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/admin/", "/api/", "/preview-movil/"],
       },
-      { userAgent: "GPTBot", allow: "/" },
-      { userAgent: "ClaudeBot", allow: "/" },
-      { userAgent: "PerplexityBot", allow: "/" },
-      { userAgent: "Google-Extended", allow: "/" },
     ],
-    sitemap,
-    host: getSiteUrl(),
+    sitemap: "https://lofthouse14.com/sitemap.xml",
   };
 }

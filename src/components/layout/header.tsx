@@ -1,23 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { HelpCircle, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
-import { BookingBar } from "./booking-bar";
 import { site, waLink } from "@/lib/site";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
-/** Navegación pública: hashes de home y páginas indexables. */
+/** Navegación del embudo: solo lo esencial hacia la reserva. */
 const PAGE_NAV = [
-  { href: "/reservas", label: "Reservar" },
-  { href: "/lofts", label: "Lofts" },
-  { href: "/resenas", label: "Reseñas" },
-  { href: "/ubicacion-miraflores-cali", label: "Ubicación" },
-  { href: "/#preguntas-frecuentes", label: "Ayuda" },
-  { href: "/galeria", label: "Galería" },
-  { href: "/blog", label: "Blog" },
+  { href: "#reservas", label: "Configurar estadía" },
+  { href: "#lofts", label: "Lofts" },
+  { href: "#testimonios", label: "Reseñas" },
+  { href: "#ubicacion", label: "Ubicación" },
+  { href: "#preguntas-frecuentes", label: "Ayuda" },
+  { href: "#galeria", label: "Galería y redes" },
 ] as const;
 
 export function Header() {
@@ -25,178 +23,209 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 p-2 sm:p-3">
-      <div
-        className={cn(
-          "pointer-events-auto mx-auto flex h-12 max-w-6xl items-center gap-1 rounded-full border px-1.5 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-300 sm:h-14 sm:gap-2 sm:px-2",
-          scrolled
-            ? "border-black/10 bg-[#f7f5f1]/92 dark:border-white/10 dark:bg-zinc-950/90"
-            : "border-white/25 bg-white/85 dark:border-white/10 dark:bg-zinc-950/75",
-        )}
-      >
-        {/* Menú */}
-        <button
-          id="menu_desplegable"
-          type="button"
-          aria-expanded={isMenuOpen}
-          aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-          onClick={() => setIsMenuOpen((v) => !v)}
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-zinc-800 transition hover:bg-black/5 dark:text-zinc-100 dark:hover:bg-white/10 sm:h-10 sm:w-10"
-        >
-          {isMenuOpen ? (
-            <X className="size-4 sm:size-5" />
-          ) : (
-            <Menu className="size-4 sm:size-5" />
-          )}
-        </button>
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 transition-all duration-300 px-4 md:px-20 py-2",
+        scrolled
+          ? "bg-[#f2f0eb]/85 dark:bg-zinc-950/85 backdrop-blur-md shadow-lg border-b border-black/5 dark:border-white/5"
+          : "bg-transparent shadow-none",
+      )}
+    >
+      <div className="items-center grid grid-cols-[auto_1fr_auto] gap-2 md:gap-4 px-3 py-2.5">
+        <div className="flex items-center justify-start gap-2.5">
+          <p
+            className={cn(
+              "hidden lg:block text-xs font-semibold uppercase tracking-wider transition-colors duration-300",
+              scrolled
+                ? "text-zinc-600 dark:text-zinc-400"
+                : "text-[#f2f0eb]/80",
+            )}
+          >
+            Vive Cali desde el lugar correcto
+          </p>
+          <div
+            className={cn(
+              "hidden lg:block h-5 w-px transition-colors duration-300",
+              scrolled ? "bg-zinc-300 dark:bg-zinc-800" : "bg-white/20",
+            )}
+          ></div>
+          <button
+            id="menu_desplegable"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className={cn(
+              "flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-sm",
+              scrolled
+                ? "border-zinc-300 text-zinc-700 hover:bg-zinc-200/50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900/50"
+                : "border-white/30 text-white hover:bg-white/10",
+            )}
+          >
+            {isMenuOpen ? (
+              <X className="w-3.5 h-3.5" />
+            ) : (
+              <Menu className="w-3.5 h-3.5" />
+            )}
+            <span>menú</span>
+          </button>
+        </div>
 
-        {/* Logo compacto */}
-        <Link
-          href="/"
-          className="shrink-0 rounded-full px-1.5 py-1 transition hover:bg-black/5 dark:hover:bg-white/10 sm:px-2"
-          aria-label="Lofthouse 14 — inicio"
-        >
-          <span className="block font-[family-name:var(--font-display)] text-[11px] font-extrabold uppercase tracking-[0.14em] text-zinc-900 dark:text-[#f2f0eb] sm:text-sm sm:tracking-[0.16em] md:text-base">
-            Lofthouse<span className="text-amber-600">14</span>
-          </span>
+        <Link href="/" className="justify-self-center">
+          <div
+            className={cn(
+              "border-l-0 border-t-2 border-r-0 border-b-2 px-3 py-1.5 transition-all duration-300",
+              scrolled
+                ? "border-zinc-900 text-zinc-900 dark:border-[#f2f0eb]/90 dark:text-[#f2f0eb]/90"
+                : "border-white text-[#f2f0eb]/90",
+            )}
+          >
+            <p className="text-base md:text-2xl lg:text-3xl font-extrabold uppercase tracking-[0.18em] font-display">
+              LOFTHOUSE14
+            </p>
+          </div>
         </Link>
 
-        <div
-          className="mx-0.5 hidden h-6 w-px shrink-0 bg-black/10 dark:bg-white/10 sm:block"
-          aria-hidden
-        />
-
-        {/* Reserva inline — el corazón del banner */}
-        <BookingBar variant="banner" className="min-w-0" />
-
-        {/* Ayuda: solo desktop; en móvil vive dentro del menú */}
-        <Link
-          href="/#preguntas-frecuentes"
-          aria-label="Ayuda"
-          className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-zinc-700 transition hover:bg-black/5 dark:text-zinc-200 dark:hover:bg-white/10 sm:inline-flex sm:h-10 sm:w-10"
-        >
-          <HelpCircle className="size-4" />
-          <span className="sr-only">Ayuda</span>
-        </Link>
-
-        {/* Tema */}
-        <div className="shrink-0">
+        <div className="flex items-center justify-end justify-self-end gap-2 md:gap-4">
+          <Link href="#preguntas-frecuentes">
+            <button
+              type="button"
+              className={cn(
+                "hidden lg:block rounded-xl px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider transition duration-300 border",
+                scrolled
+                  ? "bg-transparent text-zinc-800 border-zinc-300 hover:bg-zinc-200/50 dark:text-zinc-200 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
+                  : "bg-transparent text-white border-white/20 hover:bg-white/10",
+              )}
+            >
+              Ayuda
+            </button>
+          </Link>
+          <Link href="#reservas">
+            <button
+              type="button"
+              className={cn(
+                "hidden sm:block rounded-xl px-5 py-2.5 text-center text-xs font-bold uppercase tracking-wider transition border shadow-sm",
+                scrolled
+                  ? "bg-amber-600 text-white border-amber-600 hover:bg-amber-700 shadow-amber-600/10"
+                  : "bg-amber-500 text-white border-amber-500 hover:bg-amber-600 shadow-amber-500/20",
+              )}
+            >
+              Configurar estadía
+            </button>
+          </Link>
           <ThemeToggle />
         </div>
       </div>
 
-      {/* Menú desplegable */}
+      {/* Menú Desplegable con Glassmorphism */}
       <AnimatePresence>
-        {isMenuOpen ? (
+        {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            initial={{ opacity: 0, y: -15, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="pointer-events-auto absolute inset-x-2 top-[calc(100%+6px)] z-40 mx-auto max-w-6xl overflow-hidden rounded-3xl border border-black/5 bg-[#f2f0eb]/96 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/96 sm:inset-x-3 sm:p-7"
+            exit={{ opacity: 0, y: -15, scale: 0.98 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="absolute left-4 right-4 md:left-20 md:right-20 top-[calc(100%+8px)] rounded-3xl border border-black/5 dark:border-white/10 bg-[#f2f0eb]/95 dark:bg-zinc-950/95 backdrop-blur-xl shadow-2xl p-8 z-40 transition-all duration-300"
           >
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-              <div className="space-y-3 md:col-span-2 lg:col-span-2">
-                <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                  Explorar
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Columna 1: recorrido de la página (orden visual) */}
+              <div className="space-y-4 md:col-span-2 lg:col-span-2">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                  Reserva guiada
                 </h4>
-                <ul className="grid grid-cols-2 gap-x-4 gap-y-2">
+                <ul className="grid grid-cols-1 gap-y-2 sm:grid-cols-2">
                   {PAGE_NAV.map((item) => (
                     <li key={item.href}>
                       <Link
                         href={item.href}
                         onClick={() => setIsMenuOpen(false)}
-                        className="text-sm font-bold text-zinc-700 transition-colors hover:text-amber-600 dark:text-zinc-300 dark:hover:text-amber-400 sm:text-base"
+                        className="text-base font-bold text-zinc-700 dark:text-zinc-300 hover:text-amber-600 dark:hover:text-amber-500 transition-colors"
                       >
                         {item.label}
                       </Link>
                     </li>
                   ))}
                 </ul>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-sm">
-                  <Link
-                    href="/politicas"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-zinc-500 hover:underline dark:text-zinc-400"
-                  >
-                    Políticas
-                  </Link>
-                  <Link
-                    href="/alojamiento-grupos-cali"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-zinc-500 hover:underline dark:text-zinc-400"
-                  >
-                    Grupos en Cali
-                  </Link>
-                  <Link
-                    href="/en"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-zinc-500 hover:underline dark:text-zinc-400"
-                  >
-                    English
-                  </Link>
-                </div>
+                <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                  Más contenido
+                </p>
+                <ul className="mt-2 space-y-1 text-sm">
+                  <li>
+                    <Link
+                      href="/politicas"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="text-zinc-600 hover:underline dark:text-zinc-400"
+                    >
+                      Políticas
+                    </Link>
+                  </li>
+                </ul>
               </div>
 
-              <div className="space-y-3">
-                <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              {/* Columna 2: Contacto */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                   Contacto
                 </h4>
-                <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
+                <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
                   <p>
                     <strong className="text-zinc-800 dark:text-zinc-200">
-                      WhatsApp
+                      WhatsApp:
                     </strong>
                     <br />
                     <a
                       href={waLink()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="transition-colors hover:text-amber-600 dark:hover:text-amber-400"
+                      className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
                     >
                       {site.phoneDisplay}
                     </a>
                   </p>
                   <p>
                     <strong className="text-zinc-800 dark:text-zinc-200">
-                      Dirección
+                      Dirección:
                     </strong>
                     <br />
-                    {site.addressLine}
-                    <br />
-                    {site.neighborhood}, {site.city}
+                    {site.addressLine},<br />
+                    {site.neighborhood}, {site.city}, {site.country}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col justify-between rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 dark:bg-amber-950/20">
+              {/* Columna 4: Mini Promo / Info Box */}
+              <div className="p-6 rounded-2xl bg-amber-500/10 dark:bg-amber-950/20 border border-amber-500/20 flex flex-col justify-between">
                 <div>
-                  <h4 className="mb-1 font-display text-sm font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                    Lofthouse 14
+                  <h4 className="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-2 font-display">
+                    LoftHouse14
                   </h4>
-                  <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
-                    Vive Cali desde el lugar correcto. Privacidad, comodidad y
-                    check-in autónomo.
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                    Vive Cali desde el lugar correcto. Diseñado para tu
+                    comodidad, privacidad y total seguridad.
                   </p>
                 </div>
-                <Link
-                  href="/admin/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="mt-4 flex w-full items-center justify-center rounded-full border border-black/15 px-3 py-2.5 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-700 hover:bg-black/5 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5"
-                >
-                  Acceso administrador
-                </Link>
+                <div className="mt-4 pt-4 border-t border-amber-500/10">
+                  <Link
+                    href="/admin/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex w-full items-center justify-center rounded-full border border-black/15 px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-700 hover:bg-black/5 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5"
+                  >
+                    Acceso administrador
+                  </Link>
+                </div>
               </div>
             </div>
           </motion.div>
-        ) : null}
+        )}
       </AnimatePresence>
     </header>
   );

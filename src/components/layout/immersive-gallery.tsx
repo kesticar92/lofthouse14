@@ -27,7 +27,12 @@ type Props = {
   onChange: (index: number) => void;
 };
 
-export function ImmersiveGallery({ photos, index, onClose, onChange }: Props) {
+export function ImmersiveGallery({
+  photos,
+  index,
+  onClose,
+  onChange,
+}: Props) {
   const open = index !== null;
   const photo = index !== null ? photos[index] : null;
   const touchX = useRef<number | null>(null);
@@ -196,9 +201,7 @@ export function ImmersiveGallery({ photos, index, onClose, onChange }: Props) {
           </div>
 
           <footer className="relative z-20 px-4 pb-5 pt-2 sm:px-8">
-            <p className="mb-3 text-center text-sm text-white/65">
-              {photo.alt}
-            </p>
+            <p className="mb-3 text-center text-sm text-white/65">{photo.alt}</p>
             <div className="mx-auto flex max-w-3xl gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {photos.map((p, i) => (
                 <button

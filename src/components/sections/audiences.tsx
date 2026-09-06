@@ -20,8 +20,8 @@ export function Audiences() {
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800 dark:text-amber-500">
             Pensado para ti
           </p>
-          <h2 className="font-display text-3xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] md:text-4xl">
-            Hospedaje en Cali para cada tipo de viajero
+          <h2 className="mt-2 font-display text-3xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] md:text-4xl">
+            ¿Para quién es LOFTHOUSE 14?
           </h2>
         </motion.div>
         <div className="flex flex-wrap justify-center gap-2 md:gap-3">

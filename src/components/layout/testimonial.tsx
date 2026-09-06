@@ -85,7 +85,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
               width={40}
               height={40}
               src={testimonial.image}
-              alt={`Foto de ${testimonial.name}, huésped de Lofthouse 14`}
+              alt=""
               className="h-10 w-10 shrink-0 rounded-full border border-zinc-200 object-cover dark:border-white/10"
             />
           ) : (
@@ -152,7 +152,8 @@ export const TestimonialsColumn = ({
 
   if (testimonials.length === 0) return null;
 
-  const durationSec = duration ?? carouselDurationForCount(testimonials.length);
+  const durationSec =
+    duration ?? carouselDurationForCount(testimonials.length);
 
   const cards = testimonials.map((t) => (
     <TestimonialCard key={t.id} testimonial={t} />

@@ -18,19 +18,6 @@ npm run dev
 
 Abre [http://localhost:3000](http://localhost:3000). El panel admin está en `/admin`.
 
-## Páginas públicas (SEO)
-
-| Ruta                             | Contenido                               |
-| -------------------------------- | --------------------------------------- |
-| `/`                              | Home con H1, barra de reservas y schema |
-| `/lofts`                         | Catálogo de unidades                    |
-| `/lofts/loft-01-cali-miraflores` | Ficha de cada loft                      |
-| `/reservas`                      | Motor de reserva (fechas + huéspedes)   |
-| `/ubicacion-miraflores-cali`     | Mapa y NAP                              |
-| `/resenas`                       | Reseñas indexables                      |
-| `/blog`                          | Artículos de Cali / Parque del Perro    |
-| `/llms.txt`                      | Ficha para crawlers de IA               |
-
 ## Scripts
 
 | Comando                | Descripción               |

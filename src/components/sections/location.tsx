@@ -194,12 +194,11 @@ export function Location() {
           />
           <div className="space-y-2">
             <h2 className="font-display text-4xl md:text-5xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
-              Ubicación — Barrio Miraflores, Cali
+              Explora tu entorno
             </h2>
             <p className="text-base text-zinc-500 dark:text-zinc-400">
-              Carrera 26 # 2-91, Miraflores — Parque del Perro, Cali. Una de
-              las zonas más activas y estratégicas para vivir, trabajar o
-              recuperarte cerca de San Fernando.
+              Una de las zonas más activas y estratégicas de Cali. Con acceso a
+              lo que necesitas para vivir, trabajar o recuperarte.
             </p>
           </div>
 

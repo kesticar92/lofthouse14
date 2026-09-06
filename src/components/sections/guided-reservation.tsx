@@ -22,7 +22,6 @@ import {
 } from "@/lib/configurator-extras";
 import { cn } from "@/lib/cn";
 import { ConfiguratorOrbitalSteps } from "@/components/sections/configurator-orbital-steps";
-import { trackWhatsApp } from "@/lib/analytics";
 
 const STEPS = [
   "Tu viaje",
@@ -32,30 +31,13 @@ const STEPS = [
   "Confirmar",
 ] as const;
 
-type GuidedReservationProps = {
-  initialCheckIn?: string;
-  initialCheckOut?: string;
-  initialGuests?: number;
-};
-
-export function GuidedReservation({
-  initialCheckIn = "",
-  initialCheckOut = "",
-  initialGuests,
-}: GuidedReservationProps) {
-  // Auditoría UX: fechas + huéspedes primero.
-  // Si ya vienen del configurador, saltamos a extras (flujo establecido).
-  const [step, setStep] = useState(() => {
-    if (initialCheckIn && initialCheckOut && initialGuests) return 3;
-    if (initialCheckIn && initialCheckOut) return 2;
-    if (initialCheckIn || initialCheckOut || initialGuests) return 1;
-    return 1;
-  });
-  const [profile, setProfile] = useState<TripProfile | null>("pareja");
+export function GuidedReservation() {
+  const [step, setStep] = useState(0);
+  const [profile, setProfile] = useState<TripProfile | null>(null);
   const [name, setName] = useState("");
-  const [checkIn, setCheckIn] = useState(initialCheckIn);
-  const [checkOut, setCheckOut] = useState(initialCheckOut);
-  const [guests, setGuests] = useState(initialGuests ?? 2);
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState(2);
   const [lofts, setLofts] = useState(1);
   const [extras, setExtras] = useState<string[]>([]);
   const [mealQuantities, setMealQuantities] = useState<
@@ -64,12 +46,11 @@ export function GuidedReservation({
     breakfast: { days: 0, guests: 2 },
     lunch: { days: 0, guests: 2 },
   });
-  const [airportTransfer, setAirportTransfer] = useState<AirportTransferChoice>(
-    {
+  const [airportTransfer, setAirportTransfer] =
+    useState<AirportTransferChoice>({
       pickup: true,
       dropoff: true,
-    },
-  );
+    });
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
 
@@ -89,7 +70,8 @@ export function GuidedReservation({
     [quoteResult.ok, quoteResult.noches],
   );
 
-  const mealDaysMin = quoteResult.ok && quoteResult.noches === 1 ? 1 : 0;
+  const mealDaysMin =
+    quoteResult.ok && quoteResult.noches === 1 ? 1 : 0;
 
   useEffect(() => {
     const days = Math.max(mealDaysMin, mealDaysDefault);
@@ -117,7 +99,11 @@ export function GuidedReservation({
         setMealQuantities((mq) => ({
           ...mq,
           [mealId]: {
-            days: Math.max(mealDaysMin, mq[mealId]?.days ?? 0, mealDaysDefault),
+            days: Math.max(
+              mealDaysMin,
+              mq[mealId]?.days ?? 0,
+              mealDaysDefault,
+            ),
             guests: mq[mealId]?.guests ?? guests,
           },
         }));
@@ -133,7 +119,7 @@ export function GuidedReservation({
   }
 
   function canAdvance(): boolean {
-    if (step === 0) return true; // perfil opcional (auditoría: no bloquear)
+    if (step === 0) return profile !== null;
     if (step === 1) return Boolean(checkIn && checkOut && quoteResult.ok);
     if (step === 2) return guests >= 1 && lofts >= 1 && quoteResult.ok;
     if (step === 3) {
@@ -149,7 +135,10 @@ export function GuidedReservation({
     return false;
   }
 
-  function updateMealQty(id: MealExtraId, patch: Partial<MealExtraQuantity>) {
+  function updateMealQty(
+    id: MealExtraId,
+    patch: Partial<MealExtraQuantity>,
+  ) {
     setMealQuantities((prev) => ({
       ...prev,
       [id]: {
@@ -206,7 +195,6 @@ export function GuidedReservation({
       "Confirmo que la tarifa final y descuentos de grupo o larga estadía se cierran por WhatsApp.",
     ].filter(Boolean);
 
-    trackWhatsApp("configurador");
     window.open(waLink(lines.join("\n")), "_blank", "noopener");
   }
 
@@ -219,11 +207,11 @@ export function GuidedReservation({
         <div className="mb-8 flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-10">
           <div className="max-w-xl text-center md:text-left">
             <h2 className="font-display text-4xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
-              Cómo reservar tu loft en Cali
+              Configura tu estadía
             </h2>
             <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-              Fechas y personas primero: ves el total estimado y luego
-              personalizas extras. También puedes escribir por WhatsApp.
+              Un paso a la vez, como en recepción: tú eliges, nosotros te
+              mostramos el total estimado antes de reservar.
             </p>
           </div>
           <ConfiguratorOrbitalSteps
@@ -294,8 +282,8 @@ export function GuidedReservation({
                   {quoteResult.ok && (
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">
                       {quoteResult.noches} noche(s) · base alojamiento{" "}
-                      {formatCOP(quoteResult.subtotalAlojamiento)} ({lofts}{" "}
-                      loft(s) en el siguiente paso)
+                      {formatCOP(quoteResult.subtotalAlojamiento)} (
+                      {lofts} loft(s) en el siguiente paso)
                     </p>
                   )}
                 </div>
@@ -359,13 +347,14 @@ export function GuidedReservation({
                   </h3>
                   <p className="text-sm text-zinc-500">
                     Opciones que suman al total estimado o que coordinamos
-                    contigo (precio final en WhatsApp si aplica). Las comidas se
-                    precargan según noches y huéspedes; puedes aumentar días y
-                    personas.
+                    contigo (precio final en WhatsApp si aplica). Las comidas
+                    se precargan según noches y huéspedes; puedes aumentar días
+                    y personas.
                   </p>
                   <ul className="space-y-3">
                     {CONFIGURATOR_EXTRAS.map((e) => {
-                      const isMeal = e.id === "breakfast" || e.id === "lunch";
+                      const isMeal =
+                        e.id === "breakfast" || e.id === "lunch";
                       const isAirport = e.id === "airport-transfer";
                       const mealId = isMeal ? (e.id as MealExtraId) : null;
                       const checked = extras.includes(e.id);
@@ -528,9 +517,7 @@ export function GuidedReservation({
                   <dl className="space-y-2 text-sm">
                     <div className="flex justify-between gap-4">
                       <dt className="text-zinc-500">Viaje</dt>
-                      <dd className="font-medium">
-                        {profileMeta?.title ?? "—"}
-                      </dd>
+                      <dd className="font-medium">{profileMeta?.title ?? "—"}</dd>
                     </div>
                     <div className="flex justify-between gap-4">
                       <dt className="text-zinc-500">Fechas</dt>

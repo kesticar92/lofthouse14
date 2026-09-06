@@ -4,9 +4,18 @@ import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { LegacyHashRedirect } from "@/components/layout/legacy-hash-redirect";
-import { site } from "@/lib/site";
+import { ConsentBanner } from "@/components/analytics/consent-banner";
+import { JsonLd } from "@/components/seo/json-ld";
+import {
+  SEO,
+  SITE_URL,
+  lodgingBusinessJsonLd,
+  websiteJsonLd,
+  faqPageJsonLd,
+} from "@/lib/seo";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lofthouse14.com";
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-R9M0QWD1H3";
+const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "";
 
 const display = Bebas_Neue({
   subsets: ["latin"],
@@ -22,59 +31,44 @@ const sans = Montserrat({
   display: "swap",
 });
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "LodgingBusiness",
-  name: site.name,
-  description: site.description,
-  url: siteUrl,
-  image: [
-    `${siteUrl}/logo-lofthouse.png`,
-    ...site.gallery.map((p) => `${siteUrl}${p}`),
-  ],
-  telephone: site.phoneTel,
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: site.addressLine,
-    addressLocality: "Cali",
-    addressRegion: "Valle del Cauca",
-    addressCountry: "CO",
-    addressNeighborhood: "Miraflores",
-  },
-  priceRange: "$$",
-};
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: `${site.name} | Lofts en Miraflores, Cali`,
-    template: `%s | ${site.name}`,
+    default: SEO.titleDefault,
+    template: SEO.titleTemplate,
   },
-  description: site.description,
-  keywords: [
-    "loft cali",
-    "apartaestudio miraflores",
-    "parque del perro",
-    "alojamiento cali",
-    "lofthouse 14",
-    "hospedaje miraflores cali",
-  ],
-  authors: [{ name: site.name }],
+  description: SEO.description,
+  keywords: [...SEO.keywords],
+  authors: [{ name: "Lofthouse 14" }],
   openGraph: {
-    title: `${site.name} — ${site.tagline}`,
-    description: site.description,
+    title: SEO.titleDefault,
+    description: SEO.description,
+    url: SITE_URL,
     locale: "es_CO",
+    alternateLocale: ["en_US"],
     type: "website",
-    siteName: site.name,
-    images: [{ url: "/logo-lofthouse.png", width: 800, height: 800 }],
+    siteName: "Lofthouse 14",
+    images: [
+      {
+        url: SEO.ogImage,
+        width: 1200,
+        height: 630,
+        alt: SEO.ogImageAlt,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: site.name,
-    description: site.description,
+    title: SEO.titleDefault,
+    description: SEO.description,
+    images: [SEO.ogImage],
   },
   alternates: {
     canonical: "/",
+    languages: {
+      "es-CO": "/",
+      en: "/en",
+    },
   },
   robots: {
     index: true,
@@ -106,34 +100,62 @@ export default function RootLayout({
             </p>
             <p>
               Esta página necesita JavaScript para mostrar el contenido. Abre el
-              sitio en un navegador con JavaScript habilitado o prueba en
-              Chrome/Safari/Firefox.
+              sitio en un navegador con JavaScript habilitado.
             </p>
           </div>
         </noscript>
         <ThemeProvider>
           <LegacyHashRedirect />
           {children}
+          <ConsentBanner />
         </ThemeProvider>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-R9M0QWD1H3"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <JsonLd data={lodgingBusinessJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
+        <JsonLd data={faqPageJsonLd()} />
+        <Script id="consent-default" strategy="beforeInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-R9M0QWD1H3');
+            window.gtag = gtag;
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied',
+              wait_for_update: 500
+            });
           `}
         </Script>
         <Script
-          id="ld-json-lofthouse"
-          type="application/ld+json"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
-        >
-          {JSON.stringify(jsonLd)}
+        />
+        <Script id="ga4" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}', { anonymize_ip: true });
+          `}
         </Script>
+        {META_PIXEL_ID ? (
+          <Script id="meta-pixel" strategy="afterInteractive">
+            {`
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('consent', 'revoke');
+              fbq('init', '${META_PIXEL_ID}');
+              fbq('track', 'PageView');
+            `}
+          </Script>
+        ) : null}
       </body>
     </html>
   );

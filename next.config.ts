@@ -15,6 +15,9 @@ function contentSecurityPolicy(): string {
     "'unsafe-inline'",
     ...(isDev ? ["'unsafe-eval'" as const] : []),
     "https://browser.sentry-cdn.com",
+    "https://www.googletagmanager.com",
+    "https://www.google-analytics.com",
+    "https://connect.facebook.net",
   ].join(" ");
 
   // En dev (p. ej. http://192.168.x.x desde el móvil) algunos navegadores
@@ -33,13 +36,13 @@ function contentSecurityPolicy(): string {
         "https://*.ingest.de.sentry.io",
         "https://*.ingest.us.sentry.io",
       ].join(" ")
-    : "'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io";
+    : "'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://*.facebook.com https://*.facebook.net";
 
   const directives = [
     "default-src 'self'",
     `script-src ${scriptSrc}`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https:",
+    "img-src 'self' data: blob: https: https://www.facebook.com https://www.google-analytics.com",
     "font-src 'self' data:",
     "media-src 'self'",
     `connect-src ${connectSrc}`,

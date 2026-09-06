@@ -12,9 +12,14 @@ export function SiteFooter() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
             {site.brandLine.toUpperCase()}
           </p>
-          <p className="text-sm leading-relaxed text-zinc-400">
-            {site.addressLine} · {site.neighborhood} · {site.city}
-          </p>
+          <address className="not-italic text-sm leading-relaxed text-zinc-400">
+            <span className="block font-medium text-[#f2f0eb]">
+              {site.addressLine}
+            </span>
+            <span className="block">
+              {site.neighborhood}, {site.city}, {site.country}
+            </span>
+          </address>
           <p className="text-sm text-zinc-400">
             <a
               className="font-medium text-[#f2f0eb] hover:underline"
@@ -23,11 +28,92 @@ export function SiteFooter() {
               {site.phoneDisplay}
             </a>
           </p>
+          <p className="text-sm">
+            <a
+              href={site.google_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              Ver en Google Maps →
+            </a>
+          </p>
         </div>
-        <div className="grid flex-1 gap-8 sm:grid-cols-2">
+        <div className="grid flex-1 gap-8 sm:grid-cols-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Políticas
+              Explorar
+            </p>
+            <ul className="mt-3 space-y-2 text-sm">
+              <li>
+                <Link href="/lofts" className="text-amber-400 hover:underline">
+                  Lofts
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/ubicacion-miraflores-cali"
+                  className="text-amber-400 hover:underline"
+                >
+                  Ubicación
+                </Link>
+              </li>
+              <li>
+                <Link href="/resenas" className="text-amber-400 hover:underline">
+                  Reseñas
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="text-amber-400 hover:underline">
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link href="/en" className="text-amber-400 hover:underline">
+                  English
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Segmentos
+            </p>
+            <ul className="mt-3 space-y-2 text-sm">
+              <li>
+                <Link href="/grupos" className="text-amber-400 hover:underline">
+                  Grupos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/nomadas-digitales"
+                  className="text-amber-400 hover:underline"
+                >
+                  Nómadas
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/alojamiento-medico"
+                  className="text-amber-400 hover:underline"
+                >
+                  Médico
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/salsa-cali"
+                  className="text-amber-400 hover:underline"
+                >
+                  Salsa
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Reserva
             </p>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
@@ -40,21 +126,6 @@ export function SiteFooter() {
               </li>
               <li>
                 <Link
-                  href="/politicas"
-                  className="text-amber-400 hover:underline"
-                >
-                  Ver todas las políticas →
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Contacto
-            </p>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li>
-                <Link
                   href="/#reservas"
                   className="text-amber-400 hover:underline"
                 >
@@ -63,10 +134,10 @@ export function SiteFooter() {
               </li>
               <li>
                 <Link
-                  href="/#galeria"
-                  className="relative inline-block py-1 text-amber-400 hover:underline"
+                  href="/politicas"
+                  className="text-amber-400 hover:underline"
                 >
-                  Galería y redes
+                  Políticas →
                 </Link>
               </li>
               <li>

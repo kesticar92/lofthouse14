@@ -144,3 +144,13 @@ Cron de ejemplo: `scripts/deploy/crontab.example.txt`.
 ## Licencia
 
 Privado — uso interno del proyecto LOFTHOUSE 14.
+
+
+## Auditoría SEO (2026)
+
+Se aplicaron mejoras técnicas y de contenido sobre el baseline de producción.
+Ver detalle en [`docs/AUDITORIA-CUMPLIMIENTO.md`](docs/AUDITORIA-CUMPLIMIENTO.md).
+
+Rutas nuevas: `/lofts`, `/lofts/[slug]`, `/ubicacion-miraflores-cali`, `/resenas`, `/blog`, `/en`, `/grupos`, `/nomadas-digitales`, `/alojamiento-medico`, `/salsa-cali`, `/llms.txt`.
+
+Dev: `npm run dev` → http://127.0.0.1:3001

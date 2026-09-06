@@ -211,24 +211,33 @@ export function Hero() {
 
       <div className="pointer-events-none relative z-10 w-full p-6 pb-14 max-sm:pr-[5.75rem] sm:pb-12 md:p-16 md:pb-20 md:pr-16">
         <div className="max-w-3xl text-left">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+            <span aria-hidden>★</span> 4.8 · 388 reseñas verificadas
+          </p>
           <h1 className="font-display text-4xl font-bold uppercase leading-tight text-white drop-shadow-md md:text-5xl lg:text-6xl">
-            Bienvenido a tu rincón en Cali
+            Lofts en Cali Miraflores — Tu base en el Parque del Perro
           </h1>
           <p className="mt-4 max-w-[calc(100vw-5.75rem-3rem)] text-left text-lg leading-snug text-gray-200 drop-shadow-md sm:max-w-none md:text-xl">
-            Configura fechas, personas y extras en minutos. Un solo camino hasta
-            tu reserva.
+            Cocina, WiFi y check-in autónomo. Desde $80.000/noche. Reserva
+            directo con Lofthouse 14.
           </p>
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-8"
+            className="mt-8 flex flex-wrap gap-3"
           >
             <Link
               href="#reservas"
               className="pointer-events-auto inline-flex rounded-full border border-transparent bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-lg transition hover:bg-zinc-100 dark:border-white/15 dark:bg-zinc-900/90 dark:text-[#f2f0eb] dark:shadow-black/40 dark:backdrop-blur-md dark:hover:bg-zinc-800"
             >
               Configurar mi estadía
+            </Link>
+            <Link
+              href="/lofts"
+              className="pointer-events-auto inline-flex rounded-full border border-white/40 bg-white/10 px-6 py-4 text-sm font-bold uppercase tracking-wide text-white backdrop-blur-md transition hover:bg-white/20"
+            >
+              Ver lofts
             </Link>
           </motion.div>
         </div>

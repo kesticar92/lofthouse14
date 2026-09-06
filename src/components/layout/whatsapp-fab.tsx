@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { waLink, site } from "@/lib/site";
+import { trackWhatsAppClick } from "@/lib/analytics";
 import {
   GoogleMapsIcon,
   WhatsAppLogoIcon,
@@ -27,6 +28,7 @@ export function WhatsAppFab() {
 
       <motion.a
         href={waLink()}
+        onClick={() => trackWhatsAppClick("fab")}
         target="_blank"
         rel="noopener noreferrer"
         initial={{ scale: 1, opacity: 1 }}

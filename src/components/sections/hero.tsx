@@ -61,7 +61,7 @@ function HeroVideoSlide({
         className="h-full w-full object-cover object-center"
         aria-hidden
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/30" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/35" />
     </div>
   );
 }
@@ -106,8 +106,7 @@ export function Hero() {
       Math.max(0, index),
     );
     if (el) {
-      const slideWidth = el.clientWidth;
-      el.scrollTo({ left: clamped * slideWidth, behavior: "smooth" });
+      el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
     } else {
       slideRefs.current[clamped]?.scrollIntoView({
         behavior: "smooth",
@@ -124,8 +123,7 @@ export function Hero() {
 
   const goToPrevSlide = useCallback(() => {
     goToSlide(
-      (activeIndex - 1 + HERO_VIDEO_SLIDES.length) %
-        HERO_VIDEO_SLIDES.length,
+      (activeIndex - 1 + HERO_VIDEO_SLIDES.length) % HERO_VIDEO_SLIDES.length,
     );
   }, [activeIndex, goToSlide]);
 
@@ -146,7 +144,7 @@ export function Hero() {
 
   return (
     <>
-      {/* —— Móvil: reserva desde el hero —— */}
+      {/* —— Móvil —— */}
       <section
         id="inicio"
         className="relative md:hidden"
@@ -161,25 +159,34 @@ export function Hero() {
           aria-hidden
         />
         <div className="relative z-10 px-4 pb-8 pt-20">
-          <p className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/35 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
-            <span className="text-amber-400" aria-hidden>★</span> 4.8 · 388 reseñas
-          </p>
-          <h1 className="font-display text-[1.65rem] font-bold uppercase leading-tight text-white drop-shadow-md">
-            Lofts en Cali Miraflores — Parque del Perro
-          </h1>
-          <p className="mt-2 max-w-md text-sm leading-snug text-white/85">
-            Elige fechas aquí y pasa directo a cotizar. Cocina, WiFi y check-in
-            autónomo.
-          </p>
-          <div className="mt-5">
+          <div className="mt-1">
             <HeroBookingCard />
           </div>
+          <p className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/35 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+            <span className="text-amber-400" aria-hidden>
+              ★
+            </span>{" "}
+            4.8 · 388 reseñas
+            <BadgeCheck
+              className="h-3.5 w-3.5 text-[#1D9BF0]"
+              fill="currentColor"
+              strokeWidth={0}
+              aria-label="Verificado"
+            />
+          </p>
+          <h1 className="mt-3 font-display text-[1.65rem] font-bold uppercase leading-tight text-white drop-shadow-md">
+            Apartaestudios Dúplex en Cali, Miraflores
+          </h1>
+          <p className="mt-2 max-w-md text-sm leading-snug text-white/85">
+            Cocina equipada, A/C, Wifi y Check In Autonomo. Desde $90.000 la
+            noche. Reserva Directo con Lofthouse 14.
+          </p>
         </div>
       </section>
 
-      {/* —— Desktop: video hero —— */}
+      {/* —— Desktop —— */}
       <section
-        className="relative hidden h-[100svh] min-h-[560px] w-full flex-col justify-end overflow-hidden md:flex"
+        className="relative hidden min-h-[100svh] w-full flex-col justify-end overflow-hidden md:flex"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         aria-label="Inicio"
@@ -223,7 +230,7 @@ export function Hero() {
           <ChevronRight className="h-6 w-6" strokeWidth={2.5} />
         </button>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-32 z-20 flex justify-center gap-2">
+        <div className="pointer-events-none absolute inset-x-0 bottom-[42%] z-20 flex justify-center gap-2 lg:bottom-[48%]">
           {HERO_VIDEO_SLIDES.map((slide, index) => (
             <button
               key={slide.id}
@@ -241,47 +248,56 @@ export function Hero() {
           ))}
         </div>
 
-        <div className="pointer-events-none relative z-10 w-full p-16 pb-20">
-          <div className="max-w-3xl text-left">
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
-              <span className="text-base leading-none text-amber-400" aria-hidden>
-                ★
-              </span>
-              <span>4.8 · 388 reseñas</span>
-              <BadgeCheck
-                className="h-4 w-4 text-[#1D9BF0]"
-                fill="currentColor"
-                strokeWidth={0}
-                aria-label="Verificado"
-              />
-            </p>
-            <h1 className="font-display text-5xl font-bold uppercase leading-[1.05] text-white drop-shadow-md lg:text-6xl">
-              Apartaestudios Dúplex en Cali, Miraflores,{" "}
-              <span className="block">Vive Cali desde El parque del perro</span>
-            </h1>
-            <p className="mt-4 max-w-2xl text-xl leading-snug text-gray-200 drop-shadow-md">
-              Cocina equipada, A/C, Wifi y Check In Autonomo. Desde $90.000 la
-              noche, Reserva Directo con Lofthouse 14
-            </p>
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mt-8 flex flex-wrap gap-3"
-            >
-              <Link
-                href="#reservas"
-                className="pointer-events-auto inline-flex rounded-full border border-transparent bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-lg transition hover:bg-zinc-100 dark:border-white/15 dark:bg-zinc-900/90 dark:text-[#f2f0eb] dark:shadow-black/40 dark:backdrop-blur-md dark:hover:bg-zinc-800"
+        <div className="relative z-10 w-full px-8 pb-10 pt-28 lg:px-12 lg:pb-12">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6">
+            {/* Card con fotos — encima del título y la calificación */}
+            <div className="pointer-events-auto w-full max-w-md">
+              <HeroBookingCard compact />
+            </div>
+
+            <div className="max-w-3xl text-left">
+              <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                <span className="text-base leading-none text-amber-400" aria-hidden>
+                  ★
+                </span>
+                <span>4.8 · 388 reseñas</span>
+                <BadgeCheck
+                  className="h-4 w-4 text-[#1D9BF0]"
+                  fill="currentColor"
+                  strokeWidth={0}
+                  aria-label="Verificado"
+                />
+              </p>
+              <h1 className="font-display text-4xl font-bold uppercase leading-[1.05] text-white drop-shadow-md lg:text-5xl xl:text-6xl">
+                Apartaestudios Dúplex en Cali, Miraflores,{" "}
+                <span className="block">
+                  Vive Cali desde El parque del perro
+                </span>
+              </h1>
+              <p className="mt-4 max-w-2xl text-lg leading-snug text-gray-200 drop-shadow-md lg:text-xl">
+                Cocina equipada, A/C, Wifi y Check In Autonomo. Desde $90.000 la
+                noche, Reserva Directo con Lofthouse 14
+              </p>
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mt-7 flex flex-wrap gap-3"
               >
-                Reserva Ahora
-              </Link>
-              <Link
-                href="#lofts"
-                className="pointer-events-auto inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/10 px-6 py-4 text-sm font-bold uppercase tracking-wide text-white backdrop-blur-md transition hover:bg-white/20"
-              >
-                ver mas +
-              </Link>
-            </motion.div>
+                <Link
+                  href="/reservar"
+                  className="pointer-events-auto inline-flex rounded-full border border-transparent bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-lg transition hover:bg-zinc-100 dark:border-white/15 dark:bg-zinc-900/90 dark:text-[#f2f0eb] dark:shadow-black/40 dark:backdrop-blur-md dark:hover:bg-zinc-800"
+                >
+                  Reserva Ahora
+                </Link>
+                <Link
+                  href="#lofts"
+                  className="pointer-events-auto inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/10 px-6 py-4 text-sm font-bold uppercase tracking-wide text-white backdrop-blur-md transition hover:bg-white/20"
+                >
+                  ver mas +
+                </Link>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>

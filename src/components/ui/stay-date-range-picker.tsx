@@ -41,6 +41,8 @@ export type StayDateRangePickerProps = {
   onChange: (checkIn: string, checkOut: string) => void;
   className?: string;
   required?: boolean;
+  /** Campos bajos para banner de navegación. */
+  compact?: boolean;
 };
 
 type FocusField = "checkIn" | "checkOut";
@@ -51,6 +53,7 @@ export function StayDateRangePicker({
   onChange,
   className,
   required,
+  compact = false,
 }: StayDateRangePickerProps) {
   const [open, setOpen] = useState(false);
   const [focusField, setFocusField] = useState<FocusField>("checkIn");
@@ -129,14 +132,24 @@ export function StayDateRangePicker({
 
   const glassField = (active: boolean, filled: boolean) =>
     cn(
-      "flex min-w-0 flex-1 flex-col rounded-2xl border px-4 py-3 text-left transition-all",
-      "bg-white/60 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)] backdrop-blur-xl",
-      "dark:bg-zinc-900/45 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]",
+      "flex min-w-0 flex-1 flex-col text-left transition-all",
+      compact
+        ? "rounded-full border px-2.5 py-1 md:px-3"
+        : "rounded-2xl border px-4 py-3",
+      compact
+        ? "bg-zinc-100/80 dark:bg-zinc-800/70"
+        : "bg-white/60 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)] backdrop-blur-xl dark:bg-zinc-900/45 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]",
       active
         ? "border-amber-500/70 ring-2 ring-amber-500/25 dark:border-amber-400/60"
         : "border-black/10 hover:border-black/20 dark:border-white/10 dark:hover:border-white/20",
       filled && !active && "border-zinc-300/80 dark:border-zinc-600/80",
     );
+
+  const formatCompact = (iso: string) => {
+    const d = parseLocalISO(iso);
+    if (!d) return "";
+    return format(d, "d MMM", { locale: esDateFns });
+  };
 
   const stepHint = !checkIn
     ? "Paso 1 · Elige tu fecha de entrada"
@@ -146,14 +159,25 @@ export function StayDateRangePicker({
 
   return (
     <div ref={rootRef} className={cn("relative", className)}>
-      <span
-        id={labelId}
-        className="mb-2 block text-sm font-medium text-zinc-800 dark:text-zinc-200"
-      >
-        Fechas de estadía
-      </span>
+      {!compact ? (
+        <span
+          id={labelId}
+          className="mb-2 block text-sm font-medium text-zinc-800 dark:text-zinc-200"
+        >
+          Fechas de estadía
+        </span>
+      ) : (
+        <span id={labelId} className="sr-only">
+          Fechas de estadía
+        </span>
+      )}
 
-      <div className="flex items-stretch gap-2 sm:gap-3">
+      <div
+        className={cn(
+          "flex items-stretch",
+          compact ? "gap-1" : "gap-2 sm:gap-3",
+        )}
+      >
         <button
           type="button"
           aria-labelledby={labelId}
@@ -164,18 +188,30 @@ export function StayDateRangePicker({
             Boolean(checkIn),
           )}
         >
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+          <span
+            className={cn(
+              "font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400",
+              compact ? "text-[9px] leading-none" : "text-[10px]",
+            )}
+          >
             Entrada
           </span>
           <span
             className={cn(
-              "mt-1 truncate text-sm font-semibold",
+              "truncate font-semibold",
+              compact ? "mt-0.5 text-xs" : "mt-1 text-sm",
               checkIn
                 ? "text-zinc-900 dark:text-white"
                 : "text-zinc-400 dark:text-zinc-500",
             )}
           >
-            {checkIn ? formatDisplay(checkIn) : "Agregar fecha"}
+            {checkIn
+              ? compact
+                ? formatCompact(checkIn)
+                : formatDisplay(checkIn)
+              : compact
+                ? "Fecha"
+                : "Agregar fecha"}
           </span>
         </button>
 
@@ -183,7 +219,7 @@ export function StayDateRangePicker({
           className="flex shrink-0 items-center text-zinc-400 dark:text-zinc-500"
           aria-hidden
         >
-          <ArrowRight className="size-4" />
+          <ArrowRight className={compact ? "size-3" : "size-4"} />
         </div>
 
         <button
@@ -201,43 +237,57 @@ export function StayDateRangePicker({
             Boolean(checkOut),
           )}
         >
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+          <span
+            className={cn(
+              "font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400",
+              compact ? "text-[9px] leading-none" : "text-[10px]",
+            )}
+          >
             Salida
           </span>
           <span
             className={cn(
-              "mt-1 truncate text-sm font-semibold",
+              "truncate font-semibold",
+              compact ? "mt-0.5 text-xs" : "mt-1 text-sm",
               checkOut
                 ? "text-zinc-900 dark:text-white"
                 : "text-zinc-400 dark:text-zinc-500",
             )}
           >
             {checkOut
-              ? formatDisplay(checkOut)
+              ? compact
+                ? formatCompact(checkOut)
+                : formatDisplay(checkOut)
               : checkIn
-                ? "Agregar fecha"
-                : "Primero entrada"}
+                ? compact
+                  ? "Fecha"
+                  : "Agregar fecha"
+                : compact
+                  ? "—"
+                  : "Primero entrada"}
           </span>
         </button>
 
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className={cn(
-            "flex shrink-0 items-center justify-center rounded-2xl border border-black/10 px-3",
-            "bg-white/50 backdrop-blur-xl transition hover:bg-white/70",
-            "dark:border-white/10 dark:bg-zinc-900/40 dark:hover:bg-zinc-900/60",
-            open && "ring-2 ring-amber-500/20",
-          )}
-          aria-label={open ? "Cerrar calendario" : "Abrir calendario"}
-        >
-          <ChevronDown
+        {!compact ? (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
             className={cn(
-              "size-5 text-zinc-600 transition-transform dark:text-zinc-300",
-              open && "rotate-180",
+              "flex shrink-0 items-center justify-center rounded-2xl border border-black/10 px-3",
+              "bg-white/50 backdrop-blur-xl transition hover:bg-white/70",
+              "dark:border-white/10 dark:bg-zinc-900/40 dark:hover:bg-zinc-900/60",
+              open && "ring-2 ring-amber-500/20",
             )}
-          />
-        </button>
+            aria-label={open ? "Cerrar calendario" : "Abrir calendario"}
+          >
+            <ChevronDown
+              className={cn(
+                "size-5 text-zinc-600 transition-transform dark:text-zinc-300",
+                open && "rotate-180",
+              )}
+            />
+          </button>
+        ) : null}
       </div>
 
       {required && !checkOut ? (

@@ -5,8 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { GALLERY_PHOTOS } from "@/data/gallery-photos";
-import { BookingBar } from "@/components/layout/booking-bar";
 import { WaLink } from "@/components/layout/wa-link";
 import Image from "next/image";
 
@@ -53,7 +51,25 @@ export const HERO_VIDEO_SLIDES = [
   },
 ] as const;
 
-const HERO_PHOTOS = GALLERY_PHOTOS.slice(0, 5);
+/** Miniaturas del hero: solo cocina equipada. */
+const HERO_PHOTOS = [
+  {
+    src: "/gallery/cocina_1_resultado.webp",
+    alt: "Cocina equipada en loft Lofthouse 14 — Miraflores, Cali",
+  },
+  {
+    src: "/gallery/cocina_2.webp",
+    alt: "Cocina moderna con mesón en loft Cali Parque del Perro",
+  },
+  {
+    src: "/gallery/cocina_3.webp",
+    alt: "Cocina completa con nevera y estufa en Lofthouse 14",
+  },
+  {
+    src: "/gallery/cocina_4.webp",
+    alt: "Detalle de cocina equipada en apartaestudio Miraflores",
+  },
+] as const;
 
 function HeroVideoSlide({
   src,
@@ -292,9 +308,6 @@ export function Hero({
               Hablar por WhatsApp
             </WaLink>
           </motion.div>
-        </div>
-        <div className="pointer-events-auto mt-8 hidden md:block">
-          <BookingBar className="shadow-2xl" />
         </div>
       </div>
     </section>

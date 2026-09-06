@@ -12,7 +12,7 @@ export const SEO_TITLE_HOME =
   "Lofts en Cali Miraflores · Parque del Perro | Lofthouse 14";
 
 export const SEO_DESCRIPTION_HOME =
-  "Lofts modernos en Cali, barrio Miraflores, a pasos del Parque del Perro. WiFi, A/C, cocina equipada. Desde $80.000/noche. Check-in autónomo. Reserva directo aquí.";
+  "Lofts modernos en Cali, barrio Miraflores, a pasos del Parque del Perro. WiFi, A/C, cocina equipada. Desde $90.000/noche. Check-in autónomo. Reserva directo aquí.";
 
 export const SEO_KEYWORDS = [
   "loft cali",

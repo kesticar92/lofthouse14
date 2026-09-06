@@ -114,7 +114,7 @@ export default function RootLayout({
               Lofts en Cali Miraflores — Lofthouse 14
             </p>
             <p>
-              14 lofts privados junto al Parque del Perro. Desde $80.000/noche.
+              14 lofts privados junto al Parque del Perro. Desde $90.000/noche.
               WhatsApp {site.phoneDisplay}. Activa JavaScript para reservar en
               el sitio o escribe directo.
             </p>

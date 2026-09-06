@@ -19,7 +19,7 @@ const lofts = [
     description:
       "El espacio ideal para ti o para compartir en pareja. Un loft privado, moderno y totalmente equipado, diseñado para ser tu base de descanso después de recorrer San Fernando y vivir el ritmo de Cali.",
     capacity: "Ideal 2 personas · Máx. 5",
-    price: "Desde $80.000 por noche",
+    price: "Desde $90.000 por noche",
     priceNote: "Tarifa base para 2 personas en temporada baja",
     image: "/gallery/cocina_1_resultado.webp",
   },

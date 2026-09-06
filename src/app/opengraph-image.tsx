@@ -45,7 +45,7 @@ export default function OpenGraphImage() {
             Lofts en Cali Miraflores — Parque del Perro
           </div>
           <div style={{ display: "flex", fontSize: 28, color: "#d6d3d1" }}>
-            WiFi · A/C · Cocina · Check-in autónomo · Desde $80.000/noche
+            WiFi · A/C · Cocina · Check-in autónomo · Desde $90.000/noche
           </div>
         </div>
         <div style={{ display: "flex", fontSize: 22, color: "#a8a29e" }}>

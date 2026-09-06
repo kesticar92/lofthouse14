@@ -12,7 +12,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Lofts en Cali Miraflores — catálogo",
   description:
-    "14 lofts privados y casa para grupos en Miraflores, Cali, a pasos del Parque del Perro. Desde $80.000/noche. WiFi, A/C y cocina.",
+    "14 lofts privados y casa para grupos en Miraflores, Cali, a pasos del Parque del Perro. Desde $90.000/noche. WiFi, A/C y cocina.",
   alternates: { canonical: "/lofts" },
 };
 

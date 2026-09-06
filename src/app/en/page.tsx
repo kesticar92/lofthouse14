@@ -30,7 +30,7 @@ export default function EnglishPage() {
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-300">
           14 private lofts with WiFi, air conditioning and a kitchen. From{" "}
-          {formatCOP(site.priceFromCop)} (~USD 20) per night for two guests in
+          {formatCOP(site.priceFromCop)} (~USD 23) per night for two guests in
           low season. Self check-in after ID verification. {agg.reviewCount}{" "}
           verified reviews ({agg.ratingValue}/5) on Google, Booking and Airbnb.
         </p>

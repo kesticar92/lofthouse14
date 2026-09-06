@@ -6,7 +6,7 @@ export function getFaqItems(): FaqItem[] {
   return [
     {
       q: "¿Cuál es la tarifa de un loft en Cali Miraflores?",
-      a: "Desde $80.000 por noche por loft (2 personas, temporada baja). La tarifa final depende de fechas, demanda, número de huéspedes y cuántos lofts reserves en Lofthouse 14.",
+      a: "Desde $90.000 por noche por loft (2 personas, temporada baja). La tarifa final depende de fechas, demanda, número de huéspedes y cuántos lofts reserves en Lofthouse 14.",
     },
     {
       q: "¿Cuántas personas caben en un loft?",

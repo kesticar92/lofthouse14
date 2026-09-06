@@ -32,7 +32,7 @@ export default function GruposPage() {
           comparte barrio sin perder privacidad.
         </p>
         <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
-          El precio se arma por loft (desde $80.000 COP/noche en temporada baja)
+          El precio se arma por loft (desde $90.000 COP/noche en temporada baja)
           más aseo y huéspedes extra. Un solo interlocutor por WhatsApp coordina
           fechas, check-in autónomo y verificación de identidad. No operamos
           fiestas en el inmueble.

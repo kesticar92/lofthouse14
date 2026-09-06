@@ -18,7 +18,7 @@ export const BLOG_POSTS: BlogPost[] = [
       "Desde Lofthouse 14 (Carrera 26 # 2-91) caminas hacia la zona gastronómica, farmacias y cajeros. San Fernando queda al lado, útil si vienes por clínicas o por el Estadio Pascual Guerrero. San Antonio y el centro histórico se alcanzan en un trayecto corto.",
       "Para una noche de salsa, combina una academia o un bar de la zona con un loft con ducha y aire acondicionado al volver. No hace falta un hotel genérico al otro lado de la ciudad: el valor de Miraflores es precisamente esa densidad de comida, cultura y servicios.",
       "Si viajas en grupo, reserva varios lofts en el mismo edificio y reúnanse en la calle o en un restaurante; las unidades no están pensadas para fiestas privadas. Familias y nómadas digitales usan la misma receta: cocina en el loft para desayunar y el Parque del Perro para todo lo demás.",
-      "Reserva directo en lofthouse14.com con fechas y número de personas. El check-in es autónomo y el precio base parte desde $80.000 COP por noche en temporada baja.",
+      "Reserva directo en lofthouse14.com con fechas y número de personas. El check-in es autónomo y el precio base parte desde $90.000 COP por noche en temporada baja.",
     ],
   },
   {

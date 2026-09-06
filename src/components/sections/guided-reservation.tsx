@@ -43,9 +43,10 @@ export function GuidedReservation({
   initialCheckOut = "",
   initialGuests,
 }: GuidedReservationProps) {
-  // Auditoría UX: fechas + huéspedes primero (sin preguntar perfil al entrar).
+  // Auditoría UX: fechas + huéspedes primero.
+  // Si ya vienen del configurador, saltamos a extras (flujo establecido).
   const [step, setStep] = useState(() => {
-    if (initialCheckIn && initialCheckOut && initialGuests) return 2;
+    if (initialCheckIn && initialCheckOut && initialGuests) return 3;
     if (initialCheckIn && initialCheckOut) return 2;
     if (initialCheckIn || initialCheckOut || initialGuests) return 1;
     return 1;

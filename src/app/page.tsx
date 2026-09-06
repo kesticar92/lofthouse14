@@ -11,6 +11,7 @@ import { SocialWall } from "@/components/sections/socialWall";
 import { Audiences } from "@/components/sections/audiences";
 import { ValueProps } from "@/components/sections/value-props";
 import { GuidedReservation } from "@/components/sections/guided-reservation";
+import { ReservationConfig } from "@/components/sections/reservation-config";
 import { aggregateReviews, homeExtraJsonLd } from "@/lib/seo";
 import { JsonLdGraph } from "@/components/layout/json-ld";
 
@@ -26,6 +27,7 @@ export default function Home() {
           ratingValue={reviews.ratingValue}
           reviewCount={reviews.reviewCount}
         />
+        <ReservationConfig />
         <Audiences />
         <ValueProps />
         <Lofts />

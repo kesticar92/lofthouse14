@@ -87,7 +87,9 @@ export function StickyBookingBar() {
     <div
       className={cn(
         "fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-[#f2f0eb]/95 px-3 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] backdrop-blur-md transition-transform duration-300 dark:border-white/10 dark:bg-zinc-950/95 md:bottom-auto md:top-20 md:border-b md:border-t-0 md:shadow-lg",
-        show ? "translate-y-0" : "translate-y-full md:-translate-y-[140%]",
+        show
+          ? "translate-y-0"
+          : "pointer-events-none translate-y-full md:-translate-y-[140%]",
       )}
       aria-hidden={!show}
     >

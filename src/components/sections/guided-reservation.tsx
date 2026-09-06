@@ -65,7 +65,16 @@ export function GuidedReservation() {
       if (!draft) return;
       if (draft.checkIn) setCheckIn(draft.checkIn);
       if (draft.checkOut) setCheckOut(draft.checkOut);
-      if (draft.guests && draft.guests > 0) setGuests(draft.guests);
+      if (draft.guests && draft.guests > 0) {
+        setGuests(draft.guests);
+        // Ajusta lofts al llegar desde la barra sticky si hay más personas.
+        setLofts((prev) =>
+          Math.max(
+            prev,
+            Math.ceil(draft.guests! / site.maxGuestsPerLoft),
+          ),
+        );
+      }
       if (typeof draft.step === "number") {
         setStep(Math.min(STEPS.length - 1, Math.max(0, draft.step)));
       } else if (draft.checkIn && draft.checkOut) {
@@ -84,15 +93,27 @@ export function GuidedReservation() {
     return () => window.removeEventListener(STAY_DRAFT_EVENT, onDraft);
   }, []);
 
+  const minLoftsForGuests = Math.max(
+    1,
+    Math.ceil(guests / site.maxGuestsPerLoft),
+  );
+  const capacityOk =
+    guests <= site.maxGuests && lofts >= minLoftsForGuests;
+  const datesOk = Boolean(checkIn && checkOut && checkOut > checkIn);
+
+  /** En Fechas cotizamos con lofts suficientes para no bloquear por capacidad. */
+  const quoteLofts =
+    step === 1 ? Math.max(lofts, minLoftsForGuests) : lofts;
+
   const quoteResult = useMemo(
     () =>
       publicStayQuote({
         checkIn,
         checkOut,
         huespedes: guests,
-        lofts,
+        lofts: quoteLofts,
       }),
-    [checkIn, checkOut, guests, lofts],
+    [checkIn, checkOut, guests, quoteLofts],
   );
 
   const mealDaysDefault = useMemo(
@@ -145,13 +166,23 @@ export function GuidedReservation() {
   function applyProfileSuggestion(id: TripProfile) {
     setProfile(id);
     const p = TRIP_PROFILES.find((x) => x.id === id);
-    if (p) setLofts(p.suggestedLofts);
+    if (p) {
+      setLofts((prev) =>
+        Math.max(
+          p.suggestedLofts,
+          prev,
+          Math.ceil(guests / site.maxGuestsPerLoft),
+        ),
+      );
+    }
   }
 
   function canAdvance(): boolean {
     if (step === 0) return profile !== null;
-    if (step === 1) return Boolean(checkIn && checkOut && quoteResult.ok);
-    if (step === 2) return guests >= 1 && lofts >= 1 && quoteResult.ok;
+    // Fechas: solo rango válido. Capacidad se resuelve en Huéspedes.
+    if (step === 1) return datesOk;
+    if (step === 2)
+      return guests >= 1 && lofts >= 1 && capacityOk && quoteResult.ok;
     if (step === 3) {
       if (
         extras.includes("airport-transfer") &&
@@ -303,8 +334,9 @@ export function GuidedReservation() {
                   </h3>
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
                     Entrada = día que llegas. Salida = día que te vas. Con eso
-                    calculamos noches y el precio estimado de la estadía (aún no
-                    es una reserva confirmada).
+                    calculamos noches y un precio estimado (aún no es reserva
+                    confirmada). Personas y lofts los eliges en el siguiente
+                    paso.
                   </p>
                   <StayDateRangePicker
                     checkIn={checkIn}
@@ -315,12 +347,12 @@ export function GuidedReservation() {
                     }}
                     required
                   />
-                  {quoteResult.ok ? (
+                  {datesOk && quoteResult.ok ? (
                     <div className="rounded-2xl bg-zinc-50 p-4 text-sm dark:bg-zinc-800/60">
                       <p className="font-medium text-zinc-900 dark:text-white">
                         {quoteResult.noches} noche
-                        {quoteResult.noches === 1 ? "" : "s"} · estimado para{" "}
-                        {lofts} loft{lofts === 1 ? "" : "s"}
+                        {quoteResult.noches === 1 ? "" : "s"} · estimado
+                        orientativo
                       </p>
                       <ul className="mt-2 space-y-1 text-zinc-600 dark:text-zinc-400">
                         <li className="flex justify-between gap-3">
@@ -347,18 +379,19 @@ export function GuidedReservation() {
                         </li>
                       </ul>
                       <p className="mt-2 text-xs text-zinc-500">
-                        En el siguiente paso ajustas personas y lofts; el total
-                        se recalcula. La confirmación final es por WhatsApp.
+                        Luego eliges cuántas personas y lofts. Cada loft admite
+                        hasta {site.maxGuestsPerLoft} personas; el total se
+                        recalcula ahí.
                       </p>
                     </div>
-                  ) : checkIn && checkOut ? (
+                  ) : checkIn && checkOut && !datesOk ? (
                     <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-                      {quoteResult.error ||
-                        "Revisa las fechas para ver el precio estimado."}
+                      La salida debe ser después de la entrada.
                     </p>
                   ) : (
                     <p className="text-sm text-zinc-500">
-                      Elige entrada y salida para ver noches y precio estimado.
+                      Elige entrada y salida para continuar. El detalle de
+                      personas y lofts viene después.
                     </p>
                   )}
                 </div>
@@ -369,6 +402,10 @@ export function GuidedReservation() {
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     Huéspedes y lofts
                   </h3>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    Cada loft admite hasta {site.maxGuestsPerLoft} personas. Si
+                    viajan más, aumenta el número de lofts para ver el total.
+                  </p>
                   {profileMeta ? (
                     <p className="text-sm text-zinc-500">
                       Sugerencia para {profileMeta.title.toLowerCase()}:{" "}
@@ -385,9 +422,22 @@ export function GuidedReservation() {
                         min={1}
                         max={site.maxGuests}
                         value={guests}
-                        onChange={(e) =>
-                          setGuests(Math.max(1, Number(e.target.value) || 1))
-                        }
+                        onChange={(e) => {
+                          const next = Math.max(
+                            1,
+                            Math.min(
+                              site.maxGuests,
+                              Number(e.target.value) || 1,
+                            ),
+                          );
+                          setGuests(next);
+                          setLofts((prev) =>
+                            Math.max(
+                              prev,
+                              Math.ceil(next / site.maxGuestsPerLoft),
+                            ),
+                          );
+                        }}
                         className="w-full rounded-xl border border-zinc-300 px-4 py-3 dark:border-zinc-600 dark:bg-zinc-950"
                       />
                     </div>
@@ -401,15 +451,61 @@ export function GuidedReservation() {
                         max={site.maxLofts}
                         value={lofts}
                         onChange={(e) =>
-                          setLofts(Math.max(1, Number(e.target.value) || 1))
+                          setLofts(
+                            Math.max(
+                              1,
+                              Math.min(
+                                site.maxLofts,
+                                Number(e.target.value) || 1,
+                              ),
+                            ),
+                          )
                         }
                         className="w-full rounded-xl border border-zinc-300 px-4 py-3 dark:border-zinc-600 dark:bg-zinc-950"
                       />
                     </div>
                   </div>
-                  {!quoteResult.ok && quoteResult.error ? (
-                    <p className="text-sm text-amber-800 dark:text-amber-200">
-                      {quoteResult.error}
+
+                  {guests > site.maxGuests ? (
+                    <div className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
+                      <p>
+                        Para más de {site.maxGuests} personas coordinamos la
+                        estadía directo por WhatsApp.
+                      </p>
+                      <a
+                        href={waLink(
+                          `Hola ${site.name}, somos más de ${site.maxGuests} personas y queremos cotizar: ${checkIn || "____"} → ${checkOut || "____"}.`,
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white dark:bg-white dark:text-zinc-900"
+                      >
+                        Escribir por WhatsApp
+                      </a>
+                    </div>
+                  ) : lofts < minLoftsForGuests ? (
+                    <div className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
+                      <p>
+                        Con {guests} persona{guests === 1 ? "" : "s"} necesitas
+                        al menos {minLoftsForGuests} loft
+                        {minLoftsForGuests === 1 ? "" : "s"} (máx.{" "}
+                        {site.maxGuestsPerLoft} por loft).
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setLofts(minLoftsForGuests)}
+                        className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white dark:bg-white dark:text-zinc-900"
+                      >
+                        Usar {minLoftsForGuests} loft
+                        {minLoftsForGuests === 1 ? "" : "s"}
+                      </button>
+                    </div>
+                  ) : quoteResult.ok ? (
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                      Capacidad ok · estimado alojamiento{" "}
+                      <span className="font-semibold text-zinc-900 dark:text-white">
+                        {formatCOP(quoteResult.totalReserva)}
+                      </span>
                     </p>
                   ) : null}
                 </div>

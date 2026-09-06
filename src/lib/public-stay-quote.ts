@@ -69,13 +69,15 @@ export function publicStayQuote(
     return fail(`Puedes reservar entre 1 y ${site.maxLofts} lofts.`);
   }
   if (huespedes > lofts * site.maxGuestsPerLoft) {
+    const needed = Math.ceil(huespedes / site.maxGuestsPerLoft);
     return fail(
-      `Con ${lofts} loft(s) caben hasta ${lofts * site.maxGuestsPerLoft} huéspedes. Aumenta lofts o contáctanos por WhatsApp.`,
+      `Para ${huespedes} personas necesitas al menos ${needed} loft(s). Ajusta lofts en este paso o escríbenos por WhatsApp.`,
     );
   }
   if (lofts === 1 && huespedes > site.maxGuestsPerLoft) {
+    const needed = Math.ceil(huespedes / site.maxGuestsPerLoft);
     return fail(
-      `Un solo loft admite hasta ${site.maxGuestsPerLoft} huéspedes. Indica más lofts para ver un total estimado.`,
+      `Un loft admite hasta ${site.maxGuestsPerLoft} personas. Elige ${needed} loft(s) o más para continuar.`,
     );
   }
 

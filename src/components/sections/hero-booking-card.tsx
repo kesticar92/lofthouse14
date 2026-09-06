@@ -1,10 +1,20 @@
 "use client";
 
 import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import {
   Bath,
   ChevronLeft,
   ChevronRight,
   ChefHat,
+  Ticket,
   Tv,
   Users,
   Wifi,
@@ -50,34 +60,61 @@ const HIGHLIGHTS = [
 const GUEST_OPTIONS = Array.from({ length: site.maxGuests }, (_, i) => i + 1);
 
 /**
- * Card de reserva del hero: fotos clave + fechas (calendario) + huéspedes (selector)
- * y CTA que abre la página exclusiva /reservar.
+ * Card tipo tiquete: carrusel horizontal de fotos + fechas/huéspedes → /reservar.
  */
 export function HeroBookingCard({
   className,
   compact = false,
 }: {
   className?: string;
-  /** Más compacta en escritorio para caber sobre el título. */
   compact?: boolean;
 }) {
   const router = useRouter();
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
   const [error, setError] = useState("");
+  const [autoPlay, setAutoPlay] = useState(true);
 
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % LOFT_SLIDES.length);
-    }, 4200);
-    return () => window.clearInterval(id);
+  const goTo = useCallback((i: number) => {
+    const el = scrollerRef.current;
+    const next = ((i % LOFT_SLIDES.length) + LOFT_SLIDES.length) % LOFT_SLIDES.length;
+    setIndex(next);
+    if (el) {
+      el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+    }
   }, []);
 
-  const go = (dir: -1 | 1) => {
-    setIndex((i) => (i + dir + LOFT_SLIDES.length) % LOFT_SLIDES.length);
-  };
+  const go = useCallback(
+    (dir: -1 | 1) => {
+      setAutoPlay(false);
+      goTo(index + dir);
+    },
+    [goTo, index],
+  );
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const w = el.clientWidth;
+      if (w <= 0) return;
+      const i = Math.round(el.scrollLeft / w);
+      setIndex(Math.min(LOFT_SLIDES.length - 1, Math.max(0, i)));
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!autoPlay) return;
+    const id = window.setInterval(() => {
+      goTo(index + 1);
+    }, 4200);
+    return () => window.clearInterval(id);
+  }, [autoPlay, goTo, index]);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -105,35 +142,77 @@ export function HeroBookingCard({
   return (
     <div
       className={cn(
-        "relative z-20 w-full overflow-visible rounded-3xl border border-white/25 bg-white shadow-2xl",
-        "dark:border-white/15 dark:bg-zinc-950",
+        "relative z-20 w-full overflow-visible",
+        // Silueta de tiquete
+        "rounded-[1.35rem] border border-dashed border-zinc-300/90 bg-white shadow-2xl",
+        "dark:border-zinc-600 dark:bg-zinc-950",
         className,
       )}
     >
+      {/* Muescas laterales del tiquete */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -left-2 top-[42%] z-30 h-4 w-4 -translate-y-1/2 rounded-full bg-[#0b0b0b] ring-1 ring-white/10 md:bg-[#0b0b0b]"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-2 top-[42%] z-30 h-4 w-4 -translate-y-1/2 rounded-full bg-[#0b0b0b] ring-1 ring-white/10"
+      />
+
+      {/* Stub superior tipo tiquete */}
+      <div className="flex items-center justify-between gap-2 border-b border-dashed border-zinc-300 px-3 py-2 dark:border-zinc-700">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+          <Ticket className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+          Tiquete loft
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          {index + 1}/{LOFT_SLIDES.length} · desliza
+        </span>
+      </div>
+
+      {/* Carrusel horizontal */}
       <div
         className={cn(
           "relative bg-zinc-200 dark:bg-zinc-800",
           compact ? "aspect-[16/9]" : "aspect-[16/10]",
         )}
+        onPointerDown={() => setAutoPlay(false)}
       >
-        <Image
-          src={slide.src}
-          alt={slide.alt}
-          fill
-          priority
-          sizes="(max-width: 768px) 100vw, 440px"
-          className="object-cover"
-        />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pb-3 pt-8">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/90">
+        <div
+          ref={scrollerRef}
+          className="flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          aria-roledescription="carrusel"
+          aria-label="Fotos del loft — desliza horizontalmente"
+        >
+          {LOFT_SLIDES.map((item, i) => (
+            <div
+              key={item.src}
+              className="relative h-full w-full shrink-0 grow-0 basis-full snap-center snap-always"
+            >
+              <Image
+                src={item.src}
+                alt={item.alt}
+                fill
+                priority={i === 0}
+                sizes="(max-width: 768px) 100vw, 440px"
+                className="object-cover"
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-10">
+          <p className="text-xs font-semibold uppercase tracking-wider text-white/95">
             {slide.label} · Loft Miraflores
           </p>
         </div>
+
         <button
           type="button"
           aria-label="Foto anterior"
           onClick={() => go(-1)}
-          className="absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm"
+          className="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -141,17 +220,22 @@ export function HeroBookingCard({
           type="button"
           aria-label="Foto siguiente"
           onClick={() => go(1)}
-          className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm"
+          className="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
-        <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">
+
+        <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
           {LOFT_SLIDES.map((s, i) => (
             <button
               key={s.src}
               type="button"
               aria-label={`Ver ${s.label}`}
-              onClick={() => setIndex(i)}
+              aria-current={i === index ? "true" : undefined}
+              onClick={() => {
+                setAutoPlay(false);
+                goTo(i);
+              }}
               className={cn(
                 "h-1.5 rounded-full transition-all",
                 i === index ? "w-5 bg-white" : "w-1.5 bg-white/50",
@@ -160,6 +244,12 @@ export function HeroBookingCard({
           ))}
         </div>
       </div>
+
+      {/* Línea perforada del tiquete */}
+      <div
+        aria-hidden
+        className="mx-3 border-t border-dashed border-zinc-300 dark:border-zinc-700"
+      />
 
       <div className={cn("space-y-3", compact ? "p-3" : "p-3.5")}>
         <div>
@@ -215,7 +305,10 @@ export function HeroBookingCard({
           </label>
 
           {error ? (
-            <p className="text-xs font-medium text-red-600 dark:text-red-400" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {error}
             </p>
           ) : null}

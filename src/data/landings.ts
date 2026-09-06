@@ -38,7 +38,7 @@ export const LANDINGS: LandingPage[] = [
     title: "Lofts con WiFi para Nómadas Digitales en Cali",
     h1: "Lofts con WiFi para nómadas digitales en Cali",
     description:
-      "Lofts en Miraflores con cocina, A/C y WiFi para trabajo remoto. Cerca del Parque del Perro. Reserva directa desde $80.000/noche.",
+      "Lofts en Miraflores con cocina, A/C y WiFi para trabajo remoto. Cerca del Parque del Perro. Reserva directa desde $90.000/noche.",
     intro:
       "Trabaja remoto desde un loft real en Miraflores: cocina propia, WiFi estable y un barrio caminable. Ideal para semanas o meses sin el costo fijo de hotel.",
     bullets: [

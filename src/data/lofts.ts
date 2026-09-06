@@ -57,7 +57,7 @@ const COPY: Record<
     highlight: "Vista cercana al ritmo del barrio y cocina completa",
     floorHint: "Unidad con buena luz natural y acceso ágil",
     description:
-      "El Loft 01 en Lofthouse 14 es un apartaestudio moderno en el barrio Miraflores de Cali, a pasos del Parque del Perro. Ideal para pareja o viajero solo, combina cocina equipada, aire acondicionado y WiFi estable para trabajo remoto o turismo. El check-in autónomo te permite llegar a tu hora sin filas. Desde aquí caminas a cafés, clínicas cercanas y vida nocturna caleña. Reserva directo y evita comisiones de intermediarios: cotizamos por WhatsApp con fechas claras y tarifa desde $80.000 por noche en temporada baja.",
+      "El Loft 01 en Lofthouse 14 es un apartaestudio moderno en el barrio Miraflores de Cali, a pasos del Parque del Perro. Ideal para pareja o viajero solo, combina cocina equipada, aire acondicionado y WiFi estable para trabajo remoto o turismo. El check-in autónomo te permite llegar a tu hora sin filas. Desde aquí caminas a cafés, clínicas cercanas y vida nocturna caleña. Reserva directo y evita comisiones de intermediarios: cotizamos por WhatsApp con fechas claras y tarifa desde $90.000 por noche en temporada baja.",
   },
   2: {
     name: "Loft 02 — Base en Parque del Perro",
@@ -71,7 +71,7 @@ const COPY: Record<
     highlight: "Cocina práctica para ahorrar en restaurantes",
     floorHint: "Distribución tipo loft con entrepiso",
     description:
-      "En el Loft 03 de Lofthouse 14 cocinas con comodidad y descansas en un espacio moderno del barrio Miraflores. Este alojamiento en Cali conviene a parejas, nómadas digitales y viajeros que valoran privacidad sin hotel tradicional. Estás cerca del Parque del Perro, restaurantes y servicios. WiFi para reuniones, aire acondicionado y check-in autónomo. Capacidad ideal para 2 personas (máx. 5). Reserva sin intermediarios desde $80.000/noche según temporada.",
+      "En el Loft 03 de Lofthouse 14 cocinas con comodidad y descansas en un espacio moderno del barrio Miraflores. Este alojamiento en Cali conviene a parejas, nómadas digitales y viajeros que valoran privacidad sin hotel tradicional. Estás cerca del Parque del Perro, restaurantes y servicios. WiFi para reuniones, aire acondicionado y check-in autónomo. Capacidad ideal para 2 personas (máx. 5). Reserva sin intermediarios desde $90.000/noche según temporada.",
   },
   5: {
     name: "Loft 05 — Miraflores con privacidad",
@@ -106,7 +106,7 @@ const COPY: Record<
     highlight: "Espacio moderno para parejas y viajeros",
     floorHint: "Refugio urbano dentro del conjunto",
     description:
-      "El Loft 09 en Lofthouse 14 es un refugio urbano en Miraflores, Cali. Ideal para parejas que quieren privacidad y cocina propia cerca de la vida del Parque del Perro. WiFi estable, aire acondicionado y Smart TV. El proceso de reserva es simple: fechas, huéspedes, anticipo y acceso digital. Evita intermediarios y recibe atención directa del anfitrión. Tarifa desde $80.000 por noche en temporada baja para 2 personas.",
+      "El Loft 09 en Lofthouse 14 es un refugio urbano en Miraflores, Cali. Ideal para parejas que quieren privacidad y cocina propia cerca de la vida del Parque del Perro. WiFi estable, aire acondicionado y Smart TV. El proceso de reserva es simple: fechas, huéspedes, anticipo y acceso digital. Evita intermediarios y recibe atención directa del anfitrión. Tarifa desde $90.000 por noche en temporada baja para 2 personas.",
   },
   10: {
     name: "Loft 10 — Ideal para nómadas digitales",
@@ -141,7 +141,7 @@ const COPY: Record<
     highlight: "Misma calidad, misma ubicación estratégica",
     floorHint: "Misma experiencia Lofthouse 14",
     description:
-      "El Loft 14 completa el conjunto habitacional de Lofthouse 14 en el barrio Miraflores de Cali. Mismo estándar: cocina equipada, WiFi, A/C, Smart TV y check-in autónomo. Perfecto para turistas, nómadas, pacientes y grupos que necesitan varias unidades en el mismo lugar. Ubicación estratégica junto al Parque del Perro. Reserva directo desde $80.000/noche (2 personas, temporada baja) y recibe confirmación clara por WhatsApp.",
+      "El Loft 14 completa el conjunto habitacional de Lofthouse 14 en el barrio Miraflores de Cali. Mismo estándar: cocina equipada, WiFi, A/C, Smart TV y check-in autónomo. Perfecto para turistas, nómadas, pacientes y grupos que necesitan varias unidades en el mismo lugar. Ubicación estratégica junto al Parque del Perro. Reserva directo desde $90.000/noche (2 personas, temporada baja) y recibe confirmación clara por WhatsApp.",
   },
 };
 
@@ -158,7 +158,7 @@ export const LOFTS: LoftPage[] = LOFTS_HABITACIONALES.map((number, index) => {
     maxGuests: 5,
     beds: 1,
     bedType: "Queen / sofá cama según unidad",
-    priceFromCop: 80_000,
+    priceFromCop: 90_000,
     floorHint: copy.floorHint,
     amenities: SHARED_AMENITIES,
     images: [...IMAGE_SETS[index % IMAGE_SETS.length]],

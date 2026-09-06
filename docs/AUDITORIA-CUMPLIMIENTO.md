@@ -39,7 +39,7 @@ Documento de seguimiento de las **42 acciones** del informe (agosto 2026), aplic
 | # | Acción | Notas |
 |---|--------|------|
 | 7 | Enviar sitemap en Google Search Console | Tras deploy: `https://www.lofthouse14.com/sitemap.xml` |
-| 11–12 | Google Business Profile al 100% + responder reseñas | NAP: Carrera 26 # 2 - 91, Miraflores, Cali · +57 317 424 6076 |
+| 11–12 | Google Business Profile al 100% + responder reseñas | NAP: Carrera 26 # 2 - 91, Miraflores, Cali · +57 318 158 5801 |
 | 33 | TripAdvisor / Colombia.travel / Procolombia | Crear perfiles y citar NAP |
 | 35 | Cadencia blog 2/mes | Plantilla lista en `/blog` |
 | 37 | Backlinks locales | Outreach manual |

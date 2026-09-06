@@ -250,7 +250,7 @@ export function Hero() {
               Lofts en Cali Miraflores — Tu base en el Parque del Perro
             </h1>
             <p className="mt-4 text-xl leading-snug text-gray-200 drop-shadow-md">
-              Cocina, WiFi y check-in autónomo. Desde $80.000/noche. Reserva
+              Cocina, WiFi y check-in autónomo. Desde $90.000/noche. Reserva
               directo con Lofthouse 14.
             </p>
             <motion.div

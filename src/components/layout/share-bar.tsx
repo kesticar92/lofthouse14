@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { site, waLink } from "@/lib/site";
-import { STICKY_BOOKING_VISIBLE_EVENT } from "@/lib/stay-draft";
+import { trackWhatsAppClick } from "@/lib/analytics";
 import {
   GoogleMapsIcon,
   ShareIosIcon,
@@ -34,6 +34,7 @@ function AppleActionButton({
         rel="noopener noreferrer"
         aria-label={label}
         className={cn(base, className)}
+        onClick={onClick}
       >
         {children}
       </a>
@@ -52,25 +53,18 @@ function AppleActionButton({
   );
 }
 
+/**
+ * Columna única de acciones rápidas: compartir → Maps → WhatsApp.
+ * Evita el desorden de FABs duplicados.
+ */
 export function ShareBar() {
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState(
     process.env.NEXT_PUBLIC_SITE_URL || "https://lofthouse14.com",
   );
-  const [liftForSticky, setLiftForSticky] = useState(false);
 
   useEffect(() => {
     setShareUrl(window.location.href);
-  }, []);
-
-  useEffect(() => {
-    const onSticky = (event: Event) => {
-      const custom = event as CustomEvent<{ visible?: boolean }>;
-      setLiftForSticky(Boolean(custom.detail?.visible));
-    };
-    window.addEventListener(STICKY_BOOKING_VISIBLE_EVENT, onSticky);
-    return () =>
-      window.removeEventListener(STICKY_BOOKING_VISIBLE_EVENT, onSticky);
   }, []);
 
   const shareText = `${site.name} — ${site.tagline}`;
@@ -99,15 +93,12 @@ export function ShareBar() {
 
   return (
     <div
-      className={cn(
-        "fixed right-4 z-[60] flex flex-col items-center gap-1 transition-[bottom] duration-300",
-        liftForSticky ? "bottom-[13.5rem] md:bottom-6" : "bottom-6",
-      )}
+      className="fixed bottom-6 right-4 z-[60] flex flex-col items-center gap-1"
       aria-label="Acciones rápidas"
     >
       <div
         className={cn(
-          "flex flex-col gap-1 rounded-[1.35rem] border p-1.5 shadow-2xl",
+          "flex flex-col gap-1.5 rounded-[1.35rem] border p-1.5 shadow-2xl",
           "border-white/50 bg-white/75 backdrop-blur-2xl",
           "dark:border-white/10 dark:bg-zinc-900/75",
         )}
@@ -132,6 +123,7 @@ export function ShareBar() {
           href={waLink()}
           label={`WhatsApp — ${site.name}`}
           className="bg-zinc-100 hover:bg-zinc-200/90 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+          onClick={() => trackWhatsAppClick("fab")}
         >
           <WhatsAppLogoIcon className="size-[1.65rem]" />
         </AppleActionButton>

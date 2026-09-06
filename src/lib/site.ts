@@ -1,8 +1,8 @@
 /** Contacto oficial (WhatsApp y teléfono). */
 
-export const WHATSAPP_E164 = "+573174246076";
-export const WHATSAPP_DIGITS = "573174246076";
-export const PHONE_DISPLAY = "+57 317 424 6076";
+export const WHATSAPP_E164 = "+573181585801";
+export const WHATSAPP_DIGITS = "573181585801";
+export const PHONE_DISPLAY = "+57 318 158 5801";
 
 export const site = {
   name: "LOFTHOUSE 14",
@@ -27,7 +27,7 @@ export const site = {
   mapQuery: "Carrera 26 2-91, Miraflores, Cali, Valle del Cauca, Colombia",
   checkIn: "Desde las 3:00 PM",
   checkOut: "Hasta las 11:00 AM",
-  priceFromCop: 80_000,
+  priceFromCop: 90_000,
   /** Capacidad del conjunto (14 lofts × hasta 5 pers. c/u, con ajustes operativos). */
   maxGuests: 63,
   maxLofts: 14,

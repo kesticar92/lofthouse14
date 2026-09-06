@@ -3,7 +3,7 @@ import { site } from "@/lib/site";
 export const FAQ_ITEMS = [
   {
     q: "¿Cuál es la tarifa base?",
-    a: "Desde $80.000 por noche por loft (2 personas, temporada baja). La tarifa final depende de fechas, demanda, número de huéspedes y cuántos lofts reserves.",
+    a: "Desde $90.000 por noche por loft (2 personas, temporada baja). La tarifa final depende de fechas, demanda, número de huéspedes y cuántos lofts reserves.",
   },
   {
     q: "¿Cuántas personas caben en un loft?",

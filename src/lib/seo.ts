@@ -11,7 +11,7 @@ export const SEO = {
     "Lofts en Cali con Cocina · Barrio Miraflores | Lofthouse 14",
   titleTemplate: "%s | Lofthouse 14",
   description:
-    "Lofts modernos en Cali, barrio Miraflores, a pasos del Parque del Perro. WiFi, A/C, cocina equipada. Desde $80.000/noche. Check-in autónomo. ¡Reserva directo aquí!",
+    "Lofts modernos en Cali, barrio Miraflores, a pasos del Parque del Perro. WiFi, A/C, cocina equipada. Desde $90.000/noche. Check-in autónomo. ¡Reserva directo aquí!",
   ogImage: "/gallery/immersive/18-sala_cocina_escalera.webp",
   ogImageAlt:
     "Loft moderno en Cali Miraflores con cocina y sala — Lofthouse 14",

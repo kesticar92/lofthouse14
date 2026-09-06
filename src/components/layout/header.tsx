@@ -20,11 +20,12 @@ const PAGE_NAV = [
 
 /**
  * Barra fija única: menú a la izquierda, marca al centro, ayuda + día/noche a la derecha.
- * Sin CTA de reserva aquí (va en el hero / sticky) para evitar redundancias.
+ * Menú: izquierda → derecha en escritorio; arriba → abajo en móvil.
  */
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -32,6 +33,35 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isMenuOpen]);
+
+  const panelMotion = isDesktop
+    ? {
+        initial: { opacity: 0, x: -28 },
+        animate: { opacity: 1, x: 0 },
+        exit: { opacity: 0, x: -28 },
+      }
+    : {
+        initial: { opacity: 0, y: -16 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -16 },
+      };
 
   return (
     <header
@@ -97,72 +127,92 @@ export function Header() {
 
       <AnimatePresence>
         {isMenuOpen ? (
-          <motion.div
-            id="site-menu"
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-x-3 top-[calc(100%+6px)] z-40 max-h-[min(70vh,520px)] overflow-y-auto rounded-2xl border border-black/5 bg-[#f2f0eb]/98 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/98 md:inset-x-6 md:p-8"
-          >
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <div className="space-y-3 md:col-span-2 lg:col-span-1">
-                <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">
-                  Ir a
-                </h4>
-                <ul className="grid gap-1 sm:grid-cols-2 lg:grid-cols-1">
-                  {PAGE_NAV.map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="block rounded-lg px-2 py-2 text-sm font-bold text-zinc-800 transition hover:bg-black/5 hover:text-amber-700 dark:text-zinc-200 dark:hover:bg-white/5 dark:hover:text-amber-400"
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="space-y-3">
-                <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">
-                  Contacto
-                </h4>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  <span className="font-semibold text-zinc-800 dark:text-zinc-200">
-                    WhatsApp
-                  </span>
-                  <br />
-                  <a
-                    href={waLink()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-amber-600"
+          <>
+            <motion.button
+              type="button"
+              aria-label="Cerrar menú"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[2px]"
+              onClick={() => setIsMenuOpen(false)}
+            />
+            <motion.div
+              id="site-menu"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menú del sitio"
+              initial={panelMotion.initial}
+              animate={panelMotion.animate}
+              exit={panelMotion.exit}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className={cn(
+                "absolute z-[45] max-h-[min(85vh,640px)] overflow-y-auto border border-black/5 bg-[#f2f0eb]/98 p-5 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/98",
+                // Móvil: panel bajo el header, de arriba hacia abajo
+                "inset-x-3 top-[calc(100%+6px)] rounded-2xl",
+                // Escritorio: panel anclado a la izquierda, entra L→R
+                "md:inset-x-auto md:left-0 md:top-full md:h-[calc(100dvh-4rem)] md:max-h-none md:w-[min(22rem,90vw)] md:rounded-none md:rounded-br-2xl md:border-l-0 md:p-8",
+              )}
+            >
+              <div className="grid gap-6">
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">
+                    Ir a
+                  </h4>
+                  <ul className="grid gap-1">
+                    {PAGE_NAV.map((item) => (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block rounded-lg px-2 py-2.5 text-sm font-bold text-zinc-800 transition hover:bg-black/5 hover:text-amber-700 dark:text-zinc-200 dark:hover:bg-white/5 dark:hover:text-amber-400"
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">
+                    Contacto
+                  </h4>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                      WhatsApp
+                    </span>
+                    <br />
+                    <a
+                      href={waLink()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-amber-600"
+                    >
+                      {site.phoneDisplay}
+                    </a>
+                  </p>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    {site.addressLine}
+                    <br />
+                    {site.neighborhood}, {site.city}
+                  </p>
+                </div>
+                <div className="flex flex-col justify-between rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 dark:bg-amber-950/20">
+                  <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                    Lofts en Miraflores, cerca del Parque del Perro. Cotiza fechas
+                    y confirma por WhatsApp.
+                  </p>
+                  <Link
+                    href="#reservas"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="mt-4 inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white dark:bg-white dark:text-zinc-900"
                   >
-                    {site.phoneDisplay}
-                  </a>
-                </p>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {site.addressLine}
-                  <br />
-                  {site.neighborhood}, {site.city}
-                </p>
+                    Ir a cotizar
+                  </Link>
+                </div>
               </div>
-              <div className="flex flex-col justify-between rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 dark:bg-amber-950/20">
-                <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
-                  Lofts en Miraflores, cerca del Parque del Perro. Cotiza fechas
-                  y confirma por WhatsApp.
-                </p>
-                <Link
-                  href="#reservas"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="mt-4 inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white dark:bg-white dark:text-zinc-900"
-                >
-                  Ir a cotizar
-                </Link>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         ) : null}
       </AnimatePresence>
     </header>

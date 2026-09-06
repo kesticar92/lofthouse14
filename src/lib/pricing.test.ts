@@ -34,6 +34,6 @@ describe("quote", () => {
     expect(r.noches).toBe(2);
     expect(r.nochesLJ).toBe(2);
     expect(r.nochesVD).toBe(0);
-    expect(r.subtotalAlojamiento).toBe(2 * 80_000);
+    expect(r.subtotalAlojamiento).toBe(2 * 90_000);
   });
 });

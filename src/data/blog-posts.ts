@@ -26,7 +26,7 @@ export const BLOG_POSTS: BlogPost[] = [
       "El Parque del Perro es uno de los epicentros gastronómicos y sociales de Cali. Si te hospedas en Lofthouse 14, en el barrio Miraflores, tienes a minutos a pie cafés, restaurantes, bares y rincones culturales sin depender de taxis largos.",
       "Para una primera noche, camina la zona al atardecer: prueba un café especial, cena criolla o internacional y cierra con un plan suave. Si vienes por salsa, usa el loft como base segura: cocina propia, WiFi y check-in autónomo te dan flexibilidad cuando regresas tarde.",
       "En el día, combina Miraflores con San Fernando y puntos cercanos de cultura. Quienes llegan por citas médicas valoran la cercanía a clínicas y la posibilidad de descansar en un espacio privado con cocina.",
-      "Reserva tu loft en Cali Miraflores directo con nosotros: fechas claras, tarifa desde $80.000/noche en temporada baja y coordinación por WhatsApp.",
+      "Reserva tu loft en Cali Miraflores directo con nosotros: fechas claras, tarifa desde $90.000/noche en temporada baja y coordinación por WhatsApp.",
     ],
   },
   {

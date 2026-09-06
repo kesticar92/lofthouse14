@@ -217,7 +217,7 @@ export function HeroBookingCard() {
             type="submit"
             className="w-full rounded-full bg-zinc-900 py-3 text-xs font-bold uppercase tracking-wide text-white dark:bg-amber-600"
           >
-            Ver disponibilidad
+            Reservar
           </button>
         </form>
       </div>

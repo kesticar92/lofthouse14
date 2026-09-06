@@ -10,7 +10,7 @@ import { site, waLink } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Lofts en Cali Miraflores",
   description:
-    "Explora los lofts de Lofthouse 14 en Miraflores, Cali. Cocina, WiFi, A/C y check-in autónomo. Desde $80.000/noche.",
+    "Explora los lofts de Lofthouse 14 en Miraflores, Cali. Cocina, WiFi, A/C y check-in autónomo. Desde $90.000/noche.",
   alternates: { canonical: "/lofts" },
   openGraph: {
     title: "Lofts en Cali Miraflores | Lofthouse 14",

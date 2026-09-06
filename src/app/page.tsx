@@ -1,7 +1,6 @@
 import { Header } from "@/components/layout/header";
 import { ShareBar } from "@/components/layout/share-bar";
 import { StickyBookingBar } from "@/components/layout/sticky-booking-bar";
-import { WhatsAppFab } from "@/components/layout/whatsapp-fab";
 import { Hero } from "@/components/sections/hero";
 import { Lofts } from "@/components/sections/lofts";
 import { Location } from "@/components/sections/location";
@@ -33,7 +32,6 @@ export default function Home() {
       </main>
       <SiteFooter />
       <ShareBar />
-      <WhatsAppFab />
     </>
   );
 }

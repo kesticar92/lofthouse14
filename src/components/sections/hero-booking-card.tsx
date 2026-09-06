@@ -108,7 +108,7 @@ export function HeroBookingCard({
   return (
     <div
       className={cn(
-        "w-full overflow-hidden rounded-3xl border border-white/25 bg-white shadow-2xl",
+        "relative z-20 w-full overflow-visible rounded-3xl border border-white/25 bg-white shadow-2xl",
         "dark:border-white/15 dark:bg-zinc-950",
         className,
       )}

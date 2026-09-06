@@ -158,8 +158,8 @@ export function Hero() {
           }}
           aria-hidden
         />
-        <div className="relative z-10 px-4 pb-8 pt-20">
-          <div className="mt-1">
+        <div className="relative z-20 px-4 pb-8 pt-20">
+          <div className="relative z-30 mt-1">
             <HeroBookingCard />
           </div>
           <p className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/35 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
@@ -251,7 +251,7 @@ export function Hero() {
         <div className="relative z-10 w-full px-8 pb-10 pt-28 lg:px-12 lg:pb-12">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6">
             {/* Card con fotos — encima del título y la calificación */}
-            <div className="pointer-events-auto w-full max-w-md">
+            <div className="pointer-events-auto relative z-30 w-full max-w-md isolate">
               <HeroBookingCard compact />
             </div>
 

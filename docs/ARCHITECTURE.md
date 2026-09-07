@@ -1,7 +1,8 @@
 # Arquitectura — Lofthouse 14 → plataforma hotelera multi-tenant
 
 > **Fase 0 — Auditoría (documentación).** Completada.  
-> **Fase 1 — Foundations multi-tenant:** implementada en branch `cursor/fase1-foundations-multitenant-f0b5`. Detalle operativo: [`docs/FASE1.md`](./FASE1.md).  
+> **Fase 1 — Foundations multi-tenant:** implementada en branch `cursor/fase1-foundations-multitenant-f0b5`. Detalle: [`docs/FASE1.md`](./FASE1.md).  
+> **Fase 2 — Catálogo RoomType/Room:** implementada en branch `cursor/fase2-catalogo-pms-f0b5`. Detalle: [`docs/FASE2.md`](./FASE2.md).  
 > Fecha auditoría: 2026-09-07 · Branch Fase 0: `cursor/fase0-auditoria-arquitectura-f0b5`  
 > Este documento **reutiliza** el avance existente (website, hero cards Vista/Atrio/Cielo, banner de fechas, Personaliza tu experiencia, booking wizard, admin, pricing, PMS parcial). **No** justifica reescribir ni borrar ese trabajo.
 
@@ -65,14 +66,15 @@ Flujo de reserva actual: **fechas/categoría en hero** → `sessionStorage` (`st
 | `/admin/reservas` | PMS (calendario, iCal, bloqueos) |
 | `/admin/gastos` | Gastos + Drive/Sheets |
 | `/admin/aseos` | Housekeeping desde reservas |
+| `/admin/catalogo` | Catálogo Property / RoomType / Room (Fase 2) |
 | `/admin/usuarios` | Roles / módulos (admin+) |
 
-Claves de módulo: `cotizaciones | inventario | reservas | gastos | aseos | usuarios` (`src/lib/api/admin-modules.ts`).
+Claves de módulo: `cotizaciones | inventario | reservas | gastos | aseos | catalogo | usuarios` (`src/lib/api/admin-modules.ts`).
 
 ### 1.5 APIs
 
 **Admin (staff):**  
-`/api/admin/cotizaciones`, `inventarios`, `expenses`, `cleaning-tasks`, `cleaning-summary`, `notifications`, `users`, `staff-directory`, `app-settings/{cleaning,cotizaciones-pricing}`, `pms/{properties,reservations,blocks,ical-sources,sync}`.
+`/api/admin/cotizaciones`, `inventarios`, `expenses`, `cleaning-tasks`, `cleaning-summary`, `notifications`, `users`, `staff-directory`, `app-settings/{cleaning,cotizaciones-pricing}`, `catalog`, `organizations`, `pms/{properties,reservations,blocks,ical-sources,sync}`.
 
 **Cron (Bearer `CRON_SECRET`):**  
 `sync-ical`, `cleaning-sync`, `expense-drive-retry`.
@@ -96,17 +98,17 @@ Migraciones en `supabase/migrations/` (001–016). Tablas principales:
 |-------|---------|
 | `profiles`, `audit_logs` | Auth / auditoría |
 | `organizations`, `org_members` | Multi-tenant (Fase 1) |
-| `org_properties`, `room_types`, `rooms` | Catálogo edificio / tipos / unidades (Fase 1; bridge `legacy_property_id`) |
-| `properties`, `reservations`, `availability_blocks`, `ical_sources` | PMS + iCal (units legacy + `organization_id`) |
+| `org_properties`, `room_types`, `rooms` | Catálogo edificio / tipos / unidades (Fase 1–2; bridge `legacy_property_id` ↔ `properties.room_id`) |
+| `properties`, `reservations`, `availability_blocks`, `ical_sources` | PMS + iCal (units legacy + `organization_id`; dual-read con rooms) |
 | `cleaning_tasks`, `notifications`, `app_settings` | Aseos / config (scoped por org) |
 | `expenses`, `expense_files` | Gastos + Storage/Drive |
 | `cotizaciones` | Cotizaciones admin |
 | `inventario_*` | Inventario + revisiones + fotos |
 | `guest_reviews` | Reseñas scrapadas (migración 016 + org opcional) |
 
-Migraciones: `001`–`016` legacy + **`017`–`019` Fase 1**. Ver [`docs/FASE1.md`](./FASE1.md).
+Migraciones: `001`–`016` legacy + **`017`–`019` Fase 1** + **`020` Fase 2**. Ver [`docs/FASE1.md`](./FASE1.md) y [`docs/FASE2.md`](./FASE2.md).
 
-**Nota:** `properties` sigue siendo el inventario PMS por loft; el edificio canónico es `org_properties`. Fase 2 unifica rename/migración.
+**Nota:** `properties` sigue siendo el inventario PMS por loft; el edificio canónico es `org_properties`. Fase 2 añadió bridge bidireccional (`rooms.legacy_property_id` ↔ `properties.room_id`) sin rename destructivo.
 
 ### 1.8 Ya existe vs falta (prompt maestro SaaS)
 
@@ -124,7 +126,7 @@ Migraciones: `001`–`016` legacy + **`017`–`019` Fase 1**. Ver [`docs/FASE1.m
 | Inventario operativo | **Parcial** |
 | Cotizaciones staff | **Existe** |
 | Reseñas sync | **Parcial** |
-| Multi-tenant Organization→Property→RoomType→Room | **No existe** |
+| Multi-tenant Organization→Property→RoomType→Room | **Parcial** (Fase 1–2: schema + admin catálogo; PMS aún dual-read) |
 | Booking engine con hold/confirmación en DB | **No existe** |
 | Pagos (pasarela / depositos) | **No existe** |
 | Channel manager (Booking/Expedia API, mapping, ARI) | **No existe** |
@@ -283,7 +285,7 @@ Estrategia de migración de nombres: mantener compat API admin un tiempo (`prope
 |---|--------|------------|-------|
 | M0 | **Website / SEO / Brand** | Sí | Freeze salvo bugs |
 | M1 | **Identity & Access** | Parcial | Falta org membership |
-| M2 | **Catalog (Property/RoomType/Room)** | Parcial | Data TS + `properties` |
+| M2 | **Catalog (Property/RoomType/Room)** | Sí (Fase 2) | Admin UI + APIs; dual-read PMS |
 | M3 | **Pricing & Quotes** | Sí | Unificar público/admin |
 | M4 | **Direct Booking Engine** | No (WA lead) | Wizard reutilizable |
 | M5 | **PMS / Reservations** | Parcial | Calendario + CRUD |
@@ -340,7 +342,7 @@ M15 SaaS billing ◄── M1                                  │
 |------|--------|----------|-----------|
 | **0** | Auditoría | Este documento + inventario | — |
 | **1** | Cimientos multi-tenant | `organizations`, membership, `organization_id` en tablas core; seed Lofthouse; **sin** cambiar website UX | profiles, RLS patterns |
-| **2** | Catálogo RoomType/Room | Formalizar Vista/Atrio/Cielo + migrar `properties`→rooms; APIs admin catálogo | `loft-categories`, PMS properties |
+| **2** | Catálogo RoomType/Room | Formalizar Vista/Atrio/Cielo + bridge `properties`↔`rooms`; APIs/UI admin catálogo | `loft-categories`, PMS properties — **hecha** ([`FASE2.md`](./FASE2.md)) |
 | **3** | Disponibilidad unificada | API pública de availability; wizard consulta DB; holds cortos | guided-reservation, pms overlap |
 | **4** | Booking engine directo | Crear reservation desde wizard (estado `pending`/`confirmed`); WA como notificación, no único canal | reservar/, cotizaciones |
 | **5** | Pricing unificado | Rate plans por RoomType; alinear hero prices y `pricing.ts` | cotizaciones-pricing, public-stay-quote |
@@ -358,7 +360,8 @@ Cada fase debe: migraciones SQL + tipos regenerados + tests de dominio + **no** 
 ## 10. Fase 1 — Foundations multi-tenant (implementada)
 
 > Detalle operativo, migraciones y cómo probar: [`docs/FASE1.md`](./FASE1.md).  
-> **Fase 2 (catálogo rooms definitivo / rename) pendiente de OK.**
+> **Fase 2 (catálogo) implementada** — ver [`docs/FASE2.md`](./FASE2.md).  
+> **Fase 3 (disponibilidad unificada) pendiente de OK.**
 
 ### Qué se tocó
 
@@ -394,10 +397,37 @@ Media en **DB/RLS/API**; **nula** en UI marketing. Riesgo residual: aplicar migr
 
 ---
 
+## 11. Fase 2 — Catálogo (implementada)
+
+> Detalle: [`docs/FASE2.md`](./FASE2.md). Branch: `cursor/fase2-catalogo-pms-f0b5`.
+
+### Qué se tocó
+
+1. **Migración 020:** `properties.room_id` + backfill bridge + vista `v_catalog_rooms`.
+2. **Seed TS compartido** (`src/lib/catalog`) alineado con marketing Vista/Atrio/Cielo.
+3. **APIs:** `GET/PATCH /api/admin/catalog`; `GET/POST /api/admin/organizations` (switcher cookie).
+4. **UI:** `/admin/catalogo` + `OrgSwitcher` en shell.
+5. **Docs / tests** de seed, schema y cookie.
+
+### Qué NO se tocó
+
+Website hero/wizard; rename destructivo de `properties`; booking engine; pagos; CM OTA.
+
+### Criterios Fase 2
+
+- [x] Admin catálogo property + room types + rooms
+- [x] PATCH mínimo room_types/rooms
+- [x] Bridge dual-read PMS ↔ rooms
+- [x] Marketing categories ↔ seed
+- [ ] Smoke Supabase real con 020
+
+---
+
 ## Referencias internas
 
 - Inventario Fase 0: [`docs/FASE0-AUDIT.md`](./FASE0-AUDIT.md)
 - Fase 1 foundations: [`docs/FASE1.md`](./FASE1.md)
+- Fase 2 catálogo: [`docs/FASE2.md`](./FASE2.md)
 - Deploy: [`docs/DEPLOY.md`](./DEPLOY.md)
 - SEO cumplimiento: [`docs/AUDITORIA-CUMPLIMIENTO.md`](./AUDITORIA-CUMPLIMIENTO.md)
 - Env: [`.env.example`](../.env.example)

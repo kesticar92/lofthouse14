@@ -33,16 +33,25 @@ export function configuredOrganizationSlug(): string {
 
 /**
  * Resuelve la organización activa del staff.
- * - Membership activa preferida (env ID / slug seed).
- * - `super_admin` sin membership → seed LOFTHOUSE (plataforma).
- * - Staff sin membership → `null` (RLS no devolverá filas).
+ * Prioridad:
+ * 1. Cookie / header de switcher (`preferredOrganizationId`) si es miembro.
+ * 2. Env `DEFAULT_ORGANIZATION_ID` / slug seed si es miembro.
+ * 3. Primera membership activa.
+ * 4. `super_admin` sin membership → seed LOFTHOUSE (plataforma).
+ * 5. Staff sin membership → `null` (RLS no devolverá filas).
  */
 export async function resolveStaffOrganizationId(
   supabase: SupabaseClient,
-  opts: { userId: string; role: StaffRole },
+  opts: {
+    userId: string;
+    role: StaffRole;
+    /** Preferencia del switcher (cookie `lh_active_org`). */
+    preferredOrganizationId?: string | null;
+  },
 ): Promise<string | null> {
-  const preferredId = configuredOrganizationId();
+  const envPreferredId = configuredOrganizationId();
   const preferredSlug = configuredOrganizationSlug();
+  const switcherId = opts.preferredOrganizationId?.trim() || null;
 
   const { data: memberships, error } = await supabase
     .from("org_members")
@@ -51,8 +60,13 @@ export async function resolveStaffOrganizationId(
     .eq("status", "active");
 
   if (!error && memberships && memberships.length > 0) {
-    if (preferredId) {
-      const hit = memberships.find((m) => m.organization_id === preferredId);
+    if (switcherId) {
+      const hit = memberships.find((m) => m.organization_id === switcherId);
+      if (hit) return hit.organization_id;
+    }
+
+    if (envPreferredId) {
+      const hit = memberships.find((m) => m.organization_id === envPreferredId);
       if (hit) return hit.organization_id;
     }
 
@@ -73,13 +87,13 @@ export async function resolveStaffOrganizationId(
   // Tabla aún no migrada / error: no romper admin en entornos sin 017.
   if (error) {
     if (opts.role === "super_admin") {
-      return preferredId ?? LOFTHOUSE_ORGANIZATION_ID;
+      return switcherId ?? envPreferredId ?? LOFTHOUSE_ORGANIZATION_ID;
     }
-    return preferredId;
+    return switcherId ?? envPreferredId;
   }
 
   if (opts.role === "super_admin") {
-    return preferredId ?? LOFTHOUSE_ORGANIZATION_ID;
+    return switcherId ?? envPreferredId ?? LOFTHOUSE_ORGANIZATION_ID;
   }
 
   return null;

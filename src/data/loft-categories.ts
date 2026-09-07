@@ -1,11 +1,19 @@
 /**
  * Categorías comerciales de lofts (precio y tipo de ventana).
+ * Números de loft y capacidades se alinean con el catálogo seed
+ * (`src/lib/catalog/seed.ts` ↔ migraciones 019/020).
  * - Vista: ventana exterior (1, 14)
  * - Atrio: ventana interior / patio (5, 7, 8) — loft 5 máx. 3 huéspedes
  * - Cielo: lofts cerrados (sin ventana a calle/atrio)
  */
 
-export type LoftCategoryId = "vista" | "atrio" | "cielo";
+import {
+  loftNumbersForCategory,
+  maxGuestsOverridesForCategory,
+  type MarketingCategory,
+} from "@/lib/catalog/seed";
+
+export type LoftCategoryId = MarketingCategory;
 
 export type LoftCategory = {
   id: LoftCategoryId;
@@ -32,10 +40,10 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     shortLabel: "Vista",
     tagline: "Ventana exterior · luz de barrio",
     windowKind: "exterior",
-    loftNumbers: [1, 14],
+    loftNumbers: loftNumbersForCategory("vista"),
     priceFromCop: 120_000,
     maxGuests: 5,
-    maxGuestsByLoft: {},
+    maxGuestsByLoft: maxGuestsOverridesForCategory("vista"),
     stubCode: "VIS",
     image: "/gallery/immersive/09-fachada_diurna.webp",
     imageAlt: "Fachada con luz natural — Loft Vista",
@@ -46,10 +54,10 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     shortLabel: "Atrio",
     tagline: "Ventana interior · patio del conjunto",
     windowKind: "interior",
-    loftNumbers: [5, 7, 8],
+    loftNumbers: loftNumbersForCategory("atrio"),
     priceFromCop: 105_000,
     maxGuests: 5,
-    maxGuestsByLoft: { 5: 3 },
+    maxGuestsByLoft: maxGuestsOverridesForCategory("atrio"),
     stubCode: "ATR",
     image: "/gallery/loft-sala-sofa-miraflores-cali.webp",
     imageAlt: "Interior luminoso — Loft Atrio",
@@ -60,10 +68,10 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     shortLabel: "Cielo",
     tagline: "Loft cerrado · intimidad total",
     windowKind: "cerrado",
-    loftNumbers: [2, 3, 6, 9, 10, 11, 12, 13],
+    loftNumbers: loftNumbersForCategory("cielo"),
     priceFromCop: 90_000,
     maxGuests: 5,
-    maxGuestsByLoft: {},
+    maxGuestsByLoft: maxGuestsOverridesForCategory("cielo"),
     stubCode: "CIE",
     image: "/gallery/loft-habitacion-miraflores-cali.webp",
     imageAlt: "Habitación íntima — Loft Cielo",

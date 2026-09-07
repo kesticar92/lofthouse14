@@ -10,6 +10,7 @@ export const ADMIN_MODULE_KEYS = [
   "reservas",
   "gastos",
   "aseos",
+  "catalogo",
   "usuarios",
 ] as const;
 
@@ -22,6 +23,7 @@ export const ADMIN_MODULE_LABELS = {
   reservas: "Reservas",
   gastos: "Gastos",
   aseos: "Aseos del día",
+  catalogo: "Catálogo",
   usuarios: "Usuarios",
 } as const satisfies Record<AdminModuleKey, string>;
 
@@ -59,6 +61,7 @@ export const ADMIN_MODULE_PATHS = {
   reservas: "/admin/reservas",
   gastos: "/admin/gastos",
   aseos: "/admin/aseos",
+  catalogo: "/admin/catalogo",
   usuarios: "/admin/usuarios",
 } as const satisfies Record<AdminModuleKey, string>;
 

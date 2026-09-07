@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isStaffRole, type StaffRole } from "@/lib/supabase/env";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -10,6 +11,10 @@ import {
 } from "@/lib/api/admin-modules";
 import { resolveStaffOrganizationId } from "@/lib/tenant/organization";
 import type { OrgMemberRole } from "@/lib/tenant/constants";
+import {
+  ACTIVE_ORG_COOKIE,
+  parseActiveOrgCookie,
+} from "@/lib/tenant/active-org-cookie";
 
 export type StaffProfile = {
   role: StaffRole;
@@ -111,9 +116,20 @@ export async function requireStaff(): Promise<
     allowed_modules: allowed,
   };
 
+  let preferredOrganizationId: string | null = null;
+  try {
+    const jar = await cookies();
+    preferredOrganizationId = parseActiveOrgCookie(
+      jar.get(ACTIVE_ORG_COOKIE)?.value,
+    );
+  } catch {
+    // Fuera de request (tests): sin cookie.
+  }
+
   const organizationId = await resolveStaffOrganizationId(supabase, {
     userId: user.id,
     role: profile.role,
+    preferredOrganizationId,
   });
 
   let orgRole: OrgMemberRole | null = null;

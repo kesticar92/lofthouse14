@@ -8,6 +8,7 @@ import { fetchAdminSession, logoutAdmin } from "@/lib/auth-client";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { AdminNotificationBell } from "@/components/admin/admin-notification-bell";
+import { OrgSwitcher } from "@/components/admin/org-switcher";
 
 type NavItem = {
   href: string;
@@ -119,6 +120,23 @@ export const ADMIN_NAV: NavItem[] = [
     ),
     desc: "Limpieza y preparación desde reservas",
   },
+  {
+    href: "/admin/catalogo",
+    label: "Catálogo",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M4 6h16M4 12h16M4 18h10" />
+        <path d="M18 16v4M16 18h4" />
+      </svg>
+    ),
+    desc: "Property, tipos Vista/Atrio/Cielo y rooms",
+  },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -176,6 +194,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="flex items-center gap-2">
+            <OrgSwitcher />
             <span className="hidden max-w-[220px] truncate rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-xs text-zinc-700 dark:border-white/10 dark:bg-zinc-900/60 dark:text-zinc-200 md:inline">
               <strong className="font-semibold">{user}</strong>
               {role ? (

@@ -787,6 +787,7 @@ export type Database = {
           ical_token: string;
           id: string;
           name: string;
+          room_id: string | null;
           updated_at: string;
         };
         Insert: {
@@ -795,6 +796,7 @@ export type Database = {
           ical_token?: string;
           id?: string;
           name: string;
+          room_id?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -803,6 +805,7 @@ export type Database = {
           ical_token?: string;
           id?: string;
           name?: string;
+          room_id?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -811,6 +814,13 @@ export type Database = {
             columns: ["organization_id"];
             isOneToOne: false;
             referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "properties_room_id_fkey";
+            columns: ["room_id"];
+            isOneToOne: false;
+            referencedRelation: "rooms";
             referencedColumns: ["id"];
           },
         ];

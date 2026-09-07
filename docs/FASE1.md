@@ -2,7 +2,7 @@
 
 > Branch: `cursor/fase1-foundations-multitenant-f0b5`  
 > Base: tip con website UX (cards Vista/Atrio/Cielo, banner fechas, Personaliza tu experiencia) + docs Fase 0.  
-> **Fase 2 queda pendiente de OK explícito.**
+> **Fase 2 implementada** — ver [`FASE2.md`](./FASE2.md). **Fase 3 pendiente de OK.**
 
 Complementa [`ARCHITECTURE.md`](./ARCHITECTURE.md) §10.
 
@@ -99,13 +99,13 @@ Smoke manual (con Supabase migrado):
 4. Staff sin fila en `org_members` → 403 `FORBIDDEN_NO_ORG` en writes/listados scoped (RLS vacía datos).
 5. Website `/` y `/reservar` sin cambios visuales.
 
-## Qué falta (Fase 2+)
+## Qué falta (Fase 3+)
 
-- Renombrar/migrar `properties` PMS → `rooms` canónico (hoy coexisten vía `legacy_property_id`).
-- UI admin de catálogo / switcher multi-org.
-- Scope org en **todos** los listados restantes (notificaciones UI, sync reviews script, etc.) de forma exhaustiva.
+- Disponibilidad unificada / wizard consulta DB (Fase 3).
+- Usar `room_id` en writes PMS (reservas) de forma canónica.
+- Scope org exhaustivo en notificaciones UI / scripts reviews.
 - Tests de integración RLS.
-- Booking engine / availability pública (Fase 3–4).
+- Booking engine / pagos (Fases 4/10).
 
 ## Criterios Fase 1
 

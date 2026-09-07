@@ -14,6 +14,7 @@ describe("adminModuleForPath", () => {
     expect(adminModuleForPath("/admin/cotizaciones/extra")).toBe(
       "cotizaciones",
     );
+    expect(adminModuleForPath("/admin/catalogo")).toBe("catalogo");
     expect(adminModuleForPath("/admin")).toBeNull();
   });
 });

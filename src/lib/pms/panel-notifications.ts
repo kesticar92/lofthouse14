@@ -1,13 +1,26 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { sourceLabel } from "@/lib/pms/colors";
+import { LOFTHOUSE_ORGANIZATION_ID } from "@/lib/tenant/constants";
 
 /** Notificaciones masivas (requiere cliente service role; si falla, no rompe el flujo). */
 export async function notifyStaffUsers(
   admin: SupabaseClient,
-  rows: { user_id: string; title: string; message: string }[],
+  rows: {
+    user_id: string;
+    title: string;
+    message: string;
+    organization_id?: string;
+  }[],
+  organizationId: string = LOFTHOUSE_ORGANIZATION_ID,
 ): Promise<void> {
   if (rows.length === 0) return;
-  const { error } = await admin.from("notifications").insert(rows);
+  const payload = rows.map((r) => ({
+    user_id: r.user_id,
+    title: r.title,
+    message: r.message,
+    organization_id: r.organization_id ?? organizationId,
+  }));
+  const { error } = await admin.from("notifications").insert(payload);
   if (error) {
     console.error("panel-notifications insert", error.message);
   }

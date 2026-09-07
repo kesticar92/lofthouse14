@@ -9,7 +9,7 @@
 //   - Vía CLI Supabase:   `supabase gen types typescript --project-id <ref> \
 //                            --schema public > src/types/database.types.ts`
 //
-// NO EDITAR a mano — cualquier cambio se sobreescribe en la próxima regeneración.
+// Regenerar preferible vía CLI; Fase 1 añadió organizations/org_members/org_properties/room_types/rooms a mano.
 // Si necesitas tipos derivados (ej. con relaciones expandidas), créalos en
 // `src/types/db-aliases.ts` o en `src/features/<dominio>/types.ts`.
 // =============================================================================
@@ -31,21 +31,32 @@ export type Database = {
     Tables: {
       app_settings: {
         Row: {
+          organization_id: string;
           key: string;
           updated_at: string;
           value: Json;
         };
         Insert: {
+          organization_id: string;
           key: string;
           updated_at?: string;
           value?: Json;
         };
         Update: {
+          organization_id?: string;
           key?: string;
           updated_at?: string;
           value?: Json;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "app_settings_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       audit_logs: {
         Row: {
@@ -79,6 +90,7 @@ export type Database = {
       };
       availability_blocks: {
         Row: {
+          organization_id: string;
           created_at: string;
           created_by: string | null;
           end_date: string;
@@ -88,6 +100,7 @@ export type Database = {
           start_date: string;
         };
         Insert: {
+          organization_id: string;
           created_at?: string;
           created_by?: string | null;
           end_date: string;
@@ -97,6 +110,7 @@ export type Database = {
           start_date: string;
         };
         Update: {
+          organization_id?: string;
           created_at?: string;
           created_by?: string | null;
           end_date?: string;
@@ -106,6 +120,13 @@ export type Database = {
           start_date?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "availability_blocks_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "availability_blocks_property_id_fkey";
             columns: ["property_id"];
@@ -117,6 +138,7 @@ export type Database = {
       };
       cleaning_tasks: {
         Row: {
+          organization_id: string;
           assigned_to: string | null;
           bed_setup_notes: string;
           check_in: string | null;
@@ -137,6 +159,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          organization_id: string;
           assigned_to?: string | null;
           bed_setup_notes?: string;
           check_in?: string | null;
@@ -157,6 +180,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          organization_id?: string;
           assigned_to?: string | null;
           bed_setup_notes?: string;
           check_in?: string | null;
@@ -177,6 +201,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "cleaning_tasks_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "cleaning_tasks_assigned_to_fkey";
             columns: ["assigned_to"];
@@ -202,6 +233,7 @@ export type Database = {
       };
       cotizaciones: {
         Row: {
+          organization_id: string;
           check_in: string;
           check_out: string;
           created_at: string;
@@ -218,6 +250,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          organization_id: string;
           check_in: string;
           check_out: string;
           created_at?: string;
@@ -234,6 +267,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          organization_id?: string;
           check_in?: string;
           check_out?: string;
           created_at?: string;
@@ -249,7 +283,15 @@ export type Database = {
           total?: number;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "cotizaciones_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       expense_files: {
         Row: {
@@ -309,6 +351,7 @@ export type Database = {
       };
       expenses: {
         Row: {
+          organization_id: string;
           amount: number;
           category: string;
           created_at: string;
@@ -326,6 +369,7 @@ export type Database = {
           vendor_name: string;
         };
         Insert: {
+          organization_id: string;
           amount: number;
           category?: string;
           created_at?: string;
@@ -343,6 +387,7 @@ export type Database = {
           vendor_name?: string;
         };
         Update: {
+          organization_id?: string;
           amount?: number;
           category?: string;
           created_at?: string;
@@ -359,10 +404,83 @@ export type Database = {
           updated_at?: string;
           vendor_name?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "expenses_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
+
+      guest_reviews: {
+        Row: {
+          body: string;
+          booking_negative: string | null;
+          booking_positive: string | null;
+          booking_score: number | null;
+          id: string;
+          image: string;
+          listing_label: string | null;
+          listing_url: string | null;
+          loft_code: string | null;
+          name: string;
+          organization_id: string | null;
+          review_date: string | null;
+          source: string;
+          star_rating: number;
+          synced_at: string;
+        };
+        Insert: {
+          body: string;
+          booking_negative?: string | null;
+          booking_positive?: string | null;
+          booking_score?: number | null;
+          id: string;
+          image?: string;
+          listing_label?: string | null;
+          listing_url?: string | null;
+          loft_code?: string | null;
+          name: string;
+          organization_id?: string | null;
+          review_date?: string | null;
+          source: string;
+          star_rating?: number;
+          synced_at?: string;
+        };
+        Update: {
+          body?: string;
+          booking_negative?: string | null;
+          booking_positive?: string | null;
+          booking_score?: number | null;
+          id?: string;
+          image?: string;
+          listing_label?: string | null;
+          listing_url?: string | null;
+          loft_code?: string | null;
+          name?: string;
+          organization_id?: string | null;
+          review_date?: string | null;
+          source?: string;
+          star_rating?: number;
+          synced_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "guest_reviews_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+
       ical_sources: {
         Row: {
+          organization_id: string;
           created_at: string;
           id: string;
           last_sync: string | null;
@@ -371,6 +489,7 @@ export type Database = {
           url: string;
         };
         Insert: {
+          organization_id: string;
           created_at?: string;
           id?: string;
           last_sync?: string | null;
@@ -379,6 +498,7 @@ export type Database = {
           url: string;
         };
         Update: {
+          organization_id?: string;
           created_at?: string;
           id?: string;
           last_sync?: string | null;
@@ -387,6 +507,13 @@ export type Database = {
           url?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "ical_sources_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "ical_sources_property_id_fkey";
             columns: ["property_id"];
@@ -398,6 +525,7 @@ export type Database = {
       };
       inventario_items: {
         Row: {
+          organization_id: string;
           cantidad: number;
           created_at: string;
           estado: string;
@@ -410,6 +538,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          organization_id: string;
           cantidad?: number;
           created_at?: string;
           estado?: string;
@@ -422,6 +551,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          organization_id?: string;
           cantidad?: number;
           created_at?: string;
           estado?: string;
@@ -433,7 +563,15 @@ export type Database = {
           ultima_revision_por?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "inventario_items_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       inventario_revision_fotos: {
         Row: {
@@ -525,6 +663,7 @@ export type Database = {
       };
       inventario_revisiones: {
         Row: {
+          organization_id: string;
           created_at: string;
           created_by: string | null;
           fecha: string;
@@ -534,6 +673,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          organization_id: string;
           created_at?: string;
           created_by?: string | null;
           fecha: string;
@@ -543,6 +683,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          organization_id?: string;
           created_at?: string;
           created_by?: string | null;
           fecha?: string;
@@ -551,10 +692,19 @@ export type Database = {
           persona?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "inventario_revisiones_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       notifications: {
         Row: {
+          organization_id: string;
           created_at: string;
           id: string;
           message: string;
@@ -563,6 +713,7 @@ export type Database = {
           user_id: string;
         };
         Insert: {
+          organization_id: string;
           created_at?: string;
           id?: string;
           message: string;
@@ -571,6 +722,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          organization_id?: string;
           created_at?: string;
           id?: string;
           message?: string;
@@ -579,6 +731,13 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "notifications_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "notifications_user_id_fkey";
             columns: ["user_id"];
@@ -623,6 +782,7 @@ export type Database = {
       };
       properties: {
         Row: {
+          organization_id: string;
           created_at: string;
           ical_token: string;
           id: string;
@@ -630,6 +790,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          organization_id: string;
           created_at?: string;
           ical_token?: string;
           id?: string;
@@ -637,16 +798,26 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          organization_id?: string;
           created_at?: string;
           ical_token?: string;
           id?: string;
           name?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "properties_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       reservations: {
         Row: {
+          organization_id: string;
           check_in: string;
           check_out: string;
           commission_amount: number | null;
@@ -667,6 +838,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          organization_id: string;
           check_in: string;
           check_out: string;
           commission_amount?: number | null;
@@ -687,6 +859,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          organization_id?: string;
           check_in?: string;
           check_out?: string;
           commission_amount?: number | null;
@@ -708,6 +881,13 @@ export type Database = {
         };
         Relationships: [
           {
+            foreignKeyName: "reservations_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "reservations_ical_source_id_fkey";
             columns: ["ical_source_id"];
             isOneToOne: false;
@@ -723,11 +903,270 @@ export type Database = {
           },
         ];
       };
+
+      organizations: {
+        Row: {
+          created_at: string;
+          id: string;
+          modules_enabled: string[];
+          name: string;
+          slug: string;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          modules_enabled?: string[];
+          name: string;
+          slug: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          modules_enabled?: string[];
+          name?: string;
+          slug?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      org_members: {
+        Row: {
+          allowed_modules: string[];
+          created_at: string;
+          id: string;
+          organization_id: string;
+          role: Database["public"]["Enums"]["org_member_role"];
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          allowed_modules?: string[];
+          created_at?: string;
+          id?: string;
+          organization_id: string;
+          role?: Database["public"]["Enums"]["org_member_role"];
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          allowed_modules?: string[];
+          created_at?: string;
+          id?: string;
+          organization_id?: string;
+          role?: Database["public"]["Enums"]["org_member_role"];
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "org_members_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      org_properties: {
+        Row: {
+          address: string;
+          city: string;
+          country: string;
+          created_at: string;
+          id: string;
+          name: string;
+          organization_id: string;
+          slug: string;
+          status: string;
+          timezone: string;
+          updated_at: string;
+        };
+        Insert: {
+          address?: string;
+          city?: string;
+          country?: string;
+          created_at?: string;
+          id?: string;
+          name: string;
+          organization_id: string;
+          slug: string;
+          status?: string;
+          timezone?: string;
+          updated_at?: string;
+        };
+        Update: {
+          address?: string;
+          city?: string;
+          country?: string;
+          created_at?: string;
+          id?: string;
+          name?: string;
+          organization_id?: string;
+          slug?: string;
+          status?: string;
+          timezone?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "org_properties_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      room_types: {
+        Row: {
+          code: string;
+          created_at: string;
+          id: string;
+          marketing_category: string;
+          max_guests: number;
+          name: string;
+          organization_id: string;
+          property_id: string;
+          short_label: string;
+          sort_order: number;
+          tagline: string;
+          updated_at: string;
+        };
+        Insert: {
+          code: string;
+          created_at?: string;
+          id?: string;
+          marketing_category: string;
+          max_guests?: number;
+          name: string;
+          organization_id: string;
+          property_id: string;
+          short_label?: string;
+          sort_order?: number;
+          tagline?: string;
+          updated_at?: string;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          id?: string;
+          marketing_category?: string;
+          max_guests?: number;
+          name?: string;
+          organization_id?: string;
+          property_id?: string;
+          short_label?: string;
+          sort_order?: number;
+          tagline?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "room_types_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "room_types_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "org_properties";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      rooms: {
+        Row: {
+          code: string;
+          created_at: string;
+          id: string;
+          legacy_property_id: string | null;
+          max_guests: number;
+          name: string;
+          organization_id: string;
+          property_id: string;
+          room_type_id: string | null;
+          status: string;
+          unit_number: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          code: string;
+          created_at?: string;
+          id?: string;
+          legacy_property_id?: string | null;
+          max_guests?: number;
+          name: string;
+          organization_id: string;
+          property_id: string;
+          room_type_id?: string | null;
+          status?: string;
+          unit_number?: number | null;
+          updated_at?: string;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          id?: string;
+          legacy_property_id?: string | null;
+          max_guests?: number;
+          name?: string;
+          organization_id?: string;
+          property_id?: string;
+          room_type_id?: string | null;
+          status?: string;
+          unit_number?: number | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "rooms_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "rooms_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "org_properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "rooms_room_type_id_fkey";
+            columns: ["room_type_id"];
+            isOneToOne: false;
+            referencedRelation: "room_types";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "rooms_legacy_property_id_fkey";
+            columns: ["legacy_property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      is_org_member: { Args: { p_organization_id: string }; Returns: boolean };
+      is_org_admin: { Args: { p_organization_id: string }; Returns: boolean };
+      user_org_ids: { Args: never; Returns: string[] };
       is_active_staff: { Args: never; Returns: boolean };
       is_admin_or_super: { Args: never; Returns: boolean };
       is_cleaning_supervisor: { Args: never; Returns: boolean };
@@ -741,6 +1180,7 @@ export type Database = {
     };
     Enums: {
       app_role: "super_admin" | "admin" | "staff";
+      org_member_role: "org_admin" | "property_admin" | "staff";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -872,6 +1312,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "staff"],
+      org_member_role: ["org_admin", "property_admin", "staff"],
     },
   },
 } as const;

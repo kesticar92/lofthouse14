@@ -1,8 +1,8 @@
 # Arquitectura — Lofthouse 14 → plataforma hotelera multi-tenant
 
-> **Fase 0 — Auditoría (documentación únicamente).**  
-> Fecha: 2026-09-07 · Branch: `cursor/fase0-auditoria-arquitectura-f0b5`  
-> **Fase 1 no arranca hasta aprobación explícita.**  
+> **Fase 0 — Auditoría (documentación).** Completada.  
+> **Fase 1 — Foundations multi-tenant:** implementada en branch `cursor/fase1-foundations-multitenant-f0b5`. Detalle operativo: [`docs/FASE1.md`](./FASE1.md).  
+> Fecha auditoría: 2026-09-07 · Branch Fase 0: `cursor/fase0-auditoria-arquitectura-f0b5`  
 > Este documento **reutiliza** el avance existente (website, hero cards Vista/Atrio/Cielo, banner de fechas, Personaliza tu experiencia, booking wizard, admin, pricing, PMS parcial). **No** justifica reescribir ni borrar ese trabajo.
 
 Inventario detallado de rutas/archivos: [`docs/FASE0-AUDIT.md`](./FASE0-AUDIT.md).
@@ -95,14 +95,18 @@ Migraciones en `supabase/migrations/` (001–016). Tablas principales:
 | Tabla | Dominio |
 |-------|---------|
 | `profiles`, `audit_logs` | Auth / auditoría |
-| `properties`, `reservations`, `availability_blocks`, `ical_sources` | PMS + iCal |
-| `cleaning_tasks`, `notifications`, `app_settings` | Aseos / config |
+| `organizations`, `org_members` | Multi-tenant (Fase 1) |
+| `org_properties`, `room_types`, `rooms` | Catálogo edificio / tipos / unidades (Fase 1; bridge `legacy_property_id`) |
+| `properties`, `reservations`, `availability_blocks`, `ical_sources` | PMS + iCal (units legacy + `organization_id`) |
+| `cleaning_tasks`, `notifications`, `app_settings` | Aseos / config (scoped por org) |
 | `expenses`, `expense_files` | Gastos + Storage/Drive |
 | `cotizaciones` | Cotizaciones admin |
 | `inventario_*` | Inventario + revisiones + fotos |
-| `guest_reviews` | Reseñas scrapadas (migración 016) |
+| `guest_reviews` | Reseñas scrapadas (migración 016 + org opcional) |
 
-**No hay** tablas `organizations`, `room_types`, `rooms`, `guests`, `payments`, `channels`, `rate_plans`. Un solo edificio operativo (Lofthouse 14); `properties` ≈ unidades físicas (14 lofts + listing “casa completa”).
+Migraciones: `001`–`016` legacy + **`017`–`019` Fase 1**. Ver [`docs/FASE1.md`](./FASE1.md).
+
+**Nota:** `properties` sigue siendo el inventario PMS por loft; el edificio canónico es `org_properties`. Fase 2 unifica rename/migración.
 
 ### 1.8 Ya existe vs falta (prompt maestro SaaS)
 
@@ -351,21 +355,21 @@ Cada fase debe: migraciones SQL + tipos regenerados + tests de dominio + **no** 
 
 ---
 
-## 10. Fase 1 propuesta (detalle) — pendiente de aprobación
+## 10. Fase 1 — Foundations multi-tenant (implementada)
 
-> **No implementar hasta aprobación.** Alcance solo cimientos de datos/auth.
+> Detalle operativo, migraciones y cómo probar: [`docs/FASE1.md`](./FASE1.md).  
+> **Fase 2 (catálogo rooms definitivo / rename) pendiente de OK.**
 
-### Qué SÍ tocar
+### Qué se tocó
 
-1. **Migración SQL:** `organizations`, `org_members` (o columnas en `profiles`: `organization_id` + backfill).
-2. **Seed:** organización `Lofthouse 14`; asignar usuarios staff existentes.
-3. **Columnas `organization_id`** en: `properties` (o rooms), `reservations`, `availability_blocks`, `ical_sources`, `cleaning_tasks`, `expenses`, `cotizaciones`, `inventario_*`, `notifications`, `app_settings` (clave compuesta o scoped).
-4. **RLS:** políticas `is_org_member()` / service role sin cambio de contrato UI.
-5. **API helpers:** `requireStaff()` resuelve `organizationId` activo; filtros `.eq('organization_id', …)`.
-6. **Tipos:** regenerar `database.types.ts`; incluir `guest_reviews`.
-7. **Docs:** actualizar README enlace a este archivo; checklist env.
+1. **Migración SQL:** `organizations`, `org_members`; columnas `organization_id` en tablas core; catálogo foundation `org_properties` / `room_types` / `rooms`.
+2. **Seed:** organización `LOFTHOUSE`; property `LOFTHOUSE 14`; room types Vista/Atrio/Cielo; rooms LOFT 01–14; memberships desde staff existente.
+3. **RLS:** `is_org_member()` / `is_org_admin()`; políticas por tenant.
+4. **API helpers:** `requireStaff()` → `organizationId`; filtros e inserts scoped; `GET /api/admin/catalog`.
+5. **Tipos:** `database.types.ts` (+ `guest_reviews`).
+6. **Docs:** este archivo, `FASE1.md`, `.env.example`, README.
 
-### Qué NO tocar (freeze explícito)
+### Qué NO se tocó (freeze explícito)
 
 - `src/components/sections/hero.tsx`, `hero-booking-card.tsx`, tickets Vista/Atrio/Cielo.
 - Banner de fechas / sticky booking / `stay-draft`.
@@ -378,21 +382,22 @@ Cada fase debe: migraciones SQL + tipos regenerados + tests de dominio + **no** 
 
 ### Criterios de aceptación Fase 1
 
-- [ ] Un único org seed; todas las filas operativas con `organization_id`.
-- [ ] Staff sin membership no ve datos.
-- [ ] Panel admin y crons iCal/aseos/gastos siguen funcionando en smoke test.
-- [ ] Website público idéntico en UX (diff solo docs/plumbing si acaso env).
-- [ ] `npm run typecheck` + `npm run test` verdes.
+- [x] Un único org seed; filas operativas con `organization_id` (tras aplicar 017–019).
+- [x] Staff sin membership no ve datos (RLS + `FORBIDDEN_NO_ORG` en APIs scoped).
+- [ ] Panel admin y crons iCal/aseos/gastos — smoke en Supabase real tras aplicar SQL.
+- [x] Website público sin cambios UX (solo plumbing/docs).
+- [x] `npm run typecheck` + `npm run test` (verificar en CI/local).
 
 ### Estimación de invasividad (técnica, no calendario)
 
-Media en **DB/RLS/API**; **nula** en UI marketing si se respeta el freeze. Riesgo principal: políticas RLS incompletas.
+Media en **DB/RLS/API**; **nula** en UI marketing. Riesgo residual: aplicar migraciones en prod con cuidado (PK `app_settings`).
 
 ---
 
 ## Referencias internas
 
 - Inventario Fase 0: [`docs/FASE0-AUDIT.md`](./FASE0-AUDIT.md)
+- Fase 1 foundations: [`docs/FASE1.md`](./FASE1.md)
 - Deploy: [`docs/DEPLOY.md`](./DEPLOY.md)
 - SEO cumplimiento: [`docs/AUDITORIA-CUMPLIMIENTO.md`](./AUDITORIA-CUMPLIMIENTO.md)
 - Env: [`.env.example`](../.env.example)

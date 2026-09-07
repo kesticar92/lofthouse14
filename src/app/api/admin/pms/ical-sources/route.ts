@@ -4,11 +4,17 @@ import { syncIcalSource } from "@/lib/pms/ical-sync";
 export async function GET(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
+  const { supabase, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
   const propertyId = new URL(req.url).searchParams.get("property_id")?.trim();
   let q = supabase
     .from("ical_sources")
-    .select("id, property_id, url, last_sync, created_at, updated_at")
+    .select(
+      "id, property_id, url, last_sync, created_at, updated_at, organization_id",
+    )
+    .eq("organization_id", organizationId)
     .order("created_at");
   if (propertyId) q = q.eq("property_id", propertyId);
   const { data, error } = await q;
@@ -21,7 +27,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
+  const { supabase, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
   let body: { property_id?: string; url?: string; sync_now?: boolean };
   try {
     body = await req.json();
@@ -50,7 +59,7 @@ export async function POST(req: Request) {
   /** Varias URLs Airbnb por la misma propiedad (múltiples anuncios) → siempre nueva fila. */
   const { data: ins, error: insErr } = await supabase
     .from("ical_sources")
-    .insert({ property_id, url })
+    .insert({ property_id, url, organization_id: organizationId })
     .select("*")
     .maybeSingle();
   if (insErr || !ins?.id) {

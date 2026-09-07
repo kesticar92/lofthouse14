@@ -10,9 +10,16 @@ export const GET = apiHandler({
   module: "cotizaciones",
   query: cotizacionListQuerySchema,
   handler: async ({ ctx, query }) => {
+    if (!ctx.organizationId) {
+      throw new ApiHandlerError("Sin organización activa", {
+        status: 403,
+        code: "FORBIDDEN_NO_ORG",
+      });
+    }
     let q = ctx.supabase
       .from("cotizaciones")
       .select("*")
+      .eq("organization_id", ctx.organizationId)
       .order("created_at", { ascending: false })
       .limit(query.limit);
     if (query.status) q = q.eq("status", query.status);
@@ -26,7 +33,14 @@ export const POST = apiHandler({
   module: "cotizaciones",
   body: cotizacionCreateSchema,
   handler: async ({ ctx, body }) => {
+    if (!ctx.organizationId) {
+      throw new ApiHandlerError("Sin organización activa", {
+        status: 403,
+        code: "FORBIDDEN_NO_ORG",
+      });
+    }
     const insert: TablesInsert<"cotizaciones"> = {
+      organization_id: ctx.organizationId,
       guest_name: body.guest_name,
       check_in: body.check_in,
       check_out: body.check_out,

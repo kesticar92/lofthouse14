@@ -7,11 +7,15 @@ import {
 export async function GET() {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
+  const { supabase, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
 
   const { data, error } = await supabase
     .from("app_settings")
     .select("value")
+    .eq("organization_id", organizationId)
     .eq("key", "cleaning_pricing")
     .maybeSingle();
   if (error) {
@@ -25,7 +29,10 @@ export async function GET() {
 export async function PATCH(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
+  const { supabase, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -54,6 +61,7 @@ export async function PATCH(req: Request) {
         await supabase
           .from("app_settings")
           .select("value")
+          .eq("organization_id", organizationId)
           .eq("key", "cleaning_pricing")
           .maybeSingle()
       ).data?.value,
@@ -69,11 +77,12 @@ export async function PATCH(req: Request) {
 
   const { error } = await supabase.from("app_settings").upsert(
     {
+      organization_id: organizationId,
       key: "cleaning_pricing",
       value: merged,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "key" },
+    { onConflict: "organization_id,key" },
   );
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });

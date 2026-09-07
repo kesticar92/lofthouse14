@@ -11,7 +11,10 @@ import { notifySupervisorsNewReservation } from "@/lib/pms/panel-notifications";
 export async function GET(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
+  const { supabase, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
   const { searchParams } = new URL(req.url);
   const from =
     searchParams.get("from") ??
@@ -24,6 +27,7 @@ export async function GET(req: Request) {
   let q = supabase
     .from("reservations")
     .select("*")
+    .eq("organization_id", organizationId)
     .lt("check_in", to)
     .gt("check_out", from)
     .order("check_in");
@@ -144,7 +148,15 @@ export async function POST(req: Request) {
     );
   }
 
+  if (!gate.ctx.organizationId) {
+    return Response.json(
+      { error: "Sin organización activa" },
+      { status: 403 },
+    );
+  }
+
   const row = {
+    organization_id: gate.ctx.organizationId,
     property_id,
     source,
     external_id: null as string | null,

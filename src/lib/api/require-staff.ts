@@ -8,6 +8,8 @@ import {
   staffHasModuleAccess,
   type AdminModuleKey,
 } from "@/lib/api/admin-modules";
+import { resolveStaffOrganizationId } from "@/lib/tenant/organization";
+import type { OrgMemberRole } from "@/lib/tenant/constants";
 
 export type StaffProfile = {
   role: StaffRole;
@@ -19,6 +21,10 @@ export type StaffContext = {
   supabase: SupabaseClient;
   user: User;
   profile: StaffProfile;
+  /** Organización activa (tenant). null si no hay membership. */
+  organizationId: string | null;
+  /** Rol en la org activa, si aplica. */
+  orgRole: OrgMemberRole | null;
 };
 
 export function staffHasModule(
@@ -105,5 +111,31 @@ export async function requireStaff(): Promise<
     allowed_modules: allowed,
   };
 
-  return { ok: true, ctx: { supabase, user, profile } };
+  const organizationId = await resolveStaffOrganizationId(supabase, {
+    userId: user.id,
+    role: profile.role,
+  });
+
+  let orgRole: OrgMemberRole | null = null;
+  if (organizationId) {
+    const { data: membership } = await supabase
+      .from("org_members")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("organization_id", organizationId)
+      .eq("status", "active")
+      .maybeSingle();
+    if (
+      membership?.role === "org_admin" ||
+      membership?.role === "property_admin" ||
+      membership?.role === "staff"
+    ) {
+      orgRole = membership.role;
+    }
+  }
+
+  return {
+    ok: true,
+    ctx: { supabase, user, profile, organizationId, orgRole },
+  };
 }

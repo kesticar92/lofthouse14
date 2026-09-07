@@ -21,8 +21,15 @@ export const POST = apiHandler({
   module: "inventario",
   body: inventarioRevisionCreateSchema,
   handler: async ({ ctx, body }) => {
+    if (!ctx.organizationId) {
+      throw new ApiHandlerError("Sin organización activa", {
+        status: 403,
+        code: "FORBIDDEN_NO_ORG",
+      });
+    }
     // 1. Crear cabecera
     const insertHeader: TablesInsert<"inventario_revisiones"> = {
+      organization_id: ctx.organizationId,
       loft_id: body.loft_id,
       persona: body.persona,
       fecha: body.fecha,

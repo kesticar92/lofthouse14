@@ -9,9 +9,16 @@ const patchBodySchema = pricingConfigSchema.partial();
 export const GET = apiHandler({
   module: "cotizaciones",
   handler: async ({ ctx }) => {
+    if (!ctx.organizationId) {
+      throw new ApiHandlerError("Sin organización activa", {
+        status: 403,
+        code: "FORBIDDEN_NO_ORG",
+      });
+    }
     const { data, error } = await ctx.supabase
       .from("app_settings")
       .select("value")
+      .eq("organization_id", ctx.organizationId)
       .eq("key", APP_SETTINGS_KEY)
       .maybeSingle();
     if (error) throw new ApiHandlerError(error.message, { status: 500 });
@@ -23,6 +30,12 @@ export const PATCH = apiHandler({
   module: "cotizaciones",
   body: patchBodySchema,
   handler: async ({ body, ctx }) => {
+    if (!ctx.organizationId) {
+      throw new ApiHandlerError("Sin organización activa", {
+        status: 403,
+        code: "FORBIDDEN_NO_ORG",
+      });
+    }
     const { data: profile } = await ctx.supabase
       .from("profiles")
       .select("role")
@@ -40,6 +53,7 @@ export const PATCH = apiHandler({
         await ctx.supabase
           .from("app_settings")
           .select("value")
+          .eq("organization_id", ctx.organizationId)
           .eq("key", APP_SETTINGS_KEY)
           .maybeSingle()
       ).data?.value,
@@ -49,11 +63,12 @@ export const PATCH = apiHandler({
 
     const { error } = await ctx.supabase.from("app_settings").upsert(
       {
+        organization_id: ctx.organizationId,
         key: APP_SETTINGS_KEY,
         value: merged,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "key" },
+      { onConflict: "organization_id,key" },
     );
     if (error) throw new ApiHandlerError(error.message, { status: 500 });
     return { pricing: merged };

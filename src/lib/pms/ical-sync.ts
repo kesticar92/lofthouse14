@@ -111,8 +111,28 @@ export async function upsertAirbnbStays(
 ): Promise<{ upserted: number; errors: string[] }> {
   const errors: string[] = [];
   let upserted = 0;
+
+  const { data: propRow } = await admin
+    .from("properties")
+    .select("organization_id")
+    .eq("id", propertyId)
+    .maybeSingle();
+  const organizationId =
+    typeof propRow?.organization_id === "string"
+      ? propRow.organization_id
+      : null;
+  if (!organizationId) {
+    return {
+      upserted: 0,
+      errors: [
+        "Propiedad sin organization_id (¿migración Fase 1 aplicada?)",
+      ],
+    };
+  }
+
   for (const s of stays) {
     const row = {
+      organization_id: organizationId,
       property_id: propertyId,
       source: "airbnb",
       external_id: s.external_id,

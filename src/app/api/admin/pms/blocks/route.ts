@@ -8,7 +8,10 @@ import {
 export async function POST(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase, user } = gate.ctx;
+  const { supabase, user, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
   let body: {
     property_id?: string;
     start_date?: string;
@@ -70,6 +73,7 @@ export async function POST(req: Request) {
   const { data, error } = await supabase
     .from("availability_blocks")
     .insert({
+      organization_id: organizationId,
       property_id,
       start_date,
       end_date,

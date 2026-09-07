@@ -3,7 +3,10 @@ import { requireStaff } from "@/lib/api/require-staff";
 export async function GET(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
+  const { supabase, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
   const { searchParams } = new URL(req.url);
   const limit = Math.min(
     100,
@@ -15,6 +18,7 @@ export async function GET(req: Request) {
     .select(
       "*, expense_files(id, drive_backup_status, drive_url, original_filename)",
     )
+    .eq("organization_id", organizationId)
     .order("expense_date", { ascending: false })
     .limit(limit);
   if (error) {
@@ -26,7 +30,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase, user } = gate.ctx;
+  const { supabase, user, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
 
   let body: {
     amount?: number;
@@ -53,6 +60,7 @@ export async function POST(req: Request) {
   }
 
   const row = {
+    organization_id: organizationId,
     amount,
     currency: (body.currency ?? "COP").trim() || "COP",
     category: body.category?.trim() ?? "",

@@ -7,7 +7,10 @@ import {
 export async function GET(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
+  const { supabase, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
   const date =
     new URL(req.url).searchParams.get("date")?.trim() ??
     new Date().toISOString().slice(0, 10);
@@ -15,6 +18,7 @@ export async function GET(req: Request) {
   const { data: tasks, error } = await supabase
     .from("cleaning_tasks")
     .select("*")
+    .eq("organization_id", organizationId)
     .eq("task_date", date)
     .order("estimated_time_label", { ascending: true });
   if (error) {
@@ -27,6 +31,7 @@ export async function GET(req: Request) {
     const { data: props } = await supabase
       .from("properties")
       .select("id,name")
+      .eq("organization_id", organizationId)
       .in("id", ids);
     propNames = Object.fromEntries((props ?? []).map((p) => [p.id, p.name]));
   }
@@ -42,7 +47,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const gate = await requireStaff();
   if (!gate.ok) return gate.response;
-  const { supabase } = gate.ctx;
+  const { supabase, organizationId } = gate.ctx;
+  if (!organizationId) {
+    return Response.json({ error: "Sin organización activa" }, { status: 403 });
+  }
 
   let body: {
     property_id?: string;
@@ -77,6 +85,7 @@ export async function POST(req: Request) {
     const { data: row } = await supabase
       .from("app_settings")
       .select("value")
+      .eq("organization_id", organizationId)
       .eq("key", "cleaning_pricing")
       .maybeSingle();
     const rules = parseCleaningPricing(row?.value);
@@ -86,6 +95,7 @@ export async function POST(req: Request) {
   const { data, error } = await supabase
     .from("cleaning_tasks")
     .insert({
+      organization_id: organizationId,
       property_id,
       reservation_id: null,
       task_date,

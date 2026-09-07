@@ -11,7 +11,18 @@ vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn(),
 }));
 
+vi.mock("@/lib/tenant/organization", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/lib/tenant/organization")
+  >("@/lib/tenant/organization");
+  return {
+    ...actual,
+    resolveStaffOrganizationId: vi.fn(),
+  };
+});
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { resolveStaffOrganizationId } from "@/lib/tenant/organization";
 
 function profile(
   p: Partial<StaffProfile> & Pick<StaffProfile, "role">,
@@ -74,6 +85,10 @@ describe("enforceStaffModule", () => {
 describe("requireStaff", () => {
   beforeEach(() => {
     vi.mocked(createSupabaseServerClient).mockReset();
+    vi.mocked(resolveStaffOrganizationId).mockReset();
+    vi.mocked(resolveStaffOrganizationId).mockResolvedValue(
+      "11111111-1111-4111-8111-111111111111",
+    );
   });
 
   it("401 si no hay usuario", async () => {
@@ -163,7 +178,7 @@ describe("requireStaff", () => {
     }
   });
 
-  it("ok con staff active", async () => {
+  it("ok con staff active y organizationId", async () => {
     const maybeSingle = vi.fn().mockResolvedValue({
       data: {
         role: "staff",
@@ -172,9 +187,6 @@ describe("requireStaff", () => {
       },
       error: null,
     });
-    const eq = vi.fn().mockReturnValue({ maybeSingle });
-    const select = vi.fn().mockReturnValue({ eq });
-    const from = vi.fn().mockReturnValue({ select });
 
     const supabase = {
       auth: {
@@ -183,7 +195,24 @@ describe("requireStaff", () => {
           error: null,
         }),
       },
-      from,
+      from: vi.fn((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({ maybeSingle }),
+            }),
+          };
+        }
+        // org_members role lookup
+        const chain: Record<string, unknown> = {};
+        chain.select = vi.fn(() => chain);
+        chain.eq = vi.fn(() => chain);
+        chain.maybeSingle = vi.fn().mockResolvedValue({
+          data: { role: "staff" },
+          error: null,
+        });
+        return chain;
+      }),
     };
     vi.mocked(createSupabaseServerClient).mockResolvedValue(supabase as never);
 
@@ -192,6 +221,10 @@ describe("requireStaff", () => {
     if (out.ok) {
       expect(out.ctx.profile.status).toBe("active");
       expect(out.ctx.profile.allowed_modules).toEqual(["gastos"]);
+      expect(out.ctx.organizationId).toBe(
+        "11111111-1111-4111-8111-111111111111",
+      );
+      expect(out.ctx.orgRole).toBe("staff");
     }
   });
 });

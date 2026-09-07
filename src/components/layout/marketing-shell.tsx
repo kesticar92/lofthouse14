@@ -12,7 +12,7 @@ export function MarketingShell({
   return (
     <>
       <Header />
-      <main className="min-h-[70vh]">{children}</main>
+      <main className="min-h-[70vh] pt-[7.5rem] lg:pt-20">{children}</main>
       <SiteFooter />
       <ShareBar />
     </>

@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: `Reservar | ${site.name}`,
   description:
-    "Configura tu estadía en Lofthouse 14: fechas, huéspedes, extras y confirmación directa por WhatsApp.",
+    "Personaliza tu experiencia en Lofthouse 14: fechas, huéspedes, extras y confirmación directa por WhatsApp.",
 };
 
 /**
@@ -35,7 +35,7 @@ export default function ReservarPage() {
             Reserva directa
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold uppercase leading-tight md:text-4xl">
-            Configura tu estadía
+            Personaliza tu experiencia
           </h1>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300 md:text-base">
             Elige fechas, huéspedes y extras. Al final te llevamos a WhatsApp con

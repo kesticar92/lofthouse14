@@ -129,7 +129,7 @@ export function SiteFooter() {
                   href="/#reservas"
                   className="text-amber-400 hover:underline"
                 >
-                  Configurar estadía
+                  Personaliza tu experiencia
                 </Link>
               </li>
               <li>

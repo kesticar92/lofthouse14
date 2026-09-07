@@ -9,7 +9,12 @@ import { ThemeToggle } from "./theme-toggle";
 import { site, waLink } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { trackBeginCheckout } from "@/lib/analytics";
-import { saveStayDraft } from "@/lib/stay-draft";
+import {
+  mergeStayDraft,
+  readStayDraft,
+  STAY_DRAFT_EVENT,
+  type StayDraft,
+} from "@/lib/stay-draft";
 import { StayDateRangePicker } from "@/components/ui/stay-date-range-picker";
 
 const PAGE_NAV = [
@@ -25,8 +30,8 @@ const GUEST_OPTIONS = Array.from({ length: site.maxGuests }, (_, i) => i + 1);
 
 /**
  * Barra única con contraste sólido:
- * Menú | marca | fechas+huéspedes+Reservar (escritorio, centrados) | Ayuda + tema.
- * Menú: L→R en web, arriba→abajo en móvil (panel a pantalla completa).
+ * Menú | marca | fechas+huéspedes+Reservar | Ayuda + tema.
+ * En móvil: segunda fila con el selector de fechas/huéspedes.
  */
 export function Header() {
   const router = useRouter();
@@ -54,6 +59,21 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    const apply = (draft: StayDraft | null) => {
+      if (!draft) return;
+      if (draft.checkIn) setCheckIn(draft.checkIn);
+      if (draft.checkOut) setCheckOut(draft.checkOut);
+      if (draft.guests && draft.guests > 0) setGuests(draft.guests);
+    };
+    apply(readStayDraft());
+    const onDraft = (event: Event) => {
+      apply((event as CustomEvent<StayDraft>).detail ?? null);
+    };
+    window.addEventListener(STAY_DRAFT_EVENT, onDraft);
+    return () => window.removeEventListener(STAY_DRAFT_EVENT, onDraft);
+  }, []);
+
+  useEffect(() => {
     if (!isMenuOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIsMenuOpen(false);
@@ -66,6 +86,20 @@ export function Header() {
       window.removeEventListener("keydown", onKey);
     };
   }, [isMenuOpen]);
+
+  const persistStay = (next: {
+    checkIn?: string;
+    checkOut?: string;
+    guests?: number;
+  }) => {
+    const nextIn = next.checkIn ?? checkIn;
+    const nextOut = next.checkOut ?? checkOut;
+    mergeStayDraft({
+      checkIn: nextIn || undefined,
+      checkOut: nextOut || undefined,
+      guests: next.guests ?? guests,
+    });
+  };
 
   const panelMotion = isDesktop
     ? {
@@ -91,9 +125,54 @@ export function Header() {
       return;
     }
     trackBeginCheckout({ guests });
-    saveStayDraft({ checkIn, checkOut, guests, step: 1 });
+    // step 0 = Tu viaje; el wizard saltará Fechas/Huéspedes si ya están en el draft.
+    mergeStayDraft({ checkIn, checkOut, guests, step: 0 });
     router.push("/reservar");
   };
+
+  const bookingFields = (
+    <>
+      <div className="min-w-0 flex-[1.4]">
+        <StayDateRangePicker
+          checkIn={checkIn}
+          checkOut={checkOut}
+          onChange={(inDate, outDate) => {
+            setCheckIn(inDate);
+            setCheckOut(outDate);
+            setError("");
+            persistStay({ checkIn: inDate, checkOut: outDate });
+          }}
+          compact
+        />
+      </div>
+      <label className="flex w-[7.5rem] shrink-0 flex-col gap-0.5 text-[9px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+        <span className="inline-flex items-center gap-1">
+          <Users className="h-3 w-3" /> Huéspedes
+        </span>
+        <select
+          value={guests}
+          onChange={(e) => {
+            const next = Number(e.target.value);
+            setGuests(next);
+            persistStay({ guests: next });
+          }}
+          className="rounded-xl border border-zinc-300 bg-white px-2 py-1.5 text-xs font-semibold text-zinc-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+        >
+          {GUEST_OPTIONS.map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </select>
+      </label>
+      <button
+        type="submit"
+        className="mb-px shrink-0 rounded-full bg-zinc-900 px-4 py-2 text-[11px] font-bold uppercase tracking-wide text-white transition hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400"
+      >
+        Reservar
+      </button>
+    </>
+  );
 
   return (
     <header
@@ -132,46 +211,13 @@ export function Header() {
           </span>
         </Link>
 
-        {/* Banner de reserva centrado — solo escritorio */}
+        {/* Banner de reserva centrado — escritorio */}
         <form
           onSubmit={onReserve}
           className="relative mx-auto hidden min-w-0 flex-1 items-center justify-center gap-2 lg:flex"
         >
           <div className="flex w-full max-w-3xl items-end justify-center gap-2 rounded-2xl border border-zinc-200 bg-white px-3 py-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-            <div className="min-w-0 flex-[1.4]">
-              <StayDateRangePicker
-                checkIn={checkIn}
-                checkOut={checkOut}
-                onChange={(inDate, outDate) => {
-                  setCheckIn(inDate);
-                  setCheckOut(outDate);
-                  setError("");
-                }}
-                compact
-              />
-            </div>
-            <label className="flex w-[7.5rem] shrink-0 flex-col gap-0.5 text-[9px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-              <span className="inline-flex items-center gap-1">
-                <Users className="h-3 w-3" /> Huéspedes
-              </span>
-              <select
-                value={guests}
-                onChange={(e) => setGuests(Number(e.target.value))}
-                className="rounded-xl border border-zinc-300 bg-white px-2 py-1.5 text-xs font-semibold text-zinc-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
-              >
-                {GUEST_OPTIONS.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="submit"
-              className="mb-px shrink-0 rounded-full bg-zinc-900 px-4 py-2 text-[11px] font-bold uppercase tracking-wide text-white transition hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400"
-            >
-              Reservar
-            </button>
+            {bookingFields}
           </div>
           {error ? (
             <p
@@ -193,6 +239,24 @@ export function Header() {
           <ThemeToggle />
         </div>
       </div>
+
+      {/* Banner móvil / tablet: fechas y huéspedes bajo la barra */}
+      <form
+        onSubmit={onReserve}
+        className="border-t border-zinc-200/80 px-3 py-2 dark:border-zinc-800 lg:hidden"
+      >
+        <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-zinc-200 bg-white px-2.5 py-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+          {bookingFields}
+        </div>
+        {error ? (
+          <p
+            className="mt-1 text-center text-[10px] font-medium text-red-600 dark:text-red-400"
+            role="alert"
+          >
+            {error}
+          </p>
+        ) : null}
+      </form>
 
       <AnimatePresence>
         {isMenuOpen ? (
@@ -285,7 +349,7 @@ export function Header() {
                   onClick={() => setIsMenuOpen(false)}
                   className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-white dark:bg-amber-500 dark:text-zinc-950"
                 >
-                  Ir a reservar
+                  Reservar
                 </Link>
               </div>
             </motion.div>

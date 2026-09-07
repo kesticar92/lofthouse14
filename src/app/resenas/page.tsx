@@ -69,7 +69,7 @@ export default function ReviewsPage() {
             Reservar por WhatsApp
           </a>
           <Link href="/#reservas" className="inline-flex rounded-full border border-zinc-400 px-6 py-4 text-sm font-bold uppercase tracking-wide">
-            Configurar estadía
+            Personaliza tu experiencia
           </Link>
         </div>
       </section>

@@ -108,7 +108,7 @@ export default async function LoftDetailPage({ params }: Props) {
             href="/#reservas"
             className="inline-flex rounded-full border border-zinc-400 px-6 py-4 text-sm font-bold uppercase tracking-wide text-zinc-800 dark:border-zinc-600 dark:text-zinc-200"
           >
-            Configurar estadía
+            Personaliza tu experiencia
           </Link>
         </div>
       </article>

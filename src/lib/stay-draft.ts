@@ -11,7 +11,7 @@ export type StayDraft = {
   guests?: number;
   /** Preferencia de categoría: Vista / Atrio / Cielo. */
   categoryId?: LoftCategoryId;
-  /** Paso sugerido del configurador (1 = fechas). */
+  /** Paso sugerido del configurador (0 = tu viaje, 1 = fechas, …). */
   step?: number;
 };
 
@@ -27,6 +27,12 @@ export function saveStayDraft(draft: StayDraft) {
       detail: draft,
     }),
   );
+}
+
+/** Fusiona con el borrador existente (p. ej. fechas del banner + categoría de la card). */
+export function mergeStayDraft(patch: StayDraft) {
+  const prev = readStayDraft() ?? {};
+  saveStayDraft({ ...prev, ...patch });
 }
 
 export function readStayDraft(): StayDraft | null {

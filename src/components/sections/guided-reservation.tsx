@@ -24,7 +24,6 @@ import { cn } from "@/lib/cn";
 import { ConfiguratorOrbitalSteps } from "@/components/sections/configurator-orbital-steps";
 import {
   STAY_DRAFT_EVENT,
-  clearStayDraft,
   readStayDraft,
   type StayDraft,
 } from "@/lib/stay-draft";
@@ -67,6 +66,9 @@ export function GuidedReservation() {
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
 
+  /** Si el banner ya trajo fechas+huéspedes, no volver a pedirlos. */
+  const [skipStaySteps, setSkipStaySteps] = useState(false);
+
   useEffect(() => {
     const applyDraft = (draft: StayDraft | null) => {
       if (!draft) return;
@@ -74,7 +76,7 @@ export function GuidedReservation() {
       if (draft.checkOut) setCheckOut(draft.checkOut);
       if (draft.guests && draft.guests > 0) {
         setGuests(draft.guests);
-        // Ajusta lofts al llegar desde la barra sticky si hay más personas.
+        // Ajusta lofts al llegar desde el banner si hay más personas.
         setLofts((prev) =>
           Math.max(
             prev,
@@ -85,12 +87,34 @@ export function GuidedReservation() {
       if (draft.categoryId) {
         setCategoryId(draft.categoryId);
       }
-      if (typeof draft.step === "number") {
-        setStep(Math.min(STEPS.length - 1, Math.max(0, draft.step)));
-      } else if (draft.checkIn && draft.checkOut) {
-        setStep(1);
+
+      const hasDates = Boolean(
+        draft.checkIn &&
+          draft.checkOut &&
+          draft.checkOut > draft.checkIn,
+      );
+      const hasGuests = Boolean(draft.guests && draft.guests > 0);
+      const stayReady = hasDates && hasGuests;
+
+      if (stayReady) {
+        setSkipStaySteps(true);
       }
-      clearStayDraft();
+
+      if (typeof draft.step === "number") {
+        let next = Math.min(STEPS.length - 1, Math.max(0, draft.step));
+        // Si el draft pedía Fechas/Huéspedes pero ya están, arrancar en Tu viaje
+        // (Siguiente saltará a Extras) o en el paso pedido si es ≥ Extras.
+        if (stayReady && next > 0 && next < 3) {
+          next = 0;
+        }
+        setStep(next);
+      } else if (stayReady) {
+        setStep(0);
+      } else if (hasDates) {
+        setStep(2);
+      }
+      // No limpiamos el draft aquí: el banner y las cards siguen
+      // enlazados al mismo borrador hasta sobrescribirlo.
     };
 
     applyDraft(readStayDraft());
@@ -282,12 +306,12 @@ export function GuidedReservation() {
         <div className="mb-8 flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-10">
           <div className="max-w-xl text-center md:text-left">
             <h2 className="font-display text-4xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
-              Cotiza tu estadía
+              Personaliza tu experiencia
             </h2>
             <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-              Las fechas definen noches y precio estimado. Luego eliges lofts y
-              extras; al final te llevamos a WhatsApp con el resumen para
-              confirmar.
+              Completa tu preferencia de viaje y extras. Si ya elegiste fechas y
+              huéspedes en el banner, no te los pedimos de nuevo; al final te
+              llevamos a WhatsApp con el resumen para confirmar.
             </p>
           </div>
           <ConfiguratorOrbitalSteps
@@ -803,7 +827,12 @@ export function GuidedReservation() {
               {step > 0 ? (
                 <button
                   type="button"
-                  onClick={() => setStep((s) => s - 1)}
+                  onClick={() =>
+                    setStep((s) => {
+                      if (skipStaySteps && s === 3) return 0;
+                      return s - 1;
+                    })
+                  }
                   className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold dark:border-zinc-600"
                 >
                   <ChevronLeft className="size-4" aria-hidden />
@@ -814,7 +843,12 @@ export function GuidedReservation() {
                 <button
                   type="button"
                   disabled={!canAdvance()}
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() =>
+                    setStep((s) => {
+                      if (skipStaySteps && s === 0 && datesOk) return 3;
+                      return s + 1;
+                    })
+                  }
                   className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
                 >
                   Siguiente

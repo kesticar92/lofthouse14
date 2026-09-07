@@ -158,7 +158,7 @@ export function Hero() {
           }}
           aria-hidden
         />
-        <div className="relative z-20 px-4 pb-8 pt-20">
+        <div className="relative z-20 px-4 pb-8 pt-28">
           <div className="relative z-30 mt-1">
             <HeroBookingCard />
           </div>
@@ -250,8 +250,8 @@ export function Hero() {
 
         <div className="relative z-10 w-full px-8 pb-10 pt-28 lg:px-12 lg:pb-12">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6">
-            {/* Card con fotos — encima del título y la calificación */}
-            <div className="pointer-events-auto relative z-30 w-full max-w-md isolate">
+            {/* Tiquetes Vista / Atrio / Cielo — encima del título */}
+            <div className="pointer-events-auto relative z-30 w-full max-w-xl isolate">
               <HeroBookingCard compact />
             </div>
 
@@ -288,7 +288,7 @@ export function Hero() {
                   href="/reservar"
                   className="pointer-events-auto inline-flex rounded-full border border-transparent bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-lg transition hover:bg-zinc-100 dark:border-white/15 dark:bg-zinc-900/90 dark:text-[#f2f0eb] dark:shadow-black/40 dark:backdrop-blur-md dark:hover:bg-zinc-800"
                 >
-                  Reserva Ahora
+                  Reservar
                 </Link>
                 <Link
                   href="#lofts"

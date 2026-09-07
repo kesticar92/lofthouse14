@@ -141,6 +141,11 @@ Cron de ejemplo: `scripts/deploy/crontab.example.txt`.
 - `src/app/admin/` — panel (login + módulos)
 - `src/lib/` — configuración del sitio, precios, almacenamiento local, auth de servidor
 
+## Arquitectura (Fase 0)
+
+Auditoría y plan por fases (multi-tenant SaaS, **sin reescribir** el sitio actual):  
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · inventario [`docs/FASE0-AUDIT.md`](docs/FASE0-AUDIT.md).
+
 ## Licencia
 
 Privado — uso interno del proyecto LOFTHOUSE 14.

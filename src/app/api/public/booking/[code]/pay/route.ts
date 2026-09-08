@@ -85,8 +85,8 @@ export async function POST(req: Request, ctx: Ctx) {
   ensureFolioForReservation(reservation);
   registerFolioPayment(code, {
     amount: paid?.amount ?? payment.amount,
-    method: "wompi_mock_guest",
-    reference: `guest-sim-${code}`,
+    method: "wompi_mock",
+    notes: `guest-sim-${code}`,
   });
   settleFolioBalance(code);
 

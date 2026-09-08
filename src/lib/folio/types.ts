@@ -12,6 +12,7 @@ export type FolioPaymentMethod =
   | "cash"
   | "transfer"
   | "card_stub"
+  | "wompi_mock"
   | "other"
   | "adjustment";
 

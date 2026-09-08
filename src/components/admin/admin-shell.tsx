@@ -305,6 +305,41 @@ export const ADMIN_NAV: NavItem[] = [
     ),
     desc: "Tickets y OUT_OF_SERVICE",
   },
+  {
+    href: "/admin/usuarios",
+    label: "Usuarios",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <circle cx="9" cy="8" r="3.2" />
+        <path d="M3.5 19c.8-3 2.8-4.5 5.5-4.5S13.7 16 14.5 19" />
+        <circle cx="17" cy="9" r="2.4" />
+        <path d="M15 19c.4-2 1.6-3.2 3.5-3.2 1.2 0 2.2.5 2.9 1.4" />
+      </svg>
+    ),
+    desc: "Staff y módulos",
+  },
+  {
+    href: "/admin/registro",
+    label: "Registro",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    ),
+    desc: "Alta de cuentas staff",
+  },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

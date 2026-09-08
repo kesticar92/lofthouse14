@@ -18,10 +18,21 @@ export default function AdminAnalyticsPage() {
   const [data, setData] = useState<{
     metrics?: Record<string, number | string>;
     recommendations?: Array<{ title: string; suggestedAction: string }>;
-    ai?: { message: string; ok: boolean };
+    ai?: {
+      message?: string;
+      ok?: boolean;
+      answer?: string;
+      disclaimer?: string;
+      mode?: string;
+    };
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState(
+    "¿Qué tarifas conviene revisar la próxima semana?",
+  );
+  const [aiReply, setAiReply] = useState<string | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -47,6 +58,35 @@ export default function AdminAnalyticsPage() {
     void load();
   }, [load]);
 
+  async function askAssistant() {
+    setAiBusy(true);
+    setAiReply(null);
+    try {
+      const res = await fetch("/api/admin/analytics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt,
+          context: JSON.stringify(data?.metrics ?? {}),
+        }),
+      });
+      const json = await res.json();
+      setAiReply(
+        [
+          json.disclaimer,
+          json.ai?.answer ?? json.ai?.message ?? JSON.stringify(json),
+          "(autoApply=false)",
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+      );
+    } catch {
+      setAiReply("Error al consultar assistant.");
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
   const metrics = data?.metrics ?? {};
   const recs = data?.recommendations ?? [];
 
@@ -56,7 +96,7 @@ export default function AdminAnalyticsPage() {
         <div>
           <h1 className="font-display text-3xl tracking-wide">ANALYTICS</h1>
           <p className="mt-1 text-sm text-zinc-600">
-            Reportes, recomendaciones de revenue (sin auto-apply) y AI stub.
+            Reportes, recomendaciones de revenue (sin auto-apply) y AI assistant.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -65,6 +105,12 @@ export default function AdminAnalyticsPage() {
             className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
           >
             Reportes avanzados
+          </Link>
+          <Link
+            href="/admin/saas"
+            className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
+          >
+            Module flags
           </Link>
           <a
             href={`/api/admin/analytics?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&format=csv`}
@@ -133,12 +179,33 @@ export default function AdminAnalyticsPage() {
           </ul>
         </AdminAsyncState>
       </AdminCard>
-      <AdminCard title="AI assistant" subtitle="Requires LLM key">
-        <AdminAsyncState loading={loading}>
-          <p className="text-sm text-zinc-700">
-            {data?.ai?.message ?? "AI no disponible."}
-          </p>
-        </AdminAsyncState>
+      <AdminCard
+        title="AI assistant"
+        subtitle="OPENAI_API_KEY → live; else stub. Sin auto-apply."
+      >
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          rows={3}
+          className="w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+        />
+        <button
+          type="button"
+          disabled={aiBusy}
+          onClick={() => void askAssistant()}
+          className="mt-2 rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-zinc-900"
+        >
+          {aiBusy ? "Consultando…" : "Preguntar"}
+        </button>
+        <p className="mt-3 whitespace-pre-wrap text-sm text-zinc-700">
+          {aiReply ??
+            data?.ai?.answer ??
+            data?.ai?.message ??
+            "AI no disponible."}
+        </p>
+        {data?.ai?.disclaimer ? (
+          <p className="mt-2 text-xs text-zinc-500">{data.ai.disclaimer}</p>
+        ) : null}
       </AdminCard>
     </AdminShell>
   );

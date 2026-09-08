@@ -41,3 +41,6 @@ npm run start
 Sin cambio: `sync-ical`, `cleaning-sync`, `expense-drive-retry` con `Authorization: Bearer $CRON_SECRET`.
 
 Channel OTA pull real **no** está cableado a cron (solo stubs + iCal existente).
+
+Detalle de activación por provider: [`INTEGRATIONS.md`](./INTEGRATIONS.md).
+Migraciones 017–028: [`MIGRATIONS.md`](./MIGRATIONS.md) (`npm run migrations:verify`).

@@ -26,6 +26,19 @@ export type ChannelAdapter = {
     checkOut: string;
     available: number;
   }): Promise<ChannelSyncResult>;
+  /** Alias ARI — mismos stubs; no inventa payloads oficiales OTA. */
+  syncAvailability?(input: {
+    propertyExternalId?: string;
+    checkIn: string;
+    checkOut: string;
+    available: number;
+  }): Promise<ChannelSyncResult>;
+  syncRates?(input: {
+    checkIn: string;
+    checkOut: string;
+    amountCop?: number;
+    currency?: string;
+  }): Promise<ChannelSyncResult>;
   pullReservations(input?: {
     since?: string;
   }): Promise<ChannelSyncResult>;
@@ -56,13 +69,25 @@ export const airbnbAdapter: ChannelAdapter = {
   displayName: "Airbnb",
   isStub: true,
   async pushAvailability(input) {
-    return stubResult("airbnb", `pushAvailability ${input.checkIn}→${input.checkOut}`);
+    return stubResult(
+      "airbnb",
+      `syncAvailability stub ${input.checkIn}→${input.checkOut} (no API oficial)`,
+    );
+  },
+  async syncAvailability(input) {
+    return this.pushAvailability(input);
+  },
+  async syncRates(input) {
+    return stubResult(
+      "airbnb",
+      `syncRates stub ${input.checkIn}→${input.checkOut} amount=${input.amountCop ?? "?"} (no API oficial)`,
+    );
   },
   async pullReservations() {
-    return stubResult("airbnb", "pullReservations");
+    return stubResult("airbnb", "pullReservations stub — no API oficial");
   },
   async handleWebhook({ idempotencyKey }) {
-    return stubResult("airbnb", "webhook", idempotencyKey);
+    return stubResult("airbnb", "webhook stub", idempotencyKey);
   },
 };
 
@@ -71,13 +96,25 @@ export const bookingAdapter: ChannelAdapter = {
   displayName: "Booking.com",
   isStub: true,
   async pushAvailability(input) {
-    return stubResult("booking", `pushAvailability ${input.checkIn}→${input.checkOut}`);
+    return stubResult(
+      "booking",
+      `syncAvailability stub ${input.checkIn}→${input.checkOut} (no API oficial)`,
+    );
+  },
+  async syncAvailability(input) {
+    return this.pushAvailability(input);
+  },
+  async syncRates(input) {
+    return stubResult(
+      "booking",
+      `syncRates stub ${input.checkIn}→${input.checkOut} amount=${input.amountCop ?? "?"} (no API oficial)`,
+    );
   },
   async pullReservations() {
-    return stubResult("booking", "pullReservations");
+    return stubResult("booking", "pullReservations stub — no API oficial");
   },
   async handleWebhook({ idempotencyKey }) {
-    return stubResult("booking", "webhook", idempotencyKey);
+    return stubResult("booking", "webhook stub", idempotencyKey);
   },
 };
 

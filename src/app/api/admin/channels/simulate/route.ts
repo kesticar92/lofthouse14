@@ -1,6 +1,7 @@
 import { requireStaff, enforceStaffModule } from "@/lib/api/require-staff";
 import { getChannelAdapter } from "@/lib/channels/adapter";
 import { importChannelReservation } from "@/lib/channels/import-reservation";
+import { runChannelSyncJob } from "@/lib/channels/sync-runner";
 import { LOFTHOUSE_ORGANIZATION_ID } from "@/lib/tenant/constants";
 
 export async function POST(req: Request) {
@@ -11,7 +12,13 @@ export async function POST(req: Request) {
 
   let body: {
     channel?: string;
-    action?: "push" | "pull" | "webhook" | "import_reservation";
+    action?:
+      | "push"
+      | "pull"
+      | "webhook"
+      | "import_reservation"
+      | "sync_availability"
+      | "sync_rates";
     check_in?: string;
     check_out?: string;
     guest_name?: string;
@@ -19,6 +26,7 @@ export async function POST(req: Request) {
     price?: number;
     category_id?: "vista" | "atrio" | "cielo";
     idempotency_key?: string;
+    amount_cop?: number;
   };
   try {
     body = await req.json();
@@ -33,6 +41,30 @@ export async function POST(req: Request) {
   }
 
   const action = body.action ?? "pull";
+
+  if (action === "sync_availability" || action === "sync_rates") {
+    const entry = await runChannelSyncJob({
+      channel: adapter.id,
+      jobType: action === "sync_rates" ? "rates" : "availability",
+      checkIn: body.check_in,
+      checkOut: body.check_out,
+      amountCop: body.amount_cop ?? body.price,
+    });
+    return Response.json({
+      ok: true,
+      result: {
+        ok: entry.status !== "error",
+        channel: entry.channel,
+        status: entry.status,
+        message: entry.message,
+        payload: entry.payload,
+      },
+      sync_log: entry,
+      note: adapter.isStub
+        ? "STUB ARI — no es éxito real de API OTA. TODO: REAL INTEGRATION REQUIRED"
+        : undefined,
+    });
+  }
 
   if (action === "import_reservation") {
     const checkIn =

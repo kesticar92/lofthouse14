@@ -15,11 +15,19 @@ import {
 } from "@/lib/folio/store";
 import type { FolioPaymentMethod } from "@/lib/folio/types";
 import { runAutomation } from "@/lib/crm/automation-runner";
+import {
+  getDraftInvoiceByCode,
+  getEInvoicingProvider,
+} from "@/lib/einvoicing/provider";
 
 function serialize(code: string) {
   const folio = getFolio(code) ?? null;
   if (!folio) return null;
-  return { ...folio, balance: computeFolioBalance(folio) };
+  return {
+    ...folio,
+    balance: computeFolioBalance(folio),
+    draft_invoice: getDraftInvoiceByCode(code),
+  };
 }
 
 export async function GET(req: Request) {
@@ -68,7 +76,12 @@ export async function POST(req: Request) {
 
   let body: {
     reservation_code?: string;
-    action?: "add_charge" | "register_payment" | "settle" | "ensure";
+    action?:
+      | "add_charge"
+      | "register_payment"
+      | "settle"
+      | "ensure"
+      | "issue_draft_invoice";
     label?: string;
     amount?: number;
     kind?: string;
@@ -161,6 +174,26 @@ export async function POST(req: Request) {
       },
     });
     return Response.json({ ok: true, folio: serialize(code), automation });
+  }
+
+  if (action === "issue_draft_invoice") {
+    const folio = ensureFolioForReservation(res);
+    const provider = getEInvoicingProvider();
+    const invoice = await provider.issueDraft({
+      reservationCode: code,
+      guestName: folio.guest_name || res.guest_name,
+      lines: folio.charges.map((c) => ({
+        label: c.label,
+        amount: c.amount,
+        quantity: c.quantity,
+      })),
+    });
+    return Response.json({
+      ok: true,
+      folio: serialize(code),
+      invoice,
+      note: invoice.message,
+    });
   }
 
   return Response.json({ ok: true, folio: serialize(code) });

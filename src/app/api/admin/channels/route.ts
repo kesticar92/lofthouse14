@@ -1,5 +1,6 @@
 import { requireStaff, enforceStaffModule } from "@/lib/api/require-staff";
 import { listChannelAdapters } from "@/lib/channels/adapter";
+import { listChannelSyncLogs } from "@/lib/channels/sync-runner";
 import { LOFTHOUSE_ORGANIZATION_ID } from "@/lib/tenant/constants";
 
 export async function GET() {
@@ -34,14 +35,17 @@ export async function GET() {
     logs = syncLogs ?? [];
   }
 
+  const localLogs = listChannelSyncLogs(50);
+
   return Response.json({
     organization_id: organizationId ?? LOFTHOUSE_ORGANIZATION_ID,
     adapters,
     connections,
-    logs,
+    logs: logs.length > 0 ? logs : localLogs,
+    local_sync_logs: localLogs,
     note:
       connections.length === 0
-        ? "Sin filas channel_connections — aplicar migración 024 o usar simulador"
+        ? "Sin filas channel_connections — aplicar migración 024 o usar job runner local (ARI stub)"
         : undefined,
   });
 }

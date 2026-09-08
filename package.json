@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "migrations:verify": "node scripts/verify-migrations.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "reviews:scrape": "cd src/app/scrapper && .venv/bin/python run_all_reviews.py",

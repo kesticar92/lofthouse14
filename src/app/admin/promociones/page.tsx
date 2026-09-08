@@ -19,15 +19,24 @@ type Coupon = {
   valid_to?: string | null;
 };
 
-const emptyForm = {
+const emptyForm: {
+  code: string;
+  name: string;
+  description: string;
+  discount_type: "percent" | "fixed";
+  discount_value: number;
+  active: boolean;
+  min_nights: number;
+  max_discount_cop: string | number;
+} = {
   code: "",
   name: "",
   description: "",
-  discount_type: "percent" as const,
+  discount_type: "percent",
   discount_value: 10,
   active: true,
   min_nights: 1,
-  max_discount_cop: "" as string | number,
+  max_discount_cop: "",
 };
 
 export default function AdminPromocionesPage() {

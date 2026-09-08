@@ -43,8 +43,8 @@ export async function GET(req: Request) {
     if (data) {
       reservations = data.map((r) => ({
         ...r,
-        channel: (r as { channel?: string }).channel ?? null,
-        source: (r as { source?: string }).source ?? null,
+        channel: (r as { channel?: string | null }).channel ?? "direct",
+        source: (r as { source?: string | null }).source ?? "unknown",
       }));
     }
   }

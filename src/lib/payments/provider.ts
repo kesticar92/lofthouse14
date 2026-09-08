@@ -1,7 +1,10 @@
 /**
- * Payments abstraction (Fase 10).
+ * Payments abstraction (Fase 10 + backlog integraciones).
+ * Wompi-first: HMAC + checkout cuando hay secrets; else mock marcado.
  * TODO: REAL INTEGRATION REQUIRED — no secretos en frontend.
  */
+
+import { createWompiPaymentProvider } from "./wompi";
 
 export type PaymentProviderId =
   | "wompi"
@@ -78,7 +81,7 @@ function stubProvider(
   };
 }
 
-export const wompiProvider = stubProvider("wompi", "Wompi");
+export const wompiProvider = createWompiPaymentProvider();
 export const mercadoPagoProvider = stubProvider("mercadopago", "Mercado Pago");
 export const stripeProvider = stubProvider("stripe", "Stripe");
 export const payuProvider = stubProvider("payu", "PayU");
@@ -118,15 +121,26 @@ const REGISTRY: Record<PaymentProviderId, PaymentProvider> = {
 };
 
 export function getPaymentProvider(id: string): PaymentProvider | null {
+  if (id === "wompi") {
+    // Recrear para reflejar env actual (tests / hot reload)
+    return createWompiPaymentProvider();
+  }
   return REGISTRY[id as PaymentProviderId] ?? null;
 }
 
 export function listPaymentProviders(): PaymentProvider[] {
-  return Object.values(REGISTRY);
+  return [
+    createWompiPaymentProvider(),
+    mercadoPagoProvider,
+    stripeProvider,
+    payuProvider,
+    manualProvider,
+    REGISTRY.stub,
+  ];
 }
 
 export function defaultPaymentProviderId(): PaymentProviderId {
   const env = process.env.PAYMENT_PROVIDER?.trim().toLowerCase();
   if (env && env in REGISTRY) return env as PaymentProviderId;
-  return "stub";
+  return "wompi";
 }

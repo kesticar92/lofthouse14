@@ -7,10 +7,22 @@ import {
 import {
   balanceForPayment,
   createLocalPendingPayment,
+  getLocalPaymentByCode,
   listLocalPayments,
   markLocalPaymentPaid,
 } from "@/lib/payments/local-store";
+import {
+  ensureFolioForReservation,
+  registerFolioPayment,
+  settleFolioBalance,
+  computeFolioBalance,
+} from "@/lib/folio/store";
+import {
+  getLocalReservationByCode,
+  upsertLocalReservation,
+} from "@/lib/availability/local-store";
 import { LOFTHOUSE_ORGANIZATION_ID } from "@/lib/tenant/constants";
+import { runAutomation } from "@/lib/crm/automation-runner";
 
 export async function GET(req: Request) {
   const gate = await requireStaff();
@@ -57,6 +69,7 @@ export async function POST(req: Request) {
     reservation_id?: string;
     reservation_code?: string;
     mark_paid?: boolean;
+    simulate_wompi?: boolean;
   };
   try {
     body = await req.json();
@@ -64,13 +77,72 @@ export async function POST(req: Request) {
     return Response.json({ error: "JSON inválido" }, { status: 400 });
   }
 
+  /** Simular pago Wompi (mock) → marca paid + actualiza folio/reserva */
+  if (body.simulate_wompi && body.reservation_code) {
+    const code = body.reservation_code.trim().toUpperCase();
+    let payment = getLocalPaymentByCode(code);
+    if (!payment) {
+      const amount = Number(body.amount ?? 0);
+      payment = createLocalPendingPayment({
+        organizationId: gate.ctx.organizationId ?? LOFTHOUSE_ORGANIZATION_ID,
+        reservationCode: code,
+        amount: amount > 0 ? amount : 100_000,
+        provider: "wompi",
+        metadata: { simulated: true },
+      });
+    }
+    const paid = markLocalPaymentPaid(code);
+    const res = getLocalReservationByCode(code);
+    if (res) {
+      res.payment_status = "paid";
+      upsertLocalReservation(res);
+      ensureFolioForReservation(res);
+      registerFolioPayment(code, {
+        amount: paid?.amount_paid ?? payment.amount,
+        method: "card_stub",
+        notes: "Simular pago Wompi (mock admin)",
+      });
+    }
+    runAutomation({
+      eventType: "payment_received",
+      payload: {
+        reservation_code: code,
+        guest_name: res?.guest_name ?? "",
+        provider: "wompi",
+        simulated: true,
+      },
+    });
+    return Response.json({
+      ok: true,
+      simulated: true,
+      payment: paid
+        ? { ...paid, balance: balanceForPayment(paid) }
+        : null,
+      folio: res
+        ? {
+            ...ensureFolioForReservation(res),
+            balance: computeFolioBalance(ensureFolioForReservation(res)),
+          }
+        : null,
+      note: "Simulación Wompi mock — sin cobro real. TODO: REAL INTEGRATION REQUIRED.",
+    });
+  }
+
   if (body.mark_paid && body.reservation_code) {
-    const paid = markLocalPaymentPaid(body.reservation_code);
+    const code = body.reservation_code.trim().toUpperCase();
+    const paid = markLocalPaymentPaid(code);
     if (!paid) {
       return Response.json(
         { error: "Pago local no encontrado para ese código" },
         { status: 404 },
       );
+    }
+    const res = getLocalReservationByCode(code);
+    if (res) {
+      res.payment_status = "paid";
+      upsertLocalReservation(res);
+      ensureFolioForReservation(res);
+      settleFolioBalance(code);
     }
     return Response.json({
       ok: true,

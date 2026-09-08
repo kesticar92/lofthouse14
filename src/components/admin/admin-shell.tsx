@@ -237,7 +237,24 @@ export const ADMIN_NAV: NavItem[] = [
         <path d="M4 19V5M8 19v-6M12 19V9M16 19v-3M20 19V7" />
       </svg>
     ),
-    desc: "Reportes, revenue tips y AI stub",
+    desc: "Reportes, revenue tips y AI assistant",
+  },
+  {
+    href: "/admin/saas",
+    label: "SaaS",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M4 7h16v10H4z" />
+        <path d="M8 7V5h8v2M9 12h6" />
+      </svg>
+    ),
+    desc: "module_flags / plan seed (read-only)",
   },
   {
     href: "/admin/reportes",

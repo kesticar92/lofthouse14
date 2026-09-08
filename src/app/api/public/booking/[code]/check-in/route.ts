@@ -1,4 +1,5 @@
-import { saveDigitalCheckIn, getDigitalCheckIn } from "@/lib/guest/check-in-store";
+import { persistDigitalCheckIn } from "@/lib/guest/persist-check-in";
+import { getDigitalCheckIn } from "@/lib/guest/check-in-store";
 import { lookupLocalBooking } from "@/lib/booking/create-reservation";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
@@ -40,7 +41,6 @@ export async function POST(req: Request, ctx: Ctx) {
     return Response.json({ error: "JSON inválido" }, { status: 400 });
   }
 
-  // Validar que la reserva exista (local o supabase)
   let exists = Boolean(lookupLocalBooking(code));
   if (!exists) {
     try {
@@ -59,7 +59,7 @@ export async function POST(req: Request, ctx: Ctx) {
     return Response.json({ error: "Reserva no encontrada" }, { status: 404 });
   }
 
-  const saved = saveDigitalCheckIn({
+  const persisted = await persistDigitalCheckIn({
     reservation_code: code,
     guest_name: body.guest_name ?? "",
     guest_phone: body.guest_phone,
@@ -72,27 +72,18 @@ export async function POST(req: Request, ctx: Ctx) {
     completed_at: new Date().toISOString(),
   });
 
-  if (!saved.ok) {
-    return Response.json({ error: saved.error }, { status: 400 });
-  }
-
-  // Stub: no subimos docs; opcionalmente marcar nota en reserva supabase
-  try {
-    const admin = createServiceRoleClient();
-    await admin
-      .from("reservations")
-      .update({
-        notes: `check-in digital ETA ${saved.checkIn.arrival_eta}`,
-      })
-      .eq("reservation_code", code);
-  } catch {
-    /* ignore */
+  if (!persisted.ok) {
+    return Response.json({ error: persisted.error }, { status: 400 });
   }
 
   return Response.json({
     ok: true,
-    mode: "local",
-    check_in: saved.checkIn,
-    note: "Persistencia stub (memoria servidor + localStorage). Sin documentos sensibles.",
+    mode: persisted.mode,
+    check_in: persisted.checkIn,
+    staff_notification: persisted.staffNotification,
+    note:
+      persisted.mode === "local"
+        ? "Persistencia local + notificación staff stub. Con SUPABASE_SERVICE_ROLE_KEY se actualiza reservations."
+        : "Persistido en Supabase (reservations) + notificación staff.",
   });
 }

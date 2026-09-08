@@ -28,6 +28,13 @@ type Folio = {
     created_at: string;
   }>;
   balance: { charges_total: number; payments_total: number; balance: number };
+  draft_invoice?: {
+    id: string;
+    total: number;
+    tax_estimate: number;
+    status: string;
+    message: string;
+  } | null;
 };
 
 export default function AdminFolioDetailPage() {
@@ -265,6 +272,32 @@ export default function AdminFolioDetailPage() {
                   >
                     Marcar saldo 0
                   </button>
+                </div>
+                <div className="space-y-2 sm:col-span-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                    Facturación electrónica (CO)
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    Genera borrador local desde el folio. DIAN / proveedor
+                    autorizado requiere EINVOICE_API_KEY.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      void postAction({ action: "issue_draft_invoice" })
+                    }
+                    className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
+                  >
+                    Generar factura (borrador)
+                  </button>
+                  {folio.draft_invoice ? (
+                    <p className="text-xs text-zinc-600">
+                      Borrador {folio.draft_invoice.status}:{" "}
+                      {formatCOP(folio.draft_invoice.total)} (IVA est.{" "}
+                      {formatCOP(folio.draft_invoice.tax_estimate)}) —{" "}
+                      {folio.draft_invoice.message}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </AdminCard>

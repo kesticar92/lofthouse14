@@ -78,6 +78,32 @@ export default function AdminCanalesPage() {
     await load();
   }
 
+  async function syncJob(
+    channel: string,
+    action: "sync_availability" | "sync_rates",
+  ) {
+    setMsg(null);
+    const res = await fetch("/api/admin/channels/simulate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channel,
+        action,
+        check_in: importCheckIn || undefined,
+        check_out: importCheckOut || undefined,
+        amount_cop: 180000,
+      }),
+    });
+    const data = await res.json();
+    setMsg(
+      data.sync_log?.message ??
+        data.result?.message ??
+        data.note ??
+        (res.ok ? "OK" : data.error),
+    );
+    await load();
+  }
+
   return (
     <AdminShell>
       <div>
@@ -150,6 +176,20 @@ export default function AdminCanalesPage() {
                   >
                     Simular sync
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => void syncJob(a.id, "sync_availability")}
+                    className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+                  >
+                    Sync availability
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void syncJob(a.id, "sync_rates")}
+                    className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+                  >
+                    Sync rates
+                  </button>
                   {a.id !== "direct" && a.id !== "ical" ? (
                     <button
                       type="button"
@@ -166,12 +206,12 @@ export default function AdminCanalesPage() {
           {msg ? <p className="mt-3 text-xs text-zinc-600">{msg}</p> : null}
         </AdminAsyncState>
       </AdminCard>
-      <AdminCard title="Últimos logs" subtitle="channel_sync_logs">
+      <AdminCard title="Últimos logs" subtitle="channel_sync_logs + job runner local">
         <AdminAsyncState
           loading={loading}
           error={null}
           empty={!loading && logs.length === 0}
-          emptyMessage="Sin logs de sync todavía. Usa «Simular sync»."
+          emptyMessage="Sin logs de sync. Usa Sync availability / Sync rates (stubs OTA)."
         >
           <pre className="max-h-64 overflow-auto text-xs">
             {JSON.stringify(logs, null, 2)}

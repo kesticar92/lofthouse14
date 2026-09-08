@@ -78,13 +78,27 @@ export default function AdminPagosPage() {
     await load();
   }
 
+  async function simulateWompi(reservationCode: string) {
+    const res = await fetch("/api/admin/payments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        simulate_wompi: true,
+        reservation_code: reservationCode,
+      }),
+    });
+    const data = await res.json();
+    setResult(JSON.stringify(data, null, 2));
+    await load();
+  }
+
   return (
     <AdminShell>
       <div>
         <h1 className="font-display text-3xl tracking-wide">PAGOS</h1>
         <p className="mt-1 text-sm text-zinc-600">
-          Abstracción PaymentProvider. Default: {defaultProvider}. Secretos solo
-          en servidor (.env) — nunca en el frontend.
+          Wompi-first (HMAC + checkout si hay secrets; else mock). Default:{" "}
+          {defaultProvider}. Secretos solo en servidor (.env).
         </p>
       </div>
 
@@ -131,14 +145,27 @@ export default function AdminPagosPage() {
                       Ver pública
                     </Link>
                     {p.status !== "paid" ? (
-                      <button
-                        type="button"
-                        onClick={() => void markPaid(p.reservation_code)}
-                        className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white dark:bg-white dark:text-zinc-900"
-                      >
-                        Marcar pagado
-                      </button>
-                    ) : null}
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => void simulateWompi(p.reservation_code)}
+                          className="rounded-full border border-emerald-700/40 bg-emerald-900/10 px-3 py-1 text-xs font-semibold text-emerald-900 dark:text-emerald-300"
+                        >
+                          Simular pago Wompi
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void markPaid(p.reservation_code)}
+                          className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white dark:bg-white dark:text-zinc-900"
+                        >
+                          Marcar pagado
+                        </button>
+                      </>
+                    ) : (
+                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-900">
+                        Pagado
+                      </span>
+                    )}
                   </span>
                 </li>
               );

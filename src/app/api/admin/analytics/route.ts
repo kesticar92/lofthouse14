@@ -1,10 +1,10 @@
 import { requireStaff, enforceStaffModule } from "@/lib/api/require-staff";
 import { computePmsMetrics } from "@/lib/pms/metrics";
 import {
-  aiAssistantStub,
   buildRevenueRecommendations,
   metricsToCsv,
 } from "@/lib/analytics/reports";
+import { runLlmAssistant } from "@/lib/analytics/llm-assistant";
 import { listLocalReservations } from "@/lib/availability/local-store";
 import { CATALOG_ROOMS } from "@/lib/catalog/seed";
 
@@ -54,9 +54,52 @@ export async function GET(req: Request) {
     });
   }
 
+  const ai = prompt
+    ? await runLlmAssistant({
+        prompt,
+        context: JSON.stringify({ metrics, recommendations }),
+      })
+    : await runLlmAssistant({
+        prompt: "status",
+        context: JSON.stringify({ metrics }),
+      });
+
   return Response.json({
     metrics,
     recommendations,
-    ai: prompt ? aiAssistantStub(prompt) : aiAssistantStub("status"),
+    ai,
+    autoApply: false,
+  });
+}
+
+/** Assistant endpoint dedicado — nunca auto-apply precios. */
+export async function POST(req: Request) {
+  const gate = await requireStaff();
+  if (!gate.ok) return gate.response;
+  const mod = enforceStaffModule(gate.ctx, "analytics");
+  if (mod) return mod;
+
+  let body: { prompt?: string; context?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "JSON inválido" }, { status: 400 });
+  }
+
+  const prompt = (body.prompt ?? "").trim();
+  if (!prompt) {
+    return Response.json({ error: "prompt requerido" }, { status: 400 });
+  }
+
+  const ai = await runLlmAssistant({
+    prompt,
+    context: body.context,
+  });
+
+  return Response.json({
+    ok: ai.ok,
+    ai,
+    autoApply: false as const,
+    disclaimer: ai.disclaimer,
   });
 }

@@ -94,11 +94,14 @@ export function metricsToCsv(metrics: PmsMetrics): string {
 
 export type AiAssistantResponse = {
   ok: boolean;
-  requiresLlmKey: true;
+  requiresLlmKey: boolean;
   message: string;
   stubAnswer?: string;
+  disclaimer?: string;
+  autoApply?: false;
 };
 
+/** @deprecated Prefer runLlmAssistant from llm-assistant.ts */
 export function aiAssistantStub(prompt: string): AiAssistantResponse {
   const hasKey = Boolean(
     process.env.OPENAI_API_KEY?.trim() ||
@@ -107,17 +110,23 @@ export function aiAssistantStub(prompt: string): AiAssistantResponse {
   );
   if (!hasKey) {
     return {
-      ok: false,
+      ok: true,
       requiresLlmKey: true,
       message:
         "AI assistant stub: requires LLM key (OPENAI_API_KEY / ANTHROPIC_API_KEY / LLM_API_KEY). TODO: REAL INTEGRATION REQUIRED.",
-      stubAnswer: undefined,
+      stubAnswer: `Stub (sin key): ${prompt.slice(0, 120)}`,
+      disclaimer:
+        "Respuesta orientativa. No se auto-aplican cambios de precio. Revisión humana obligatoria.",
+      autoApply: false,
     };
   }
   return {
     ok: true,
-    requiresLlmKey: true,
-    message: "LLM key detected but adapter not wired — returning stub.",
-    stubAnswer: `Stub reply to: ${prompt.slice(0, 120)}`,
+    requiresLlmKey: false,
+    message: "Key detectada — usar POST /api/admin/analytics (runLlmAssistant).",
+    stubAnswer: `Use runLlmAssistant for live reply. Prompt: ${prompt.slice(0, 120)}`,
+    disclaimer:
+      "Respuesta orientativa. No se auto-aplican cambios de precio. Revisión humana obligatoria.",
+    autoApply: false,
   };
 }

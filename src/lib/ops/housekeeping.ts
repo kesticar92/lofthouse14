@@ -1,9 +1,16 @@
 /**
  * Housekeeping tasks locales — auto dirty al checkout.
+ * Persistencia durable: `.data/housekeeping.json`.
  */
 
 import { LOFTHOUSE_ORGANIZATION_ID } from "@/lib/tenant/constants";
 import type { HkStatus } from "@/lib/ops/maintenance";
+import {
+  clearJsonFile,
+  durableStoreEnabled,
+  loadJsonFile,
+  saveJsonFile,
+} from "@/lib/persist/json-file-store";
 
 export type HousekeepingTask = {
   id: string;
@@ -19,11 +26,30 @@ export type HousekeepingTask = {
   updated_at: string;
 };
 
+type HkSnapshot = { tasks: HousekeepingTask[] };
+
+const STORE_NAME = "housekeeping";
+
 const g = globalThis as unknown as {
   __lhHousekeeping?: HousekeepingTask[];
+  __lhHkHydrated?: boolean;
 };
 
+function hydrateIfNeeded() {
+  if (g.__lhHkHydrated) return;
+  g.__lhHkHydrated = true;
+  if (!durableStoreEnabled()) return;
+  const snap = loadJsonFile<HkSnapshot>(STORE_NAME);
+  if (snap?.tasks) g.__lhHousekeeping = snap.tasks;
+}
+
+function persist() {
+  if (!durableStoreEnabled()) return;
+  saveJsonFile(STORE_NAME, { tasks: store() } satisfies HkSnapshot);
+}
+
 function store(): HousekeepingTask[] {
+  hydrateIfNeeded();
   if (!g.__lhHousekeeping) g.__lhHousekeeping = [];
   return g.__lhHousekeeping;
 }
@@ -65,6 +91,7 @@ export function createDirtyTaskOnCheckout(input: {
     updated_at: now,
   };
   store().unshift(task);
+  persist();
   return task;
 }
 
@@ -91,9 +118,11 @@ export function updateHousekeepingStatus(
   if (!t) return null;
   t.status = status;
   t.updated_at = new Date().toISOString();
+  persist();
   return t;
 }
 
 export function resetHousekeepingTasks() {
   g.__lhHousekeeping = [];
+  clearJsonFile(STORE_NAME);
 }

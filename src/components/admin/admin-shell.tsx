@@ -88,6 +88,23 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Ocupación, iCal Airbnb y exportación",
   },
   {
+    href: "/admin/front-desk",
+    label: "Front desk",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M4 19h16M6 19V9l6-4 6 4v10" />
+        <path d="M10 19v-4h4v4" />
+      </svg>
+    ),
+    desc: "Llegadas, salidas e in-house del día",
+  },
+  {
     href: "/admin/gastos",
     label: "Gastos",
     icon: (

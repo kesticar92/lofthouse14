@@ -8,6 +8,10 @@ import {
   adminApiClientKey,
   publicApiClientKey,
 } from "@/lib/admin-rate-limit";
+import {
+  checkCsrfOrigin,
+  pathNeedsCsrf,
+} from "@/lib/security/csrf";
 
 function isRateLimitedPublicApi(pathname: string): boolean {
   return (
@@ -37,6 +41,16 @@ export async function middleware(request: NextRequest) {
       return NextResponse.json(
         { error: "Too many requests", code: "RATE_LIMIT" },
         { status: 429 },
+      );
+    }
+  }
+
+  if (pathNeedsCsrf(pathname)) {
+    const csrf = checkCsrfOrigin(request);
+    if (!csrf.ok) {
+      return NextResponse.json(
+        { error: csrf.error, code: csrf.code },
+        { status: csrf.status },
       );
     }
   }

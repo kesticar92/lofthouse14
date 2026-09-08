@@ -10,6 +10,8 @@ type Row = {
   message: string;
   read: boolean;
   created_at: string;
+  href?: string;
+  level?: string;
 };
 
 export function AdminNotificationBell() {
@@ -41,6 +43,9 @@ export function AdminNotificationBell() {
   const unread = items.filter((n) => !n.read).length;
 
   async function markOne(id: string) {
+    setItems((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
     await fetch(`/api/admin/notifications/${id}`, {
       method: "PATCH",
       credentials: "include",
@@ -51,6 +56,7 @@ export function AdminNotificationBell() {
   }
 
   async function markAll() {
+    setItems((prev) => prev.map((n) => ({ ...n, read: true })));
     await fetch("/api/admin/notifications", {
       method: "PATCH",
       credentials: "include",
@@ -64,6 +70,7 @@ export function AdminNotificationBell() {
       <button
         type="button"
         aria-label="Notificaciones"
+        aria-expanded={open}
         onClick={() => {
           setOpen((v) => !v);
           if (!open) void refresh();
@@ -102,7 +109,7 @@ export function AdminNotificationBell() {
           >
             <div className="mb-2 flex items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                Avisos
+                Avisos {unread > 0 ? `(${unread})` : ""}
               </p>
               {unread > 0 ? (
                 <button
@@ -124,7 +131,12 @@ export function AdminNotificationBell() {
                   <li key={n.id}>
                     <button
                       type="button"
-                      onClick={() => void markOne(n.id)}
+                      onClick={() => {
+                        void markOne(n.id);
+                        if (n.href) {
+                          window.location.href = n.href;
+                        }
+                      }}
                       className={cn(
                         "w-full rounded-xl border px-3 py-2 text-left text-sm transition",
                         n.read
@@ -144,11 +156,11 @@ export function AdminNotificationBell() {
               </ul>
             )}
             <Link
-              href="/admin/aseos"
+              href="/admin/notificaciones"
               className="mt-3 block text-center text-xs font-semibold text-amber-900 underline dark:text-amber-400"
               onClick={() => setOpen(false)}
             >
-              Ir a operación de aseo
+              Ver todas las notificaciones
             </Link>
           </div>
         </>

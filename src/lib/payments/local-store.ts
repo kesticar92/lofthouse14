@@ -1,9 +1,16 @@
 /**
  * Payments locales (stub) — pending al booking sin pasarela real.
  * Soporta depósito % + saldo restante.
+ * Persistencia durable: `.data/payments.json`.
  */
 
 import { depositPercentFromEnv } from "@/lib/payments/deposit";
+import {
+  clearJsonFile,
+  durableStoreEnabled,
+  loadJsonFile,
+  saveJsonFile,
+} from "@/lib/persist/json-file-store";
 
 export type LocalPayment = {
   id: string;
@@ -32,11 +39,36 @@ export type LocalPayment = {
   metadata?: Record<string, unknown>;
 };
 
+type PaymentsSnapshot = { payments: LocalPayment[] };
+
+const STORE_NAME = "payments";
+
 const g = globalThis as unknown as {
   __lhLocalPayments?: Map<string, LocalPayment>;
+  __lhPaymentsHydrated?: boolean;
 };
 
+function hydrateIfNeeded() {
+  if (g.__lhPaymentsHydrated) return;
+  g.__lhPaymentsHydrated = true;
+  if (!durableStoreEnabled()) return;
+  const snap = loadJsonFile<PaymentsSnapshot>(STORE_NAME);
+  if (!snap?.payments?.length) return;
+  const m = new Map<string, LocalPayment>();
+  for (const row of snap.payments) {
+    m.set(row.id, row);
+    m.set(`code:${row.reservation_code}`, row);
+  }
+  g.__lhLocalPayments = m;
+}
+
+function persist() {
+  if (!durableStoreEnabled()) return;
+  saveJsonFile(STORE_NAME, { payments: listLocalPayments() } satisfies PaymentsSnapshot);
+}
+
 function map() {
+  hydrateIfNeeded();
   if (!g.__lhLocalPayments) g.__lhLocalPayments = new Map();
   return g.__lhLocalPayments;
 }
@@ -97,6 +129,7 @@ export function createLocalPendingPayment(input: {
   };
   map().set(row.id, row);
   map().set(`code:${row.reservation_code}`, row);
+  persist();
   return row;
 }
 
@@ -150,6 +183,7 @@ export function markLocalDepositPaid(code: string): LocalPayment | null {
   p.updated_at = new Date().toISOString();
   map().set(p.id, p);
   map().set(`code:${p.reservation_code}`, p);
+  persist();
   return p;
 }
 
@@ -164,9 +198,11 @@ export function markLocalPaymentPaid(
   p.updated_at = new Date().toISOString();
   map().set(p.id, p);
   map().set(`code:${p.reservation_code}`, p);
+  persist();
   return p;
 }
 
 export function resetLocalPayments() {
   g.__lhLocalPayments = new Map();
+  clearJsonFile(STORE_NAME);
 }

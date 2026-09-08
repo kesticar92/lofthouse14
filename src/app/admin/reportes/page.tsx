@@ -4,6 +4,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
 import { AdminAsyncState } from "@/components/admin/admin-async-state";
 import { formatCOP } from "@/lib/pricing";
+import {
+  BOOKING_CHANNEL_LABELS,
+  isBookingChannel,
+} from "@/lib/booking/channels";
+
+function channelLabel(channel: string): string {
+  if (isBookingChannel(channel)) return BOOKING_CHANNEL_LABELS[channel];
+  return channel;
+}
 
 function defaultFrom() {
   return new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
@@ -143,7 +152,10 @@ export default function AdminReportesPage() {
         </AdminAsyncState>
       </AdminCard>
 
-      <AdminCard title="Por canal" subtitle="Revenue stub por channel/source">
+      <AdminCard
+        title="Por canal"
+        subtitle="Incluye direct / corporate / referral / OTA stubs"
+      >
         <AdminAsyncState
           loading={loading}
           empty={!loading && channels.length === 0}
@@ -155,7 +167,12 @@ export default function AdminReportesPage() {
                 key={c.channel}
                 className="flex justify-between gap-3 rounded-lg border border-black/10 px-3 py-2 dark:border-white/10"
               >
-                <span className="font-medium">{c.channel}</span>
+                <span className="font-medium">
+                  {channelLabel(c.channel)}
+                  <span className="ml-1 font-mono text-[10px] text-zinc-400">
+                    {c.channel}
+                  </span>
+                </span>
                 <span className="text-xs text-zinc-500">
                   {c.reservations} res · {c.room_nights} rn ·{" "}
                   {formatCOP(c.revenue)}

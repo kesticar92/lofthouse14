@@ -107,6 +107,15 @@ export function adminModuleForPath(pathname: string): AdminModuleKey | null {
   if (p === "/admin/reviews" || p.startsWith("/admin/reviews/")) {
     return "crm";
   }
+  if (p === "/admin/front-desk" || p.startsWith("/admin/front-desk/")) {
+    return "reservas";
+  }
+  if (
+    p === "/admin/notificaciones" ||
+    p.startsWith("/admin/notificaciones/")
+  ) {
+    return null;
+  }
   for (const key of ADMIN_MODULE_KEYS) {
     const base = ADMIN_MODULE_PATHS[key];
     if (p === base || p.startsWith(`${base}/`)) return key;

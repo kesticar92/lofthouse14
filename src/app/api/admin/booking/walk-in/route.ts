@@ -4,6 +4,7 @@ import { createLocalBooking } from "@/lib/booking/create-reservation";
 import { unifiedQuote, SEED_RATE_PLANS } from "@/lib/pricing/unified";
 import { ensureFolioForReservation } from "@/lib/folio/store";
 import { runAutomation } from "@/lib/crm/automation-runner";
+import { normalizeBookingChannel } from "@/lib/booking/channels";
 
 const schema = z.object({
   check_in: z.string().min(8),
@@ -17,6 +18,9 @@ const schema = z.object({
   notes: z.string().max(2000).optional(),
   price: z.number().nonnegative().nullable().optional(),
   walk_in: z.boolean().default(true),
+  channel: z.string().max(40).optional(),
+  corporate_name: z.string().max(200).optional(),
+  referrer_name: z.string().max(200).optional(),
 });
 
 /** Walk-in / grupo ligero vía motor local de booking. */
@@ -58,6 +62,10 @@ export async function POST(req: Request) {
     price = q.ok ? q.totalReserva : null;
   }
 
+  const channel = body.walk_in
+    ? "walk_in"
+    : normalizeBookingChannel(body.channel, "direct");
+
   const result = createLocalBooking({
     checkIn: body.check_in,
     checkOut: body.check_out,
@@ -70,7 +78,10 @@ export async function POST(req: Request) {
     price,
     notes: body.notes,
     walkIn: body.walk_in,
-    source: body.walk_in ? "walk_in" : "admin",
+    source: body.walk_in ? "walk_in" : channel,
+    channel,
+    corporateName: body.corporate_name,
+    referrerName: body.referrer_name,
   });
 
   if (!result.ok) {

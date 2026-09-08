@@ -1,11 +1,17 @@
 /**
- * Store local en memoria para evaluación sin Supabase (Fase 3–4).
- * No persiste entre reinicios de proceso — marcado como mock.
+ * Store local para evaluación sin Supabase (Fase 3–4).
+ * Persistencia durable opcional en `.data/booking.json` (sobrevive reinicio en dev).
  */
 
 import type { OccupancyInterval } from "@/lib/availability/engine";
 import { buildSeedCatalog } from "@/lib/catalog/seed";
 import type { InventoryUnit } from "@/lib/availability/engine";
+import {
+  clearJsonFile,
+  durableStoreEnabled,
+  loadJsonFile,
+  saveJsonFile,
+} from "@/lib/persist/json-file-store";
 
 export type LocalReservation = {
   id: string;
@@ -33,6 +39,8 @@ export type LocalReservation = {
   notes: string;
   is_walk_in?: boolean;
   group_id?: string | null;
+  corporate_name?: string | null;
+  referrer_name?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -47,23 +55,72 @@ export type LocalHold = {
   status: string;
 };
 
+type BookingSnapshot = {
+  reservations: LocalReservation[];
+  holds: LocalHold[];
+  blocks: OccupancyInterval[];
+};
+
+const STORE_NAME = "booking";
+
 const g = globalThis as unknown as {
   __lhLocalReservations?: Map<string, LocalReservation>;
   __lhLocalHolds?: Map<string, LocalHold>;
   __lhLocalBlocks?: OccupancyInterval[];
+  __lhBookingHydrated?: boolean;
 };
 
+function hydrateIfNeeded() {
+  if (g.__lhBookingHydrated) return;
+  g.__lhBookingHydrated = true;
+  if (!durableStoreEnabled()) return;
+  const snap = loadJsonFile<BookingSnapshot>(STORE_NAME);
+  if (!snap) return;
+  const resMap = new Map<string, LocalReservation>();
+  for (const row of snap.reservations ?? []) {
+    resMap.set(row.id, row);
+    if (row.reservation_code) {
+      resMap.set(`code:${row.reservation_code}`, row);
+    }
+  }
+  g.__lhLocalReservations = resMap;
+  const holds = new Map<string, LocalHold>();
+  for (const h of snap.holds ?? []) holds.set(h.id, h);
+  g.__lhLocalHolds = holds;
+  g.__lhLocalBlocks = snap.blocks ?? [];
+}
+
+function persist() {
+  if (!durableStoreEnabled()) return;
+  const seen = new Set<string>();
+  const reservations: LocalReservation[] = [];
+  for (const [k, v] of reservationsMap()) {
+    if (k.startsWith("code:")) continue;
+    if (seen.has(v.id)) continue;
+    seen.add(v.id);
+    reservations.push(v);
+  }
+  saveJsonFile(STORE_NAME, {
+    reservations,
+    holds: [...holdsMap().values()],
+    blocks: blocksList(),
+  } satisfies BookingSnapshot);
+}
+
 function reservationsMap() {
+  hydrateIfNeeded();
   if (!g.__lhLocalReservations) g.__lhLocalReservations = new Map();
   return g.__lhLocalReservations;
 }
 
 function holdsMap() {
+  hydrateIfNeeded();
   if (!g.__lhLocalHolds) g.__lhLocalHolds = new Map();
   return g.__lhLocalHolds;
 }
 
 function blocksList() {
+  hydrateIfNeeded();
   if (!g.__lhLocalBlocks) g.__lhLocalBlocks = [];
   return g.__lhLocalBlocks;
 }
@@ -120,10 +177,15 @@ export function upsertLocalReservation(row: LocalReservation) {
   if (row.reservation_code) {
     reservationsMap().set(`code:${row.reservation_code}`, row);
   }
+  persist();
 }
 
 export function getLocalReservationByCode(code: string): LocalReservation | null {
   return reservationsMap().get(`code:${code}`) ?? null;
+}
+
+export function getLocalReservationById(id: string): LocalReservation | null {
+  return reservationsMap().get(id) ?? null;
 }
 
 export function listLocalReservations(): LocalReservation[] {
@@ -140,6 +202,7 @@ export function listLocalReservations(): LocalReservation[] {
 
 export function addLocalHold(hold: LocalHold) {
   holdsMap().set(hold.id, hold);
+  persist();
 }
 
 export function consumeLocalHold(id: string) {
@@ -147,15 +210,18 @@ export function consumeLocalHold(id: string) {
   if (h) {
     h.status = "consumed";
     holdsMap().set(id, h);
+    persist();
   }
 }
 
 export function addLocalBlock(interval: OccupancyInterval) {
   blocksList().push(interval);
+  persist();
 }
 
 export function resetLocalBookingStore() {
   reservationsMap().clear();
   holdsMap().clear();
   g.__lhLocalBlocks = [];
+  clearJsonFile(STORE_NAME);
 }

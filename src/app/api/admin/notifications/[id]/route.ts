@@ -1,4 +1,5 @@
 import { requireStaff } from "@/lib/api/require-staff";
+import { markLocalOpsNotificationRead } from "@/lib/ops/local-notifications";
 
 export async function PATCH(
   req: Request,
@@ -19,13 +20,25 @@ export async function PATCH(
     return Response.json({ error: "JSON inválido" }, { status: 400 });
   }
 
-  const { error } = await supabase
-    .from("notifications")
-    .update({ read: body.read ?? true })
-    .eq("id", id)
-    .eq("user_id", user.id);
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+  const wantRead = body.read ?? true;
+  let supabaseHit = false;
+  try {
+    const { data, error } = await supabase
+      .from("notifications")
+      .update({ read: wantRead })
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .select("id")
+      .maybeSingle();
+    supabaseHit = !error && Boolean(data);
+  } catch {
+    supabaseHit = false;
   }
-  return Response.json({ ok: true });
+
+  const localHit = wantRead ? markLocalOpsNotificationRead(id) : false;
+  if (!supabaseHit && !localHit) {
+    return Response.json({ error: "Notificación no encontrada" }, { status: 404 });
+  }
+
+  return Response.json({ ok: true, supabase: supabaseHit, local: localHit });
 }

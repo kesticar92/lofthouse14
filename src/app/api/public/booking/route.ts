@@ -19,6 +19,8 @@ import { runAutomation } from "@/lib/crm/automation-runner";
 import { unifiedQuote, SEED_RATE_PLANS } from "@/lib/pricing/unified";
 import { validateCoupon } from "@/lib/promotions/coupons";
 import { ensureFolioForReservation } from "@/lib/folio/store";
+import { normalizeClientExtras } from "@/lib/booking/extras-catalog";
+import { normalizeBookingChannel } from "@/lib/booking/channels";
 
 const bodySchema = z.object({
   check_in: z.string().min(8),
@@ -33,7 +35,7 @@ const bodySchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        label: z.string(),
+        label: z.string().optional(),
         amountCop: z.number().optional(),
       }),
     )
@@ -43,6 +45,10 @@ const bodySchema = z.object({
   coupon_code: z.string().max(40).optional(),
   /** Si true, también sugiere abrir WhatsApp (coexistencia) */
   also_whatsapp: z.boolean().optional(),
+  channel: z.string().max(40).optional(),
+  corporate_name: z.string().max(200).optional(),
+  referrer_name: z.string().max(200).optional(),
+  source: z.string().max(80).optional(),
 });
 
 export async function POST(req: Request) {
@@ -73,22 +79,30 @@ export async function POST(req: Request) {
     categoryId: body.category_id,
     publicMode: true,
   });
-  let price = quoteResult.ok ? quoteResult.totalReserva : null;
+  const nights = quoteResult.ok ? quoteResult.noches : undefined;
+  const extrasQuoted = normalizeClientExtras(body.extras, {
+    guests: body.guests,
+    nights: nights ?? 1,
+  });
+  const extrasPayload = extrasQuoted.lines.map((l) => ({
+    id: l.id,
+    label: l.label,
+    amountCop: l.amountCop,
+  }));
+  const channel = normalizeBookingChannel(body.channel, "direct");
+
+  let price = quoteResult.ok
+    ? quoteResult.totalReserva + extrasQuoted.totalCop
+    : null;
   let couponApplied: {
     code: string;
     discount: number;
     total_after: number;
   } | null = null;
   if (price != null && body.coupon_code?.trim()) {
-    const nights = quoteResult.ok ? quoteResult.noches : undefined;
-    const extrasSum = (body.extras ?? []).reduce(
-      (s, e) => s + Math.round(e.amountCop ?? 0),
-      0,
-    );
-    const subtotal = price + extrasSum;
     const validated = validateCoupon({
       code: body.coupon_code,
-      subtotal,
+      subtotal: price,
       nights,
     });
     if (validated.ok) {
@@ -214,9 +228,9 @@ export async function POST(req: Request) {
         price,
         status: body.pending ? "pending" : "confirmed",
         payment_status: "unpaid",
-        extras: body.extras ?? [],
-        source: "lofthouse14.com",
-        channel: "direct",
+        extras: extrasPayload,
+        source: body.source ?? "lofthouse14.com",
+        channel,
         notes: body.notes ?? "",
       };
 
@@ -248,6 +262,8 @@ export async function POST(req: Request) {
         reservation: data,
         reservation_code: code,
         quote: quoteResult.ok ? quoteResult : null,
+        extras: extrasQuoted,
+        channel,
         coupon: couponApplied,
         whatsapp_suggested: body.also_whatsapp !== false,
         automation,
@@ -266,11 +282,14 @@ export async function POST(req: Request) {
     guestPhone: body.guest_phone,
     guestEmail: body.guest_email,
     categoryId: body.category_id,
-    extras: body.extras,
+    extras: extrasPayload,
     price,
     notes: body.notes,
     pending: body.pending,
-    source: "lofthouse14.com",
+    source: body.source ?? "lofthouse14.com",
+    channel,
+    corporateName: body.corporate_name,
+    referrerName: body.referrer_name,
   });
 
   if (!local.ok) {
@@ -289,6 +308,7 @@ export async function POST(req: Request) {
       check_in: local.reservation.check_in,
       check_out: local.reservation.check_out,
       total: local.reservation.price ?? "",
+      channel,
     },
   });
 
@@ -297,12 +317,14 @@ export async function POST(req: Request) {
     mode: local.mode,
     note:
       local.mode === "local"
-        ? "Reserva en store local (mock) — aplicar migraciones 021–022 para persistir en Supabase"
+        ? "Reserva en store local durable (.data/) — aplicar migraciones 021–022 + Supabase para path remoto"
         : undefined,
     reservation: local.reservation,
     reservation_code: local.reservation.reservation_code,
     payment: local.payment ?? null,
     quote: quoteResult.ok ? quoteResult : null,
+    extras: extrasQuoted,
+    channel,
     coupon: couponApplied,
     whatsapp_suggested: body.also_whatsapp !== false,
     automation,
@@ -335,7 +357,7 @@ export async function GET(req: Request) {
   }
   return Response.json({
     mode: "local",
-    note: "Store local en memoria del proceso",
+    note: "Store local durable (.data/) si LH_DURABLE_STORE≠0",
     reservation: local,
   });
 }

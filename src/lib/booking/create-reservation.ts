@@ -28,6 +28,10 @@ import {
   depositPercentFromEnv,
 } from "@/lib/payments/deposit";
 import { recordLocalAudit } from "@/lib/audit/local-audit";
+import {
+  formatChannelNote,
+  normalizeBookingChannel,
+} from "@/lib/booking/channels";
 
 export type BookingExtra = {
   id: string;
@@ -51,6 +55,10 @@ export type CreateBookingInput = {
   price?: number | null;
   notes?: string;
   source?: string;
+  /** Canal: direct | corporate | referral | walk_in | … */
+  channel?: string;
+  corporateName?: string;
+  referrerName?: string;
   /** Si true, status=pending; si no confirmed */
   pending?: boolean;
   /** Walk-in PMS: llegada inmediata */
@@ -147,6 +155,15 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
   const code = generateReservationCode("LH");
   const now = new Date().toISOString();
   const groupId = needed > 1 ? newId() : null;
+  const channel = input.walkIn
+    ? "walk_in"
+    : normalizeBookingChannel(input.channel, "direct");
+  const channelNote = formatChannelNote({
+    channel,
+    corporate_name: input.corporateName,
+    referrer_name: input.referrerName,
+  });
+  const baseNotes = input.notes?.trim() || "";
   const reservation: LocalReservation = {
     id: newId(),
     reservation_code: code,
@@ -168,10 +185,12 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
     payment_status: "unpaid",
     extras: input.extras ?? [],
     source: input.walkIn ? "walk_in" : (input.source ?? "lofthouse14.com"),
-    channel: input.walkIn ? "walk_in" : "direct",
-    notes: input.notes?.trim() || "",
+    channel,
+    notes: [baseNotes, channelNote].filter(Boolean).join(" · "),
     is_walk_in: Boolean(input.walkIn),
     group_id: groupId,
+    corporate_name: input.corporateName?.trim() || null,
+    referrer_name: input.referrerName?.trim() || null,
     created_at: now,
     updated_at: now,
   };

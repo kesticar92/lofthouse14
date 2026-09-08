@@ -28,7 +28,10 @@ async function main() {
 
   const createRes = await fetch(`${BASE}/api/public/booking`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Origin: BASE,
+    },
     body: JSON.stringify({
       check_in,
       check_out,
@@ -39,6 +42,12 @@ async function main() {
       guest_email: "smoke@example.com",
       category_id: "vista",
       also_whatsapp: false,
+      channel: "corporate",
+      corporate_name: "Smoke Corp",
+      extras: [
+        { id: "early-checkin", label: "Early" },
+        { id: "breakfast", label: "Desayuno" },
+      ],
     }),
   });
   const createBody = await createRes.json().catch(() => ({}));
@@ -53,7 +62,17 @@ async function main() {
     console.error("[smoke] FAIL no reservation_code", createBody);
     process.exit(1);
   }
-  console.log(`[smoke] created ${code} mode=${createBody.mode}`);
+  if (createBody.channel !== "corporate") {
+    console.error("[smoke] FAIL channel", createBody.channel);
+    process.exit(1);
+  }
+  if (!createBody.extras?.totalCop || createBody.extras.totalCop < 60000) {
+    console.error("[smoke] FAIL extras quote", createBody.extras);
+    process.exit(1);
+  }
+  console.log(
+    `[smoke] created ${code} mode=${createBody.mode} channel=${createBody.channel} extras=${createBody.extras.totalCop}`,
+  );
 
   const getRes = await fetch(
     `${BASE}/api/public/booking/${encodeURIComponent(code)}`,
@@ -80,7 +99,10 @@ async function main() {
     `${BASE}/api/public/booking/${encodeURIComponent(code)}/pay`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Origin: BASE,
+      },
       body: JSON.stringify({ simulate: true, kind: "deposit" }),
     },
   );
@@ -130,7 +152,10 @@ async function main() {
     `${BASE}/api/public/booking/${encodeURIComponent(code)}/cancel`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Origin: BASE,
+      },
       body: JSON.stringify({ reason: "guest_cancel", confirm: true }),
     },
   );
@@ -157,6 +182,35 @@ async function main() {
     process.exit(1);
   }
   console.log(`[smoke] /lofts ${loftsRes.status}`);
+
+  const polRes = await fetch(`${BASE}/politicas`);
+  const polHtml = await polRes.text();
+  if (!polRes.ok || !polHtml.includes("cancelaciones")) {
+    console.error("[smoke] FAIL /politicas", polRes.status);
+    process.exit(1);
+  }
+  console.log(`[smoke] /politicas ${polRes.status}`);
+
+  // CSRF: Origin malicioso debe fallar en mutación booking
+  const csrfRes = await fetch(`${BASE}/api/public/booking`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "https://evil.example",
+    },
+    body: JSON.stringify({
+      check_in: isoPlus(offset + 20),
+      check_out: isoPlus(offset + 22),
+      guests: 1,
+      guest_name: "CSRF",
+    }),
+  });
+  if (csrfRes.status !== 403) {
+    console.error("[smoke] FAIL CSRF expect 403 got", csrfRes.status);
+    process.exit(1);
+  }
+  console.log("[smoke] CSRF Origin reject OK");
+
   console.log("[smoke] PASS");
 }
 

@@ -1,7 +1,14 @@
 /**
  * Notificaciones operativas locales (sin Supabase).
- * Usadas por inventario low-stock y otros stubs.
+ * Persistencia durable: `.data/notifications.json`.
  */
+
+import {
+  clearJsonFile,
+  durableStoreEnabled,
+  loadJsonFile,
+  saveJsonFile,
+} from "@/lib/persist/json-file-store";
 
 export type LocalOpsNotification = {
   id: string;
@@ -14,11 +21,32 @@ export type LocalOpsNotification = {
   source: string;
 };
 
+type NotifSnapshot = { notifications: LocalOpsNotification[] };
+
+const STORE_NAME = "notifications";
+
 const g = globalThis as unknown as {
   __lhLocalOpsNotifications?: LocalOpsNotification[];
+  __lhNotifHydrated?: boolean;
 };
 
+function hydrateIfNeeded() {
+  if (g.__lhNotifHydrated) return;
+  g.__lhNotifHydrated = true;
+  if (!durableStoreEnabled()) return;
+  const snap = loadJsonFile<NotifSnapshot>(STORE_NAME);
+  if (snap?.notifications) g.__lhLocalOpsNotifications = snap.notifications;
+}
+
+function persist() {
+  if (!durableStoreEnabled()) return;
+  saveJsonFile(STORE_NAME, {
+    notifications: store(),
+  } satisfies NotifSnapshot);
+}
+
 function store(): LocalOpsNotification[] {
+  hydrateIfNeeded();
   if (!g.__lhLocalOpsNotifications) g.__lhLocalOpsNotifications = [];
   return g.__lhLocalOpsNotifications;
 }
@@ -47,6 +75,8 @@ export function pushLocalOpsNotification(
     read: input.read ?? false,
   };
   store().unshift(row);
+  if (store().length > 200) store().length = 200;
+  persist();
   return row;
 }
 
@@ -62,9 +92,23 @@ export function markLocalOpsNotificationRead(id: string): boolean {
   const n = store().find((x) => x.id === id);
   if (!n) return false;
   n.read = true;
+  persist();
   return true;
+}
+
+export function markAllLocalOpsNotificationsRead(): number {
+  let n = 0;
+  for (const row of store()) {
+    if (!row.read) {
+      row.read = true;
+      n += 1;
+    }
+  }
+  if (n) persist();
+  return n;
 }
 
 export function resetLocalOpsNotifications() {
   g.__lhLocalOpsNotifications = [];
+  clearJsonFile(STORE_NAME);
 }

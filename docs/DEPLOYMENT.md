@@ -22,10 +22,18 @@ PAYU_API_LOGIN=
 OPENAI_API_KEY=
 ANTHROPIC_API_KEY=
 LLM_API_KEY=
-  ADMIN_API_RATE_LIMIT_PER_MINUTE=240
-  PUBLIC_API_RATE_LIMIT_PER_MINUTE=45
-  BOOKING_DEPOSIT_PERCENT=30
+ADMIN_API_RATE_LIMIT_PER_MINUTE=240
+PUBLIC_API_RATE_LIMIT_PER_MINUTE=45
+BOOKING_DEPOSIT_PERCENT=30
+CSRF_ALLOWED_ORIGINS=https://lofthouse14.com
+# CSRF_STRICT=1
+# LH_DURABLE_STORE=1
+# LH_DATA_DIR=.data
 ```
+
+## Persistencia local (sin Supabase)
+
+En dev, bookings/holds, payments/deposits, messages, housekeeping, notifications y review-requests se guardan en **`.data/*.json`** y sobreviven `next dev` restart. Con Supabase configurado, las rutas públicas/admin prefieren el path remoto existente. No desplegar `.data/` como fuente de verdad en multi-instancia.
 
 ## Proceso
 

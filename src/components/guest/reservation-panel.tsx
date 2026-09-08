@@ -97,8 +97,8 @@ export function ReservationPanel({
     (acc, e) => acc + (e.amountCop ?? 0),
     0,
   );
-  const total =
-    reservation.price != null ? reservation.price + extrasTotal : null;
+  /** `price` es total de estadía (alojamiento + extras cotizados). */
+  const total = reservation.price != null ? reservation.price : null;
 
   const [payBusy, setPayBusy] = useState(false);
   const [payMsg, setPayMsg] = useState<string | null>(null);

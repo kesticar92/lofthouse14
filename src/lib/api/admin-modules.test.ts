@@ -21,6 +21,8 @@ describe("adminModuleForPath", () => {
     expect(adminModuleForPath("/admin/reportes")).toBe("analytics");
     expect(adminModuleForPath("/admin/reviews")).toBe("crm");
     expect(adminModuleForPath("/admin/saas")).toBe("analytics");
+    expect(adminModuleForPath("/admin/front-desk")).toBe("reservas");
+    expect(adminModuleForPath("/admin/notificaciones")).toBeNull();
   });
 });
 

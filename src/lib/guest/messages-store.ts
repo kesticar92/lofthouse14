@@ -1,6 +1,14 @@
 /**
- * Message center guest — threads por código de reserva (local stub).
+ * Message center guest — threads por código de reserva.
+ * Persistencia durable: `.data/messages.json`.
  */
+
+import {
+  clearJsonFile,
+  durableStoreEnabled,
+  loadJsonFile,
+  saveJsonFile,
+} from "@/lib/persist/json-file-store";
 
 export type GuestMessage = {
   id: string;
@@ -17,11 +25,35 @@ export type GuestMessageThread = {
   created_at: string;
 };
 
+type MessagesSnapshot = { threads: GuestMessageThread[] };
+
+const STORE_NAME = "messages";
+
 const g = globalThis as unknown as {
   __lhGuestMessages?: Map<string, GuestMessageThread>;
+  __lhMessagesHydrated?: boolean;
 };
 
+function hydrateIfNeeded() {
+  if (g.__lhMessagesHydrated) return;
+  g.__lhMessagesHydrated = true;
+  if (!durableStoreEnabled()) return;
+  const snap = loadJsonFile<MessagesSnapshot>(STORE_NAME);
+  if (!snap?.threads?.length) return;
+  const m = new Map<string, GuestMessageThread>();
+  for (const t of snap.threads) {
+    m.set(t.reservation_code, t);
+  }
+  g.__lhGuestMessages = m;
+}
+
+function persist() {
+  if (!durableStoreEnabled()) return;
+  saveJsonFile(STORE_NAME, { threads: listThreads() } satisfies MessagesSnapshot);
+}
+
 function map() {
+  hydrateIfNeeded();
   if (!g.__lhGuestMessages) g.__lhGuestMessages = new Map();
   return g.__lhGuestMessages;
 }
@@ -56,6 +88,7 @@ export function getOrCreateThread(
     updated_at: now,
   };
   map().set(key, thread);
+  persist();
   return thread;
 }
 
@@ -80,6 +113,7 @@ export function appendGuestMessage(
   if (guestName) thread.guest_name = guestName;
   thread.updated_at = new Date().toISOString();
   map().set(thread.reservation_code, thread);
+  persist();
   return thread;
 }
 
@@ -98,6 +132,7 @@ export function appendStaffReply(
     created_at: new Date().toISOString(),
   });
   thread.updated_at = new Date().toISOString();
+  persist();
   return thread;
 }
 
@@ -109,4 +144,5 @@ export function listThreads(): GuestMessageThread[] {
 
 export function resetGuestMessages() {
   g.__lhGuestMessages = new Map();
+  clearJsonFile(STORE_NAME);
 }

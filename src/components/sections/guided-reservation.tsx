@@ -68,6 +68,11 @@ export function GuidedReservation() {
   const [couponCode, setCouponCode] = useState("");
   const [couponMsg, setCouponMsg] = useState<string | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
+  const [bookingChannel, setBookingChannel] = useState<
+    "direct" | "corporate" | "referral" | "whatsapp"
+  >("direct");
+  const [corporateName, setCorporateName] = useState("");
+  const [referrerName, setReferrerName] = useState("");
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
 
@@ -414,6 +419,15 @@ export function GuidedReservation() {
           extras: extrasPayload,
           coupon_code: couponCode.trim() || undefined,
           also_whatsapp: true,
+          channel: bookingChannel,
+          corporate_name:
+            bookingChannel === "corporate"
+              ? corporateName.trim() || undefined
+              : undefined,
+          referrer_name:
+            bookingChannel === "referral"
+              ? referrerName.trim() || undefined
+              : undefined,
         }),
       });
       const data = (await res.json()) as {
@@ -928,7 +942,61 @@ export function GuidedReservation() {
                         {guests} / {lofts}
                       </dd>
                     </div>
+                    {extrasCop > 0 || extras.length > 0 ? (
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-zinc-500">Extras</dt>
+                        <dd className="max-w-[60%] text-right font-medium">
+                          {CONFIGURATOR_EXTRAS.filter((e) =>
+                            extras.includes(e.id),
+                          )
+                            .map((e) => e.label)
+                            .join(", ") || "—"}
+                          {extrasCop > 0 ? (
+                            <span className="block text-xs font-normal text-zinc-500">
+                              {formatCOP(extrasCop)}
+                            </span>
+                          ) : null}
+                        </dd>
+                      </div>
+                    ) : null}
                   </dl>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Origen de la reserva
+                    </label>
+                    <select
+                      value={bookingChannel}
+                      onChange={(e) =>
+                        setBookingChannel(
+                          e.target.value as typeof bookingChannel,
+                        )
+                      }
+                      className="w-full rounded-xl border border-black/10 bg-white/80 px-3 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                    >
+                      <option value="direct">Directo (web)</option>
+                      <option value="whatsapp">WhatsApp</option>
+                      <option value="corporate">Corporativo / empresa</option>
+                      <option value="referral">Referido</option>
+                    </select>
+                    {bookingChannel === "corporate" ? (
+                      <input
+                        type="text"
+                        value={corporateName}
+                        onChange={(e) => setCorporateName(e.target.value)}
+                        placeholder="Nombre de la empresa"
+                        className="mt-2 w-full rounded-xl border border-black/10 bg-white/80 px-3 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                      />
+                    ) : null}
+                    {bookingChannel === "referral" ? (
+                      <input
+                        type="text"
+                        value={referrerName}
+                        onChange={(e) => setReferrerName(e.target.value)}
+                        placeholder="Quién te refirió"
+                        className="mt-2 w-full rounded-xl border border-black/10 bg-white/80 px-3 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                      />
+                    ) : null}
+                  </div>
                   <div>
                     <label className="mb-2 block text-sm font-medium">
                       Tu nombre (opcional)

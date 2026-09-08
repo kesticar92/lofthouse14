@@ -8,8 +8,9 @@
 4. **Rate limit:** middleware limita `/api/admin/*` (`ADMIN_API_RATE_LIMIT_PER_MINUTE`, default 240) y APIs públicas (`PUBLIC_API_RATE_LIMIT_PER_MINUTE`, default **45**): booking, availability (+ calendar), messages, coupons, fx, reviews.
 5. **Webhooks:** validación de firma es **placeholder**; no activar OTAs/pagos reales sin verificar HMAC del proveedor.
 6. **Idempotencia:** headers `Idempotency-Key` / `x-idempotency-key` en webhooks de canales/pagos (dedupe best-effort en DB).
-7. **CSRF (nota):** las mutaciones admin van con sesión cookie Supabase same-site; no hay tokens CSRF dedicados aún. Riesgo residual en browsers antiguos / cross-site form posts. Mitigación futura: `SameSite=Lax` estricto + Origin check en `POST /api/admin/*` y double-submit cookie en guest pay/cancel. Hoy: rate limit + staff gate + audit local en walk-in/cancel/pay.
-8. **Audit:** helper `recordLocalAudit` en booking walk-in/create, guest/admin cancel, pay mock y housekeeping checkout (redacta password/token/secret).
+7. **CSRF:** mutaciones en `/api/admin/*` y `/api/public/booking*` validan **Origin** (preferido) o **Referer** contra allowlist (`NEXT_PUBLIC_SITE_URL` + localhost:43127/3000 + `CSRF_ALLOWED_ORIGINS`). Sin ambos headers: permitido salvo `CSRF_STRICT=1` (smoke/curl). Desactivar: `CSRF_ORIGIN_CHECK=0`.
+8. **Audit:** helper `recordLocalAudit` en booking walk-in/create, guest/admin cancel, pay mock, housekeeping checkout y front-desk (redacta password/token/secret).
+9. **Persistencia local durable:** sin Supabase, stores escriben `.data/*.json` (sobrevive reinicio del server en dev). Preferir path Supabase cuando hay service role. `LH_DURABLE_STORE=0` / Vitest desactiva disco.
 
 ## Checklist prod
 
@@ -18,5 +19,7 @@
 - [ ] Desactivar module_flags.payments hasta tener proveedor real
 - [ ] Revisar políticas Storage (gastos/fotos)
 - [ ] No loguear bodies de webhooks con PII completa en prod
-- [ ] Origin/CSRF check en mutaciones admin sensibles
+- [x] Origin/CSRF check en mutaciones admin + public booking
+- [ ] `CSRF_STRICT=1` + allowlist de dominios de producción
 - [ ] Bajar `PUBLIC_API_RATE_LIMIT_PER_MINUTE` si hay abuso (default 45)
+- [ ] No versionar `.data/` (runtime local)

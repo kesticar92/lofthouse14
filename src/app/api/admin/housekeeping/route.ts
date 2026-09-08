@@ -80,18 +80,34 @@ export async function POST(req: Request) {
     roomId: body.room_id ?? local?.room_id ?? null,
   });
 
+  const { queuePostCheckoutReviewRequest } = await import(
+    "@/lib/reviews/post-checkout-request"
+  );
+  const review = queuePostCheckoutReviewRequest({
+    reservationCode: code,
+    guestName: local?.guest_name ?? "Huésped",
+    guestEmail: local?.guest_email,
+    checkIn: local?.check_in,
+    checkOut: local?.check_out,
+  });
+
   recordLocalAudit({
     action: "housekeeping.checkout_dirty",
     entity_type: "housekeeping_task",
     entity_id: task.id,
     actor: gate.ctx.user?.email ?? "staff",
-    metadata: { reservation_code: code, property_id: task.property_id },
+    metadata: {
+      reservation_code: code,
+      property_id: task.property_id,
+      review_request: review.id,
+    },
   });
 
   return Response.json({
     ok: true,
     task,
     reservation: local,
-    note: "Tarea dirty creada automáticamente al checkout",
+    review_request: review,
+    note: "Tarea dirty + reseña stub al checkout",
   });
 }

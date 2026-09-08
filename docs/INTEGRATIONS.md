@@ -14,9 +14,27 @@
 | **FX / multimoneda** | (futuro provider) | Stub ECB-like COP→USD/EUR + disclaimer |
 | **OTA Channel Manager** | Credenciales partner (no cableadas) | `syncAvailability` / `syncRates` **stubs** + log UI |
 | **iCal** | Fuentes en PMS | Path real existente (`/api/ical`, cron sync) |
-| **Supabase** | `NEXT_PUBLIC_SUPABASE_*` + `SUPABASE_SERVICE_ROLE_KEY` | Stores locales (booking, pagos, check-in, folio) |
+| **Supabase** | `NEXT_PUBLIC_SUPABASE_*` + `SUPABASE_SERVICE_ROLE_KEY` | Stores locales **durables** en `.data/` (booking, pagos, messages, HK, notifications) |
 
 Todas las rutas mock llevan `TODO: REAL INTEGRATION REQUIRED` en mensajes.
+
+### Persistencia local durable
+
+```env
+# default on en dev (off en Vitest)
+# LH_DURABLE_STORE=0
+# LH_DATA_DIR=.data
+```
+
+Archivos típicos: `booking.json`, `payments.json`, `messages.json`, `housekeeping.json`, `notifications.json`, `review-requests.json`. Reiniciar el server Next no borra reservas/depósitos locales.
+
+### CSRF
+
+```env
+CSRF_ALLOWED_ORIGINS=https://lofthouse14.com,https://www.lofthouse14.com
+# CSRF_STRICT=1          # rechaza mutaciones sin Origin/Referer
+# CSRF_ORIGIN_CHECK=0    # desactivar
+```
 
 ---
 

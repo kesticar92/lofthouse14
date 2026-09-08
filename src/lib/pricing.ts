@@ -1,6 +1,7 @@
 /**
- * Lógica de cotización — réplica exacta de
- * "Calculadora_Tarifas_Lofthouse.xlsx" (hojas Configuracion + Calculadora).
+ * Lógica de cotización — réplica de
+ * "Calculadora_Tarifas_Lofthouse.xlsx" (hojas Configuracion + Calculadora),
+ * extendida con tramos de larga estadía 7 / 14 / 30 noches.
  *
  * Valores por defecto (editables en Admin → Configuración):
  *  - Lunes a Jueves:      90.000 COP por noche (base 1–2 huéspedes)
@@ -9,8 +10,9 @@
  *  - Aseo 1–2 noches (por loft):  30.000 COP
  *  - Aseo 3–7 noches (por loft):  60.000 COP
  *  - Aseo >7 noches (por loft): ROUNDUP(noches/7) × 30.000 COP
- *  - Descuento ≥7 noches:  20 %   (sobre alojamiento + recargo huéspedes)
- *  - Descuento ≥28 noches: 40 %   (reemplaza al anterior)
+ *  - Descuento ≥7 noches:  15 %   (sobre alojamiento + recargo huéspedes)
+ *  - Descuento ≥14 noches: 25 %   (reemplaza al de 7)
+ *  - Descuento ≥30 noches: 40 %   (reemplaza al de 14)
  *  - Comisión Airbnb (opcional): + 12 %
  */
 
@@ -21,7 +23,11 @@ export type PricingConfig = {
   aseoCorta: number;
   aseoMedia: number;
   aseoSemanal: number;
+  /** ≥7 noches */
   descuentoSemanal: number;
+  /** ≥14 noches */
+  descuentoQuincenal: number;
+  /** ≥30 noches */
   descuentoMensual: number;
   comisionAirbnb: number;
 };
@@ -33,7 +39,8 @@ export const DEFAULT_PRICING: PricingConfig = {
   aseoCorta: 30_000,
   aseoMedia: 60_000,
   aseoSemanal: 30_000,
-  descuentoSemanal: 0.2,
+  descuentoSemanal: 0.15,
+  descuentoQuincenal: 0.25,
   descuentoMensual: 0.4,
   comisionAirbnb: 0.12,
 };
@@ -182,12 +189,16 @@ export function quote(
   let descuento = 0;
   let descuentoDetalle = "Sin descuento (estadía menor a 7 noches)";
   const baseDescuento = subtotalAlojamiento + recargoHuespedes;
-  if (noches >= 28) {
+  const quincenal = cfg.descuentoQuincenal ?? 0.25;
+  if (noches >= 30) {
     descuento = -baseDescuento * cfg.descuentoMensual;
-    descuentoDetalle = `Descuento mensual ${(cfg.descuentoMensual * 100).toFixed(0)}% sobre ${formatCOP(baseDescuento)}`;
+    descuentoDetalle = `Descuento larga estadía 30+ ${(cfg.descuentoMensual * 100).toFixed(0)}% sobre ${formatCOP(baseDescuento)}`;
+  } else if (noches >= 14) {
+    descuento = -baseDescuento * quincenal;
+    descuentoDetalle = `Descuento larga estadía 14+ ${(quincenal * 100).toFixed(0)}% sobre ${formatCOP(baseDescuento)}`;
   } else if (noches >= 7) {
     descuento = -baseDescuento * cfg.descuentoSemanal;
-    descuentoDetalle = `Descuento semanal ${(cfg.descuentoSemanal * 100).toFixed(0)}% sobre ${formatCOP(baseDescuento)}`;
+    descuentoDetalle = `Descuento larga estadía 7+ ${(cfg.descuentoSemanal * 100).toFixed(0)}% sobre ${formatCOP(baseDescuento)}`;
   }
 
   const totalReserva = subtotalReserva + descuento;

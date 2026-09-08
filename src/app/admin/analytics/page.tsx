@@ -17,7 +17,15 @@ export default function AdminAnalyticsPage() {
   const [to, setTo] = useState(defaultTo);
   const [data, setData] = useState<{
     metrics?: Record<string, number | string>;
-    recommendations?: Array<{ title: string; suggestedAction: string }>;
+    recommendations?: Array<{
+      title: string;
+      suggestedAction: string;
+      rationale?: string;
+      confidence?: string;
+      occupancyBand?: string;
+      impactHint?: string;
+      autoApply?: boolean;
+    }>;
     ai?: {
       message?: string;
       ok?: boolean;
@@ -160,7 +168,7 @@ export default function AdminAnalyticsPage() {
           <pre className="text-xs">{JSON.stringify(metrics, null, 2)}</pre>
         </AdminAsyncState>
       </AdminCard>
-      <AdminCard title="Revenue recommendations" subtitle="autoApply=false">
+      <AdminCard title="Revenue recommendations" subtitle="autoApply=false · heurística ocupación">
         <AdminAsyncState
           loading={loading}
           empty={!loading && recs.length === 0}
@@ -170,10 +178,37 @@ export default function AdminAnalyticsPage() {
             {recs.map((r, i) => (
               <li
                 key={i}
-                className="rounded border border-black/10 p-2 dark:border-white/10"
+                className="rounded border border-black/10 p-3 dark:border-white/10"
               >
-                <strong>{r.title}</strong>
-                <p className="text-xs text-zinc-600">{r.suggestedAction}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <strong>{r.title}</strong>
+                  {r.occupancyBand ? (
+                    <span className="rounded-full border border-zinc-300 px-2 py-0.5 text-[10px] uppercase tracking-wider dark:border-zinc-600">
+                      {r.occupancyBand}
+                    </span>
+                  ) : null}
+                  {r.confidence ? (
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-500">
+                      conf {r.confidence}
+                    </span>
+                  ) : null}
+                </div>
+                {r.rationale ? (
+                  <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+                    {r.rationale}
+                  </p>
+                ) : null}
+                <p className="mt-1 text-xs text-zinc-700 dark:text-zinc-300">
+                  {r.suggestedAction}
+                </p>
+                {r.impactHint ? (
+                  <p className="mt-1 text-[11px] italic text-zinc-500">
+                    {r.impactHint}
+                  </p>
+                ) : null}
+                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                  autoApply=false
+                </p>
               </li>
             ))}
           </ul>

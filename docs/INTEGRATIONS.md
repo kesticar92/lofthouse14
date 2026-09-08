@@ -11,6 +11,7 @@
 | **Email** | `RESEND_API_KEY`, `EMAIL_FROM` | Mock sender (log) |
 | **LLM analytics** | `OPENAI_API_KEY` | Stub + disclaimer (sin auto-apply) |
 | **E-factura CO** | `EINVOICE_API_KEY` / `DIAN_API_KEY` | Borrador local desde folio |
+| **FX / multimoneda** | (futuro provider) | Stub ECB-like COP→USD/EUR + disclaimer |
 | **OTA Channel Manager** | Credenciales partner (no cableadas) | `syncAvailability` / `syncRates` **stubs** + log UI |
 | **iCal** | Fuentes en PMS | Path real existente (`/api/ical`, cron sync) |
 | **Supabase** | `NEXT_PUBLIC_SUPABASE_*` + `SUPABASE_SERVICE_ROLE_KEY` | Stores locales (booking, pagos, check-in, folio) |
@@ -75,9 +76,13 @@ EINVOICE_PROVIDER=dian_authorized_stub
 EINVOICE_API_KEY=
 ```
 
-Folio → **Generar factura (borrador)** (`action: issue_draft_invoice`).
+Folio → **Generar factura (borrador)** (`action: issue_draft_invoice`). Visible también en portal huésped si existe borrador.
 
-## 7. SaaS foundations
+## 7. Multimoneda (foundation)
+
+`GET /api/public/fx?amount_cop=410000` — tasas **stub** (no oficiales). Display COP base + USD/EUR en confirmación.
+
+## 8. SaaS foundations
 
 - Seed `module_flags` / planes en `src/lib/saas/module-flags.ts`
 - Admin read-only: `/admin/saas` + `GET /api/admin/saas/flags`

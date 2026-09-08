@@ -12,7 +12,10 @@ export type LocalReservation = {
   reservation_code: string;
   organization_id: string;
   property_id: string;
+  /** Multi-unidad / grupo ligero: todas las propiedades ocupadas */
+  property_ids?: string[];
   room_id: string | null;
+  room_ids?: string[];
   room_type_id: string | null;
   guest_name: string;
   guest_phone: string;
@@ -20,6 +23,7 @@ export type LocalReservation = {
   check_in: string;
   check_out: string;
   guests: number;
+  lofts?: number;
   price: number | null;
   status: string;
   payment_status: string;
@@ -27,6 +31,8 @@ export type LocalReservation = {
   source: string;
   channel: string;
   notes: string;
+  is_walk_in?: boolean;
+  group_id?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -91,14 +97,20 @@ export function listLocalOccupancy(): OccupancyInterval[] {
 
   const res = [...reservationsMap().values()]
     .filter((r) => r.status !== "cancelled")
-    .map((r) => ({
-      id: r.id,
-      propertyId: r.property_id,
-      start: r.check_in,
-      endExclusive: r.check_out,
-      kind: "reservation" as const,
-      status: r.status,
-    }));
+    .flatMap((r) => {
+      const props =
+        r.property_ids && r.property_ids.length > 0
+          ? r.property_ids
+          : [r.property_id];
+      return props.map((propertyId, idx) => ({
+        id: idx === 0 ? r.id : `${r.id}:${propertyId}`,
+        propertyId,
+        start: r.check_in,
+        endExclusive: r.check_out,
+        kind: "reservation" as const,
+        status: r.status,
+      }));
+    });
 
   return [...blocksList(), ...holds, ...res];
 }

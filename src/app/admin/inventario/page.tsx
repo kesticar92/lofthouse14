@@ -18,6 +18,7 @@ import {
   type InventarioGuardado,
   type InventarioItemResultado,
 } from "@/lib/inventarios-store";
+import { StockOpsPanel } from "@/features/inventarios/components/stock-ops-panel";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -165,9 +166,12 @@ export default function InventarioPage() {
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
           Revisa artículo por artículo cada loft. Marca estado y si funciona;
-          los ítems que no apliquen se llenan solos.
+          los ítems que no apliquen se llenan solos. Abajo: stock operativo y
+          compras mínimas.
         </p>
       </div>
+
+      <StockOpsPanel />
 
       <AdminCard
         title="Datos del registro"

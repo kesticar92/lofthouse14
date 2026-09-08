@@ -1,7 +1,9 @@
 import { lookupLocalBooking } from "@/lib/booking/create-reservation";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
-import { getLocalPaymentByCode } from "@/lib/payments/local-store";
+import { getLocalPaymentByCode, balanceForPayment } from "@/lib/payments/local-store";
 import { getDigitalCheckIn } from "@/lib/guest/check-in-store";
+import { getDraftInvoiceByCode } from "@/lib/einvoicing/provider";
+import { getStubFxRates, formatMoney } from "@/lib/currency/rates";
 
 type Ctx = { params: Promise<{ code: string }> };
 
@@ -12,8 +14,23 @@ export async function GET(_req: Request, ctx: Ctx) {
     return Response.json({ error: "code requerido" }, { status: 400 });
   }
 
-  const payment = getLocalPaymentByCode(code);
+  const paymentRaw = getLocalPaymentByCode(code);
+  const payment = paymentRaw
+    ? { ...paymentRaw, balance: balanceForPayment(paymentRaw) }
+    : null;
   const checkIn = getDigitalCheckIn(code);
+  const invoiceDraft = getDraftInvoiceByCode(code);
+  const fx = getStubFxRates();
+
+  function withDisplay(price: number | null | undefined) {
+    if (price == null) return null;
+    return {
+      cop: formatMoney(price, "COP", fx),
+      usd: formatMoney(price, "USD", fx),
+      eur: formatMoney(price, "EUR", fx),
+      disclaimer: fx.disclaimer,
+    };
+  }
 
   try {
     const admin = createServiceRoleClient();
@@ -30,6 +47,11 @@ export async function GET(_req: Request, ctx: Ctx) {
         reservation: data,
         payment,
         check_in: checkIn,
+        invoice_draft: invoiceDraft,
+        display_price: withDisplay(
+          typeof data.price === "number" ? data.price : null,
+        ),
+        fx: { provider: fx.provider, isStub: fx.isStub, disclaimer: fx.disclaimer },
       });
     }
   } catch {
@@ -47,5 +69,8 @@ export async function GET(_req: Request, ctx: Ctx) {
     reservation: local,
     payment,
     check_in: checkIn,
+    invoice_draft: invoiceDraft,
+    display_price: withDisplay(local.price),
+    fx: { provider: fx.provider, isStub: fx.isStub, disclaimer: fx.disclaimer },
   });
 }

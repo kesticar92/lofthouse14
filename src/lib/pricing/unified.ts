@@ -116,6 +116,7 @@ export function unifiedQuote(params: {
     const r = publicStayQuote(params.input, {
       ...cfg,
       descuentoSemanal: 0,
+      descuentoQuincenal: 0,
       descuentoMensual: 0,
       comisionAirbnb: 0,
     });

@@ -3,24 +3,26 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-
-const ITEMS = [
-  { href: "/reservar", label: "Reservar" },
-  { href: "/mi-reserva", label: "Mi reserva" },
-  { href: "/ayuda", label: "Ayuda" },
-] as const;
+import { localeFromPathname, t } from "@/lib/i18n/dictionary";
 
 /** Bottom nav móvil para journey huésped (no admin). */
 export function GuestBottomNav() {
   const pathname = usePathname() ?? "";
+  const locale = localeFromPathname(pathname);
+
+  const items = [
+    { href: "/reservar", label: t("nav.book", locale) },
+    { href: "/mi-reserva", label: t("nav.myReservation", locale) },
+    { href: "/ayuda", label: t("nav.help", locale) },
+  ] as const;
 
   return (
     <nav
-      aria-label="Navegación huésped"
+      aria-label={locale === "en" ? "Guest navigation" : "Navegación huésped"}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200/80 bg-[#f7f5f0]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md dark:border-zinc-700 dark:bg-zinc-950/95 md:hidden"
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-around">
-        {ITEMS.map((item) => {
+        {items.map((item) => {
           const active =
             pathname === item.href ||
             (item.href === "/mi-reserva" &&

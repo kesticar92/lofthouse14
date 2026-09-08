@@ -112,4 +112,46 @@ describe("createLocalBooking", () => {
       "pending",
     );
   });
+
+  it("reserva multi-unidad (grupo ligero 2+ lofts)", () => {
+    const r = createLocalBooking({
+      checkIn: "2027-01-10",
+      checkOut: "2027-01-13",
+      guests: 6,
+      guestName: "Grupo",
+      lofts: 2,
+      price: 540_000,
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.reservation.lofts).toBe(2);
+    expect(r.reservation.property_ids?.length).toBe(2);
+    expect(r.reservation.group_id).toBeTruthy();
+
+    // Segunda reserva de 2 lofts mismas fechas — debe reducir inventario
+    const r2 = createLocalBooking({
+      checkIn: "2027-01-10",
+      checkOut: "2027-01-13",
+      guests: 4,
+      guestName: "Grupo 2",
+      lofts: 2,
+    });
+    expect(r2.ok).toBe(true);
+  });
+
+  it("walk-in marca canal y checked_in", () => {
+    const r = createLocalBooking({
+      checkIn: "2027-02-01",
+      checkOut: "2027-02-02",
+      guests: 2,
+      guestName: "Walk-in",
+      walkIn: true,
+      price: 100_000,
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.reservation.is_walk_in).toBe(true);
+    expect(r.reservation.channel).toBe("walk_in");
+    expect(r.reservation.status).toBe("checked_in");
+  });
 });

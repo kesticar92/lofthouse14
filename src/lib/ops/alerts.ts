@@ -1,11 +1,9 @@
-/**
- * Alertas stub para dashboard admin (sin depender de notificaciones DB).
- */
-
 import { listLocalMaintenanceTickets } from "@/lib/ops/maintenance";
 import { listLocalPayments } from "@/lib/payments/local-store";
 import { listLocalReservations } from "@/lib/availability/local-store";
 import { listDigitalCheckIns } from "@/lib/guest/check-in-store";
+import { listLowStockItems } from "@/lib/inventory/stock";
+import { listLocalOpsNotifications } from "@/lib/ops/local-notifications";
 
 export type OpsAlert = {
   id: string;
@@ -78,6 +76,36 @@ export function buildStubOpsAlerts(now = new Date()): OpsAlert[] {
           : "Todas con check-in digital registrado (stub).",
       href: "/admin/reservas",
     });
+  }
+
+  try {
+    const low = listLowStockItems();
+    if (low.length > 0) {
+      alerts.push({
+        id: "low-stock",
+        level: low.some((i) => i.qty_on_hand === 0) ? "critical" : "warn",
+        title: `${low.length} ítem(s) low stock`,
+        message: low
+          .slice(0, 3)
+          .map((i) => `${i.sku}: ${i.qty_on_hand}/${i.reorder_point}`)
+          .join(" · "),
+        href: "/admin/inventario?tab=stock",
+      });
+    }
+    const invNotes = listLocalOpsNotifications({ unreadOnly: true }).filter(
+      (n) => n.source === "inventory.low_stock",
+    );
+    if (invNotes.length > 0 && !alerts.some((a) => a.id === "low-stock")) {
+      alerts.push({
+        id: "low-stock-notify",
+        level: "warn",
+        title: `${invNotes.length} alerta(s) inventario`,
+        message: invNotes[0]!.message,
+        href: "/admin/inventario?tab=stock",
+      });
+    }
+  } catch {
+    /* stock seed optional */
   }
 
   if (alerts.length === 0) {

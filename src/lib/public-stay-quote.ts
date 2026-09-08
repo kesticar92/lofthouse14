@@ -11,6 +11,7 @@ import { site } from "@/lib/site";
 export const PUBLIC_PRICING_CONFIG: PricingConfig = {
   ...DEFAULT_PRICING,
   descuentoSemanal: 0,
+  descuentoQuincenal: 0,
   descuentoMensual: 0,
   comisionAirbnb: 0,
 };

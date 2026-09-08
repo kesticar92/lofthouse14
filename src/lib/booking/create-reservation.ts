@@ -40,12 +40,16 @@ export type CreateBookingInput = {
   categoryId?: MarketingCategory | null;
   roomTypeId?: string | null;
   lofts?: number;
+  /** Preferencias de unidades (property ids) — opcional */
+  propertyIds?: string[];
   extras?: BookingExtra[];
   price?: number | null;
   notes?: string;
   source?: string;
   /** Si true, status=pending; si no confirmed */
   pending?: boolean;
+  /** Walk-in PMS: llegada inmediata */
+  walkIn?: boolean;
 };
 
 export type CreateBookingResult =
@@ -73,7 +77,7 @@ function newId(): string {
 
 /**
  * Crea reserva en store local (sin Supabase).
- * Asigna la primera unidad disponible del room type.
+ * Asigna N unidades disponibles (lofts / grupo ligero).
  */
 export function createLocalBooking(input: CreateBookingInput): CreateBookingResult {
   const checkIn = input.checkIn?.trim();
@@ -82,19 +86,28 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
     return { ok: false, error: "Fechas inválidas", code: "INVALID_DATES" };
   }
   const guests = Math.max(1, Math.floor(input.guests || 1));
+  const needed = Math.max(1, Math.floor(input.lofts || 1));
   const roomTypeId = resolveRoomTypeId(input);
   const units = seedInventoryUnits();
   const intervals = listLocalOccupancy();
-  const available = findAvailableUnits({
+  /** Capacidad por unidad en grupos ligeros (no exigir todos los huéspedes en 1 loft). */
+  const guestsPerUnit = Math.max(1, Math.ceil(guests / needed));
+  let available = findAvailableUnits({
     units,
     intervals,
     checkIn,
     checkOut,
     roomTypeId,
-    guests,
+    guests: guestsPerUnit,
   });
 
-  const needed = Math.max(1, Math.floor(input.lofts || 1));
+  if (input.propertyIds?.length) {
+    const prefer = new Set(input.propertyIds);
+    const preferred = available.filter((u) => prefer.has(u.propertyId));
+    const rest = available.filter((u) => !prefer.has(u.propertyId));
+    available = [...preferred, ...rest];
+  }
+
   if (available.length < needed) {
     return {
       ok: false,
@@ -103,30 +116,40 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
     };
   }
 
-  const unit = available[0]!;
-  if (wouldDoubleBook(unit.propertyId, checkIn, checkOut, intervals, unit)) {
-    return { ok: false, error: "Double booking detectado", code: "DOUBLE_BOOKING" };
+  const assigned = available.slice(0, needed);
+  for (const unit of assigned) {
+    if (wouldDoubleBook(unit.propertyId, checkIn, checkOut, intervals, unit)) {
+      return { ok: false, error: "Double booking detectado", code: "DOUBLE_BOOKING" };
+    }
   }
 
-  const holdId = newId();
-  addLocalHold({
-    id: holdId,
-    property_id: unit.propertyId,
-    room_type_id: roomTypeId,
-    check_in: checkIn,
-    check_out: checkOut,
-    expires_at: new Date(Date.now() + 15 * 60_000).toISOString(),
-    status: "active",
-  });
+  const holdIds: string[] = [];
+  for (const unit of assigned) {
+    const holdId = newId();
+    holdIds.push(holdId);
+    addLocalHold({
+      id: holdId,
+      property_id: unit.propertyId,
+      room_type_id: roomTypeId,
+      check_in: checkIn,
+      check_out: checkOut,
+      expires_at: new Date(Date.now() + 15 * 60_000).toISOString(),
+      status: "active",
+    });
+  }
 
+  const primary = assigned[0]!;
   const code = generateReservationCode("LH");
   const now = new Date().toISOString();
+  const groupId = needed > 1 ? newId() : null;
   const reservation: LocalReservation = {
     id: newId(),
     reservation_code: code,
     organization_id: LOFTHOUSE_ORGANIZATION_ID,
-    property_id: unit.propertyId,
-    room_id: unit.roomId ?? null,
+    property_id: primary.propertyId,
+    property_ids: assigned.map((u) => u.propertyId),
+    room_id: primary.roomId ?? null,
+    room_ids: assigned.map((u) => u.roomId).filter(Boolean) as string[],
     room_type_id: roomTypeId,
     guest_name: input.guestName?.trim() || "Huésped",
     guest_phone: input.guestPhone?.trim() || "",
@@ -134,19 +157,22 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
     check_in: checkIn,
     check_out: checkOut,
     guests,
+    lofts: needed,
     price: input.price ?? null,
-    status: input.pending ? "pending" : "confirmed",
+    status: input.pending ? "pending" : input.walkIn ? "checked_in" : "confirmed",
     payment_status: "unpaid",
     extras: input.extras ?? [],
-    source: input.source ?? "lofthouse14.com",
-    channel: "direct",
+    source: input.walkIn ? "walk_in" : (input.source ?? "lofthouse14.com"),
+    channel: input.walkIn ? "walk_in" : "direct",
     notes: input.notes?.trim() || "",
+    is_walk_in: Boolean(input.walkIn),
+    group_id: groupId,
     created_at: now,
     updated_at: now,
   };
 
   upsertLocalReservation(reservation);
-  consumeLocalHold(holdId);
+  for (const hid of holdIds) consumeLocalHold(hid);
 
   const payment =
     reservation.price != null && reservation.price > 0
@@ -156,7 +182,11 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
           reservationCode: reservation.reservation_code,
           amount: reservation.price,
           provider: "stub",
-          metadata: { source: reservation.source },
+          metadata: {
+            source: reservation.source,
+            lofts: needed,
+            walk_in: Boolean(input.walkIn),
+          },
         })
       : undefined;
 
@@ -170,7 +200,7 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
     mode: "local",
     reservation,
     payment,
-    whatsappSuggested: true,
+    whatsappSuggested: !input.walkIn,
   };
 }
 

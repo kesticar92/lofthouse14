@@ -1,32 +1,38 @@
-# Post-Fases 11 — backlog real (integraciones)
+# Post-Fases 11 — backlog real (integraciones + plataforma)
 
-> Branch tip: `cursor/integraciones-backlog-f0b5`  
-> Base: `cursor/next-backlog-slice-2-f0b5` (folio, cupones, reportes, reviews, automations).  
+> Branch tip: `cursor/continuar-plataforma-f0b5`  
+> Base avanzada: `cursor/integraciones-backlog-f0b5` (Wompi, messaging, canales, LLM, e-factura, SaaS).  
 > Cómo activar providers: [`INTEGRATIONS.md`](./INTEGRATIONS.md) · Migraciones: [`MIGRATIONS.md`](./MIGRATIONS.md).
 
-## Cerrado en esta pasada (integraciones backlog)
+## Cerrado en esta pasada (continuar plataforma)
 
 | Ítem | Qué |
 |------|-----|
-| Supabase / migraciones | `docs/MIGRATIONS.md` + `npm run migrations:verify` (017–028); smoke tenant/booking local |
-| Check-in digital | Persistencia API (Supabase si hay env; else local) + notificación staff stub |
-| Payments Wompi-first | `WompiPaymentProvider` createCheckout / verifyWebhook HMAC; webhook idempotente; flujo pending→paid + folio; UI «Simular pago Wompi» |
-| WhatsApp / Email | Provider interfaces + Meta client (falla claro sin token) + mock log; automation runner cableado a templates |
-| Channel Manager | `syncAvailability` / `syncRates` stubs + job runner + sync log UI; iCal real; sin fingir OTA oficial |
-| LLM analytics | `runLlmAssistant` + POST `/api/admin/analytics`; stub con disclaimer; **sin auto-apply** |
-| E-factura CO | `EInvoicingProvider` stub DIAN; borrador desde folio; botón «Generar factura (borrador)» |
-| SaaS foundations | `module_flags` / plan seed; `/admin/saas` read-only; `ONBOARDING-SAAS.md` |
+| Guest portal endurecido | `/mi-reserva` valida código + loading/error; `/confirmacion/[code]` skeleton/reintento; pago mock guest; factura borrador; FX display stub |
+| Walk-in + grupos | `POST /api/admin/booking/walk-in`; multi-unidad (`lofts`→`property_ids`) en motor local; UI en `/admin/reservas` |
+| Larga estadía 7/14/30 | `quote()` + config `descuentoQuincenal`; umbral mensual 30; tests |
+| Inventario + compras | Stock seed, movimientos, low-stock → `local-notifications`; PO draft; UI en `/admin/inventario` |
+| Revenue recommendations | Heurísticas ocupación enriquecidas (bandas, impactHint); UI analytics |
+| i18n foundation | Diccionario ES/EN (`src/lib/i18n/dictionary.ts`) en bottom nav + CTAs guest |
+| Multimoneda | COP base + USD/EUR stub ECB-like + disclaimer; `GET /api/public/fx` |
+| E2E smoke | `npm run smoke:booking` → booking → confirmación → pay mock → fx |
 
 **Freeze respetado:** hero cards, banner, Personaliza, RESERVAR / WhatsApp, check-in, bottom nav.
 
 ---
 
-## Cerrado antes
+## Cerrado antes (integraciones backlog)
 
-| Slice | Qué |
-|-------|-----|
-| Slice 2 | Folio, cupones, reportes CSV, reviews, automations runner |
-| Slice 1 | Guest UX, check-in UI, housekeeping, channel import, payments pending, CRM |
+| Ítem | Qué |
+|------|-----|
+| Supabase / migraciones | `docs/MIGRATIONS.md` + `npm run migrations:verify` (017–028) |
+| Check-in digital | Persistencia API + notificación staff stub |
+| Payments Wompi-first | Adapter + webhook idempotente + simular admin |
+| WhatsApp / Email | Providers + automation runner |
+| Channel Manager | syncAvailability/Rates stubs + iCal |
+| LLM analytics | stub sin auto-apply |
+| E-factura CO | borrador desde folio |
+| SaaS foundations | module_flags read-only |
 
 ---
 
@@ -37,7 +43,9 @@
 3. Credenciales partner OTA (ARI push real)
 4. OpenAI (u otro LLM) para respuestas live
 5. Proveedor autorizado DIAN / e-factura
-6. Billing SaaS (suscripción) — solo foundations
+6. FX provider real (ECB / Open Exchange) — hoy stub
+7. Billing SaaS (suscripción) — solo foundations
+8. Persistencia multi-room / walk-in en Supabase (hoy local)
 
 ---
 
@@ -50,29 +58,29 @@ npm run test
 npm run typecheck   # puede fallar por deuda previa en inventarios/printables
 npm run lint
 npm run dev         # http://127.0.0.1:43127
+npm run smoke:booking
 ```
 
-Smoke:
+Smoke manual:
 
-1. Booking → `/admin/pagos` → **Simular pago Wompi** → folio paid.
-2. Check-in `/check-in/[code]` → notificación staff stub.
-3. `/admin/canales` → Sync availability / rates → logs (stub).
-4. `/admin/folio/[code]` → Generar factura (borrador).
-5. `/admin/analytics` → Preguntar (stub sin key).
-6. `/admin/saas` → module_flags read-only.
+1. Booking → `/confirmacion/LH-…` → Simular pago (mock) → check-in.
+2. `/admin/reservas` → Walk-in / grupo (2 lofts).
+3. Cotización 7/14/30 noches → descuentos.
+4. `/admin/inventario` → Stock: movimiento → low stock notify; PO draft.
+5. `/admin/analytics` → recomendaciones con banda ocupación.
+6. `GET /api/public/fx?amount_cop=410000` → disclaimer stub.
 7. Guest UX (cards / Personaliza / bottom nav) intacta.
 
 ---
 
 ## Criterios
 
-- [x] Migraciones doc + verify 017–028
-- [x] Check-in persist + staff notify stub
-- [x] Wompi adapter + webhook idempotency + UI simular
-- [x] WhatsApp/Email providers + runner
-- [x] Channel sync jobs + logs (stubs honestos)
-- [x] LLM assistant sin auto-apply
-- [x] E-invoice draft desde folio
-- [x] SaaS module_flags read-only + onboarding doc
-- [x] INTEGRATIONS.md + tests
+- [x] Guest portal + pay mock + invoice draft + loading/error
+- [x] Walk-in + multi-unidad local
+- [x] Larga estadía 7/14/30 + tests
+- [x] Stock movimientos + low stock notify + PO
+- [x] Revenue recommendations enriquecidas
+- [x] i18n ES/EN foundation
+- [x] Multimoneda stub + disclaimer
+- [x] Smoke booking script
 - [x] UX website preservada

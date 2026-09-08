@@ -48,6 +48,19 @@ export default function AdminReservasPage() {
     commission_amount: "",
   });
 
+  const [walkInForm, setWalkInForm] = useState({
+    guest_name: "",
+    guest_phone: "",
+    check_in: "",
+    check_out: "",
+    guests: "2",
+    lofts: "1",
+    category_id: "" as "" | "vista" | "atrio" | "cielo",
+    notes: "",
+    walk_in: true,
+  });
+  const [showWalkIn, setShowWalkIn] = useState(false);
+
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
 
   useEffect(() => {
@@ -303,6 +316,39 @@ export default function AdminReservasPage() {
     await pms.refresh();
   }
 
+  async function submitWalkIn(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setErr(null);
+    setMsg(null);
+    const r = await postJson<{
+      reservation?: { reservation_code?: string; lofts?: number };
+      note?: string;
+    }>("/api/admin/booking/walk-in", {
+      guest_name: walkInForm.guest_name,
+      guest_phone: walkInForm.guest_phone,
+      check_in: walkInForm.check_in || pms.viewFrom,
+      check_out: walkInForm.check_out || addDays(pms.viewFrom, 1),
+      guests: Number(walkInForm.guests) || 2,
+      lofts: Math.max(1, Number(walkInForm.lofts) || 1),
+      category_id: walkInForm.category_id || undefined,
+      notes: walkInForm.notes,
+      walk_in: walkInForm.walk_in,
+    });
+    setBusy(false);
+    if (!r.ok) {
+      setErr(r.error ?? "Error walk-in");
+      return;
+    }
+    setShowWalkIn(false);
+    const code = r.data?.reservation?.reservation_code ?? "";
+    const lofts = r.data?.reservation?.lofts ?? 1;
+    setMsg(
+      `${r.data?.note ?? "OK"} · ${code}${lofts > 1 ? ` · ${lofts} unidades` : ""}`,
+    );
+    await pms.refresh();
+  }
+
   async function submitBlock(e: React.FormEvent) {
     e.preventDefault();
     if (!blockDraft) return;
@@ -400,6 +446,40 @@ export default function AdminReservasPage() {
               onRegenerateToken={() => void regenerateToken()}
             />
           )}
+        </AdminCard>
+
+        <AdminCard
+          title="Walk-in + grupos ligeros"
+          subtitle="Motor local: walk-in (checked_in) o multi-unidad (2+ lofts)"
+          actions={
+            <button
+              type="button"
+              className="rounded-full border border-black/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider dark:border-white/10"
+              onClick={() => {
+                setWalkInForm({
+                  guest_name: "",
+                  guest_phone: "",
+                  check_in: pms.viewFrom,
+                  check_out: addDays(pms.viewFrom, 1),
+                  guests: "2",
+                  lofts: "1",
+                  category_id: "",
+                  notes: "",
+                  walk_in: true,
+                });
+                setShowWalkIn(true);
+              }}
+            >
+              Nueva walk-in / grupo
+            </button>
+          }
+        >
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+            Usa el booking engine local (anti-double-booking). Grupos ligeros
+            asignan N unidades en{" "}
+            <code className="text-[11px]">property_ids</code>. Persistencia
+            Supabase multi-room pendiente de migración.
+          </p>
         </AdminCard>
 
         <AdminCard
@@ -515,6 +595,137 @@ export default function AdminReservasPage() {
           )}
         </AdminCard>
       </div>
+
+      {showWalkIn && (
+        <Modal
+          title="Walk-in / grupo ligero"
+          onClose={() => setShowWalkIn(false)}
+        >
+          <form className="space-y-3" onSubmit={(e) => void submitWalkIn(e)}>
+            <Field label="Nombre huésped">
+              <input
+                required
+                className="w-full rounded-lg border border-black/10 px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                value={walkInForm.guest_name}
+                onChange={(e) =>
+                  setWalkInForm((f) => ({ ...f, guest_name: e.target.value }))
+                }
+              />
+            </Field>
+            <Field label="Teléfono">
+              <input
+                className="w-full rounded-lg border border-black/10 px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                value={walkInForm.guest_phone}
+                onChange={(e) =>
+                  setWalkInForm((f) => ({ ...f, guest_phone: e.target.value }))
+                }
+              />
+            </Field>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Check-in">
+                <input
+                  type="date"
+                  required
+                  className="w-full rounded-lg border border-black/10 px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                  value={walkInForm.check_in}
+                  onChange={(e) =>
+                    setWalkInForm((f) => ({ ...f, check_in: e.target.value }))
+                  }
+                />
+              </Field>
+              <Field label="Check-out">
+                <input
+                  type="date"
+                  required
+                  className="w-full rounded-lg border border-black/10 px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                  value={walkInForm.check_out}
+                  onChange={(e) =>
+                    setWalkInForm((f) => ({ ...f, check_out: e.target.value }))
+                  }
+                />
+              </Field>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Field label="Huéspedes">
+                <input
+                  type="number"
+                  min={1}
+                  className="w-full rounded-lg border border-black/10 px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                  value={walkInForm.guests}
+                  onChange={(e) =>
+                    setWalkInForm((f) => ({ ...f, guests: e.target.value }))
+                  }
+                />
+              </Field>
+              <Field label="Lofts (grupo)">
+                <input
+                  type="number"
+                  min={1}
+                  max={14}
+                  className="w-full rounded-lg border border-black/10 px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                  value={walkInForm.lofts}
+                  onChange={(e) =>
+                    setWalkInForm((f) => ({ ...f, lofts: e.target.value }))
+                  }
+                />
+              </Field>
+              <Field label="Categoría">
+                <select
+                  className="w-full rounded-lg border border-black/10 px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                  value={walkInForm.category_id}
+                  onChange={(e) =>
+                    setWalkInForm((f) => ({
+                      ...f,
+                      category_id: e.target.value as typeof f.category_id,
+                    }))
+                  }
+                >
+                  <option value="">Cualquiera</option>
+                  <option value="vista">Vista</option>
+                  <option value="atrio">Atrio</option>
+                  <option value="cielo">Cielo</option>
+                </select>
+              </Field>
+            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={walkInForm.walk_in}
+                onChange={(e) =>
+                  setWalkInForm((f) => ({ ...f, walk_in: e.target.checked }))
+                }
+              />
+              Marcar como walk-in (status checked_in)
+            </label>
+            <Field label="Notas">
+              <textarea
+                className="w-full rounded-lg border border-black/10 px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                rows={2}
+                value={walkInForm.notes}
+                onChange={(e) =>
+                  setWalkInForm((f) => ({ ...f, notes: e.target.value }))
+                }
+              />
+            </Field>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                className="rounded-full border px-4 py-2 text-xs font-semibold"
+                onClick={() => setShowWalkIn(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={busy}
+                className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-zinc-900"
+              >
+                Crear
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
 
       {showRes && (
         <Modal title="Nueva reserva" onClose={() => setShowRes(false)}>

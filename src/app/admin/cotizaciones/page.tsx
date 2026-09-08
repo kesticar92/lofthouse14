@@ -418,12 +418,17 @@ export default function CotizacionesPage() {
             onChange={(v) => handleConfigChange("aseoSemanal", v)}
           />
           <PercentField
-            label="Descuento semanal (≥7 noches)"
+            label="Descuento ≥7 noches"
             value={config.descuentoSemanal}
             onChange={(v) => handleConfigChange("descuentoSemanal", v)}
           />
           <PercentField
-            label="Descuento mensual (≥28 noches)"
+            label="Descuento ≥14 noches"
+            value={config.descuentoQuincenal ?? 0.25}
+            onChange={(v) => handleConfigChange("descuentoQuincenal", v)}
+          />
+          <PercentField
+            label="Descuento ≥30 noches"
             value={config.descuentoMensual}
             onChange={(v) => handleConfigChange("descuentoMensual", v)}
           />

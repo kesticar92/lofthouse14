@@ -20,6 +20,7 @@ export const pricingConfigSchema = z.object({
   aseoMedia: z.number().nonnegative(),
   aseoSemanal: z.number().nonnegative(),
   descuentoSemanal: z.number().min(0).max(1),
+  descuentoQuincenal: z.number().min(0).max(1).default(0.25),
   descuentoMensual: z.number().min(0).max(1),
 });
 

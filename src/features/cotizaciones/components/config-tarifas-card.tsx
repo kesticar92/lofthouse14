@@ -61,12 +61,17 @@ export function ConfigTarifasCard({
           onChange={(v) => onChange("aseoSemanal", v)}
         />
         <PercentField
-          label="Descuento semanal (≥7 noches)"
+          label="Descuento ≥7 noches"
           value={config.descuentoSemanal}
           onChange={(v) => onChange("descuentoSemanal", v)}
         />
         <PercentField
-          label="Descuento mensual (≥28 noches)"
+          label="Descuento ≥14 noches"
+          value={config.descuentoQuincenal ?? 0.25}
+          onChange={(v) => onChange("descuentoQuincenal", v)}
+        />
+        <PercentField
+          label="Descuento ≥30 noches"
           value={config.descuentoMensual}
           onChange={(v) => onChange("descuentoMensual", v)}
         />

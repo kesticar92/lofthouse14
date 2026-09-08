@@ -24,8 +24,28 @@ const base: PmsMetrics = {
 describe("analytics stubs", () => {
   it("recomienda sin auto-apply", () => {
     const recs = buildRevenueRecommendations(base);
-    expect(recs.some((r) => r.id === "occ-low")).toBe(true);
+    expect(recs.some((r) => r.id === "occ-critical-low" || r.id === "occ-low")).toBe(
+      true,
+    );
     expect(recs.every((r) => r.autoApply === false)).toBe(true);
+  });
+
+  it("enriquece banda alta y mid", () => {
+    const high = buildRevenueRecommendations({
+      ...base,
+      occupancyRate: 0.9,
+      roomNightsSold: 88,
+    });
+    expect(high.some((r) => r.id === "occ-high")).toBe(true);
+    expect(high.every((r) => r.autoApply === false)).toBe(true);
+
+    const mid = buildRevenueRecommendations({
+      ...base,
+      occupancyRate: 0.55,
+      roomNightsSold: 54,
+      arrivals: 8,
+    });
+    expect(mid.some((r) => r.id === "mid-band-lengthen")).toBe(true);
   });
 
   it("exporta CSV", () => {

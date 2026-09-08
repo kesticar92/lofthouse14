@@ -16,6 +16,10 @@ export function parseCotizacionesPricing(raw: unknown): PricingConfig {
       o.descuentoSemanal,
       DEFAULT_PRICING.descuentoSemanal,
     ),
+    descuentoQuincenal: ratio(
+      o.descuentoQuincenal,
+      DEFAULT_PRICING.descuentoQuincenal,
+    ),
     descuentoMensual: ratio(
       o.descuentoMensual,
       DEFAULT_PRICING.descuentoMensual,

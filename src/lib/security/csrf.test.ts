@@ -73,6 +73,14 @@ describe("csrf Origin/Referer", () => {
     expect(checkCsrfOrigin(req).ok).toBe(false);
   });
 
+  it("permite trycloudflare preview tunnels", () => {
+    const req = new Request("http://127.0.0.1:43127/api/public/booking", {
+      method: "POST",
+      headers: { Origin: "https://abc-def.trycloudflare.com" },
+    });
+    expect(checkCsrfOrigin(req).ok).toBe(true);
+  });
+
   it("incluye localhost en defaults", () => {
     const origins = csrfAllowedOrigins();
     expect(origins.some((o) => o.includes("127.0.0.1"))).toBe(true);

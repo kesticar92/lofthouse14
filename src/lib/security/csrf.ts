@@ -44,7 +44,17 @@ export function csrfAllowedOrigins(): string[] {
 
 function originAllowed(candidate: string, allowed: string[]): boolean {
   const c = candidate.replace(/\/$/, "").toLowerCase();
-  return allowed.some((a) => a.replace(/\/$/, "").toLowerCase() === c);
+  if (allowed.some((a) => a.replace(/\/$/, "").toLowerCase() === c)) {
+    return true;
+  }
+  // Quick tunnels de Cloudflare (preview cloud agent)
+  try {
+    const host = new URL(c).hostname;
+    if (host.endsWith(".trycloudflare.com")) return true;
+  } catch {
+    /* ignore */
+  }
+  return false;
 }
 
 export type CsrfCheckResult =

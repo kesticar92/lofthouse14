@@ -1,4 +1,11 @@
-export type ReservationStatus = "confirmed" | "blocked" | "cancelled";
+export type ReservationStatus =
+  | "pending"
+  | "confirmed"
+  | "blocked"
+  | "cancelled"
+  | "checked_in"
+  | "checked_out"
+  | "no_show";
 
 export type ReservationSource =
   | "airbnb"

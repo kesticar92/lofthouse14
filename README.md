@@ -16,16 +16,17 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000). El panel admin está en `/admin`.
+Abre [http://localhost:43127](http://localhost:43127) (dev). El panel admin está en `/admin`.
 
 ## Scripts
 
 | Comando                | Descripción               |
 | ---------------------- | ------------------------- |
-| `npm run dev`          | Servidor de desarrollo    |
+| `npm run dev`          | Servidor de desarrollo (:43127) |
 | `npm run build`        | Compilación de producción |
 | `npm run start`        | Sirve el build            |
 | `npm run lint`         | ESLint (Next)             |
+| `npm run typecheck`    | TypeScript                |
 | `npm run test`         | Vitest (tests unitarios)  |
 | `npm run format`       | Formatea con Prettier     |
 | `npm run format:check` | Comprueba formato (CI)    |
@@ -36,20 +37,22 @@ Copia `.env.example` a `.env.local`. Las claves públicas del sitio usan el pref
 
 Guías:
 
-- Arquitectura multi-tenant (Fase 0–1): [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/FASE1.md`](docs/FASE1.md).
-- Credenciales **Supabase** y **Sentry**: [`docs/credenciales-supabase-sentry.md`](docs/credenciales-supabase-sentry.md).
-- **Sentry MCP** en Cursor: [`docs/mcp-sentry-cursor.md`](docs/mcp-sentry-cursor.md).
+- Arquitectura multi-tenant (Fase 0–11): [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- Fases 3–11 (availability → SaaS stubs): [`docs/FASES-3-11.md`](docs/FASES-3-11.md)
+- API / Security / Deployment / Testing: [`docs/API.md`](docs/API.md), [`docs/SECURITY.md`](docs/SECURITY.md), [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md), [`docs/TESTING.md`](docs/TESTING.md)
+- Credenciales **Supabase** y **Sentry**: [`docs/credenciales-supabase-sentry.md`](docs/credenciales-supabase-sentry.md)
+- **Sentry MCP** en Cursor: [`docs/mcp-sentry-cursor.md`](docs/mcp-sentry-cursor.md)
 
 ### Panel `/admin` (Supabase Auth)
 
 - `NEXT_PUBLIC_SUPABASE_URL` y clave pública: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 - La sesión es la de **Supabase Auth** (cookies gestionadas con `@supabase/ssr`); el **middleware** refresca la sesión y exige rol `staff`, `admin` o `super_admin` en la tabla `public.profiles`.
-- Multi-tenant (Fase 1): membership en `org_members`; migraciones `017`–`019` en [`supabase/migrations/`](supabase/migrations/). Detalle en [`docs/FASE1.md`](docs/FASE1.md).
+- Multi-tenant: membership en `org_members`; migraciones `017`–`028` en [`supabase/migrations/`](supabase/migrations/). Sin migrar, catálogo/booking/admin caen a **seed/local mock** (evaluable).
 
 **Primera vez en Supabase**
 
 1. En **Authentication → Providers**, activa **Email** y crea usuarios del staff (o habilita registro solo si lo controlas).
-2. En **SQL Editor**, ejecuta las migraciones en orden bajo [`supabase/migrations/`](supabase/migrations/) (empezando por [`001_profiles_audit.sql`](supabase/migrations/001_profiles_audit.sql); Fase 1: `017`–`019`).
+2. En **SQL Editor**, ejecuta las migraciones en orden bajo [`supabase/migrations/`](supabase/migrations/) (empezando por [`001_profiles_audit.sql`](supabase/migrations/001_profiles_audit.sql); multi-tenant `017`–`020`; plataforma `021`–`028`).
 3. Crea el usuario en **Authentication → Users**, luego en **SQL Editor** ejecuta [`supabase/snippets/promote_super_admin.sql`](supabase/snippets/promote_super_admin.sql) (cambia el correo y pulsa **Run**). Alternativa rápida:
 
    ```sql
@@ -60,7 +63,7 @@ Guías:
 
 Tras promover, la migración `017` (o un re-run del backfill de memberships) asocia el usuario a la org **LOFTHOUSE**.
 
-Los módulos operativos usan tablas Supabase + APIs; algunos flujos aún tienen banners de migración desde localStorage.
+Los módulos operativos usan tablas Supabase + APIs; algunos flujos aún tienen banners de migración desde localStorage. Booking público: wizard → motor de reservas + WhatsApp coexistente (`/confirmacion`, `/mi-reserva`).
 
 ### Modelo de amenaza (resumen)
 

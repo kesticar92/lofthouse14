@@ -96,7 +96,17 @@ export async function POST(req: Request) {
   }
   const source = normalizeReservationSource(body.source);
   const status = (body.status ?? "confirmed").trim() || "confirmed";
-  if (!["confirmed", "blocked", "cancelled"].includes(status)) {
+  if (
+    ![
+      "pending",
+      "confirmed",
+      "blocked",
+      "cancelled",
+      "checked_in",
+      "checked_out",
+      "no_show",
+    ].includes(status)
+  ) {
     return Response.json({ error: "status inválido" }, { status: 400 });
   }
 

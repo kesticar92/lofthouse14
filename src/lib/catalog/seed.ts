@@ -13,7 +13,12 @@ import {
 
 export type MarketingCategory = "vista" | "atrio" | "cielo";
 
-export type RoomStatus = "active" | "inactive" | "maintenance" | "storage";
+export type RoomStatus =
+  | "active"
+  | "inactive"
+  | "maintenance"
+  | "storage"
+  | "out_of_service";
 
 export type CatalogRoomTypeSeed = {
   id: string;

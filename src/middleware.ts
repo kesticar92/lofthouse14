@@ -2,9 +2,23 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isStaffRole, supabasePublicEnv } from "@/lib/supabase/env";
+import {
+  allowAdminApiRequest,
+  adminApiClientKey,
+} from "@/lib/admin-rate-limit";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith("/api/admin")) {
+    if (!allowAdminApiRequest(adminApiClientKey(request))) {
+      return NextResponse.json(
+        { error: "Too many requests", code: "RATE_LIMIT" },
+        { status: 429 },
+      );
+    }
+  }
+
   const { url, key, ok } = supabasePublicEnv();
 
   if (!ok) {

@@ -11,6 +11,10 @@ export const ADMIN_MODULE_KEYS = [
   "gastos",
   "aseos",
   "catalogo",
+  "canales",
+  "crm",
+  "pagos",
+  "analytics",
   "usuarios",
 ] as const;
 
@@ -24,6 +28,10 @@ export const ADMIN_MODULE_LABELS = {
   gastos: "Gastos",
   aseos: "Aseos del día",
   catalogo: "Catálogo",
+  canales: "Canales",
+  crm: "CRM",
+  pagos: "Pagos",
+  analytics: "Analytics",
   usuarios: "Usuarios",
 } as const satisfies Record<AdminModuleKey, string>;
 
@@ -62,6 +70,10 @@ export const ADMIN_MODULE_PATHS = {
   gastos: "/admin/gastos",
   aseos: "/admin/aseos",
   catalogo: "/admin/catalogo",
+  canales: "/admin/canales",
+  crm: "/admin/crm",
+  pagos: "/admin/pagos",
+  analytics: "/admin/analytics",
   usuarios: "/admin/usuarios",
 } as const satisfies Record<AdminModuleKey, string>;
 
@@ -77,6 +89,9 @@ export function isAdminOnlyAdminPath(pathname: string): boolean {
 /** Módulo requerido para una ruta `/admin/...`, o `null` si no aplica (p. ej. `/admin`). */
 export function adminModuleForPath(pathname: string): AdminModuleKey | null {
   const p = pathname.replace(/\/$/, "") || "/";
+  if (p === "/admin/mantenimiento" || p.startsWith("/admin/mantenimiento/")) {
+    return "aseos";
+  }
   for (const key of ADMIN_MODULE_KEYS) {
     const base = ADMIN_MODULE_PATHS[key];
     if (p === base || p.startsWith(`${base}/`)) return key;

@@ -63,6 +63,8 @@ export function GuidedReservation() {
       pickup: true,
       dropoff: true,
     });
+  const [bookingBusy, setBookingBusy] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
 
@@ -246,7 +248,7 @@ export function GuidedReservation() {
     }));
   }
 
-  function handleWhatsApp() {
+  function buildWhatsAppLines(reservationCode?: string) {
     const extraLines = CONFIGURATOR_EXTRAS.filter((e) =>
       extras.includes(e.id),
     ).map((e) => {
@@ -274,9 +276,10 @@ export function GuidedReservation() {
     });
 
     const categoryMeta = categoryId ? getLoftCategory(categoryId) : null;
-    const lines = [
+    return [
       `Hola ${site.name}, quiero reservar:`,
       name.trim() ? `Nombre: ${name.trim()}` : "",
+      reservationCode ? `Código reserva: ${reservationCode}` : "",
       profileMeta ? `Tipo de viaje: ${profileMeta.title}` : "",
       categoryMeta
         ? `Preferencia: ${categoryMeta.name} (${categoryMeta.tagline})`
@@ -293,8 +296,81 @@ export function GuidedReservation() {
       "",
       "Confirmo que la tarifa final y descuentos de grupo o larga estadía se cierran por WhatsApp.",
     ].filter(Boolean);
+  }
 
-    window.open(waLink(lines.join("\n")), "_blank", "noopener");
+  /**
+   * Fase 4: crea reserva en motor (DB o mock local) y abre WhatsApp
+   * como canal de confirmación coexistente.
+   */
+  async function handleReservar() {
+    if (!quoteResult.ok || bookingBusy) return;
+    setBookingBusy(true);
+    setBookingError(null);
+
+    const extrasPayload = CONFIGURATOR_EXTRAS.filter((e) =>
+      extras.includes(e.id),
+    ).map((e) => ({
+      id: e.id,
+      label: e.label,
+      amountCop:
+        e.interestOnly || e.priceCop <= 0
+          ? 0
+          : extraLineTotalCop(e, {
+              mealQty:
+                e.id === "breakfast" || e.id === "lunch"
+                  ? mealQuantities[e.id]
+                  : undefined,
+              airport: e.id === "airport-transfer" ? airportTransfer : undefined,
+            }),
+    }));
+
+    let reservationCode: string | undefined;
+    try {
+      const res = await fetch("/api/public/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          check_in: checkIn,
+          check_out: checkOut,
+          guests,
+          lofts,
+          guest_name: name.trim() || "Huésped web",
+          category_id: categoryId ?? undefined,
+          extras: extrasPayload,
+          also_whatsapp: true,
+        }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        reservation_code?: string;
+        error?: string;
+        mode?: string;
+      };
+      if (!res.ok || !data.ok) {
+        setBookingError(
+          data.error ??
+            "No se pudo crear la reserva (disponibilidad). Puedes continuar por WhatsApp.",
+        );
+      } else {
+        reservationCode = data.reservation_code;
+        if (reservationCode) {
+          window.location.href = `/confirmacion/${encodeURIComponent(reservationCode)}?wa=1`;
+          return;
+        }
+      }
+    } catch {
+      setBookingError(
+        "Motor de reservas no disponible — abriendo WhatsApp (fallback).",
+      );
+    } finally {
+      setBookingBusy(false);
+    }
+
+    window.open(
+      waLink(buildWhatsAppLines(reservationCode).join("\n")),
+      "_blank",
+      "noopener",
+    );
   }
 
   return (
@@ -855,22 +931,33 @@ export function GuidedReservation() {
                   <ChevronRight className="size-4" aria-hidden />
                 </button>
               ) : (
-                <button
-                  type="button"
-                  disabled={!quoteResult.ok}
-                  onClick={handleWhatsApp}
-                  className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
-                >
-                  <Image
-                    src="/logos/whatsapp.svg"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="size-5"
-                    aria-hidden
-                  />
-                  Reservar por WhatsApp
-                </button>
+                <div className="flex flex-col items-end gap-2">
+                  {bookingError ? (
+                    <p className="max-w-xs text-right text-xs text-amber-800 dark:text-amber-300">
+                      {bookingError}
+                    </p>
+                  ) : null}
+                  <button
+                    type="button"
+                    disabled={!quoteResult.ok || bookingBusy}
+                    onClick={() => void handleReservar()}
+                    className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                  >
+                    <Image
+                      src="/logos/whatsapp.svg"
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="size-5"
+                      aria-hidden
+                    />
+                    {bookingBusy ? "Creando reserva…" : "RESERVAR"}
+                  </button>
+                  <p className="max-w-xs text-right text-[11px] text-zinc-500">
+                    Crea la reserva en el motor y abre WhatsApp para confirmar
+                    (pueden coexistir).
+                  </p>
+                </div>
               )}
             </div>
           </div>

@@ -137,6 +137,89 @@ export const ADMIN_NAV: NavItem[] = [
     ),
     desc: "Property, tipos Vista/Atrio/Cielo y rooms",
   },
+  {
+    href: "/admin/canales",
+    label: "Canales",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M4 12h4l3-8 4 16 3-8h4" />
+      </svg>
+    ),
+    desc: "Channel manager stubs + simulador",
+  },
+  {
+    href: "/admin/crm",
+    label: "CRM",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <circle cx="9" cy="8" r="3" />
+        <path d="M3 19c0-3 2.5-5 6-5s6 2 6 5" />
+        <path d="M16 11h5M18.5 8.5v5" />
+      </svg>
+    ),
+    desc: "Huéspedes, templates y automations",
+  },
+  {
+    href: "/admin/pagos",
+    label: "Pagos",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <rect x="3" y="6" width="18" height="12" rx="2" />
+        <path d="M3 10h18" />
+      </svg>
+    ),
+    desc: "Pasarelas stub (Wompi/MP/Stripe/PayU)",
+  },
+  {
+    href: "/admin/analytics",
+    label: "Analytics",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M4 19V5M8 19v-6M12 19V9M16 19v-3M20 19V7" />
+      </svg>
+    ),
+    desc: "Reportes, revenue tips y AI stub",
+  },
+  {
+    href: "/admin/mantenimiento",
+    label: "Mantenimiento",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-1.9-1.9 2-2.1z" />
+      </svg>
+    ),
+    desc: "Tickets y OUT_OF_SERVICE",
+  },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

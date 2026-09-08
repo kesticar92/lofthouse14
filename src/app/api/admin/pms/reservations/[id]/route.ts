@@ -67,7 +67,16 @@ export async function PATCH(
   const nextStatus =
     body.status !== undefined ? body.status.trim() : cur.status;
 
-  if (!["confirmed", "blocked", "cancelled"].includes(nextStatus)) {
+  const ALLOWED_STATUS = [
+    "pending",
+    "confirmed",
+    "blocked",
+    "cancelled",
+    "checked_in",
+    "checked_out",
+    "no_show",
+  ];
+  if (!ALLOWED_STATUS.includes(nextStatus)) {
     return Response.json({ error: "status inválido" }, { status: 400 });
   }
 

@@ -3,6 +3,7 @@
 > **Fase 0 — Auditoría (documentación).** Completada.  
 > **Fase 1 — Foundations multi-tenant:** implementada en branch `cursor/fase1-foundations-multitenant-f0b5`. Detalle: [`docs/FASE1.md`](./FASE1.md).  
 > **Fase 2 — Catálogo RoomType/Room:** implementada en branch `cursor/fase2-catalogo-pms-f0b5`. Detalle: [`docs/FASE2.md`](./FASE2.md).  
+> **Fases 3–11 — Plataforma (availability → SaaS stubs):** implementadas en branch `cursor/fase3-a-11-plataforma-f0b5`. Detalle: [`docs/FASES-3-11.md`](./FASES-3-11.md).  
 > Fecha auditoría: 2026-09-07 · Branch Fase 0: `cursor/fase0-auditoria-arquitectura-f0b5`  
 > Este documento **reutiliza** el avance existente (website, hero cards Vista/Atrio/Cielo, banner de fechas, Personaliza tu experiencia, booking wizard, admin, pricing, PMS parcial). **No** justifica reescribir ni borrar ese trabajo.
 
@@ -106,7 +107,7 @@ Migraciones en `supabase/migrations/` (001–016). Tablas principales:
 | `inventario_*` | Inventario + revisiones + fotos |
 | `guest_reviews` | Reseñas scrapadas (migración 016 + org opcional) |
 
-Migraciones: `001`–`016` legacy + **`017`–`019` Fase 1** + **`020` Fase 2**. Ver [`docs/FASE1.md`](./FASE1.md) y [`docs/FASE2.md`](./FASE2.md).
+Migraciones: `001`–`016` legacy + **`017`–`019` Fase 1** + **`020` Fase 2** + **`021`–`028` Fases 3–11**. Ver [`docs/FASE1.md`](./FASE1.md), [`docs/FASE2.md`](./FASE2.md), [`docs/FASES-3-11.md`](./FASES-3-11.md).
 
 **Nota:** `properties` sigue siendo el inventario PMS por loft; el edificio canónico es `org_properties`. Fase 2 añadió bridge bidireccional (`rooms.legacy_property_id` ↔ `properties.room_id`) sin rename destructivo.
 
@@ -127,13 +128,13 @@ Migraciones: `001`–`016` legacy + **`017`–`019` Fase 1** + **`020` Fase 2**.
 | Cotizaciones staff | **Existe** |
 | Reseñas sync | **Parcial** |
 | Multi-tenant Organization→Property→RoomType→Room | **Parcial** (Fase 1–2: schema + admin catálogo; PMS aún dual-read) |
-| Booking engine con hold/confirmación en DB | **No existe** |
-| Pagos (pasarela / depositos) | **No existe** |
-| Channel manager (Booking/Expedia API, mapping, ARI) | **No existe** |
-| CRM huéspedes / lifecycle | **No existe** |
-| Rate plans / seasons / yield | **No** (tarifas planas L-J / V-D) |
+| Booking engine con hold/confirmación en DB | **Parcial** (Fase 4: API + local fallback; DB con 021–022) |
+| Pagos (pasarela / depositos) | **Stub** (Fase 10 adapters) |
+| Channel manager (Booking/Expedia API, mapping, ARI) | **Stub** (Fase 7; iCal sigue vivo) |
+| CRM huéspedes / lifecycle | **Parcial** (Fase 9 profiles + templates) |
+| Rate plans / seasons / yield | **Parcial** (Fase 5 rate_plans + motor unificado) |
 | Folio / facturación electrónica | **No existe** |
-| App huésped / portal | **No existe** |
+| App huésped / portal | **Mínimo** (`/confirmacion`, `/mi-reserva`) |
 
 ---
 
@@ -361,7 +362,7 @@ Cada fase debe: migraciones SQL + tipos regenerados + tests de dominio + **no** 
 
 > Detalle operativo, migraciones y cómo probar: [`docs/FASE1.md`](./FASE1.md).  
 > **Fase 2 (catálogo) implementada** — ver [`docs/FASE2.md`](./FASE2.md).  
-> **Fase 3 (disponibilidad unificada) pendiente de OK.**
+> **Fases 3–11 implementadas** — ver [`docs/FASES-3-11.md`](./FASES-3-11.md).
 
 ### Qué se tocó
 
@@ -428,6 +429,8 @@ Website hero/wizard; rename destructivo de `properties`; booking engine; pagos; 
 - Inventario Fase 0: [`docs/FASE0-AUDIT.md`](./FASE0-AUDIT.md)
 - Fase 1 foundations: [`docs/FASE1.md`](./FASE1.md)
 - Fase 2 catálogo: [`docs/FASE2.md`](./FASE2.md)
+- Fases 3–11 plataforma: [`docs/FASES-3-11.md`](./FASES-3-11.md)
+- API / Security / Deployment / Testing: [`docs/API.md`](./API.md), [`docs/SECURITY.md`](./SECURITY.md), [`docs/DEPLOYMENT.md`](./DEPLOYMENT.md), [`docs/TESTING.md`](./TESTING.md)
 - Deploy: [`docs/DEPLOY.md`](./DEPLOY.md)
 - SEO cumplimiento: [`docs/AUDITORIA-CUMPLIMIENTO.md`](./AUDITORIA-CUMPLIMIENTO.md)
 - Env: [`.env.example`](../.env.example)

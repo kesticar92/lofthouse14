@@ -11,6 +11,7 @@ import { KEYS, safeGet, exportAll, importAllFromFile } from "@/lib/storage";
 import type { CotizacionGuardada } from "@/lib/cotizaciones-store";
 import type { AseoGuardado } from "@/lib/aseos-store";
 import type { InventarioGuardado } from "@/lib/inventarios-store";
+import { formatCOP } from "@/lib/pricing";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -23,6 +24,14 @@ export default function AdminHomePage() {
     aseosHoy: 0,
     aseosHoyPendientes: 0,
   });
+  const [metrics, setMetrics] = useState<{
+    occupancyRate?: number;
+    adr?: number;
+    revpar?: number;
+    arrivals?: number;
+    departures?: number;
+    inHouse?: number;
+  } | null>(null);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -42,6 +51,12 @@ export default function AdminHomePage() {
 
   useEffect(() => {
     recalc();
+    void fetch("/api/admin/pms/metrics")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.metrics) setMetrics(d.metrics);
+      })
+      .catch(() => null);
   }, []);
 
   function handleExport() {
@@ -80,6 +95,21 @@ export default function AdminHomePage() {
           cotiza, revisa el inventario y registra los aseos del día.
         </p>
       </div>
+
+      {metrics ? (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            label="Ocupación"
+            value={`${((metrics.occupancyRate ?? 0) * 100).toFixed(0)}%`}
+          />
+          <StatCard label="ADR" value={formatCOP(metrics.adr ?? 0)} />
+          <StatCard label="RevPAR" value={formatCOP(metrics.revpar ?? 0)} />
+          <StatCard
+            label="In-house / Arrivals"
+            value={`${metrics.inHouse ?? 0} / ${metrics.arrivals ?? 0}`}
+          />
+        </div>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Cotizaciones guardadas" value={stats.cotizaciones} />
@@ -176,7 +206,7 @@ function StatCard({
   highlight,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   highlight?: boolean;
 }) {
   return (

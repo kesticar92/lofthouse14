@@ -83,11 +83,19 @@ export default function AdminCrmPage() {
 
   return (
     <AdminShell>
-      <div>
-        <h1 className="font-display text-3xl tracking-wide">CRM</h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          Perfiles, templates con variables y automations stub.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl tracking-wide">CRM</h1>
+          <p className="mt-1 text-sm text-zinc-600">
+            Perfiles, templates con variables y automations stub.
+          </p>
+        </div>
+        <Link
+          href="/admin/reviews"
+          className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
+        >
+          Reviews centralizados
+        </Link>
       </div>
       <AdminCard title="Huéspedes" subtitle="Historial / fichas">
         <AdminAsyncState
@@ -148,7 +156,7 @@ export default function AdminCrmPage() {
           </ul>
         </AdminAsyncState>
       </AdminCard>
-      <AdminCard title="Automations" subtitle="Event stubs">
+      <AdminCard title="Automations" subtitle="Runner local (log + notification)">
         <button
           type="button"
           onClick={() => void fireAutomation()}
@@ -156,6 +164,10 @@ export default function AdminCrmPage() {
         >
           Disparar stub booking_confirmed
         </button>
+        <p className="mt-2 text-xs text-zinc-500">
+          También se dispara al crear reserva / checkout / pago en folio. Ver{" "}
+          <code className="font-mono">GET /api/admin/crm/automations</code>.
+        </p>
       </AdminCard>
     </AdminShell>
   );

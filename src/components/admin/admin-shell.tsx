@@ -189,6 +189,41 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Pasarelas stub (Wompi/MP/Stripe/PayU)",
   },
   {
+    href: "/admin/folio",
+    label: "Folios",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M6 4h9l3 3v13H6z" />
+        <path d="M14 4v4h4M8 12h8M8 16h6" />
+      </svg>
+    ),
+    desc: "Cuenta huésped: cargos, pagos, saldo",
+  },
+  {
+    href: "/admin/promociones",
+    label: "Promociones",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M4 9h16v10H4z" />
+        <path d="M8 9V7a4 4 0 0 1 8 0v2" />
+        <path d="M9 14h6" />
+      </svg>
+    ),
+    desc: "Cupones seed + CRUD local",
+  },
+  {
     href: "/admin/analytics",
     label: "Analytics",
     icon: (
@@ -203,6 +238,39 @@ export const ADMIN_NAV: NavItem[] = [
       </svg>
     ),
     desc: "Reportes, revenue tips y AI stub",
+  },
+  {
+    href: "/admin/reportes",
+    label: "Reportes",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="M5 4h10l4 4v12H5z" />
+        <path d="M14 4v5h5M8 13h8M8 17h5" />
+      </svg>
+    ),
+    desc: "Ocupación / revenue / canal CSV",
+  },
+  {
+    href: "/admin/reviews",
+    label: "Reviews",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <path d="m12 3 2.2 4.5 5 .7-3.6 3.5.9 5L12 14.8 7.5 16.7l.9-5L4.8 8.2l5-.7L12 3z" />
+      </svg>
+    ),
+    desc: "Reseñas + sentiment stub",
   },
   {
     href: "/admin/mantenimiento",

@@ -15,8 +15,10 @@ import {
 import { ROOM_TYPE_IDS } from "@/lib/catalog/seed";
 import { LOFTHOUSE_ORGANIZATION_ID } from "@/lib/tenant/constants";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
-import { stubAutomationEvent } from "@/lib/crm/templates";
+import { runAutomation } from "@/lib/crm/automation-runner";
 import { unifiedQuote, SEED_RATE_PLANS } from "@/lib/pricing/unified";
+import { validateCoupon } from "@/lib/promotions/coupons";
+import { ensureFolioForReservation } from "@/lib/folio/store";
 
 const bodySchema = z.object({
   check_in: z.string().min(8),
@@ -38,6 +40,7 @@ const bodySchema = z.object({
     .optional(),
   notes: z.string().max(2000).optional(),
   pending: z.boolean().optional(),
+  coupon_code: z.string().max(40).optional(),
   /** Si true, también sugiere abrir WhatsApp (coexistencia) */
   also_whatsapp: z.boolean().optional(),
 });
@@ -70,7 +73,33 @@ export async function POST(req: Request) {
     categoryId: body.category_id,
     publicMode: true,
   });
-  const price = quoteResult.ok ? quoteResult.totalReserva : null;
+  let price = quoteResult.ok ? quoteResult.totalReserva : null;
+  let couponApplied: {
+    code: string;
+    discount: number;
+    total_after: number;
+  } | null = null;
+  if (price != null && body.coupon_code?.trim()) {
+    const nights = quoteResult.ok ? quoteResult.noches : undefined;
+    const extrasSum = (body.extras ?? []).reduce(
+      (s, e) => s + Math.round(e.amountCop ?? 0),
+      0,
+    );
+    const subtotal = price + extrasSum;
+    const validated = validateCoupon({
+      code: body.coupon_code,
+      subtotal,
+      nights,
+    });
+    if (validated.ok) {
+      couponApplied = {
+        code: validated.coupon.code,
+        discount: validated.discount,
+        total_after: validated.total_after,
+      };
+      price = Math.max(0, validated.total_after);
+    }
+  }
 
   // Prefer Supabase si está disponible
   try {
@@ -202,9 +231,15 @@ export async function POST(req: Request) {
         throw new Error(error.message);
       }
 
-      const automation = stubAutomationEvent("booking_created", {
-        reservation_code: code,
-        guest_name: body.guest_name,
+      const automation = runAutomation({
+        eventType: "booking_created",
+        payload: {
+          reservation_code: code,
+          guest_name: body.guest_name,
+          check_in: body.check_in,
+          check_out: body.check_out,
+          total: price ?? "",
+        },
       });
 
       return Response.json({
@@ -213,6 +248,7 @@ export async function POST(req: Request) {
         reservation: data,
         reservation_code: code,
         quote: quoteResult.ok ? quoteResult : null,
+        coupon: couponApplied,
         whatsapp_suggested: body.also_whatsapp !== false,
         automation,
       });
@@ -244,6 +280,18 @@ export async function POST(req: Request) {
     );
   }
 
+  ensureFolioForReservation(local.reservation);
+  const automation = runAutomation({
+    eventType: "booking_created",
+    payload: {
+      reservation_code: local.reservation.reservation_code,
+      guest_name: local.reservation.guest_name,
+      check_in: local.reservation.check_in,
+      check_out: local.reservation.check_out,
+      total: local.reservation.price ?? "",
+    },
+  });
+
   return Response.json({
     ok: true,
     mode: local.mode,
@@ -255,10 +303,9 @@ export async function POST(req: Request) {
     reservation_code: local.reservation.reservation_code,
     payment: local.payment ?? null,
     quote: quoteResult.ok ? quoteResult : null,
+    coupon: couponApplied,
     whatsapp_suggested: body.also_whatsapp !== false,
-    automation: stubAutomationEvent("booking_created", {
-      reservation_code: local.reservation.reservation_code,
-    }),
+    automation,
   });
 }
 

@@ -65,6 +65,9 @@ export function GuidedReservation() {
     });
   const [bookingBusy, setBookingBusy] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponMsg, setCouponMsg] = useState<string | null>(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
 
@@ -169,10 +172,49 @@ export function GuidedReservation() {
   }, [mealDaysDefault, mealDaysMin, guests, checkIn, checkOut]);
 
   const extrasCop = extrasTotalCop(extras, mealQuantities, airportTransfer);
-  const grandTotal =
+  const subtotalBeforeCoupon =
     quoteResult.ok && quoteResult.totalReserva > 0
       ? quoteResult.totalReserva + extrasCop
       : null;
+  const grandTotal =
+    subtotalBeforeCoupon != null
+      ? Math.max(0, subtotalBeforeCoupon - couponDiscount)
+      : null;
+
+  async function applyCoupon() {
+    if (!subtotalBeforeCoupon || !couponCode.trim()) {
+      setCouponMsg(null);
+      setCouponDiscount(0);
+      return;
+    }
+    try {
+      const res = await fetch("/api/public/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponCode.trim(),
+          subtotal: subtotalBeforeCoupon,
+          nights: quoteResult.ok ? quoteResult.noches : undefined,
+        }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        discount?: number;
+        message?: string;
+        error?: string;
+      };
+      if (!res.ok || !data.ok) {
+        setCouponDiscount(0);
+        setCouponMsg(data.error ?? "Cupón no válido");
+        return;
+      }
+      setCouponDiscount(data.discount ?? 0);
+      setCouponMsg(data.message ?? "Cupón aplicado");
+    } catch {
+      setCouponDiscount(0);
+      setCouponMsg("No se pudo validar el cupón");
+    }
+  }
 
   function toggleExtra(id: string) {
     setExtras((prev) => {
@@ -290,6 +332,9 @@ export function GuidedReservation() {
       grandTotal !== null
         ? `\nTotal estimado (web): ${formatCOP(grandTotal)}`
         : "",
+      couponDiscount > 0 && couponCode
+        ? `Cupón ${couponCode.trim().toUpperCase()}: −${formatCOP(couponDiscount)}`
+        : "",
       quoteResult.ok
         ? `(Alojamiento+aseo: ${formatCOP(quoteResult.totalReserva)}${extrasCop ? ` + extras ${formatCOP(extrasCop)}` : ""})`
         : "",
@@ -367,6 +412,7 @@ export function GuidedReservation() {
           guest_name: name.trim() || "Huésped web",
           category_id: categoryId ?? undefined,
           extras: extrasPayload,
+          coupon_code: couponCode.trim() || undefined,
           also_whatsapp: true,
         }),
       });
@@ -902,6 +948,34 @@ export function GuidedReservation() {
                       <p className="font-display text-3xl text-zinc-900 dark:text-white">
                         {formatCOP(grandTotal ?? quoteResult.totalReserva)}
                       </p>
+                      {couponDiscount > 0 ? (
+                        <p className="mt-1 text-xs text-emerald-800 dark:text-emerald-300">
+                          Cupón −{formatCOP(couponDiscount)}
+                        </p>
+                      ) : null}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <input
+                          type="text"
+                          value={couponCode}
+                          onChange={(e) => {
+                            setCouponCode(e.target.value.toUpperCase());
+                            setCouponDiscount(0);
+                            setCouponMsg(null);
+                          }}
+                          placeholder="Cupón (opcional)"
+                          className="min-w-[140px] flex-1 rounded-xl border border-zinc-300 px-3 py-2 font-mono text-sm dark:border-zinc-600 dark:bg-zinc-950"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => void applyCoupon()}
+                          className="rounded-full border border-zinc-400 px-3 py-2 text-xs font-semibold"
+                        >
+                          Aplicar
+                        </button>
+                      </div>
+                      {couponMsg ? (
+                        <p className="mt-1 text-xs text-zinc-500">{couponMsg}</p>
+                      ) : null}
                       <ul className="mt-2 list-inside list-disc text-xs text-zinc-500">
                         {quoteResult.disclaimers.map((d) => (
                           <li key={d}>{d}</li>

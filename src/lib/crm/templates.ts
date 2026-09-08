@@ -65,4 +65,18 @@ export const DEFAULT_TEMPLATES = [
     body: "Hola {{guest_name}}, te esperamos mañana ({{check_in}}). Código: {{reservation_code}}.",
     variables: ["guest_name", "check_in", "reservation_code"],
   },
+  {
+    code: "post_stay",
+    channel: "whatsapp" as const,
+    name: "Post-estadía",
+    body: "Hola {{guest_name}}, gracias por hospedarte en LOFTHOUSE 14 ({{reservation_code}}). ¡Esperamos verte de nuevo!",
+    variables: ["guest_name", "reservation_code"],
+  },
+  {
+    code: "payment_received",
+    channel: "email" as const,
+    name: "Pago recibido",
+    body: "Hola {{guest_name}}, registramos un pago para {{reservation_code}}. Gracias.",
+    variables: ["guest_name", "reservation_code"],
+  },
 ];

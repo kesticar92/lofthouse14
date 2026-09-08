@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
 import { AdminAsyncState } from "@/components/admin/admin-async-state";
+import { formatCOP } from "@/lib/pricing";
 
 function defaultFrom() {
   return new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
@@ -12,13 +12,17 @@ function defaultTo() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export default function AdminAnalyticsPage() {
+export default function AdminReportesPage() {
   const [from, setFrom] = useState(defaultFrom);
   const [to, setTo] = useState(defaultTo);
   const [data, setData] = useState<{
     metrics?: Record<string, number | string>;
-    recommendations?: Array<{ title: string; suggestedAction: string }>;
-    ai?: { message: string; ok: boolean };
+    channels?: Array<{
+      channel: string;
+      reservations: number;
+      revenue: number;
+      room_nights: number;
+    }>;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +32,7 @@ export default function AdminAnalyticsPage() {
     setError(null);
     try {
       const qs = new URLSearchParams({ from, to });
-      const res = await fetch(`/api/admin/analytics?${qs}`);
+      const res = await fetch(`/api/admin/reports?${qs}`);
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError((json as { error?: string }).error ?? `Error ${res.status}`);
@@ -37,7 +41,7 @@ export default function AdminAnalyticsPage() {
       }
       setData(json);
     } catch {
-      setError("No se pudo cargar analytics.");
+      setError("No se pudo cargar reportes.");
     } finally {
       setLoading(false);
     }
@@ -47,34 +51,33 @@ export default function AdminAnalyticsPage() {
     void load();
   }, [load]);
 
+  const csvUrl = useMemo(
+    () =>
+      `/api/admin/reports?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&format=excel`,
+    [from, to],
+  );
+
   const metrics = data?.metrics ?? {};
-  const recs = data?.recommendations ?? [];
+  const channels = data?.channels ?? [];
 
   return (
     <AdminShell>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl tracking-wide">ANALYTICS</h1>
+          <h1 className="font-display text-3xl tracking-wide">REPORTES</h1>
           <p className="mt-1 text-sm text-zinc-600">
-            Reportes, recomendaciones de revenue (sin auto-apply) y AI stub.
+            Ocupación, revenue y canal · CSV Excel-friendly (UTF-8 BOM + ;).
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href="/admin/reportes"
-            className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
-          >
-            Reportes avanzados
-          </Link>
-          <a
-            href={`/api/admin/analytics?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&format=csv`}
-            className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
-          >
-            Export CSV
-          </a>
-        </div>
+        <a
+          href={csvUrl}
+          className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
+        >
+          Export CSV (Excel)
+        </a>
       </div>
-      <AdminCard title="Rango" subtitle="Filtro de fechas">
+
+      <AdminCard title="Filtros de fecha" subtitle="from inclusivo · to exclusivo/fin">
         <div className="flex flex-wrap items-end gap-3">
           <label className="text-xs">
             Desde
@@ -103,41 +106,63 @@ export default function AdminAnalyticsPage() {
           </button>
         </div>
       </AdminCard>
-      <AdminCard title="Métricas" subtitle="Ocupación / ADR / RevPAR">
+
+      <AdminCard title="Métricas" subtitle="Occupancy / ADR / RevPAR">
         <AdminAsyncState
           loading={loading}
           error={error}
           empty={!loading && !error && Object.keys(metrics).length === 0}
-          emptyMessage="Sin métricas (crea reservas para ver ocupación)."
+          emptyMessage="Sin métricas en el rango."
           onRetry={() => void load()}
         >
-          <pre className="text-xs">{JSON.stringify(metrics, null, 2)}</pre>
+          <dl className="grid gap-2 text-sm sm:grid-cols-3">
+            {(
+              [
+                ["occupancyRate", "Ocupación"],
+                ["roomRevenue", "Revenue"],
+                ["adr", "ADR"],
+                ["revpar", "RevPAR"],
+                ["roomNightsSold", "Room nights"],
+                ["arrivals", "Llegadas"],
+              ] as const
+            ).map(([key, label]) => (
+              <div key={key} className="rounded-lg border border-black/10 p-3 dark:border-white/10">
+                <dt className="text-[10px] uppercase tracking-wider text-zinc-500">
+                  {label}
+                </dt>
+                <dd className="mt-1 font-semibold">
+                  {key === "occupancyRate"
+                    ? `${(Number(metrics[key] ?? 0) * 100).toFixed(1)}%`
+                    : key === "roomRevenue" || key === "adr" || key === "revpar"
+                      ? formatCOP(Number(metrics[key] ?? 0))
+                      : String(metrics[key] ?? "—")}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </AdminAsyncState>
       </AdminCard>
-      <AdminCard title="Revenue recommendations" subtitle="autoApply=false">
+
+      <AdminCard title="Por canal" subtitle="Revenue stub por channel/source">
         <AdminAsyncState
           loading={loading}
-          empty={!loading && recs.length === 0}
-          emptyMessage="Sin recomendaciones en este momento."
+          empty={!loading && channels.length === 0}
+          emptyMessage="Sin reservas en el rango."
         >
           <ul className="space-y-2 text-sm">
-            {recs.map((r, i) => (
+            {channels.map((c) => (
               <li
-                key={i}
-                className="rounded border border-black/10 p-2 dark:border-white/10"
+                key={c.channel}
+                className="flex justify-between gap-3 rounded-lg border border-black/10 px-3 py-2 dark:border-white/10"
               >
-                <strong>{r.title}</strong>
-                <p className="text-xs text-zinc-600">{r.suggestedAction}</p>
+                <span className="font-medium">{c.channel}</span>
+                <span className="text-xs text-zinc-500">
+                  {c.reservations} res · {c.room_nights} rn ·{" "}
+                  {formatCOP(c.revenue)}
+                </span>
               </li>
             ))}
           </ul>
-        </AdminAsyncState>
-      </AdminCard>
-      <AdminCard title="AI assistant" subtitle="Requires LLM key">
-        <AdminAsyncState loading={loading}>
-          <p className="text-sm text-zinc-700">
-            {data?.ai?.message ?? "AI no disponible."}
-          </p>
         </AdminAsyncState>
       </AdminCard>
     </AdminShell>

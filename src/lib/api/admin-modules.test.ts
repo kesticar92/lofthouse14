@@ -16,6 +16,10 @@ describe("adminModuleForPath", () => {
     );
     expect(adminModuleForPath("/admin/catalogo")).toBe("catalogo");
     expect(adminModuleForPath("/admin")).toBeNull();
+    expect(adminModuleForPath("/admin/folio/LH-ABC")).toBe("pagos");
+    expect(adminModuleForPath("/admin/promociones")).toBe("cotizaciones");
+    expect(adminModuleForPath("/admin/reportes")).toBe("analytics");
+    expect(adminModuleForPath("/admin/reviews")).toBe("crm");
   });
 });
 

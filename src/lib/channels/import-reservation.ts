@@ -7,6 +7,8 @@ import { createLocalBooking } from "@/lib/booking/create-reservation";
 import { getLocalPaymentByCode } from "@/lib/payments/local-store";
 import type { ChannelId } from "@/lib/channels/adapter";
 import type { MarketingCategory } from "@/lib/catalog/seed";
+import { ensureFolioForReservation } from "@/lib/folio/store";
+import { runAutomation } from "@/lib/crm/automation-runner";
 
 export type ImportChannelReservationInput = {
   channel: ChannelId | string;
@@ -66,11 +68,25 @@ export function importChannelReservation(input: ImportChannelReservationInput) {
     };
   }
 
+  ensureFolioForReservation(result.reservation);
+  const automation = runAutomation({
+    eventType: "booking_created",
+    payload: {
+      reservation_code: result.reservation.reservation_code,
+      guest_name: result.reservation.guest_name,
+      check_in: result.reservation.check_in,
+      check_out: result.reservation.check_out,
+      total: result.reservation.price ?? "",
+      channel,
+    },
+  });
+
   return {
     ok: true as const,
     mode: "local" as const,
     reservation: result.reservation,
     payment,
+    automation,
     note: "STUB — reserva importada al store local. TODO: REAL INTEGRATION REQUIRED",
   };
 }

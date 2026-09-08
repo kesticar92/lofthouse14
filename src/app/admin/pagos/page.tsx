@@ -119,6 +119,12 @@ export default function AdminPagosPage() {
                   </div>
                   <span className="flex flex-wrap gap-2">
                     <Link
+                      href={`/admin/folio/${guestKey}`}
+                      className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+                    >
+                      Folio
+                    </Link>
+                    <Link
                       href={`/confirmacion/${guestKey}`}
                       className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
                     >

@@ -69,12 +69,20 @@ export default function AdminCrmGuestPage() {
             {guest?.full_name || guestId || "Huésped"}
           </h1>
         </div>
-        <Link
-          href="/admin/crm"
-          className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
-        >
-          ← Volver CRM
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/crm"
+            className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
+          >
+            ← Volver CRM
+          </Link>
+          <Link
+            href="/admin/reviews"
+            className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold"
+          >
+            Reviews
+          </Link>
+        </div>
       </div>
 
       <AdminAsyncState
@@ -128,12 +136,20 @@ export default function AdminCrmGuestPage() {
                       {s.source}
                     </p>
                   </div>
-                  <Link
-                    href={`/admin/pagos`}
-                    className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
-                  >
-                    Ver saldo
-                  </Link>
+                  <span className="flex flex-wrap gap-2">
+                    <Link
+                      href={`/admin/pagos`}
+                      className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+                    >
+                      Ver saldo
+                    </Link>
+                    <Link
+                      href={`/admin/folio/${encodeURIComponent(s.reservation_code)}`}
+                      className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+                    >
+                      Folio
+                    </Link>
+                  </span>
                 </li>
               ))}
             </ul>

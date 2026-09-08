@@ -5,6 +5,11 @@ import {
 } from "@/lib/pms/conflicts";
 import { regenerateCleaningTasksForReservation } from "@/lib/pms/cleaning-rpc";
 import { normalizeReservationSource } from "@/lib/pms/reservation-source";
+import { runAutomation } from "@/lib/crm/automation-runner";
+import {
+  getLocalReservationByCode,
+  upsertLocalReservation,
+} from "@/lib/availability/local-store";
 
 export async function PATCH(
   req: Request,
@@ -211,5 +216,26 @@ export async function PATCH(
     console.error("regenerateCleaningTasksForReservation", rpcErr);
   }
 
-  return Response.json({ reservation: data });
+  let automation = null;
+  if (nextStatus === "checked_out" && cur.status !== "checked_out") {
+    automation = runAutomation({
+      eventType: "post_stay",
+      payload: {
+        reservation_code: data?.reservation_code ?? id,
+        guest_name: nextGuestName,
+        check_in,
+        check_out,
+      },
+    });
+    const code = String(data?.reservation_code ?? "").toUpperCase();
+    if (code) {
+      const local = getLocalReservationByCode(code);
+      if (local) {
+        local.status = "checked_out";
+        upsertLocalReservation(local);
+      }
+    }
+  }
+
+  return Response.json({ reservation: data, automation });
 }

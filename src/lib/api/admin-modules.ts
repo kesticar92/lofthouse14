@@ -92,6 +92,18 @@ export function adminModuleForPath(pathname: string): AdminModuleKey | null {
   if (p === "/admin/mantenimiento" || p.startsWith("/admin/mantenimiento/")) {
     return "aseos";
   }
+  if (p === "/admin/folio" || p.startsWith("/admin/folio/")) {
+    return "pagos";
+  }
+  if (p === "/admin/promociones" || p.startsWith("/admin/promociones/")) {
+    return "cotizaciones";
+  }
+  if (p === "/admin/reportes" || p.startsWith("/admin/reportes/")) {
+    return "analytics";
+  }
+  if (p === "/admin/reviews" || p.startsWith("/admin/reviews/")) {
+    return "crm";
+  }
   for (const key of ADMIN_MODULE_KEYS) {
     const base = ADMIN_MODULE_PATHS[key];
     if (p === base || p.startsWith(`${base}/`)) return key;

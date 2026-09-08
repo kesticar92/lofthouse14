@@ -257,14 +257,26 @@ function syncPaymentAmount(folio: GuestFolio) {
   } else {
     payment.amount = Math.max(0, bal.charges_total);
     payment.amount_paid = Math.min(bal.payments_total, payment.amount);
-    payment.status =
-      payment.amount_paid >= payment.amount && payment.amount > 0
-        ? "paid"
-        : payment.amount_paid > 0
-          ? "pending"
-          : payment.amount === 0
-            ? "paid"
-            : "pending";
+    const deposit =
+      payment.deposit_amount > 0
+        ? payment.deposit_amount
+        : Math.round((payment.amount * (payment.deposit_percent || 30)) / 100);
+    if (payment.amount_paid >= payment.amount && payment.amount > 0) {
+      payment.status = "paid";
+    } else if (payment.amount === 0) {
+      payment.status = "paid";
+    } else if (
+      deposit > 0 &&
+      payment.amount_paid >= deposit &&
+      payment.amount_paid < payment.amount
+    ) {
+      payment.status = "deposit_paid";
+      payment.deposit_amount = deposit;
+    } else if (payment.amount_paid > 0) {
+      payment.status = "pending";
+    } else {
+      payment.status = "pending";
+    }
     payment.updated_at = new Date().toISOString();
   }
   if (bal.balance <= 0 && bal.charges_total > 0) {

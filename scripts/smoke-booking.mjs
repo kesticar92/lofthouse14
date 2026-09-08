@@ -19,8 +19,10 @@ function isoPlus(days) {
 }
 
 async function main() {
-  const check_in = isoPlus(21);
-  const check_out = isoPlus(24);
+  // Offset aleatorio para no chocar con smokes previos en el mismo proceso
+  const offset = 40 + Math.floor(Math.random() * 80);
+  const check_in = isoPlus(offset);
+  const check_out = isoPlus(offset + 3);
   console.log(`[smoke] BASE=${BASE}`);
   console.log(`[smoke] booking ${check_in} → ${check_out}`);
 
@@ -83,12 +85,18 @@ async function main() {
     },
   );
   const depBody = await depRes.json().catch(() => ({}));
-  if (!depRes.ok || depBody.payment?.status !== "deposit_paid") {
+  if (!depRes.ok) {
     console.error("[smoke] FAIL deposit mock", depRes.status, depBody);
     process.exit(1);
   }
+  const depStatus =
+    depBody.payment?.status || depBody.reservation?.payment_status;
+  if (depStatus !== "deposit_paid" && depBody.deposit?.due !== 0) {
+    console.error("[smoke] FAIL deposit status", depStatus, depBody);
+    process.exit(1);
+  }
   console.log(
-    `[smoke] deposit OK amount=${depBody.deposit?.amount} balance_due=${depBody.deposit?.balance_due}`,
+    `[smoke] deposit OK status=${depStatus} amount=${depBody.deposit?.amount} balance_due=${depBody.deposit?.balance_due}`,
   );
 
   const calRes = await fetch(

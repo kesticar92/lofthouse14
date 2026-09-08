@@ -139,11 +139,27 @@ export async function POST(req: Request, ctx: Ctx) {
     amount:
       kind === "deposit"
         ? payAmount
-        : Math.max(0, payAmount - (payment.amount_paid || 0) || payAmount),
+        : Math.max(
+            0,
+            (paid.amount - (payment.amount_paid || 0)) || payAmount,
+          ),
     method: "wompi_mock",
     notes: `guest-${kind}-${code}`,
   });
-  if (paid.status === "paid") settleFolioBalance(code);
+  if (kind === "full" || kind === "balance" || paid.status === "paid") {
+    settleFolioBalance(code);
+  }
+
+  // Re-leer tras sync de folio (puede ajustar status deposit_paid/paid)
+  const latest = getLocalPaymentByCode(code) ?? paid;
+  if (
+    kind === "deposit" &&
+    latest.status !== "paid" &&
+    latest.amount_paid >= latest.deposit_amount
+  ) {
+    latest.status = "deposit_paid";
+  }
+  paid = latest;
 
   recordLocalAudit({
     action: kind === "deposit" ? "payment.deposit_mock" : "payment.pay_mock",

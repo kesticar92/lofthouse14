@@ -1,5 +1,7 @@
 import { lookupLocalBooking } from "@/lib/booking/create-reservation";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { getLocalPaymentByCode } from "@/lib/payments/local-store";
+import { getDigitalCheckIn } from "@/lib/guest/check-in-store";
 
 type Ctx = { params: Promise<{ code: string }> };
 
@@ -9,6 +11,9 @@ export async function GET(_req: Request, ctx: Ctx) {
   if (!code) {
     return Response.json({ error: "code requerido" }, { status: 400 });
   }
+
+  const payment = getLocalPaymentByCode(code);
+  const checkIn = getDigitalCheckIn(code);
 
   try {
     const admin = createServiceRoleClient();
@@ -20,7 +25,12 @@ export async function GET(_req: Request, ctx: Ctx) {
       .eq("reservation_code", code)
       .maybeSingle();
     if (data) {
-      return Response.json({ mode: "supabase", reservation: data });
+      return Response.json({
+        mode: "supabase",
+        reservation: data,
+        payment,
+        check_in: checkIn,
+      });
     }
   } catch {
     /* local */
@@ -35,5 +45,7 @@ export async function GET(_req: Request, ctx: Ctx) {
     mode: "local",
     note: "Mock local — no persiste entre reinicios",
     reservation: local,
+    payment,
+    check_in: checkIn,
   });
 }

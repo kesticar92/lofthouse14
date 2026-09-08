@@ -21,6 +21,8 @@ import {
 import { generateReservationCode } from "@/lib/booking/reservation-code";
 import { LOFTHOUSE_ORGANIZATION_ID } from "@/lib/tenant/constants";
 import { ROOM_TYPE_IDS, type MarketingCategory } from "@/lib/catalog/seed";
+import { createLocalPendingPayment } from "@/lib/payments/local-store";
+import type { LocalPayment } from "@/lib/payments/local-store";
 
 export type BookingExtra = {
   id: string;
@@ -51,6 +53,7 @@ export type CreateBookingResult =
       ok: true;
       mode: "local" | "supabase";
       reservation: LocalReservation;
+      payment?: LocalPayment;
       whatsappSuggested: boolean;
     }
   | { ok: false; error: string; code?: string };
@@ -145,10 +148,28 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
   upsertLocalReservation(reservation);
   consumeLocalHold(holdId);
 
+  const payment =
+    reservation.price != null && reservation.price > 0
+      ? createLocalPendingPayment({
+          organizationId: LOFTHOUSE_ORGANIZATION_ID,
+          reservationId: reservation.id,
+          reservationCode: reservation.reservation_code,
+          amount: reservation.price,
+          provider: "stub",
+          metadata: { source: reservation.source },
+        })
+      : undefined;
+
+  if (payment) {
+    reservation.payment_status = "pending";
+    upsertLocalReservation(reservation);
+  }
+
   return {
     ok: true,
     mode: "local",
     reservation,
+    payment,
     whatsappSuggested: true,
   };
 }

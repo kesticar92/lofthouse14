@@ -1,6 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import {
   addDays,
@@ -467,8 +468,17 @@ export function ReservationsTimeline({
                     const tip = [
                       `Origen: ${sourceLabel(r.source)}`,
                       `Estado: ${statusLabel(r.status)}`,
+                      r.payment_status
+                        ? `Pago: ${r.payment_status}`
+                        : null,
+                      r.reservation_code
+                        ? `Código: ${r.reservation_code}`
+                        : null,
                       `${r.check_in} → ${r.check_out} (salida exclusiva)`,
                       r.guest_name ? `Huésped: ${r.guest_name}` : null,
+                      r.price != null
+                        ? `Total: ${formatMoneyCop(Number(r.price))}`
+                        : null,
                       r.referrer_name?.trim()
                         ? `Referidor: ${r.referrer_name.trim()}`
                         : null,
@@ -616,6 +626,26 @@ function TodayStatusPanel({
               {r.check_in}→{r.check_out}
             </span>
             <span className="flex flex-wrap gap-1">
+              {(() => {
+                const guestKey =
+                  r.guest_email || r.guest_phone || r.guest_name || "";
+                return guestKey ? (
+                  <Link
+                    href={`/admin/crm/${encodeURIComponent(guestKey)}`}
+                    className="rounded-full border border-zinc-400/50 px-2 py-1 font-semibold"
+                  >
+                    CRM
+                  </Link>
+                ) : null;
+              })()}
+              {r.payment_status ? (
+                <Link
+                  href="/admin/pagos"
+                  className="rounded-full border border-amber-700/40 px-2 py-1 font-semibold text-amber-900 dark:text-amber-200"
+                >
+                  Saldo · {r.payment_status}
+                </Link>
+              ) : null}
               {r.status !== "checked_in" ? (
                 <button
                   type="button"

@@ -12,6 +12,9 @@ export default function AdminCanalesPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [importCheckIn, setImportCheckIn] = useState("");
+  const [importCheckOut, setImportCheckOut] = useState("");
+  const [importGuest, setImportGuest] = useState("OTA Guest");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -21,8 +24,7 @@ export default function AdminCanalesPage() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(
-          (data as { error?: string }).error ??
-            `Error ${res.status}`,
+          (data as { error?: string }).error ?? `Error ${res.status}`,
         );
         setAdapters([]);
         setLogs([]);
@@ -39,21 +41,40 @@ export default function AdminCanalesPage() {
 
   useEffect(() => {
     void load();
+    const inDate = new Date(Date.now() + 21 * 86400000)
+      .toISOString()
+      .slice(0, 10);
+    const outDate = new Date(Date.now() + 24 * 86400000)
+      .toISOString()
+      .slice(0, 10);
+    setImportCheckIn(inDate);
+    setImportCheckOut(outDate);
   }, [load]);
 
-  async function simulate(channel: string) {
+  async function simulate(channel: string, action: "pull" | "import_reservation") {
     setMsg(null);
     const res = await fetch("/api/admin/channels/simulate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         channel,
-        action: "pull",
-        idempotency_key: `ui-${channel}-${Date.now()}`,
+        action,
+        check_in: importCheckIn || undefined,
+        check_out: importCheckOut || undefined,
+        guest_name: importGuest || undefined,
+        idempotency_key: `ui-${channel}-${action}-${Date.now()}`,
       }),
     });
     const data = await res.json();
-    setMsg(data.result?.message ?? data.note ?? "OK");
+    if (!res.ok) {
+      setMsg(data.error ?? `Error ${res.status}`);
+    } else if (action === "import_reservation" && data.reservation) {
+      setMsg(
+        `Importada ${data.reservation.reservation_code} · pago ${data.payment?.status ?? "pending"} (stub)`,
+      );
+    } else {
+      setMsg(data.result?.message ?? data.note ?? "OK");
+    }
     await load();
   }
 
@@ -66,6 +87,39 @@ export default function AdminCanalesPage() {
           OTAs.
         </p>
       </div>
+      <AdminCard
+        title="Importar reserva (simulador)"
+        subtitle="Crea reserva + payment pending en store local"
+      >
+        <div className="grid gap-2 sm:grid-cols-3">
+          <label className="text-xs">
+            Check-in
+            <input
+              type="date"
+              value={importCheckIn}
+              onChange={(e) => setImportCheckIn(e.target.value)}
+              className="mt-1 w-full rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-600 dark:bg-zinc-900"
+            />
+          </label>
+          <label className="text-xs">
+            Check-out
+            <input
+              type="date"
+              value={importCheckOut}
+              onChange={(e) => setImportCheckOut(e.target.value)}
+              className="mt-1 w-full rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-600 dark:bg-zinc-900"
+            />
+          </label>
+          <label className="text-xs">
+            Huésped
+            <input
+              value={importGuest}
+              onChange={(e) => setImportGuest(e.target.value)}
+              className="mt-1 w-full rounded border border-zinc-300 px-2 py-1.5 dark:border-zinc-600 dark:bg-zinc-900"
+            />
+          </label>
+        </div>
+      </AdminCard>
       <AdminCard title="Adapters" subtitle="Simulador admin">
         <AdminAsyncState
           loading={loading}
@@ -88,13 +142,24 @@ export default function AdminCanalesPage() {
                     <span className="text-xs text-emerald-700">(live/local)</span>
                   )}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => void simulate(a.id)}
-                  className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
-                >
-                  Simular sync
-                </button>
+                <span className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void simulate(a.id, "pull")}
+                    className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+                  >
+                    Simular sync
+                  </button>
+                  {a.id !== "direct" && a.id !== "ical" ? (
+                    <button
+                      type="button"
+                      onClick={() => void simulate(a.id, "import_reservation")}
+                      className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white dark:bg-white dark:text-zinc-900"
+                    >
+                      Import reservation
+                    </button>
+                  ) : null}
+                </span>
               </li>
             ))}
           </ul>

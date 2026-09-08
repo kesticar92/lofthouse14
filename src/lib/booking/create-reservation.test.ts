@@ -2,9 +2,14 @@ import { describe, expect, it, beforeEach } from "vitest";
 import { createLocalBooking, lookupLocalBooking } from "./create-reservation";
 import { resetLocalBookingStore } from "@/lib/availability/local-store";
 import { generateReservationCode, isValidReservationCode } from "./reservation-code";
+import {
+  getLocalPaymentByCode,
+  resetLocalPayments,
+} from "@/lib/payments/local-store";
 
 beforeEach(() => {
   resetLocalBookingStore();
+  resetLocalPayments();
 });
 
 describe("reservation-code", () => {
@@ -85,5 +90,26 @@ describe("createLocalBooking", () => {
       expect(pending.reservation.status).toBe("pending");
       expect(pending.reservation.payment_status).toBe("unpaid");
     }
+  });
+
+  it("crea payment pending cuando hay precio", () => {
+    const r = createLocalBooking({
+      checkIn: "2026-12-10",
+      checkOut: "2026-12-12",
+      guests: 2,
+      guestName: "Con pago",
+      categoryId: "atrio",
+      price: 180_000,
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.reservation.payment_status).toBe("pending");
+    expect(r.payment?.amount).toBe(180_000);
+    expect(getLocalPaymentByCode(r.reservation.reservation_code)?.status).toBe(
+      "pending",
+    );
+    expect(lookupLocalBooking(r.reservation.reservation_code)?.payment_status).toBe(
+      "pending",
+    );
   });
 });

@@ -1,11 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
 import { AdminAsyncState } from "@/components/admin/admin-async-state";
 
+type GuestRow = {
+  id?: string;
+  full_name?: string;
+  email?: string;
+  phone?: string;
+};
+
 export default function AdminCrmPage() {
-  const [guests, setGuests] = useState<unknown[]>([]);
+  const [guests, setGuests] = useState<GuestRow[]>([]);
   const [templates, setTemplates] = useState<unknown[]>([]);
   const [preview, setPreview] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -81,7 +89,7 @@ export default function AdminCrmPage() {
           Perfiles, templates con variables y automations stub.
         </p>
       </div>
-      <AdminCard title="Huéspedes" subtitle="Historial / perfiles">
+      <AdminCard title="Huéspedes" subtitle="Historial / fichas">
         <AdminAsyncState
           loading={loading}
           error={error}
@@ -89,9 +97,30 @@ export default function AdminCrmPage() {
           emptyMessage="Sin huéspedes todavía (aparecen al crear reservas con email)."
           onRetry={() => void load()}
         >
-          <pre className="max-h-48 overflow-auto text-xs">
-            {JSON.stringify(guests, null, 2)}
-          </pre>
+          <ul className="space-y-2">
+            {guests.map((g, i) => {
+              const id = g.id ?? String(i);
+              return (
+                <li
+                  key={id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-black/10 px-3 py-2 text-sm dark:border-white/10"
+                >
+                  <div>
+                    <p className="font-semibold">{g.full_name || "Sin nombre"}</p>
+                    <p className="text-xs text-zinc-500">
+                      {[g.email, g.phone].filter(Boolean).join(" · ") || "—"}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/admin/crm/${encodeURIComponent(id)}`}
+                    className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+                  >
+                    Abrir ficha
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </AdminAsyncState>
       </AdminCard>
       <AdminCard title="Templates" subtitle="Preview variables">

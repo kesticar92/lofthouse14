@@ -12,6 +12,7 @@ import type { CotizacionGuardada } from "@/lib/cotizaciones-store";
 import type { AseoGuardado } from "@/lib/aseos-store";
 import type { InventarioGuardado } from "@/lib/inventarios-store";
 import { formatCOP } from "@/lib/pricing";
+import { buildStubOpsAlerts, type OpsAlert } from "@/lib/ops/alerts";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -32,6 +33,7 @@ export default function AdminHomePage() {
     departures?: number;
     inHouse?: number;
   } | null>(null);
+  const [alerts, setAlerts] = useState<OpsAlert[]>([]);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -51,10 +53,32 @@ export default function AdminHomePage() {
 
   useEffect(() => {
     recalc();
+    setAlerts(buildStubOpsAlerts());
     void fetch("/api/admin/pms/metrics")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (d?.metrics) setMetrics(d.metrics);
+      })
+      .catch(() => null);
+    void fetch("/api/admin/notifications?unread=1")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const notes = (d?.notifications ?? []) as Array<{
+          id: string;
+          title: string;
+          message: string;
+        }>;
+        if (notes.length === 0) return;
+        setAlerts((prev) => [
+          ...notes.slice(0, 5).map((n) => ({
+            id: `notif-${n.id}`,
+            level: "info" as const,
+            title: n.title,
+            message: n.message,
+            href: "/admin",
+          })),
+          ...prev.filter((a) => a.id !== "all-clear"),
+        ]);
       })
       .catch(() => null);
   }, []);
@@ -121,6 +145,41 @@ export default function AdminHomePage() {
           highlight={stats.aseosHoyPendientes > 0}
         />
       </div>
+
+      {alerts.length > 0 ? (
+        <AdminCard
+          title="Alertas operativas"
+          subtitle="Stub desde notificaciones + estado local (mantenimiento / pagos / llegadas)."
+        >
+          <ul className="space-y-2">
+            {alerts.map((a) => (
+              <li
+                key={a.id}
+                className={`rounded-xl border px-3 py-2 text-sm ${
+                  a.level === "critical"
+                    ? "border-red-500/40 bg-red-500/10"
+                    : a.level === "warn"
+                      ? "border-amber-500/40 bg-amber-500/10"
+                      : "border-black/10 bg-white/60 dark:border-white/10 dark:bg-zinc-900/40"
+                }`}
+              >
+                <p className="font-semibold">{a.title}</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                  {a.message}
+                </p>
+                {a.href ? (
+                  <Link
+                    href={a.href}
+                    className="mt-1 inline-block text-xs font-semibold text-amber-900 underline dark:text-amber-300"
+                  >
+                    Abrir →
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </AdminCard>
+      ) : null}
 
       <AdminCard
         title="Accesos rápidos"

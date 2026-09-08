@@ -253,6 +253,7 @@ export async function POST(req: Request) {
         : undefined,
     reservation: local.reservation,
     reservation_code: local.reservation.reservation_code,
+    payment: local.payment ?? null,
     quote: quoteResult.ok ? quoteResult : null,
     whatsapp_suggested: body.also_whatsapp !== false,
     automation: stubAutomationEvent("booking_created", {

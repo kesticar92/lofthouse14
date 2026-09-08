@@ -61,6 +61,10 @@ export type ReservationRow = {
   /** Presente tras migración `006_reservations_referral` */
   referrer_name?: string;
   commission_amount?: number | null;
+  /** Fase 4+ / booking engine */
+  reservation_code?: string | null;
+  guest_email?: string | null;
+  payment_status?: string | null;
   created_at: string;
   updated_at: string;
 };

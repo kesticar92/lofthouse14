@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { SiteFooter } from "@/components/sections/site-footer";
 import { ShareBar } from "@/components/layout/share-bar";
+import { GuestBottomNav } from "@/components/guest/guest-bottom-nav";
 
 export function MarketingShell({
   children,
@@ -12,9 +13,12 @@ export function MarketingShell({
   return (
     <>
       <Header />
-      <main className="min-h-[70vh] pt-[7.5rem] lg:pt-20">{children}</main>
+      <main className="min-h-[70vh] pt-[7.5rem] pb-20 lg:pt-20 md:pb-0">
+        {children}
+      </main>
       <SiteFooter />
       <ShareBar />
+      <GuestBottomNav />
     </>
   );
 }

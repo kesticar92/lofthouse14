@@ -444,9 +444,35 @@ export default function AseosPage() {
                             {fmtCop(Number(t.cleaning_price ?? 0))}
                           </p>
                         </div>
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                          {/* Móvil: botones grandes para cambiar estado */}
+                          <div className="grid grid-cols-3 gap-1.5 sm:hidden">
+                            {(
+                              [
+                                ["pending", "Pend."],
+                                ["in_progress", "Curso"],
+                                ["done", "Hecho"],
+                              ] as const
+                            ).map(([value, label]) => (
+                              <button
+                                key={value}
+                                type="button"
+                                onClick={() =>
+                                  void patchTask(t.id, { status: value })
+                                }
+                                className={cn(
+                                  "min-h-11 rounded-xl border px-2 text-xs font-semibold",
+                                  t.status === value
+                                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-amber-400 dark:bg-amber-400 dark:text-zinc-900"
+                                    : "border-black/15 bg-white/80 dark:border-white/15 dark:bg-zinc-900/60",
+                                )}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
                           <select
-                            className={smallSelect}
+                            className={cn(smallSelect, "hidden sm:block")}
                             value={t.status}
                             onChange={(e) =>
                               void patchTask(t.id, { status: e.target.value })
@@ -458,7 +484,7 @@ export default function AseosPage() {
                           </select>
                           {isSupervisor ? (
                             <select
-                              className={smallSelect}
+                              className={cn(smallSelect, "min-h-11 sm:min-h-0")}
                               value={t.assigned_to ?? ""}
                               onChange={(e) =>
                                 void patchTask(t.id, {

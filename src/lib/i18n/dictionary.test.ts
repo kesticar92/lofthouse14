@@ -12,6 +12,8 @@ describe("i18n dictionary", () => {
   it("traduce CTAs clave", () => {
     expect(t("nav.book", "es")).toBe("Reservar");
     expect(t("nav.book", "en")).toBe("Book");
+    expect(t("nav.messages", "es")).toBe("Mensajes");
+    expect(t("cta.payDeposit", "en")).toMatch(/deposit/i);
     expect(t("cta.payMock", "en")).toMatch(/mock/i);
   });
 });

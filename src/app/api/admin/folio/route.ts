@@ -19,14 +19,28 @@ import {
   getDraftInvoiceByCode,
   getEInvoicingProvider,
 } from "@/lib/einvoicing/provider";
+import {
+  balanceForPayment,
+  getLocalPaymentByCode,
+} from "@/lib/payments/local-store";
 
 function serialize(code: string) {
   const folio = getFolio(code) ?? null;
   if (!folio) return null;
+  const payment = getLocalPaymentByCode(code);
   return {
     ...folio,
     balance: computeFolioBalance(folio),
     draft_invoice: getDraftInvoiceByCode(code),
+    deposit: payment
+      ? {
+          percent: payment.deposit_percent,
+          amount: payment.deposit_amount,
+          paid: payment.amount_paid,
+          status: payment.status,
+          ...balanceForPayment(payment),
+        }
+      : null,
   };
 }
 
@@ -47,10 +61,24 @@ export async function GET(req: Request) {
       );
     }
     const folio = ensureFolioForReservation(res);
+    const payment = getLocalPaymentByCode(code);
     return Response.json({
       mode: "local",
-      folio: { ...folio, balance: computeFolioBalance(folio) },
+      folio: {
+        ...folio,
+        balance: computeFolioBalance(folio),
+        deposit: payment
+          ? {
+              percent: payment.deposit_percent,
+              amount: payment.deposit_amount,
+              paid: payment.amount_paid,
+              status: payment.status,
+              ...balanceForPayment(payment),
+            }
+          : null,
+      },
       reservation: res,
+      payment,
     });
   }
 

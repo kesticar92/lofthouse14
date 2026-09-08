@@ -167,3 +167,70 @@ export function holdExpiresAt(
 ): Date {
   return new Date(from.getTime() + ttlMinutes * 60_000);
 }
+
+function addDaysIso(isoDate: string, days: number): string {
+  const d = new Date(`${isoDate}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+export type NightAvailability = {
+  date: string;
+  available: boolean;
+  available_count: number;
+  total_active: number;
+  blocked_reason?: "occupied" | "out_of_service" | "no_units";
+};
+
+/**
+ * Calendario noche-a-noche [from, toExclusive) usando el motor Fase 3.
+ * Una noche `d` está disponible si hay ≥1 unidad libre en [d, d+1).
+ */
+export function nightAvailabilityCalendar(params: {
+  units: InventoryUnit[];
+  intervals: OccupancyInterval[];
+  from: string;
+  toExclusive: string;
+  roomTypeId?: string | null;
+  guests?: number;
+}): NightAvailability[] {
+  const { units, intervals, from, toExclusive, roomTypeId, guests } = params;
+  if (!from || !toExclusive || toExclusive <= from) return [];
+
+  const nights: NightAvailability[] = [];
+  let cursor = from;
+  let guard = 0;
+  while (cursor < toExclusive && guard < 400) {
+    guard += 1;
+    const next = addDaysIso(cursor, 1);
+    const available = findAvailableUnits({
+      units,
+      intervals,
+      checkIn: cursor,
+      checkOut: next,
+      roomTypeId,
+      guests,
+    });
+    const scoped = roomTypeId
+      ? units.filter((u) => !u.roomTypeId || u.roomTypeId === roomTypeId)
+      : units;
+    const totalActive = scoped.filter(isUnitBookable).length;
+    const oos = scoped.some((u) => !isUnitBookable(u)) && totalActive === 0;
+    nights.push({
+      date: cursor,
+      available: available.length > 0,
+      available_count: available.length,
+      total_active: totalActive,
+      blocked_reason:
+        available.length > 0
+          ? undefined
+          : oos
+            ? "out_of_service"
+            : totalActive === 0
+              ? "no_units"
+              : "occupied",
+    });
+    cursor = next;
+  }
+  return nights;
+}

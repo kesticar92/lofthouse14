@@ -1,6 +1,9 @@
 /**
  * Payments locales (stub) — pending al booking sin pasarela real.
+ * Soporta depósito % + saldo restante.
  */
+
+import { depositPercentFromEnv } from "@/lib/payments/deposit";
 
 export type LocalPayment = {
   id: string;
@@ -9,10 +12,21 @@ export type LocalPayment = {
   reservation_code: string;
   provider: string;
   external_id: string;
+  /** Total de la estadía (COP) */
   amount: number;
+  /** Monto del depósito configurado */
+  deposit_amount: number;
+  /** % deposit aplicado al crear */
+  deposit_percent: number;
   amount_paid: number;
   currency: string;
-  status: "pending" | "paid" | "failed" | "refunded" | "stub";
+  status:
+    | "pending"
+    | "deposit_paid"
+    | "paid"
+    | "failed"
+    | "refunded"
+    | "stub";
   created_at: string;
   updated_at: string;
   metadata?: Record<string, unknown>;
@@ -42,9 +56,23 @@ export function createLocalPendingPayment(input: {
   currency?: string;
   provider?: string;
   metadata?: Record<string, unknown>;
+  /** Si se omite, se calcula con BOOKING_DEPOSIT_PERCENT / default 30% */
+  depositAmount?: number;
+  depositPercent?: number;
 }): LocalPayment {
   const now = new Date().toISOString();
   const amount = Math.max(0, Math.round(input.amount || 0));
+  const depositPercent =
+    input.depositPercent ??
+    (typeof input.metadata?.deposit_percent === "number"
+      ? Number(input.metadata.deposit_percent)
+      : depositPercentFromEnv());
+  const deposit_amount =
+    input.depositAmount != null
+      ? Math.max(0, Math.round(input.depositAmount))
+      : amount > 0
+        ? Math.max(1, Math.round((amount * depositPercent) / 100))
+        : 0;
   const row: LocalPayment = {
     id: newId(),
     organization_id: input.organizationId,
@@ -53,12 +81,19 @@ export function createLocalPendingPayment(input: {
     provider: input.provider ?? "stub",
     external_id: `local_${Date.now()}`,
     amount,
+    deposit_amount,
+    deposit_percent: depositPercent,
     amount_paid: 0,
     currency: input.currency ?? "COP",
     status: amount > 0 ? "pending" : "paid",
     created_at: now,
     updated_at: now,
-    metadata: input.metadata,
+    metadata: {
+      ...input.metadata,
+      deposit_percent: depositPercent,
+      deposit_amount,
+      balance_due: Math.max(0, amount - deposit_amount),
+    },
   };
   map().set(row.id, row);
   map().set(`code:${row.reservation_code}`, row);
@@ -85,11 +120,37 @@ export function balanceForPayment(p: LocalPayment): {
   total: number;
   paid: number;
   due: number;
+  deposit: number;
+  deposit_due: number;
+  balance_after_deposit: number;
 } {
   const total = p.amount;
   const paid = p.amount_paid;
   const due = Math.max(0, total - paid);
-  return { total, paid, due };
+  const deposit = p.deposit_amount ?? Math.round((total * (p.deposit_percent || 30)) / 100);
+  const deposit_due = Math.max(0, deposit - paid);
+  const balance_after_deposit = Math.max(0, total - Math.max(paid, deposit));
+  return { total, paid, due, deposit, deposit_due, balance_after_deposit };
+}
+
+export function markLocalDepositPaid(code: string): LocalPayment | null {
+  const p = getLocalPaymentByCode(code);
+  if (!p) return null;
+  const deposit =
+    p.deposit_amount > 0
+      ? p.deposit_amount
+      : Math.max(1, Math.round((p.amount * (p.deposit_percent || 30)) / 100));
+  p.amount_paid = Math.max(p.amount_paid, deposit);
+  p.deposit_amount = deposit;
+  if (p.amount_paid >= p.amount) {
+    p.status = "paid";
+  } else {
+    p.status = "deposit_paid";
+  }
+  p.updated_at = new Date().toISOString();
+  map().set(p.id, p);
+  map().set(`code:${p.reservation_code}`, p);
+  return p;
 }
 
 export function markLocalPaymentPaid(

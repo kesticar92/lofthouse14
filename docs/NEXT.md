@@ -1,10 +1,28 @@
 # Post-Fases 11 — backlog real (integraciones + plataforma)
 
-> Branch tip: `cursor/continuar-plataforma-f0b5`  
-> Base avanzada: `cursor/integraciones-backlog-f0b5` (Wompi, messaging, canales, LLM, e-factura, SaaS).  
-> Cómo activar providers: [`INTEGRATIONS.md`](./INTEGRATIONS.md) · Migraciones: [`MIGRATIONS.md`](./MIGRATIONS.md).
+> Branch tip: `cursor/continuar-plataforma-2-f0b5`  
+> Base: `cursor/continuar-plataforma-f0b5`  
+> Cómo activar providers: [`INTEGRATIONS.md`](./INTEGRATIONS.md) · Migraciones: [`MIGRATIONS.md`](./MIGRATIONS.md) · Seguridad: [`SECURITY.md`](./SECURITY.md).
 
-## Cerrado en esta pasada (continuar plataforma)
+## Cerrado en esta pasada (continuar plataforma 2)
+
+| Ítem | Qué |
+|------|-----|
+| Admin UX | Breadcrumbs en shell (`AdminBreadcrumbs`); sidebar ya cubre folio/promos/reportes/reviews/canales/CRM/pagos/SaaS/catálogo/analytics/mantenimiento/inventario/cotizaciones; `saas` mapeado a módulo analytics |
+| Availability calendar | `GET /api/public/availability/calendar` + `nightAvailabilityCalendar` + UI en `/lofts` |
+| Deposit flow | % configurable (`BOOKING_DEPOSIT_PERCENT`, default 30); guest pagar depósito/saldo mock; folio admin muestra deposit vs balance |
+| Cancel / no-show | Policies seed + fee stub guest `/cancel` y admin `/api/admin/booking/cancel` |
+| Housekeeping auto | Checkout → tarea `dirty` (local store + PMS PATCH + `/api/admin/housekeeping`) |
+| Message center | `/mensajes` + `GET/POST /api/public/messages/[code]` (local) |
+| Security | CSRF note; rate limit público default 45 + más rutas; audit helper en walk-in/cancel/pay/HK |
+| Smoke + tests | Smoke extendido; tests deposit/cancel/HK/messages/audit/calendar |
+| Loft polish | `/lofts/[slug]` CTA Reservar enlaza draft fechas del banner |
+
+**Freeze respetado:** hero cards, banner, Personaliza, RESERVAR / WhatsApp, check-in, bottom nav (añadido Mensajes sin romper layout).
+
+---
+
+## Cerrado antes (continuar plataforma)
 
 | Ítem | Qué |
 |------|-----|
@@ -15,24 +33,7 @@
 | Revenue recommendations | Heurísticas ocupación enriquecidas (bandas, impactHint); UI analytics |
 | i18n foundation | Diccionario ES/EN (`src/lib/i18n/dictionary.ts`) en bottom nav + CTAs guest |
 | Multimoneda | COP base + USD/EUR stub ECB-like + disclaimer; `GET /api/public/fx` |
-| E2E smoke | `npm run smoke:booking` → booking → confirmación → pay mock → fx |
-
-**Freeze respetado:** hero cards, banner, Personaliza, RESERVAR / WhatsApp, check-in, bottom nav.
-
----
-
-## Cerrado antes (integraciones backlog)
-
-| Ítem | Qué |
-|------|-----|
-| Supabase / migraciones | `docs/MIGRATIONS.md` + `npm run migrations:verify` (017–028) |
-| Check-in digital | Persistencia API + notificación staff stub |
-| Payments Wompi-first | Adapter + webhook idempotente + simular admin |
-| WhatsApp / Email | Providers + automation runner |
-| Channel Manager | syncAvailability/Rates stubs + iCal |
-| LLM analytics | stub sin auto-apply |
-| E-factura CO | borrador desde folio |
-| SaaS foundations | module_flags read-only |
+| E2E smoke | `npm run smoke:booking` |
 
 ---
 
@@ -45,7 +46,8 @@
 5. Proveedor autorizado DIAN / e-factura
 6. FX provider real (ECB / Open Exchange) — hoy stub
 7. Billing SaaS (suscripción) — solo foundations
-8. Persistencia multi-room / walk-in en Supabase (hoy local)
+8. Persistencia multi-room / walk-in / deposits / messages / HK en Supabase (hoy local)
+9. CSRF Origin check + tokens en mutaciones admin (hoy nota + SameSite)
 
 ---
 
@@ -63,24 +65,24 @@ npm run smoke:booking
 
 Smoke manual:
 
-1. Booking → `/confirmacion/LH-…` → Simular pago (mock) → check-in.
-2. `/admin/reservas` → Walk-in / grupo (2 lofts).
-3. Cotización 7/14/30 noches → descuentos.
-4. `/admin/inventario` → Stock: movimiento → low stock notify; PO draft.
-5. `/admin/analytics` → recomendaciones con banda ocupación.
-6. `GET /api/public/fx?amount_cop=410000` → disclaimer stub.
-7. Guest UX (cards / Personaliza / bottom nav) intacta.
+1. Booking → `/confirmacion/LH-…` → Pagar depósito (mock) → opcional saldo → check-in.
+2. `/lofts` → calendario noches libres/bloqueadas → click → draft fechas.
+3. `/mensajes` → abrir thread por código → enviar.
+4. Cancel guest o admin → fee stub en folio.
+5. Checkout admin/HK → tarea dirty.
+6. Guest UX (cards / Personaliza / bottom nav) intacta.
 
 ---
 
 ## Criterios
 
-- [x] Guest portal + pay mock + invoice draft + loading/error
-- [x] Walk-in + multi-unidad local
-- [x] Larga estadía 7/14/30 + tests
-- [x] Stock movimientos + low stock notify + PO
-- [x] Revenue recommendations enriquecidas
-- [x] i18n ES/EN foundation
-- [x] Multimoneda stub + disclaimer
-- [x] Smoke booking script
+- [x] Admin breadcrumbs + módulos sidebar
+- [x] Availability calendar public + UI `/lofts`
+- [x] Deposit % + guest mock + admin folio
+- [x] Cancel/no-show policies + fee stub
+- [x] Housekeeping dirty on checkout
+- [x] Message center guest stub
+- [x] Security CSRF note + rate limits + audit
+- [x] Tests + smoke extendido
 - [x] UX website preservada
+- [x] `/lofts/[slug]` CTA con fechas banner

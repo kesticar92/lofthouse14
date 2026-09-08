@@ -3,6 +3,7 @@ import {
   availabilityByRoomType,
   findAvailableUnits,
   isUnitBookable,
+  nightAvailabilityCalendar,
   wouldDoubleBook,
   type InventoryUnit,
   type OccupancyInterval,
@@ -174,5 +175,37 @@ describe("availabilityByRoomType", () => {
     expect(vista?.availableCount).toBe(2);
     expect(atrio?.availableCount).toBe(0);
     expect(atrio?.totalActive).toBe(0);
+  });
+});
+
+describe("nightAvailabilityCalendar", () => {
+  it("marca noches ocupadas vs libres", () => {
+    const intervals: OccupancyInterval[] = [
+      {
+        propertyId: "p1",
+        start: "2026-09-10",
+        endExclusive: "2026-09-12",
+        kind: "reservation",
+        status: "confirmed",
+      },
+      {
+        propertyId: "p2",
+        start: "2026-09-10",
+        endExclusive: "2026-09-12",
+        kind: "reservation",
+        status: "confirmed",
+      },
+    ];
+    const nights = nightAvailabilityCalendar({
+      units: units.filter((u) => u.roomTypeId === "vista"),
+      intervals,
+      from: "2026-09-10",
+      toExclusive: "2026-09-13",
+      roomTypeId: "vista",
+    });
+    expect(nights).toHaveLength(3);
+    expect(nights[0]?.available).toBe(false);
+    expect(nights[1]?.available).toBe(false);
+    expect(nights[2]?.available).toBe(true);
   });
 });

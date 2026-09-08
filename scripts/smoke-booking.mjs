@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Smoke E2E (node): booking local → confirmación (+ opcional pay mock).
+ * Smoke E2E (node): booking → deposit → calendar → messages → cancel fee → fx.
  *
  * Uso:
  *   node scripts/smoke-booking.mjs
@@ -62,7 +62,7 @@ async function main() {
     process.exit(1);
   }
   console.log(
-    `[smoke] confirm OK payment=${getBody.payment?.status ?? "none"} invoice=${getBody.invoice_draft ? "yes" : "no"}`,
+    `[smoke] confirm OK payment=${getBody.payment?.status ?? "none"} deposit=${getBody.payment?.deposit_amount ?? "?"}`,
   );
 
   const pageRes = await fetch(
@@ -74,20 +74,66 @@ async function main() {
   }
   console.log(`[smoke] confirmacion page ${pageRes.status}`);
 
-  const payRes = await fetch(
+  const depRes = await fetch(
     `${BASE}/api/public/booking/${encodeURIComponent(code)}/pay`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ simulate: true }),
+      body: JSON.stringify({ simulate: true, kind: "deposit" }),
     },
   );
-  const payBody = await payRes.json().catch(() => ({}));
-  if (!payRes.ok) {
-    console.error("[smoke] FAIL pay mock", payRes.status, payBody);
+  const depBody = await depRes.json().catch(() => ({}));
+  if (!depRes.ok || depBody.payment?.status !== "deposit_paid") {
+    console.error("[smoke] FAIL deposit mock", depRes.status, depBody);
     process.exit(1);
   }
-  console.log(`[smoke] pay mock OK status=${payBody.payment?.status}`);
+  console.log(
+    `[smoke] deposit OK amount=${depBody.deposit?.amount} balance_due=${depBody.deposit?.balance_due}`,
+  );
+
+  const calRes = await fetch(
+    `${BASE}/api/public/availability/calendar?from=${check_in}&to=${check_out}&category=vista`,
+  );
+  const calBody = await calRes.json().catch(() => ({}));
+  if (!calRes.ok || !Array.isArray(calBody.nights)) {
+    console.error("[smoke] FAIL calendar", calRes.status, calBody);
+    process.exit(1);
+  }
+  console.log(
+    `[smoke] calendar OK nights=${calBody.nights.length} blocked=${calBody.summary?.blocked_nights}`,
+  );
+
+  const msgRes = await fetch(
+    `${BASE}/api/public/messages/${encodeURIComponent(code)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body: "Smoke message hello" }),
+    },
+  );
+  const msgBody = await msgRes.json().catch(() => ({}));
+  if (!msgRes.ok || !msgBody.thread?.messages?.length) {
+    console.error("[smoke] FAIL messages", msgRes.status, msgBody);
+    process.exit(1);
+  }
+  console.log(`[smoke] messages OK count=${msgBody.thread.messages.length}`);
+
+  const cancelRes = await fetch(
+    `${BASE}/api/public/booking/${encodeURIComponent(code)}/cancel`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason: "guest_cancel", confirm: true }),
+    },
+  );
+  const cancelBody = await cancelRes.json().catch(() => ({}));
+  if (!cancelRes.ok || cancelBody.fee == null) {
+    console.error("[smoke] FAIL cancel fee", cancelRes.status, cancelBody);
+    process.exit(1);
+  }
+  console.log(
+    `[smoke] cancel fee OK amount=${cancelBody.fee.fee_amount} tier=${cancelBody.fee.tier_id}`,
+  );
 
   const fxRes = await fetch(`${BASE}/api/public/fx?amount_cop=410000`);
   const fxBody = await fxRes.json().catch(() => ({}));
@@ -96,6 +142,13 @@ async function main() {
     process.exit(1);
   }
   console.log(`[smoke] fx stub OK provider=${fxBody.provider}`);
+
+  const loftsRes = await fetch(`${BASE}/lofts`);
+  if (!loftsRes.ok) {
+    console.error("[smoke] FAIL /lofts", loftsRes.status);
+    process.exit(1);
+  }
+  console.log(`[smoke] /lofts ${loftsRes.status}`);
   console.log("[smoke] PASS");
 }
 

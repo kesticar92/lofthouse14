@@ -13,6 +13,7 @@ export function GuestBottomNav() {
   const items = [
     { href: "/reservar", label: t("nav.book", locale) },
     { href: "/mi-reserva", label: t("nav.myReservation", locale) },
+    { href: "/mensajes", label: t("nav.messages", locale) },
     { href: "/ayuda", label: t("nav.help", locale) },
   ] as const;
 
@@ -28,13 +29,14 @@ export function GuestBottomNav() {
             (item.href === "/mi-reserva" &&
               (pathname.startsWith("/confirmacion") ||
                 pathname.startsWith("/check-in") ||
-                pathname.startsWith("/mi-reserva")));
+                pathname.startsWith("/mi-reserva"))) ||
+            (item.href === "/mensajes" && pathname.startsWith("/mensajes"));
           return (
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 px-2 py-3 text-[11px] font-semibold uppercase tracking-wider transition",
+                  "flex flex-col items-center justify-center gap-0.5 px-1 py-3 text-[10px] font-semibold uppercase tracking-wider transition sm:text-[11px]",
                   active
                     ? "text-amber-900 dark:text-amber-300"
                     : "text-zinc-500 dark:text-zinc-400",

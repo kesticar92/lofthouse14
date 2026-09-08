@@ -8,7 +8,8 @@
 
 const WINDOW_MS = 60_000;
 const DEFAULT_ADMIN_MAX = 240;
-const DEFAULT_PUBLIC_MAX = 60;
+/** Público más estricto (booking / availability / messages / fx). */
+const DEFAULT_PUBLIC_MAX = 45;
 
 type Bucket = { resetAt: number; count: number };
 

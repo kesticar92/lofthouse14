@@ -234,6 +234,21 @@ export async function PATCH(
         local.status = "checked_out";
         upsertLocalReservation(local);
       }
+      const { createDirtyTaskOnCheckout } = await import(
+        "@/lib/ops/housekeeping"
+      );
+      const { recordLocalAudit } = await import("@/lib/audit/local-audit");
+      const hk = createDirtyTaskOnCheckout({
+        reservationCode: code,
+        propertyId: property_id,
+        roomId: (data as { room_id?: string | null })?.room_id ?? null,
+      });
+      recordLocalAudit({
+        action: "housekeeping.checkout_dirty",
+        entity_type: "housekeeping_task",
+        entity_id: hk.id,
+        metadata: { reservation_code: code, via: "pms_patch" },
+      });
     }
   }
 

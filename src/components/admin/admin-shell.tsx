@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { AdminNotificationBell } from "@/components/admin/admin-notification-bell";
 import { OrgSwitcher } from "@/components/admin/org-switcher";
+import { AdminBreadcrumbs } from "@/components/admin/admin-page-header";
 
 type NavItem = {
   href: string;
@@ -483,7 +484,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </nav>
         </aside>
 
-        <main className="min-w-0 flex-1 space-y-6">{children}</main>
+        <main className="min-w-0 flex-1 space-y-6">
+          <AdminBreadcrumbs />
+          {children}
+        </main>
       </div>
     </div>
   );

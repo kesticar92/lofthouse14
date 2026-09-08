@@ -89,6 +89,9 @@ export function isAdminOnlyAdminPath(pathname: string): boolean {
 /** Módulo requerido para una ruta `/admin/...`, o `null` si no aplica (p. ej. `/admin`). */
 export function adminModuleForPath(pathname: string): AdminModuleKey | null {
   const p = pathname.replace(/\/$/, "") || "/";
+  if (p === "/admin/saas" || p.startsWith("/admin/saas/")) {
+    return "analytics";
+  }
   if (p === "/admin/mantenimiento" || p.startsWith("/admin/mantenimiento/")) {
     return "aseos";
   }

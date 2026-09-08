@@ -20,6 +20,7 @@ describe("adminModuleForPath", () => {
     expect(adminModuleForPath("/admin/promociones")).toBe("cotizaciones");
     expect(adminModuleForPath("/admin/reportes")).toBe("analytics");
     expect(adminModuleForPath("/admin/reviews")).toBe("crm");
+    expect(adminModuleForPath("/admin/saas")).toBe("analytics");
   });
 });
 

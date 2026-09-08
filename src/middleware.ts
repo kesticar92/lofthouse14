@@ -9,6 +9,17 @@ import {
   publicApiClientKey,
 } from "@/lib/admin-rate-limit";
 
+function isRateLimitedPublicApi(pathname: string): boolean {
+  return (
+    pathname.startsWith("/api/public/booking") ||
+    pathname.startsWith("/api/public/availability") ||
+    pathname.startsWith("/api/public/messages") ||
+    pathname.startsWith("/api/public/coupons") ||
+    pathname.startsWith("/api/public/fx") ||
+    pathname.startsWith("/api/public/reviews")
+  );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -21,10 +32,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (
-    pathname.startsWith("/api/public/booking") ||
-    pathname.startsWith("/api/public/availability")
-  ) {
+  if (isRateLimitedPublicApi(pathname)) {
     if (!allowPublicApiRequest(publicApiClientKey(request))) {
       return NextResponse.json(
         { error: "Too many requests", code: "RATE_LIMIT" },

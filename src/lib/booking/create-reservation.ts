@@ -23,6 +23,11 @@ import { LOFTHOUSE_ORGANIZATION_ID } from "@/lib/tenant/constants";
 import { ROOM_TYPE_IDS, type MarketingCategory } from "@/lib/catalog/seed";
 import { createLocalPendingPayment } from "@/lib/payments/local-store";
 import type { LocalPayment } from "@/lib/payments/local-store";
+import {
+  computeDepositAmounts,
+  depositPercentFromEnv,
+} from "@/lib/payments/deposit";
+import { recordLocalAudit } from "@/lib/audit/local-audit";
 
 export type BookingExtra = {
   id: string;
@@ -176,24 +181,48 @@ export function createLocalBooking(input: CreateBookingInput): CreateBookingResu
 
   const payment =
     reservation.price != null && reservation.price > 0
-      ? createLocalPendingPayment({
-          organizationId: LOFTHOUSE_ORGANIZATION_ID,
-          reservationId: reservation.id,
-          reservationCode: reservation.reservation_code,
-          amount: reservation.price,
-          provider: "stub",
-          metadata: {
-            source: reservation.source,
-            lofts: needed,
-            walk_in: Boolean(input.walkIn),
-          },
-        })
+      ? (() => {
+          const dep = computeDepositAmounts(
+            reservation.price,
+            depositPercentFromEnv(),
+          );
+          return createLocalPendingPayment({
+            organizationId: LOFTHOUSE_ORGANIZATION_ID,
+            reservationId: reservation.id,
+            reservationCode: reservation.reservation_code,
+            amount: dep.total,
+            depositAmount: dep.deposit,
+            depositPercent: dep.percent,
+            provider: "stub",
+            metadata: {
+              source: reservation.source,
+              lofts: needed,
+              walk_in: Boolean(input.walkIn),
+              deposit_percent: dep.percent,
+              balance_due: dep.balance_due,
+            },
+          });
+        })()
       : undefined;
 
   if (payment) {
-    reservation.payment_status = "pending";
+    reservation.payment_status = "pending_deposit";
     upsertLocalReservation(reservation);
   }
+
+  recordLocalAudit({
+    action: input.walkIn ? "booking.walk_in" : "booking.create",
+    entity_type: "reservation",
+    entity_id: reservation.reservation_code,
+    metadata: {
+      check_in: checkIn,
+      check_out: checkOut,
+      guests,
+      lofts: needed,
+      deposit: payment?.deposit_amount ?? null,
+      total: payment?.amount ?? reservation.price,
+    },
+  });
 
   return {
     ok: true,

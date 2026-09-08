@@ -43,6 +43,10 @@ export function guestPaymentLabel(status?: string | null): string {
       return "Saldo pendiente";
     case "pending":
       return "Pago en proceso";
+    case "pending_deposit":
+      return "Depósito pendiente";
+    case "deposit_paid":
+      return "Depósito pagado";
     case "partial":
       return "Pago parcial";
     case "paid":
@@ -51,6 +55,9 @@ export function guestPaymentLabel(status?: string | null): string {
       return "Reembolsado";
     case "failed":
       return "Pago fallido";
+    case "cancelled":
+    case "cancelled_with_fee":
+      return "Cancelado";
     default:
       return status?.trim() || "Sin info de pago";
   }
@@ -64,12 +71,15 @@ export function guestStatusTone(
     case "checked_in":
     case "checked_out":
     case "paid":
+    case "deposit_paid":
       return "ok";
     case "pending":
+    case "pending_deposit":
     case "unpaid":
     case "partial":
       return "warn";
     case "cancelled":
+    case "cancelled_with_fee":
     case "no_show":
     case "failed":
       return "bad";

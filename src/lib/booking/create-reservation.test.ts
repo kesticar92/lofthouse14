@@ -92,7 +92,7 @@ describe("createLocalBooking", () => {
     }
   });
 
-  it("crea payment pending cuando hay precio", () => {
+  it("crea payment pending_deposit cuando hay precio", () => {
     const r = createLocalBooking({
       checkIn: "2026-12-10",
       checkOut: "2026-12-12",
@@ -103,13 +103,14 @@ describe("createLocalBooking", () => {
     });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    expect(r.reservation.payment_status).toBe("pending");
+    expect(r.reservation.payment_status).toBe("pending_deposit");
     expect(r.payment?.amount).toBe(180_000);
+    expect(r.payment?.deposit_amount).toBe(54_000);
     expect(getLocalPaymentByCode(r.reservation.reservation_code)?.status).toBe(
       "pending",
     );
     expect(lookupLocalBooking(r.reservation.reservation_code)?.payment_status).toBe(
-      "pending",
+      "pending_deposit",
     );
   });
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { JsonLd } from "@/components/seo/json-ld";
+import { AvailabilityCalendarLite } from "@/components/availability/availability-calendar-lite";
 import { LOFTS } from "@/data/lofts";
 import { SEO, absoluteUrl, breadcrumbJsonLd } from "@/lib/seo";
 import { site, waLink } from "@/lib/site";
@@ -77,6 +78,8 @@ export default function LoftsIndexPage() {
             Consultar por WhatsApp
           </a>
         </div>
+
+        <AvailabilityCalendarLite />
       </section>
     </MarketingShell>
   );

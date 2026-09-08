@@ -34,7 +34,18 @@ export type GuestPaymentView = {
   status?: string;
   amount?: number;
   amount_paid?: number;
-  balance?: number;
+  deposit_amount?: number;
+  deposit_percent?: number;
+  balance?:
+    | number
+    | {
+        total?: number;
+        paid?: number;
+        due?: number;
+        deposit?: number;
+        deposit_due?: number;
+        balance_after_deposit?: number;
+      };
   provider?: string;
 };
 
@@ -96,10 +107,28 @@ export function ReservationPanel({
     reservation.payment_status,
   );
 
+  const balObj =
+    payment?.balance && typeof payment.balance === "object"
+      ? payment.balance
+      : null;
+  const depositAmount =
+    payment?.deposit_amount ?? balObj?.deposit ?? null;
+  const depositDue = balObj?.deposit_due ?? null;
+  const balanceDue =
+    balObj?.due ??
+    (typeof payment?.balance === "number" ? payment.balance : null);
+
   const paid =
     localPaymentStatus === "paid" ||
     payment?.status === "paid" ||
-    (payment?.balance != null && payment.balance <= 0 && payment.status === "paid");
+    (typeof payment?.balance === "number" &&
+      payment.balance <= 0 &&
+      payment.status === "paid");
+  const depositPaid =
+    paid ||
+    localPaymentStatus === "deposit_paid" ||
+    payment?.status === "deposit_paid" ||
+    (depositDue != null && depositDue <= 0 && (payment?.amount_paid ?? 0) > 0);
 
   const waMsg = [
     `Hola ${site.name}, necesito ayuda con mi reserva ${code}:`,
@@ -107,7 +136,7 @@ export function ReservationPanel({
     `Fechas: ${reservation.check_in} → ${reservation.check_out}`,
   ].join("\n");
 
-  async function simulatePay() {
+  async function simulatePay(kind: "deposit" | "balance" | "full") {
     setPayBusy(true);
     setPayErr(null);
     setPayMsg(null);
@@ -117,7 +146,7 @@ export function ReservationPanel({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ simulate: true }),
+          body: JSON.stringify({ simulate: true, kind }),
         },
       );
       const data = await res.json().catch(() => ({}));
@@ -125,7 +154,12 @@ export function ReservationPanel({
         setPayErr((data as { error?: string }).error ?? `Error ${res.status}`);
         return;
       }
-      setLocalPaymentStatus("paid");
+      const nextStatus =
+        (data as { reservation?: { payment_status?: string } }).reservation
+          ?.payment_status ??
+        (data as { payment?: { status?: string } }).payment?.status ??
+        (kind === "deposit" ? "deposit_paid" : "paid");
+      setLocalPaymentStatus(nextStatus);
       setPayMsg(
         (data as { note?: string }).note ??
           "Pago mock registrado. No es un cargo real.",
@@ -224,19 +258,55 @@ export function ReservationPanel({
             Incluye extras {formatCOP(extrasTotal)}
           </p>
         ) : null}
+        {depositAmount != null && depositAmount > 0 ? (
+          <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+            {t("guest.depositLabel", locale)}
+            {payment?.deposit_percent
+              ? ` (${payment.deposit_percent}%)`
+              : ""}
+            : {formatCOP(depositAmount)}
+            {depositPaid && !paid ? " · pagado" : ""}
+          </p>
+        ) : null}
+        {balanceDue != null && !paid ? (
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+            {t("guest.balanceDue", locale)}: {formatCOP(balanceDue)}
+          </p>
+        ) : null}
         <p className="mt-2 text-xs text-zinc-500">
           {guestPaymentLabel(localPaymentStatus ?? payment?.status)} · pago real
           vía Wompi pendiente de integración.
         </p>
         {!paid && reservation.status !== "cancelled" ? (
-          <button
-            type="button"
-            disabled={payBusy}
-            onClick={() => void simulatePay()}
-            className="mt-3 rounded-full bg-amber-900 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50 dark:bg-amber-500 dark:text-zinc-950"
-          >
-            {payBusy ? "…" : t("cta.payMock", locale)}
-          </button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {!depositPaid ? (
+              <button
+                type="button"
+                disabled={payBusy}
+                onClick={() => void simulatePay("deposit")}
+                className="rounded-full bg-amber-900 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50 dark:bg-amber-500 dark:text-zinc-950"
+              >
+                {payBusy ? "…" : t("cta.payDeposit", locale)}
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={payBusy}
+                onClick={() => void simulatePay("balance")}
+                className="rounded-full bg-amber-900 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50 dark:bg-amber-500 dark:text-zinc-950"
+              >
+                {payBusy ? "…" : t("cta.payBalance", locale)}
+              </button>
+            )}
+            <button
+              type="button"
+              disabled={payBusy}
+              onClick={() => void simulatePay("full")}
+              className="rounded-full border border-zinc-300 px-4 py-2.5 text-xs font-semibold disabled:opacity-50 dark:border-zinc-600"
+            >
+              {payBusy ? "…" : t("cta.payMock", locale)}
+            </button>
+          </div>
         ) : null}
         {payMsg ? (
           <p className="mt-2 text-xs text-emerald-800 dark:text-emerald-200">
@@ -293,6 +363,12 @@ export function ReservationPanel({
         >
           {t("cta.whatsappHelp", locale)}
         </a>
+        <Link
+          href={`/mensajes`}
+          className="rounded-full border border-zinc-300 px-4 py-2.5 text-xs font-semibold dark:border-zinc-600"
+        >
+          {t("cta.messages", locale)}
+        </Link>
         <Link
           href="/ayuda"
           className="rounded-full border border-zinc-300 px-4 py-2.5 text-xs font-semibold dark:border-zinc-600"

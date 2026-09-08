@@ -28,6 +28,14 @@ type Folio = {
     created_at: string;
   }>;
   balance: { charges_total: number; payments_total: number; balance: number };
+  deposit?: {
+    percent?: number;
+    amount?: number;
+    paid?: number;
+    status?: string;
+    due?: number;
+    deposit_due?: number;
+  } | null;
   draft_invoice?: {
     id: string;
     total: number;
@@ -139,6 +147,23 @@ export default function AdminFolioDetailPage() {
               <p className="font-display text-4xl">
                 {formatCOP(folio.balance.balance)}
               </p>
+              {folio.deposit ? (
+                <div className="mt-3 space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
+                  <p>
+                    Depósito ({folio.deposit.percent ?? 30}%):{" "}
+                    <strong>
+                      {formatCOP(folio.deposit.amount ?? 0)}
+                    </strong>
+                    {folio.deposit.status
+                      ? ` · ${folio.deposit.status}`
+                      : ""}
+                  </p>
+                  <p>
+                    Pagado: {formatCOP(folio.deposit.paid ?? 0)} · Balance due:{" "}
+                    {formatCOP(folio.deposit.due ?? folio.balance.balance)}
+                  </p>
+                </div>
+              ) : null}
               {msg ? (
                 <p className="mt-2 text-xs text-zinc-500">{msg}</p>
               ) : null}

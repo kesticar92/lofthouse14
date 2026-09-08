@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackLoftView } from "@/components/analytics/track-loft-view";
+import { LoftReserveCta } from "@/components/lofts/loft-reserve-cta";
 import { LOFTS, getLoftBySlug } from "@/data/lofts";
 import {
   SEO,
@@ -12,7 +12,6 @@ import {
   breadcrumbJsonLd,
   hotelRoomJsonLd,
 } from "@/lib/seo";
-import { waLink } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -95,22 +94,11 @@ export default async function LoftDetailPage({ params }: Props) {
             </li>
           ))}
         </ul>
-        <div className="mt-10 flex flex-wrap gap-3">
-          <a
-            href={waLink(
-              `Hola, quiero reservar el ${loft.shortName} en Lofthouse 14. Fechas ____.`,
-            )}
-            className="inline-flex rounded-full bg-zinc-900 px-8 py-4 text-sm font-bold uppercase tracking-wide text-white dark:bg-amber-600"
-          >
-            Reservar este loft
-          </a>
-          <Link
-            href="/#reservas"
-            className="inline-flex rounded-full border border-zinc-400 px-6 py-4 text-sm font-bold uppercase tracking-wide text-zinc-800 dark:border-zinc-600 dark:text-zinc-200"
-          >
-            Personaliza tu experiencia
-          </Link>
-        </div>
+        <LoftReserveCta
+          loftName={loft.shortName}
+          categoryId={loft.categoryId}
+          slug={loft.slug}
+        />
       </article>
     </MarketingShell>
   );

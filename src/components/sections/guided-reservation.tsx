@@ -326,6 +326,36 @@ export function GuidedReservation() {
 
     let reservationCode: string | undefined;
     try {
+      // Preflight availability (mismo motor que booking)
+      if (checkIn && checkOut) {
+        const availQs = new URLSearchParams({
+          check_in: checkIn,
+          check_out: checkOut,
+          guests: String(guests),
+        });
+        if (categoryId) availQs.set("category", categoryId);
+        const availRes = await fetch(
+          `/api/public/availability?${availQs.toString()}`,
+        );
+        if (availRes.ok) {
+          const avail = (await availRes.json()) as {
+            available_count?: number;
+          };
+          if ((avail.available_count ?? 0) < Math.max(1, lofts)) {
+            setBookingError(
+              "No hay disponibilidad para esas fechas / categoría. Ajusta fechas o continúa por WhatsApp.",
+            );
+            setBookingBusy(false);
+            window.open(
+              waLink(buildWhatsAppLines().join("\n")),
+              "_blank",
+              "noopener",
+            );
+            return;
+          }
+        }
+      }
+
       const res = await fetch("/api/public/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

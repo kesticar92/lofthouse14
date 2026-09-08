@@ -11,7 +11,9 @@ export async function GET() {
 
   let query = supabase
     .from("properties")
-    .select("id, name, ical_token, created_at, updated_at, organization_id")
+    .select(
+      "id, name, ical_token, created_at, updated_at, organization_id, room_id",
+    )
     .eq("organization_id", organizationId!)
     .order("name");
 
@@ -19,7 +21,43 @@ export async function GET() {
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-  return Response.json({ properties: data ?? [] });
+
+  const properties = data ?? [];
+  const roomIds = properties
+    .map((p) => p.room_id)
+    .filter((id): id is string => Boolean(id));
+
+  let statusByRoom = new Map<string, string>();
+  if (roomIds.length > 0) {
+    const { data: rooms } = await supabase
+      .from("rooms")
+      .select("id, status")
+      .in("id", roomIds);
+    statusByRoom = new Map((rooms ?? []).map((r) => [r.id, r.status]));
+  }
+
+  // Fallback: bridge por legacy_property_id si room_id aún no está poblado
+  const missing = properties.filter((p) => !p.room_id).map((p) => p.id);
+  if (missing.length > 0) {
+    const { data: roomsByLegacy } = await supabase
+      .from("rooms")
+      .select("id, status, legacy_property_id")
+      .in("legacy_property_id", missing);
+    for (const r of roomsByLegacy ?? []) {
+      if (r.legacy_property_id) {
+        statusByRoom.set(r.legacy_property_id, r.status);
+      }
+    }
+  }
+
+  const enriched = properties.map((p) => ({
+    ...p,
+    unit_status: p.room_id
+      ? (statusByRoom.get(p.room_id) ?? null)
+      : (statusByRoom.get(p.id) ?? null),
+  }));
+
+  return Response.json({ properties: enriched });
 }
 
 export async function PATCH(req: Request) {

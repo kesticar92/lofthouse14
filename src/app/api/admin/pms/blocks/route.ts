@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     /** Si true, end_date es el último día bloqueado (inclusivo). Por defecto true. */
     end_inclusive?: boolean;
     reason?: string;
+    block_type?: string;
   };
   try {
     body = await req.json();
@@ -33,6 +34,19 @@ export async function POST(req: Request) {
       { error: "Faltan property_id, start_date o end_date" },
       { status: 400 },
     );
+  }
+  const ALLOWED_BLOCK_TYPES = [
+    "manual",
+    "maintenance",
+    "out_of_service",
+    "owner",
+    "other",
+  ] as const;
+  const block_type = (body.block_type?.trim() || "manual").toLowerCase();
+  if (
+    !(ALLOWED_BLOCK_TYPES as readonly string[]).includes(block_type)
+  ) {
+    return Response.json({ error: "block_type inválido" }, { status: 400 });
   }
   const endAlreadyExclusive = body.end_inclusive === false;
   const { start_date, end_date } = endAlreadyExclusive
@@ -78,11 +92,34 @@ export async function POST(req: Request) {
       start_date,
       end_date,
       reason: body.reason?.trim() ?? "",
+      block_type,
       created_by: user.id,
     })
     .select("*")
     .maybeSingle();
   if (error) {
+    // Columna block_type puede no existir si 021 no está aplicada
+    if (/block_type/i.test(error.message)) {
+      const retry = await supabase
+        .from("availability_blocks")
+        .insert({
+          organization_id: organizationId,
+          property_id,
+          start_date,
+          end_date,
+          reason: body.reason?.trim() ?? "",
+          created_by: user.id,
+        })
+        .select("*")
+        .maybeSingle();
+      if (retry.error) {
+        return Response.json({ error: retry.error.message }, { status: 500 });
+      }
+      return Response.json({
+        block: retry.data,
+        note: "block_type omitido — aplicar migración 021",
+      });
+    }
     return Response.json({ error: error.message }, { status: 500 });
   }
   return Response.json({ block: data });

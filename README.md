@@ -39,6 +39,7 @@ Guías:
 
 - Arquitectura multi-tenant (Fase 0–11): [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - Fases 3–11 (availability → SaaS stubs): [`docs/FASES-3-11.md`](docs/FASES-3-11.md)
+- Post-11 hardening + backlog real (Wompi/OTA/WA/LLM): [`docs/NEXT.md`](docs/NEXT.md)
 - API / Security / Deployment / Testing: [`docs/API.md`](docs/API.md), [`docs/SECURITY.md`](docs/SECURITY.md), [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md), [`docs/TESTING.md`](docs/TESTING.md)
 - Credenciales **Supabase** y **Sentry**: [`docs/credenciales-supabase-sentry.md`](docs/credenciales-supabase-sentry.md)
 - **Sentry MCP** en Cursor: [`docs/mcp-sentry-cursor.md`](docs/mcp-sentry-cursor.md)

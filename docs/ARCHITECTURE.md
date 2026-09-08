@@ -4,6 +4,7 @@
 > **Fase 1 — Foundations multi-tenant:** implementada en branch `cursor/fase1-foundations-multitenant-f0b5`. Detalle: [`docs/FASE1.md`](./FASE1.md).  
 > **Fase 2 — Catálogo RoomType/Room:** implementada en branch `cursor/fase2-catalogo-pms-f0b5`. Detalle: [`docs/FASE2.md`](./FASE2.md).  
 > **Fases 3–11 — Plataforma (availability → SaaS stubs):** implementadas en branch `cursor/fase3-a-11-plataforma-f0b5`. Detalle: [`docs/FASES-3-11.md`](./FASES-3-11.md).  
+> **Post-11 hardening:** `cursor/post-fases-hardening-f0b5` — [`docs/NEXT.md`](./NEXT.md).  
 > Fecha auditoría: 2026-09-07 · Branch Fase 0: `cursor/fase0-auditoria-arquitectura-f0b5`  
 > Este documento **reutiliza** el avance existente (website, hero cards Vista/Atrio/Cielo, banner de fechas, Personaliza tu experiencia, booking wizard, admin, pricing, PMS parcial). **No** justifica reescribir ni borrar ese trabajo.
 
@@ -178,7 +179,7 @@ Organization (tenant)
 4. **Booking público sin backend:** no consulta `reservations`/`availability_blocks`; riesgo de overbooking si se “confirma” solo por WhatsApp.
 5. **Pricing divergente:** categorías muestran precios desde 90/105/120k; motor `DEFAULT_PRICING` usa base 90/100k L-J/V-D; admin puede persistir otra config en `app_settings`.
 6. **`guest_reviews` fuera de `database.types.ts`:** migración 016 existe; tipos generados no la incluyen.
-7. **Rate limit muerto:** `src/lib/admin-rate-limit.ts` no está cableado en middleware/API (doc antigua lo daba por hecho).
+7. **Rate limit:** cableado en middleware para `/api/admin/*` y `/api/public/{booking,availability}` (ver `admin-rate-limit.ts`). Ajuste vía env.
 8. **README desactualizado:** aún sugiere que cotizaciones/inventario/aseos viven solo en localStorage; ya hay tablas + APIs + banners de migración.
 9. **Canal “Booking/Expedia”:** el tipo `ReservationSource` los nombra, pero solo hay sync iCal práctico (Airbnb).
 10. **Deploy dual:** crons en Vercel + operación en Droplet — riesgo de doble ejecución o cron no activo según hosting.

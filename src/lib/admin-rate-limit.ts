@@ -1,20 +1,22 @@
 // =============================================================================
-// Rate limiting ligero para /api/admin/* (Edge middleware).
+// Rate limiting ligero para APIs (Edge middleware).
 // Ventana fija por IP; en varias réplicas cada una tiene su contador (aprox.).
 //
-// ADMIN_API_RATE_LIMIT_PER_MINUTE — default 240 (ajústalo en overload real).
+// ADMIN_API_RATE_LIMIT_PER_MINUTE — default 240
+// PUBLIC_API_RATE_LIMIT_PER_MINUTE — default 60 (booking / availability)
 // =============================================================================
 
 const WINDOW_MS = 60_000;
-const DEFAULT_MAX = 240;
+const DEFAULT_ADMIN_MAX = 240;
+const DEFAULT_PUBLIC_MAX = 60;
 
 type Bucket = { resetAt: number; count: number };
 
 const buckets = new Map<string, Bucket>();
 
-function maxPerWindow(): number {
-  const n = Number(process.env.ADMIN_API_RATE_LIMIT_PER_MINUTE);
-  return Number.isFinite(n) && n > 0 ? Math.floor(n) : DEFAULT_MAX;
+function envMax(name: string, fallback: number): number {
+  const n = Number(process.env[name]);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback;
 }
 
 function prune(now: number): void {
@@ -27,13 +29,12 @@ function prune(now: number): void {
 /**
  * @returns true si la solicitud puede continuar.
  */
-export function allowAdminApiRequest(ipKey: string): boolean {
+export function allowRequest(bucketKey: string, max: number): boolean {
   const now = Date.now();
   prune(now);
-  const max = maxPerWindow();
-  const b = buckets.get(ipKey);
+  const b = buckets.get(bucketKey);
   if (!b || now > b.resetAt) {
-    buckets.set(ipKey, { resetAt: now + WINDOW_MS, count: 1 });
+    buckets.set(bucketKey, { resetAt: now + WINDOW_MS, count: 1 });
     return true;
   }
   if (b.count >= max) return false;
@@ -41,11 +42,38 @@ export function allowAdminApiRequest(ipKey: string): boolean {
   return true;
 }
 
-export function adminApiClientKey(req: { headers: Headers }): string {
+export function allowAdminApiRequest(ipKey: string): boolean {
+  return allowRequest(ipKey, envMax("ADMIN_API_RATE_LIMIT_PER_MINUTE", DEFAULT_ADMIN_MAX));
+}
+
+export function allowPublicApiRequest(ipKey: string): boolean {
+  return allowRequest(
+    ipKey,
+    envMax("PUBLIC_API_RATE_LIMIT_PER_MINUTE", DEFAULT_PUBLIC_MAX),
+  );
+}
+
+export function clientIpKey(
+  req: { headers: Headers },
+  prefix: string,
+): string {
   const xf = req.headers.get("x-forwarded-for");
   const ip =
     xf?.split(",")[0]?.trim() ||
     req.headers.get("x-real-ip")?.trim() ||
     "unknown";
-  return `admin:${ip}`;
+  return `${prefix}:${ip}`;
+}
+
+export function adminApiClientKey(req: { headers: Headers }): string {
+  return clientIpKey(req, "admin");
+}
+
+export function publicApiClientKey(req: { headers: Headers }): string {
+  return clientIpKey(req, "public");
+}
+
+/** Solo tests — vacía buckets en memoria. */
+export function __resetRateLimitBucketsForTests(): void {
+  buckets.clear();
 }

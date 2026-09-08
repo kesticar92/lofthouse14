@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
+import { AdminAsyncState } from "@/components/admin/admin-async-state";
 
 type Adapter = { id: string; displayName: string; isStub: boolean };
 
@@ -9,17 +10,36 @@ export default function AdminCanalesPage() {
   const [adapters, setAdapters] = useState<Adapter[]>([]);
   const [logs, setLogs] = useState<unknown[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  async function load() {
-    const res = await fetch("/api/admin/channels");
-    const data = await res.json();
-    setAdapters(data.adapters ?? []);
-    setLogs(data.logs ?? []);
-  }
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/channels");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(
+          (data as { error?: string }).error ??
+            `Error ${res.status}`,
+        );
+        setAdapters([]);
+        setLogs([]);
+        return;
+      }
+      setAdapters(data.adapters ?? []);
+      setLogs(data.logs ?? []);
+    } catch {
+      setError("No se pudo cargar canales.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     void load();
-  }, []);
+  }, [load]);
 
   async function simulate(channel: string) {
     setMsg(null);
@@ -47,36 +67,51 @@ export default function AdminCanalesPage() {
         </p>
       </div>
       <AdminCard title="Adapters" subtitle="Simulador admin">
-        <ul className="space-y-2">
-          {adapters.map((a) => (
-            <li
-              key={a.id}
-              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-black/10 px-3 py-2 text-sm dark:border-white/10"
-            >
-              <span>
-                {a.displayName}{" "}
-                {a.isStub ? (
-                  <span className="text-xs text-amber-700">(stub)</span>
-                ) : (
-                  <span className="text-xs text-emerald-700">(live/local)</span>
-                )}
-              </span>
-              <button
-                type="button"
-                onClick={() => void simulate(a.id)}
-                className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+        <AdminAsyncState
+          loading={loading}
+          error={error}
+          empty={!loading && !error && adapters.length === 0}
+          emptyMessage="No hay adapters registrados."
+          onRetry={() => void load()}
+        >
+          <ul className="space-y-2">
+            {adapters.map((a) => (
+              <li
+                key={a.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-black/10 px-3 py-2 text-sm dark:border-white/10"
               >
-                Simular sync
-              </button>
-            </li>
-          ))}
-        </ul>
-        {msg ? <p className="mt-3 text-xs text-zinc-600">{msg}</p> : null}
+                <span>
+                  {a.displayName}{" "}
+                  {a.isStub ? (
+                    <span className="text-xs text-amber-700">(stub)</span>
+                  ) : (
+                    <span className="text-xs text-emerald-700">(live/local)</span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void simulate(a.id)}
+                  className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-semibold"
+                >
+                  Simular sync
+                </button>
+              </li>
+            ))}
+          </ul>
+          {msg ? <p className="mt-3 text-xs text-zinc-600">{msg}</p> : null}
+        </AdminAsyncState>
       </AdminCard>
       <AdminCard title="Últimos logs" subtitle="channel_sync_logs">
-        <pre className="max-h-64 overflow-auto text-xs">
-          {JSON.stringify(logs, null, 2)}
-        </pre>
+        <AdminAsyncState
+          loading={loading}
+          error={null}
+          empty={!loading && logs.length === 0}
+          emptyMessage="Sin logs de sync todavía. Usa «Simular sync»."
+        >
+          <pre className="max-h-64 overflow-auto text-xs">
+            {JSON.stringify(logs, null, 2)}
+          </pre>
+        </AdminAsyncState>
       </AdminCard>
     </AdminShell>
   );

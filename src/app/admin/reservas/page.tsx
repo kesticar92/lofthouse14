@@ -32,6 +32,7 @@ export default function AdminReservasPage() {
     endInclusive: string;
   } | null>(null);
   const [blockReason, setBlockReason] = useState("");
+  const [blockType, setBlockType] = useState("manual");
 
   const [resForm, setResForm] = useState({
     property_id: "",
@@ -312,6 +313,7 @@ export default function AdminReservasPage() {
       start_date: blockDraft.start,
       end_date: blockDraft.endInclusive,
       reason: blockReason,
+      block_type: blockType,
     });
     setBusy(false);
     if (!r.ok) {
@@ -321,6 +323,7 @@ export default function AdminReservasPage() {
     setShowBlock(false);
     setBlockDraft(null);
     setBlockReason("");
+    setBlockType("manual");
     setMsg("Bloqueo creado.");
     await pms.refresh();
   }
@@ -477,6 +480,36 @@ export default function AdminReservasPage() {
                   await pms.refresh();
                 }
                 return r;
+              }}
+              onReservationStatus={async ({ id, status }) => {
+                setErr(null);
+                setMsg(null);
+                const res = await fetch(`/api/admin/pms/reservations/${id}`, {
+                  method: "PATCH",
+                  credentials: "include",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ status }),
+                });
+                const text = await res.text();
+                let data: { error?: string } = {};
+                try {
+                  data = JSON.parse(text) as { error?: string };
+                } catch {
+                  return { ok: false, error: text || res.statusText };
+                }
+                if (!res.ok) {
+                  setErr(data.error ?? res.statusText);
+                  return { ok: false, error: data.error ?? res.statusText };
+                }
+                setMsg(
+                  status === "checked_in"
+                    ? "Check-in registrado."
+                    : status === "checked_out"
+                      ? "Check-out registrado."
+                      : "Estado actualizado.",
+                );
+                await pms.refresh();
+                return { ok: true };
               }}
             />
           )}
@@ -683,11 +716,27 @@ export default function AdminReservasPage() {
                 placeholder="Mantenimiento, uso propio…"
               />
             </Field>
+            <Field label="Tipo de bloqueo">
+              <select
+                className="w-full rounded-lg border border-black/10 bg-white px-2 py-2 text-sm dark:border-white/10 dark:bg-zinc-900"
+                value={blockType}
+                onChange={(e) => setBlockType(e.target.value)}
+              >
+                <option value="manual">Manual</option>
+                <option value="maintenance">Mantenimiento</option>
+                <option value="out_of_service">Fuera de servicio</option>
+                <option value="owner">Owner</option>
+                <option value="other">Otro</option>
+              </select>
+            </Field>
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
                 className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-600"
-                onClick={() => setShowBlock(false)}
+                onClick={() => {
+                  setShowBlock(false);
+                  setBlockType("manual");
+                }}
               >
                 Cancelar
               </button>

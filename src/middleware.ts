@@ -4,7 +4,9 @@ import type { NextRequest } from "next/server";
 import { isStaffRole, supabasePublicEnv } from "@/lib/supabase/env";
 import {
   allowAdminApiRequest,
+  allowPublicApiRequest,
   adminApiClientKey,
+  publicApiClientKey,
 } from "@/lib/admin-rate-limit";
 
 export async function middleware(request: NextRequest) {
@@ -12,6 +14,18 @@ export async function middleware(request: NextRequest) {
 
   if (pathname.startsWith("/api/admin")) {
     if (!allowAdminApiRequest(adminApiClientKey(request))) {
+      return NextResponse.json(
+        { error: "Too many requests", code: "RATE_LIMIT" },
+        { status: 429 },
+      );
+    }
+  }
+
+  if (
+    pathname.startsWith("/api/public/booking") ||
+    pathname.startsWith("/api/public/availability")
+  ) {
+    if (!allowPublicApiRequest(publicApiClientKey(request))) {
       return NextResponse.json(
         { error: "Too many requests", code: "RATE_LIMIT" },
         { status: 429 },

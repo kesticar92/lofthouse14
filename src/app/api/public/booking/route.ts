@@ -98,7 +98,8 @@ export async function POST(req: Request) {
           propertyIds.length
             ? propertyIds
             : ["00000000-0000-0000-0000-000000000000"],
-        );
+        )
+        .neq("status", "cancelled");
 
       const { data: blocks } = await admin
         .from("availability_blocks")
@@ -110,10 +111,30 @@ export async function POST(req: Request) {
             : ["00000000-0000-0000-0000-000000000000"],
         );
 
+      let holds: Array<{
+        id: string;
+        property_id: string;
+        check_in: string;
+        check_out: string;
+        status: string;
+        expires_at: string;
+      }> = [];
+      try {
+        const { data: holdRows } = await admin
+          .from("availability_holds")
+          .select("id, property_id, check_in, check_out, status, expires_at")
+          .eq("status", "active")
+          .gt("expires_at", new Date().toISOString());
+        holds = holdRows ?? [];
+      } catch {
+        /* tabla 021 puede no existir */
+      }
+
       const units = unitsFromCatalogRows(rooms);
       const intervals = intervalsFromDbRows({
         reservations: reservations ?? [],
         blocks: blocks ?? [],
+        holds,
       });
 
       const available = findAvailableUnits({

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
+import { AdminAsyncState } from "@/components/admin/admin-async-state";
 
 export default function AdminAnalyticsPage() {
   const [data, setData] = useState<{
@@ -9,12 +10,34 @@ export default function AdminAnalyticsPage() {
     recommendations?: Array<{ title: string; suggestedAction: string }>;
     ai?: { message: string; ok: boolean };
   } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/analytics");
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((json as { error?: string }).error ?? `Error ${res.status}`);
+        setData(null);
+        return;
+      }
+      setData(json);
+    } catch {
+      setError("No se pudo cargar analytics.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    void fetch("/api/admin/analytics")
-      .then((r) => r.json())
-      .then(setData);
-  }, []);
+    void load();
+  }, [load]);
+
+  const metrics = data?.metrics ?? {};
+  const recs = data?.recommendations ?? [];
 
   return (
     <AdminShell>
@@ -33,20 +56,41 @@ export default function AdminAnalyticsPage() {
         </a>
       </div>
       <AdminCard title="Métricas" subtitle="Ocupación / ADR / RevPAR">
-        <pre className="text-xs">{JSON.stringify(data?.metrics ?? {}, null, 2)}</pre>
+        <AdminAsyncState
+          loading={loading}
+          error={error}
+          empty={!loading && !error && Object.keys(metrics).length === 0}
+          emptyMessage="Sin métricas (crea reservas para ver ocupación)."
+          onRetry={() => void load()}
+        >
+          <pre className="text-xs">{JSON.stringify(metrics, null, 2)}</pre>
+        </AdminAsyncState>
       </AdminCard>
       <AdminCard title="Revenue recommendations" subtitle="autoApply=false">
-        <ul className="space-y-2 text-sm">
-          {(data?.recommendations ?? []).map((r, i) => (
-            <li key={i} className="rounded border border-black/10 p-2 dark:border-white/10">
-              <strong>{r.title}</strong>
-              <p className="text-xs text-zinc-600">{r.suggestedAction}</p>
-            </li>
-          ))}
-        </ul>
+        <AdminAsyncState
+          loading={loading}
+          empty={!loading && recs.length === 0}
+          emptyMessage="Sin recomendaciones en este momento."
+        >
+          <ul className="space-y-2 text-sm">
+            {recs.map((r, i) => (
+              <li
+                key={i}
+                className="rounded border border-black/10 p-2 dark:border-white/10"
+              >
+                <strong>{r.title}</strong>
+                <p className="text-xs text-zinc-600">{r.suggestedAction}</p>
+              </li>
+            ))}
+          </ul>
+        </AdminAsyncState>
       </AdminCard>
       <AdminCard title="AI assistant" subtitle="Requires LLM key">
-        <p className="text-sm text-zinc-700">{data?.ai?.message}</p>
+        <AdminAsyncState loading={loading}>
+          <p className="text-sm text-zinc-700">
+            {data?.ai?.message ?? "AI no disponible."}
+          </p>
+        </AdminAsyncState>
       </AdminCard>
     </AdminShell>
   );

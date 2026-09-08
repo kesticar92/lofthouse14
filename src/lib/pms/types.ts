@@ -18,13 +18,31 @@ export type ReservationSource =
   | "manual"
   | string;
 
+export type UnitOperationalStatus =
+  | "active"
+  | "inactive"
+  | "maintenance"
+  | "storage"
+  | "out_of_service"
+  | string;
+
 export type PropertyRow = {
   id: string;
   name: string;
   ical_token: string;
   created_at: string;
   updated_at: string;
+  /** Estado operativo del room bridged (021+); opcional si no hay catálogo. */
+  unit_status?: UnitOperationalStatus | null;
+  room_id?: string | null;
 };
+
+export type BlockType =
+  | "manual"
+  | "maintenance"
+  | "out_of_service"
+  | "owner"
+  | "other";
 
 export type ReservationRow = {
   id: string;
@@ -55,6 +73,9 @@ export type AvailabilityBlockRow = {
   reason: string;
   created_by: string | null;
   created_at: string;
+  /** Presente tras migración 021 */
+  block_type?: BlockType | string | null;
+  organization_id?: string | null;
 };
 
 export type IcalSourceRow = {

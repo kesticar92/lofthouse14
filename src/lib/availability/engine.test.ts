@@ -117,6 +117,28 @@ describe("findAvailableUnits", () => {
       }),
     ).toHaveLength(1);
   });
+
+  it("checked_in y confirmed siguen ocupando", () => {
+    for (const status of ["confirmed", "checked_in", "pending"] as const) {
+      const intervals: OccupancyInterval[] = [
+        {
+          propertyId: "p1",
+          start: "2026-09-10",
+          endExclusive: "2026-09-13",
+          kind: "reservation",
+          status,
+        },
+      ];
+      expect(
+        findAvailableUnits({
+          units: [units[0]!],
+          intervals,
+          checkIn: "2026-09-11",
+          checkOut: "2026-09-12",
+        }),
+      ).toHaveLength(0);
+    }
+  });
 });
 
 describe("wouldDoubleBook", () => {

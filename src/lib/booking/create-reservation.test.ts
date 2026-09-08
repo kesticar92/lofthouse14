@@ -70,4 +70,20 @@ describe("createLocalBooking", () => {
     });
     expect(r.ok).toBe(false);
   });
+
+  it("reserva pending vs confirmed", () => {
+    const pending = createLocalBooking({
+      checkIn: "2026-12-01",
+      checkOut: "2026-12-03",
+      guests: 2,
+      guestName: "Pendiente",
+      categoryId: "cielo",
+      pending: true,
+    });
+    expect(pending.ok).toBe(true);
+    if (pending.ok) {
+      expect(pending.reservation.status).toBe("pending");
+      expect(pending.reservation.payment_status).toBe("unpaid");
+    }
+  });
 });

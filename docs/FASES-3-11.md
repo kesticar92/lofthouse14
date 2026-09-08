@@ -1,6 +1,7 @@
 # Fases 3–11 — Plataforma PMS / booking / canales / pagos
 
 > Branch: `cursor/fase3-a-11-plataforma-f0b5`  
+> Hardening post-11: `cursor/post-fases-hardening-f0b5` — ver [`NEXT.md`](./NEXT.md).  
 > Base: tip Fase 2 (`cursor/fase2-catalogo-pms-f0b5`) + website UX (cards, banner, Personaliza, RESERVAR).  
 > Fuente de verdad del orden: [`ARCHITECTURE.md`](./ARCHITECTURE.md) §9.
 
@@ -13,14 +14,22 @@
 | Fase | Estado | Usable | Stub / TODO real |
 |------|--------|--------|------------------|
 | **3** Disponibilidad | Hecha | Motor puro + `/api/public/availability` + admin | Holds en DB requieren migración 021 |
-| **4** Booking engine | Hecha | POST `/api/public/booking`, wizard RESERVAR, `/confirmacion`, `/mi-reserva` | Persistencia Supabase si 022; si no → store local memoria |
+| **4** Booking engine | Hecha + harden | POST `/api/public/booking`, wizard RESERVAR (preflight avail), `/confirmacion`, `/mi-reserva` | Persistencia Supabase si 022; si no → store local memoria |
 | **5** Pricing unificado | Hecha | `unifiedQuote` + rate plans seed + admin pricing existente | Temporadas DB (023) opcionales |
-| **6** PMS core | Hecha | Métricas ocupación/ADR/RevPAR en `/admin` + API metrics; statuses check-in/out | Calendario visual sigue el de `/admin/reservas` |
-| **7** Channel Manager | Hecha | Adapters + webhooks stub + `/admin/canales` simulador | Airbnb/Booking/Expedia API reales |
+| **6** PMS core | Hecha + harden | Métricas + calendario con estados / `block_type` / OOS + check-in/out UI | Deep-link quote→reservation avanzado |
+| **7** Channel Manager | Hecha | Adapters + webhooks stub + `/admin/canales` (async states) | Airbnb/Booking/Expedia API reales |
 | **8** Ops | Hecha | Maintenance tickets + OUT_OF_SERVICE → availability; HK statuses | Drive/inventario legacy intactos |
 | **9** CRM | Hecha | Guests, templates `{{vars}}`, automations stub, `/admin/crm` | WhatsApp/Email API reales |
 | **10** Payments | Hecha | PaymentProvider stubs + webhooks + `/admin/pagos` | Wompi/MP/Stripe/PayU keys |
-| **11** Analytics/SaaS | Hecha | CSV export, revenue tips (no auto-apply), AI stub, rate limit, docs | LLM key; billing SaaS |
+| **11** Analytics/SaaS | Hecha | CSV export, revenue tips, AI stub, rate limit admin+público, docs | LLM key; billing SaaS |
+
+### Gaps cerrados en hardening post-11
+
+- PMS calendario: colores por estado, tipos de bloqueo, filas fuera de servicio, panel check-in/out.
+- Booking: holds en create Supabase, cancelled filtrado, preflight availability en wizard.
+- Rate limit público en middleware + tests.
+- Admin canales/CRM/pagos/analytics/mantenimiento: loading / empty / error.
+- Docs: [`NEXT.md`](./NEXT.md) backlog real (Wompi / OTA / WA / LLM).
 
 ---
 
@@ -88,8 +97,11 @@ Smoke sin Supabase:
 4. `/admin/canales` → Simular sync (stub).
 5. `/admin/pagos` → intent stub.
 6. `/admin/analytics` → CSV + AI “requires LLM key”.
+7. `/admin/reservas` → bloqueo con tipo + check-in/out si hay estancia hoy.
 
 Con Supabase: aplicar 021–028 y repetir (persistencia real).
+
+Backlog post-11: [`NEXT.md`](./NEXT.md).
 
 ---
 
@@ -103,3 +115,4 @@ Con Supabase: aplicar 021–028 y repetir (persistencia real).
 - [x] Ops OUT_OF_SERVICE
 - [x] Analytics + docs SECURITY/API/DEPLOYMENT + rate limit
 - [x] Admin local sin Supabase usable
+- [x] Hardening post-11 (calendario / booking / rate limit público / admin async states)

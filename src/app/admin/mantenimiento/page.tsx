@@ -1,36 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
+import { AdminAsyncState } from "@/components/admin/admin-async-state";
 
 export default function AdminMantenimientoPage() {
   const [tickets, setTickets] = useState<unknown[]>([]);
   const [title, setTitle] = useState("");
   const [blocks, setBlocks] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  async function load() {
-    const res = await fetch("/api/admin/maintenance");
-    const data = await res.json();
-    setTickets(data.tickets ?? []);
-  }
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/maintenance");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? `Error ${res.status}`);
+        setTickets([]);
+        return;
+      }
+      setTickets(data.tickets ?? []);
+    } catch {
+      setError("No se pudo cargar mantenimiento.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     void load();
-  }, []);
+  }, [load]);
 
   async function createTicket() {
-    if (!title.trim()) return;
-    await fetch("/api/admin/maintenance", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: title.trim(),
-        blocks_availability: blocks,
-        priority: "high",
-      }),
-    });
-    setTitle("");
-    await load();
+    if (!title.trim() || busy) return;
+    setBusy(true);
+    try {
+      await fetch("/api/admin/maintenance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: title.trim(),
+          blocks_availability: blocks,
+          priority: "high",
+        }),
+      });
+      setTitle("");
+      await load();
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -60,17 +82,26 @@ export default function AdminMantenimientoPage() {
           </label>
           <button
             type="button"
+            disabled={busy}
             onClick={() => void createTicket()}
-            className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white dark:bg-white dark:text-zinc-900"
+            className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-zinc-900"
           >
             Crear
           </button>
         </div>
       </AdminCard>
       <AdminCard title="Tickets">
-        <pre className="max-h-80 overflow-auto text-xs">
-          {JSON.stringify(tickets, null, 2)}
-        </pre>
+        <AdminAsyncState
+          loading={loading}
+          error={error}
+          empty={!loading && !error && tickets.length === 0}
+          emptyMessage="Sin tickets. Crea uno arriba."
+          onRetry={() => void load()}
+        >
+          <pre className="max-h-80 overflow-auto text-xs">
+            {JSON.stringify(tickets, null, 2)}
+          </pre>
+        </AdminAsyncState>
       </AdminCard>
     </AdminShell>
   );

@@ -1,23 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
+import { AdminAsyncState } from "@/components/admin/admin-async-state";
 
 export default function AdminCrmPage() {
   const [guests, setGuests] = useState<unknown[]>([]);
   const [templates, setTemplates] = useState<unknown[]>([]);
   const [preview, setPreview] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    void (async () => {
-      const [g, t] = await Promise.all([
-        fetch("/api/admin/crm/guests").then((r) => r.json()),
-        fetch("/api/admin/crm/templates").then((r) => r.json()),
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [gRes, tRes] = await Promise.all([
+        fetch("/api/admin/crm/guests"),
+        fetch("/api/admin/crm/templates"),
       ]);
+      const g = await gRes.json().catch(() => ({}));
+      const t = await tRes.json().catch(() => ({}));
+      if (!gRes.ok && !tRes.ok) {
+        setError(
+          (g as { error?: string }).error ??
+            (t as { error?: string }).error ??
+            "Error al cargar CRM",
+        );
+        return;
+      }
       setGuests(g.guests ?? []);
       setTemplates(t.templates ?? []);
-    })();
+    } catch {
+      setError("No se pudo cargar CRM.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   async function previewTemplate() {
     const res = await fetch("/api/admin/crm/templates", {
@@ -59,9 +82,17 @@ export default function AdminCrmPage() {
         </p>
       </div>
       <AdminCard title="Huéspedes" subtitle="Historial / perfiles">
-        <pre className="max-h-48 overflow-auto text-xs">
-          {JSON.stringify(guests, null, 2)}
-        </pre>
+        <AdminAsyncState
+          loading={loading}
+          error={error}
+          empty={!loading && !error && guests.length === 0}
+          emptyMessage="Sin huéspedes todavía (aparecen al crear reservas con email)."
+          onRetry={() => void load()}
+        >
+          <pre className="max-h-48 overflow-auto text-xs">
+            {JSON.stringify(guests, null, 2)}
+          </pre>
+        </AdminAsyncState>
       </AdminCard>
       <AdminCard title="Templates" subtitle="Preview variables">
         <button
@@ -74,13 +105,19 @@ export default function AdminCrmPage() {
         {preview ? (
           <p className="mt-3 whitespace-pre-wrap text-sm">{preview}</p>
         ) : null}
-        <ul className="mt-3 list-disc pl-5 text-xs text-zinc-600">
-          {(templates as { code?: string; name?: string }[]).map((t, i) => (
-            <li key={t.code ?? i}>
-              {t.name} ({t.code})
-            </li>
-          ))}
-        </ul>
+        <AdminAsyncState
+          loading={loading}
+          empty={!loading && templates.length === 0}
+          emptyMessage="Sin templates en DB — el preview usa seed en memoria."
+        >
+          <ul className="mt-3 list-disc pl-5 text-xs text-zinc-600">
+            {(templates as { code?: string; name?: string }[]).map((t, i) => (
+              <li key={t.code ?? i}>
+                {t.name} ({t.code})
+              </li>
+            ))}
+          </ul>
+        </AdminAsyncState>
       </AdminCard>
       <AdminCard title="Automations" subtitle="Event stubs">
         <button

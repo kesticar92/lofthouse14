@@ -8,7 +8,14 @@ import {
   parseISODate,
   toISODateString,
 } from "@/lib/pms/date-range";
-import { reservationBarClasses, sourceLabel } from "@/lib/pms/colors";
+import {
+  blockBarClasses,
+  blockTypeLabel,
+  isOutOfServiceUnit,
+  reservationBarClasses,
+  sourceLabel,
+  statusLabel,
+} from "@/lib/pms/colors";
 import { detectSuspiciousGaps } from "@/lib/pms/gaps";
 import type {
   AvailabilityBlockRow,
@@ -75,6 +82,7 @@ export function ReservationsTimeline({
   viewDays,
   onBlockRange,
   onReservationPatch,
+  onReservationStatus,
 }: {
   properties: PropertyRow[];
   reservations: ReservationRow[];
@@ -91,6 +99,10 @@ export function ReservationsTimeline({
     property_id: string;
     check_in: string;
     check_out: string;
+  }) => Promise<{ ok: boolean; error?: string }>;
+  onReservationStatus?: (payload: {
+    id: string;
+    status: string;
   }) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const viewEndEx = addDays(viewFrom, viewDays);
@@ -304,7 +316,11 @@ export function ReservationsTimeline({
         <LegendDot className="bg-violet-600" label="Web" />
         <LegendDot className="bg-emerald-600" label="Directa" />
         <LegendDot className="bg-rose-600" label="Referido" />
-        <LegendDot className="bg-zinc-500" label="Bloqueo / reparación" />
+        <LegendDot className="bg-amber-500" label="Pendiente" />
+        <LegendDot className="bg-teal-600" label="Check-in" />
+        <LegendDot className="bg-zinc-500" label="Bloqueo" />
+        <LegendDot className="bg-orange-700" label="Mantenimiento" />
+        <LegendDot className="bg-red-700" label="Fuera de servicio" />
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -357,12 +373,15 @@ export function ReservationsTimeline({
             </div>
           </div>
 
-          {properties.map((p) => (
+          {properties.map((p) => {
+            const oos = isOutOfServiceUnit(p.unit_status);
+            return (
             <div
               key={p.id}
               data-pmsrow={p.id}
               className={cn(
                 "flex border-b border-black/5 transition-colors last:border-0 dark:border-white/5",
+                oos && "bg-red-500/[0.06]",
                 drag &&
                   drag.hoverPropertyId === p.id &&
                   drag.hoverPropertyId !== drag.propertyId
@@ -370,8 +389,15 @@ export function ReservationsTimeline({
                   : "",
               )}
             >
-              <div className="sticky left-0 z-30 flex w-[140px] shrink-0 items-center bg-[#f2f0eb]/95 px-2 py-2 text-sm font-medium text-zinc-800 dark:bg-[#141210]/95 dark:text-zinc-100">
-                <span className="line-clamp-3">{p.name}</span>
+              <div className="sticky left-0 z-30 flex w-[140px] shrink-0 flex-col justify-center bg-[#f2f0eb]/95 px-2 py-2 text-sm font-medium text-zinc-800 dark:bg-[#141210]/95 dark:text-zinc-100">
+                <span className="line-clamp-2">{p.name}</span>
+                {oos ? (
+                  <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-red-700 dark:text-red-300">
+                    {p.unit_status === "maintenance"
+                      ? "Mantenimiento"
+                      : "Fuera de servicio"}
+                  </span>
+                ) : null}
               </div>
               <div
                 className="relative shrink-0"
@@ -412,9 +438,10 @@ export function ReservationsTimeline({
                     return (
                       <div
                         key={b.id}
-                        title={`Bloqueo: ${b.start_date} → ${addDays(b.end_date, -1)} · ${b.reason || "—"}`}
+                        title={`Bloqueo (${blockTypeLabel(b.block_type)}): ${b.start_date} → ${addDays(b.end_date, -1)} · ${b.reason || "—"}`}
                         className={cn(
-                          "absolute top-2 z-10 h-10 rounded-md bg-zinc-500/40 ring-1 ring-zinc-600/25 dark:bg-zinc-600/45",
+                          "absolute top-2 z-10 h-10 rounded-md",
+                          blockBarClasses(b.block_type),
                           mode === "block" && "pointer-events-none",
                         )}
                         style={{
@@ -439,7 +466,7 @@ export function ReservationsTimeline({
                     const isDragging = drag?.id === r.id;
                     const tip = [
                       `Origen: ${sourceLabel(r.source)}`,
-                      `Estado: ${r.status}`,
+                      `Estado: ${statusLabel(r.status)}`,
                       `${r.check_in} → ${r.check_out} (salida exclusiva)`,
                       r.guest_name ? `Huésped: ${r.guest_name}` : null,
                       r.referrer_name?.trim()
@@ -484,15 +511,29 @@ export function ReservationsTimeline({
                         }}
                       >
                         {(r.guest_name || sourceLabel(r.source)) +
-                          (r.guests ? ` · ${r.guests}p` : "")}
+                          (r.guests ? ` · ${r.guests}p` : "") +
+                          (r.status === "checked_in"
+                            ? " · IN"
+                            : r.status === "pending"
+                              ? " · ?"
+                              : "")}
                       </div>
                     );
                   })}
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
       </div>
+
+      {onReservationStatus ? (
+        <TodayStatusPanel
+          reservations={reservations}
+          properties={properties}
+          onReservationStatus={onReservationStatus}
+        />
+      ) : null}
 
       {drag &&
         typeof document !== "undefined" &&
@@ -531,5 +572,78 @@ function LegendDot({ className, label }: { className: string; label: string }) {
       <span className={cn("h-2.5 w-2.5 rounded-sm", className)} />
       {label}
     </span>
+  );
+}
+
+function TodayStatusPanel({
+  reservations,
+  properties,
+  onReservationStatus,
+}: {
+  reservations: ReservationRow[];
+  properties: PropertyRow[];
+  onReservationStatus: (payload: {
+    id: string;
+    status: string;
+  }) => Promise<{ ok: boolean; error?: string }>;
+}) {
+  const today = toISODateString(new Date());
+  const names = Object.fromEntries(properties.map((p) => [p.id, p.name]));
+  const actionable = reservations.filter(
+    (r) =>
+      r.status !== "cancelled" &&
+      r.status !== "checked_out" &&
+      r.status !== "no_show" &&
+      r.check_in <= today &&
+      r.check_out > today,
+  );
+  if (actionable.length === 0) return null;
+
+  return (
+    <div className="rounded-xl border border-teal-600/30 bg-teal-500/5 px-3 py-3">
+      <p className="text-xs font-semibold uppercase tracking-wider text-teal-900 dark:text-teal-100">
+        Hoy — check-in / check-out
+      </p>
+      <ul className="mt-2 space-y-2">
+        {actionable.map((r) => (
+          <li
+            key={r.id}
+            className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-800 dark:text-zinc-100"
+          >
+            <span>
+              <strong>{r.guest_name || "Huésped"}</strong> ·{" "}
+              {names[r.property_id] ?? "—"} · {statusLabel(r.status)} ·{" "}
+              {r.check_in}→{r.check_out}
+            </span>
+            <span className="flex flex-wrap gap-1">
+              {r.status !== "checked_in" ? (
+                <button
+                  type="button"
+                  className="rounded-full border border-teal-700/40 px-2 py-1 font-semibold text-teal-900 dark:text-teal-100"
+                  onClick={() =>
+                    void onReservationStatus({ id: r.id, status: "checked_in" })
+                  }
+                >
+                  Check-in
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="rounded-full border border-zinc-400/50 px-2 py-1 font-semibold"
+                  onClick={() =>
+                    void onReservationStatus({
+                      id: r.id,
+                      status: "checked_out",
+                    })
+                  }
+                >
+                  Check-out
+                </button>
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

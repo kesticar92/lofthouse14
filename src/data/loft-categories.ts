@@ -46,6 +46,7 @@ export type LoftCategory = {
 
 const COMMON_AMENITIES = [
   "Aire Condicionado",
+  "Cocina",
   "Smart TV",
   "WiFi",
   "Smart Entry",

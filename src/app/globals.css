@@ -59,26 +59,29 @@ body {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
-/* —— Boarding-pass tickets (Vista / Atrio / Cielo) —— */
+/* —— Boarding-pass tickets (Vista / Atrio / Cielo) ——
+ * Paleta alineada al sitio: crema (#f2f0eb), charcoal, ámbar/tierra.
+ * Sin azul marina / sage / beige “airline”.
+ */
 .loft-boarding {
-  --ticket-bg: #f7f3ea;
-  --ticket-fg: #1a1814;
-  --ticket-muted: #6b645a;
-  --ticket-line: rgba(26, 24, 20, 0.28);
-  --ticket-stub: #efe8db;
+  --ticket-bg: #f2f0eb;
+  --ticket-fg: #141210;
+  --ticket-muted: #5c574e;
+  --ticket-line: rgba(20, 18, 16, 0.22);
+  --ticket-stub: #ebe6dc;
   --ticket-stub-field: rgba(255, 255, 255, 0.55);
-  --ticket-accent: #8a6a2f;
-  --ticket-vista-bg: #efe6d4;
-  --ticket-vista-fg: #3a2f1c;
-  --ticket-seal-bg: #2a2418;
-  --ticket-seal-fg: #f4e8c8;
-  --ticket-cta-bg: #1a1814;
-  --ticket-cta-fg: #f7f3ea;
+  --ticket-accent: #b45309;
+  --ticket-vista-bg: #e8e0d2;
+  --ticket-vista-fg: #1c1917;
+  --ticket-seal-bg: #1c1917;
+  --ticket-seal-fg: #f2f0eb;
+  --ticket-cta-bg: #1c1917;
+  --ticket-cta-fg: #f2f0eb;
   position: relative;
   isolation: isolate;
   background:
-    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.14), transparent 42%),
-    linear-gradient(165deg, var(--ticket-bg), color-mix(in srgb, var(--ticket-bg) 88%, #000 12%));
+    radial-gradient(circle at 14% 10%, rgba(255, 255, 255, 0.35), transparent 46%),
+    linear-gradient(165deg, var(--ticket-bg), color-mix(in srgb, var(--ticket-bg) 92%, #8a6a2f 8%));
   color: var(--ticket-fg);
   border-radius: 0.65rem 0.65rem 0.4rem 0.4rem;
   box-shadow:
@@ -87,84 +90,65 @@ body {
     inset 0 0 0 1.5px color-mix(in srgb, var(--ticket-line) 80%, transparent);
 }
 
-/* Muescas laterales en la perforación */
-.loft-boarding::before,
-.loft-boarding::after {
-  content: "";
-  position: absolute;
-  top: 78%;
-  z-index: 2;
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  background: #0b0b0b;
-  transform: translateY(-50%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
+/* Sin perforaciones / puntos negros decorativos */
 
-.loft-boarding::before {
-  left: -7px;
-}
-
-.loft-boarding::after {
-  right: -7px;
-}
-
+/* Vista — crema clara + ámbar (luz de ciudad) */
 .loft-boarding--vista {
-  --ticket-bg: #1b2a44;
-  --ticket-fg: #f0e6c8;
-  --ticket-muted: #c4b896;
-  --ticket-line: rgba(240, 230, 200, 0.35);
-  --ticket-stub: #152238;
-  --ticket-stub-field: rgba(240, 230, 200, 0.12);
-  --ticket-accent: #d4b56a;
-  --ticket-vista-bg: #e8dcc0;
-  --ticket-vista-fg: #1b2a44;
-  --ticket-seal-bg: #8a6a2f;
-  --ticket-seal-fg: #f7efd8;
-  --ticket-cta-bg: #f0e6c8;
-  --ticket-cta-fg: #1b2a44;
+  --ticket-bg: #f5f2ea;
+  --ticket-fg: #141210;
+  --ticket-muted: #6b645a;
+  --ticket-line: rgba(20, 18, 16, 0.2);
+  --ticket-stub: #ebe4d6;
+  --ticket-stub-field: rgba(255, 255, 255, 0.5);
+  --ticket-accent: #b45309;
+  --ticket-vista-bg: #efe6d4;
+  --ticket-vista-fg: #3a2f1c;
+  --ticket-seal-bg: #b45309;
+  --ticket-seal-fg: #fff7ed;
+  --ticket-cta-bg: #1c1917;
+  --ticket-cta-fg: #f2f0eb;
 }
 
+/* Atrio — arena cálida + terracota (patio / tierra) */
 .loft-boarding--atrio {
-  --ticket-bg: #c9d6c4;
-  --ticket-fg: #1e3320;
-  --ticket-muted: #4a6350;
-  --ticket-line: rgba(30, 51, 32, 0.28);
-  --ticket-stub: #b8c9b2;
+  --ticket-bg: #efe8dc;
+  --ticket-fg: #1c1410;
+  --ticket-muted: #6a5648;
+  --ticket-line: rgba(28, 20, 16, 0.22);
+  --ticket-stub: #e4d8c8;
   --ticket-stub-field: rgba(255, 255, 255, 0.45);
-  --ticket-accent: #2f5a38;
-  --ticket-vista-bg: #e4efe0;
-  --ticket-vista-fg: #1e3320;
-  --ticket-seal-bg: #2a4a30;
-  --ticket-seal-fg: #e8f2e6;
-  --ticket-cta-bg: #1e3320;
-  --ticket-cta-fg: #e8f2e6;
+  --ticket-accent: #c2410c;
+  --ticket-vista-bg: #e8dcc8;
+  --ticket-vista-fg: #3a2418;
+  --ticket-seal-bg: #9a3412;
+  --ticket-seal-fg: #fff7ed;
+  --ticket-cta-bg: #1c1410;
+  --ticket-cta-fg: #f2f0eb;
 }
 
+/* Cielo — crema más profunda + charcoal (intimidad) */
 .loft-boarding--cielo {
-  --ticket-bg: #d9c9a8;
-  --ticket-fg: #3a2a18;
-  --ticket-muted: #6a5640;
-  --ticket-line: rgba(58, 42, 24, 0.28);
-  --ticket-stub: #cbb892;
+  --ticket-bg: #e8e2d6;
+  --ticket-fg: #141210;
+  --ticket-muted: #5c574e;
+  --ticket-line: rgba(20, 18, 16, 0.24);
+  --ticket-stub: #ddd5c6;
   --ticket-stub-field: rgba(255, 255, 255, 0.4);
-  --ticket-accent: #6b4a28;
-  --ticket-vista-bg: #efe4cc;
-  --ticket-vista-fg: #3a2a18;
-  --ticket-seal-bg: #4a3420;
-  --ticket-seal-fg: #f3e8d2;
-  --ticket-cta-bg: #3a2a18;
-  --ticket-cta-fg: #f3e8d2;
+  --ticket-accent: #92400e;
+  --ticket-vista-bg: #d9d0c0;
+  --ticket-vista-fg: #1c1917;
+  --ticket-seal-bg: #1c1917;
+  --ticket-seal-fg: #f2f0eb;
+  --ticket-cta-bg: #1c1917;
+  --ticket-cta-fg: #f2f0eb;
 }
 
 .loft-boarding-seal {
   background: var(--ticket-seal-bg);
   color: var(--ticket-seal-fg);
   box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--ticket-seal-fg) 35%, transparent),
-    0 6px 14px rgba(0, 0, 0, 0.28);
-  transform: rotate(-6deg);
+    0 0 0 2px color-mix(in srgb, var(--ticket-seal-fg) 28%, transparent),
+    0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 .loft-boarding-cta {

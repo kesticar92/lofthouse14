@@ -2,7 +2,16 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Plane } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  BedDouble,
+  CookingPot,
+  KeyRound,
+  Plane,
+  Tv,
+  Wifi,
+  Wind,
+} from "lucide-react";
 import { trackBeginCheckout } from "@/lib/analytics";
 import { mergeStayDraft, readStayDraft } from "@/lib/stay-draft";
 import { cn } from "@/lib/cn";
@@ -15,6 +24,14 @@ import {
 const BARCODE_BARS = [
   2, 1, 3, 1, 2, 1, 1, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 1, 2, 3, 1, 1, 2,
 ];
+
+const AMENITY_ICONS: Record<string, LucideIcon> = {
+  "Aire Condicionado": Wind,
+  Cocina: CookingPot,
+  "Smart TV": Tv,
+  WiFi: Wifi,
+  "Smart Entry": KeyRound,
+};
 
 function TicketBarcode({ className }: { className?: string }) {
   return (
@@ -100,39 +117,66 @@ function BoardingTicket({
           Vista: {category.vistaLabel}
         </p>
 
-        {/* Amenities + price seal */}
-        <div className="relative mt-3 flex min-h-[5.5rem] gap-2 pr-1">
-          <div className="min-w-0 flex-1 space-y-1.5">
-            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--ticket-fg)]">
-              Amenidades comunes
-            </p>
-            <p className="text-[10px] leading-snug text-[var(--ticket-muted)]">
+        {/* Amenities — full width, sin solapamiento con el precio */}
+        <div className="mt-3 space-y-1.5">
+          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--ticket-fg)]">
+            Amenidades comunes
+          </p>
+          <p className="flex items-start gap-1.5 text-[10px] leading-snug text-[var(--ticket-muted)]">
+            <BedDouble
+              className="mt-0.5 h-3 w-3 shrink-0 text-[var(--ticket-accent)]"
+              strokeWidth={2}
+              aria-hidden
+            />
+            <span>
               <span className="font-bold text-[var(--ticket-fg)]">Camas:</span>{" "}
               {category.bedsLabel}
-            </p>
-            <p className="text-[10px] leading-snug text-[var(--ticket-muted)]">
-              <span className="font-bold text-[var(--ticket-fg)]">
-                Comodidades:
-              </span>{" "}
-              {category.amenities.join(", ")}
-            </p>
-            <p className="text-[9px] text-[var(--ticket-muted)]">{capacityNote}</p>
-          </div>
+            </span>
+          </p>
+          <ul className="grid gap-1">
+            {category.amenities.map((amenity) => {
+              const Icon = AMENITY_ICONS[amenity];
+              return (
+                <li
+                  key={amenity}
+                  className="flex items-center gap-1.5 text-[10px] leading-snug text-[var(--ticket-muted)]"
+                >
+                  {Icon ? (
+                    <Icon
+                      className="h-3 w-3 shrink-0 text-[var(--ticket-accent)]"
+                      strokeWidth={2}
+                      aria-hidden
+                    />
+                  ) : (
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-full bg-[var(--ticket-accent)]/30"
+                      aria-hidden
+                    />
+                  )}
+                  <span className="font-medium text-[var(--ticket-fg)]">
+                    {amenity}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="text-[9px] text-[var(--ticket-muted)]">{capacityNote}</p>
+        </div>
 
-          <div
-            className="loft-boarding-seal absolute -right-0.5 top-0 flex h-[4.6rem] w-[4.6rem] shrink-0 flex-col items-center justify-center rounded-full text-center shadow-md"
-            aria-label={`Desde ${formatPrice(category.priceFromCop)} COP`}
-          >
-            <span className="text-[8px] font-bold uppercase tracking-wider opacity-90">
-              Desde
-            </span>
-            <span className="text-[11px] font-black tabular-nums leading-tight">
-              {formatPrice(category.priceFromCop)}
-            </span>
-            <span className="text-[8px] font-bold uppercase tracking-wide">
-              COP
-            </span>
-          </div>
+        {/* Precio como badge inferior — no cubre amenities */}
+        <div
+          className="loft-boarding-seal mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-center"
+          aria-label={`Desde ${formatPrice(category.priceFromCop)} COP`}
+        >
+          <span className="text-[8px] font-bold uppercase tracking-wider opacity-90">
+            Desde
+          </span>
+          <span className="text-[13px] font-black tabular-nums leading-none">
+            {formatPrice(category.priceFromCop)}
+          </span>
+          <span className="text-[8px] font-bold uppercase tracking-wide">
+            COP / noche
+          </span>
         </div>
 
         <button

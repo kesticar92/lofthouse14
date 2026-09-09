@@ -21,10 +21,6 @@ import {
   type LoftCategoryId,
 } from "@/data/loft-categories";
 
-const BARCODE_BARS = [
-  2, 1, 3, 1, 2, 1, 1, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 1, 2, 3, 1, 1, 2,
-];
-
 const AMENITY_ICONS: Record<string, LucideIcon> = {
   "Aire Condicionado": Wind,
   Cocina: CookingPot,
@@ -32,19 +28,6 @@ const AMENITY_ICONS: Record<string, LucideIcon> = {
   WiFi: Wifi,
   "Smart Entry": KeyRound,
 };
-
-function TicketBarcode({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn("loft-boarding-barcode text-current", className)}
-      aria-hidden
-    >
-      {BARCODE_BARS.map((w, i) => (
-        <span key={i} style={{ width: w }} />
-      ))}
-    </div>
-  );
-}
 
 function formatPrice(n: number) {
   return n.toLocaleString("es-CO");
@@ -73,19 +56,21 @@ function BoardingTicket({
         "hover:-translate-y-1",
       )}
     >
-      <div className="loft-boarding-inner relative flex flex-1 flex-col px-3.5 pb-3 pt-3 sm:px-4">
+      <div className="loft-boarding-inner relative flex flex-1 flex-col px-3.5 pb-3.5 pt-3 sm:px-4">
         {/* Header */}
         <header className="flex items-start justify-between gap-2">
           <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--ticket-muted)] sm:text-[9px]">
             Ticket de reserva #{ticketNo}
           </p>
-          <div className="flex flex-col items-center leading-none">
-            <span
-              className="text-[10px] font-black tracking-tight text-[var(--ticket-accent)]"
+          <div className="flex flex-col items-center gap-0.5 leading-none">
+            <Image
+              src="/logo-lofthouse.png"
+              alt=""
+              width={28}
+              height={28}
+              className="h-7 w-7 object-contain"
               aria-hidden
-            >
-              ⌂
-            </span>
+            />
             <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-[var(--ticket-fg)]">
               Lofthouse 14
             </span>
@@ -187,21 +172,6 @@ function BoardingTicket({
         >
           Reservar
         </button>
-
-        <p className="mt-2 text-center text-[8px] font-semibold uppercase tracking-[0.18em] text-[var(--ticket-muted)]">
-          Boleto de selección de habitación
-        </p>
-      </div>
-
-      {/* Tear-off stub */}
-      <div className="loft-boarding-stub relative mx-3.5 border-t border-dashed border-[var(--ticket-line)] px-0 pb-3 pt-2.5 sm:mx-4">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-[var(--ticket-muted)]">
-            {category.stubLabel}
-          </span>
-          <span className="h-5 flex-1 rounded-sm border border-[var(--ticket-line)] bg-[var(--ticket-stub-field)]" />
-        </div>
-        <TicketBarcode />
       </div>
     </article>
   );

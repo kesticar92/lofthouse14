@@ -161,31 +161,6 @@ body {
   filter: brightness(1.08);
 }
 
-.loft-boarding-barcode {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  justify-content: center;
-  gap: 1.5px;
-  height: 2rem;
-  width: 100%;
-  color: var(--ticket-fg);
-}
-
-.loft-boarding-barcode span {
-  display: block;
-  background: currentColor;
-  opacity: 0.85;
-}
-
-.loft-boarding-barcode span:nth-child(3n) {
-  opacity: 0.5;
-}
-
-.loft-boarding-barcode span:nth-child(5n) {
-  opacity: 0.7;
-}
-
 /* Compat: stubs antiguos (si quedan referencias) */
 .loft-ticket {
   --ticket-bg: #f7f3ea;

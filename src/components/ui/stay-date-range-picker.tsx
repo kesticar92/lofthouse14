@@ -142,14 +142,14 @@ export function StayDateRangePicker({
       compact
         ? cn(
             "rounded-xl border px-2.5 py-1.5",
-            "border-zinc-300 bg-white text-zinc-900",
-            "dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-50",
-            active && "ring-2 ring-amber-500/35",
+            "border-[#1c1917]/18 bg-[#f2f0eb] text-[#141210]",
+            "dark:border-[#f2f0eb]/15 dark:bg-[#141210] dark:text-[#f2f0eb]",
+            active && "ring-2 ring-amber-600/35",
           )
         : cn(
             "rounded-2xl border px-4 py-3",
-            "border-black/10 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/50",
-            active && "border-amber-500/70 ring-2 ring-amber-500/25",
+            "border-[#1c1917]/12 bg-[#f2f0eb]/80 backdrop-blur-xl dark:border-[#f2f0eb]/12 dark:bg-[#1c1917]/60",
+            active && "border-amber-600/70 ring-2 ring-amber-500/25",
           ),
     );
 

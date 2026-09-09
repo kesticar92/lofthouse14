@@ -28,8 +28,6 @@ export type LoftCategory = {
   bedsLabel: string;
   /** Comodidades mostradas en el ticket. */
   amenities: string[];
-  /** Código del stub inferior del ticket. */
-  stubLabel: string;
   windowKind: "exterior" | "interior" | "cerrado";
   loftNumbers: number[];
   /** Precio desde (COP / noche, temporada baja, 1–2 huéspedes). */
@@ -61,7 +59,6 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     vistaLabel: "Ciudad",
     bedsLabel: "1 Cama Doble + 3 Sofacamas",
     amenities: COMMON_AMENITIES,
-    stubLabel: "CHECK-IN",
     windowKind: "exterior",
     loftNumbers: loftNumbersForCategory("vista"),
     priceFromCop: 120_000,
@@ -80,7 +77,6 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     vistaLabel: "Patio Interior",
     bedsLabel: "1 Cama Doble + 3 Sofacamas",
     amenities: COMMON_AMENITIES,
-    stubLabel: "FECHA",
     windowKind: "interior",
     loftNumbers: loftNumbersForCategory("atrio"),
     priceFromCop: 105_000,
@@ -99,7 +95,6 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     vistaLabel: "Claraboya al Cielo",
     bedsLabel: "1 Cama Doble + 3 Sofacamas",
     amenities: COMMON_AMENITIES,
-    stubLabel: "VIP",
     windowKind: "cerrado",
     loftNumbers: loftNumbersForCategory("cielo"),
     priceFromCop: 90_000,

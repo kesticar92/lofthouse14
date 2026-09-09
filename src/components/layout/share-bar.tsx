@@ -98,15 +98,15 @@ export function ShareBar() {
     >
       <div
         className={cn(
-          "flex flex-col gap-1.5 rounded-[1.35rem] border p-1.5 shadow-2xl",
-          "border-white/50 bg-white/75 backdrop-blur-2xl",
-          "dark:border-white/10 dark:bg-zinc-900/75",
+          "flex flex-col gap-1.5 rounded-[1.35rem] border p-1.5 shadow-2xl backdrop-blur-2xl",
+          "border-[#1c1917]/14 bg-[#ebe6dc]/90",
+          "dark:border-[#f2f0eb]/12 dark:bg-[#1c1917]/90",
         )}
       >
         <AppleActionButton
           onClick={handleShare}
           label="Compartir"
-          className="bg-zinc-100 text-zinc-800 hover:bg-zinc-200/90 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+          className="bg-[#f2f0eb] text-[#141210] hover:bg-[#e2dccf] dark:bg-[#25211d] dark:text-[#f2f0eb] dark:hover:bg-[#2f2a25]"
         >
           <ShareIosIcon />
         </AppleActionButton>
@@ -114,7 +114,7 @@ export function ShareBar() {
         <AppleActionButton
           href={site.google_url}
           label="Ubicación en Google Maps"
-          className="bg-zinc-100 hover:bg-zinc-200/90 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+          className="bg-[#f2f0eb] hover:bg-[#e2dccf] dark:bg-[#25211d] dark:hover:bg-[#2f2a25]"
         >
           <GoogleMapsIcon />
         </AppleActionButton>
@@ -122,7 +122,7 @@ export function ShareBar() {
         <AppleActionButton
           href={waLink()}
           label={`WhatsApp — ${site.name}`}
-          className="bg-zinc-100 hover:bg-zinc-200/90 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+          className="bg-[#f2f0eb] hover:bg-[#e2dccf] dark:bg-[#25211d] dark:hover:bg-[#2f2a25]"
           onClick={() => trackWhatsAppClick("fab")}
         >
           <WhatsAppLogoIcon className="size-[1.65rem]" />
@@ -130,7 +130,7 @@ export function ShareBar() {
       </div>
 
       {copied ? (
-        <span className="rounded-full bg-zinc-900/90 px-3 py-1 text-[10px] font-medium text-white backdrop-blur-md dark:bg-white/90 dark:text-zinc-900">
+        <span className="rounded-full bg-[#1c1917]/90 px-3 py-1 text-[10px] font-medium text-[#f2f0eb] backdrop-blur-md dark:bg-[#ebe6dc]/95 dark:text-[#141210]">
           Enlace copiado
         </span>
       ) : null}

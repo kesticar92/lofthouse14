@@ -145,7 +145,7 @@ export function Header() {
           compact
         />
       </div>
-      <label className="flex w-[7.5rem] shrink-0 flex-col gap-0.5 text-[9px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+      <label className="flex w-[7.5rem] shrink-0 flex-col gap-0.5 text-[9px] font-bold uppercase tracking-wider text-[#5c574e] dark:text-[#c4bdb0]">
         <span className="inline-flex items-center gap-1">
           <Users className="h-3 w-3" /> Huéspedes
         </span>
@@ -156,7 +156,7 @@ export function Header() {
             setGuests(next);
             persistStay({ guests: next });
           }}
-          className="rounded-xl border border-zinc-300 bg-white px-2 py-1.5 text-xs font-semibold text-zinc-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+          className="rounded-xl border border-[#1c1917]/18 bg-[#f2f0eb] px-2 py-1.5 text-xs font-semibold text-[#141210] dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb]"
         >
           {GUEST_OPTIONS.map((n) => (
             <option key={n} value={n}>
@@ -167,7 +167,7 @@ export function Header() {
       </label>
       <button
         type="submit"
-        className="mb-px shrink-0 rounded-full bg-zinc-900 px-4 py-2 text-[11px] font-bold uppercase tracking-wide text-white transition hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400"
+        className="mb-px shrink-0 rounded-full bg-[#1c1917] px-4 py-2 text-[11px] font-bold uppercase tracking-wide text-[#f2f0eb] transition hover:bg-[#2a2622] dark:bg-amber-600 dark:text-[#141210] dark:hover:bg-amber-500"
       >
         Reservar
       </button>
@@ -178,9 +178,9 @@ export function Header() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300",
-        // Contraste sólido siempre (día y noche)
-        "border-zinc-200/80 bg-[#f2f0eb]/97 text-zinc-900 backdrop-blur-md",
-        "dark:border-zinc-800 dark:bg-zinc-950/97 dark:text-zinc-50",
+        // Día: crema brand. Noche: charcoal profundo.
+        "border-[#1c1917]/12 bg-[#f2f0eb]/97 text-[#141210] backdrop-blur-md",
+        "dark:border-[#f2f0eb]/10 dark:bg-[#141210]/97 dark:text-[#f2f0eb]",
         scrolled && "shadow-md",
       )}
     >
@@ -195,7 +195,7 @@ export function Header() {
             e.stopPropagation();
             setIsMenuOpen((v) => !v);
           }}
-          className="relative z-[70] inline-flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-300 bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-zinc-900 transition hover:bg-zinc-100 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800 md:px-3.5 md:text-xs"
+          className="relative z-[70] inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#1c1917]/18 bg-[#ebe6dc] px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#141210] transition hover:bg-[#e2dccf] dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb] dark:hover:bg-[#25211d] md:px-3.5 md:text-xs"
         >
           {isMenuOpen ? (
             <X className="h-3.5 w-3.5" aria-hidden />
@@ -206,7 +206,8 @@ export function Header() {
         </button>
 
         <Link href="/" className="shrink-0" aria-label={site.name}>
-          <span className="border-y-2 border-zinc-900 px-1.5 py-0.5 font-display text-xs font-extrabold uppercase tracking-[0.14em] text-zinc-900 dark:border-zinc-50 dark:text-zinc-50 sm:px-2 sm:text-sm md:text-base">
+          {/* Día: tipografía clara sobre chip charcoal. Noche: tipografía oscura sobre crema. */}
+          <span className="inline-block rounded-sm border-y-2 border-[#f2f0eb] bg-[#1c1917] px-1.5 py-0.5 font-display text-xs font-extrabold uppercase tracking-[0.14em] text-[#f2f0eb] dark:border-[#141210] dark:bg-[#ebe6dc] dark:text-[#141210] sm:px-2 sm:text-sm md:text-base">
             LOFTHOUSE14
           </span>
         </Link>
@@ -216,12 +217,12 @@ export function Header() {
           onSubmit={onReserve}
           className="relative mx-auto hidden min-w-0 flex-1 items-center justify-center gap-2 lg:flex"
         >
-          <div className="flex w-full max-w-3xl items-end justify-center gap-2 rounded-2xl border border-zinc-200 bg-white px-3 py-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="flex w-full max-w-3xl items-end justify-center gap-2 rounded-2xl border border-[#1c1917]/14 bg-[#ebe6dc] px-3 py-2 shadow-sm dark:border-[#f2f0eb]/12 dark:bg-[#1c1917]">
             {bookingFields}
           </div>
           {error ? (
             <p
-              className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[10px] font-medium text-red-600 dark:text-red-400"
+              className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[10px] font-medium text-red-700 dark:text-red-400"
               role="alert"
             >
               {error}
@@ -232,7 +233,7 @@ export function Header() {
         <div className="ml-auto flex shrink-0 items-center gap-1.5 md:gap-2">
           <Link
             href="/#preguntas-frecuentes"
-            className="rounded-full border border-zinc-300 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-900 transition hover:bg-zinc-100 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800 md:px-4 md:text-xs"
+            className="rounded-full border border-[#1c1917]/18 bg-[#ebe6dc] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#141210] transition hover:bg-[#e2dccf] dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb] dark:hover:bg-[#25211d] md:px-4 md:text-xs"
           >
             Ayuda
           </Link>
@@ -243,9 +244,9 @@ export function Header() {
       {/* Banner móvil / tablet: fechas y huéspedes bajo la barra */}
       <form
         onSubmit={onReserve}
-        className="border-t border-zinc-200/80 px-3 py-2 dark:border-zinc-800 lg:hidden"
+        className="border-t border-[#1c1917]/10 px-3 py-2 dark:border-[#f2f0eb]/10 lg:hidden"
       >
-        <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-zinc-200 bg-white px-2.5 py-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-[#1c1917]/14 bg-[#ebe6dc] px-2.5 py-2 shadow-sm dark:border-[#f2f0eb]/12 dark:bg-[#1c1917]">
           {bookingFields}
         </div>
         {error ? (
@@ -280,7 +281,7 @@ export function Header() {
               exit={panelMotion.exit}
               transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
               className={cn(
-                "fixed z-[70] overflow-y-auto border border-zinc-200 bg-[#f2f0eb] p-6 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950",
+                "fixed z-[70] overflow-y-auto border border-[#1c1917]/12 bg-[#f2f0eb] p-6 shadow-2xl dark:border-[#f2f0eb]/10 dark:bg-[#141210]",
                 // Móvil: panel completo de arriba hacia abajo
                 "inset-x-0 top-0 max-h-[100dvh] rounded-b-3xl pt-[4.5rem]",
                 // Escritorio: panel lateral L→R
@@ -288,14 +289,14 @@ export function Header() {
               )}
             >
               <div className="mb-4 flex items-center justify-between md:hidden">
-                <span className="font-display text-sm font-extrabold uppercase tracking-widest text-zinc-900 dark:text-zinc-50">
+                <span className="font-display text-sm font-extrabold uppercase tracking-widest text-[#141210] dark:text-[#f2f0eb]">
                   Menú
                 </span>
                 <button
                   type="button"
                   aria-label="Cerrar"
                   onClick={() => setIsMenuOpen(false)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-50"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#1c1917]/18 bg-[#ebe6dc] text-[#141210] dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb]"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -303,7 +304,7 @@ export function Header() {
 
               <div className="grid gap-6">
                 <div className="space-y-3">
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-[#5c574e] dark:text-[#c4bdb0]">
                     Ir a
                   </h4>
                   <ul className="grid gap-1">
@@ -312,7 +313,7 @@ export function Header() {
                         <Link
                           href={item.href}
                           onClick={() => setIsMenuOpen(false)}
-                          className="block rounded-lg px-2 py-3 text-base font-bold text-zinc-900 transition hover:bg-black/5 hover:text-amber-700 dark:text-zinc-50 dark:hover:bg-white/5 dark:hover:text-amber-400 md:py-2.5 md:text-sm"
+                          className="block rounded-lg px-2 py-3 text-base font-bold text-[#141210] transition hover:bg-[#1c1917]/5 hover:text-amber-800 dark:text-[#f2f0eb] dark:hover:bg-[#f2f0eb]/5 dark:hover:text-amber-400 md:py-2.5 md:text-sm"
                         >
                           {item.label}
                         </Link>
@@ -321,11 +322,11 @@ export function Header() {
                   </ul>
                 </div>
                 <div className="space-y-3">
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-[#5c574e] dark:text-[#c4bdb0]">
                     Contacto
                   </h4>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                    <span className="font-semibold text-zinc-900 dark:text-zinc-50">
+                  <p className="text-sm text-[#5c574e] dark:text-[#c4bdb0]">
+                    <span className="font-semibold text-[#141210] dark:text-[#f2f0eb]">
                       WhatsApp
                     </span>
                     <br />
@@ -333,12 +334,12 @@ export function Header() {
                       href={waLink()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-amber-600"
+                      className="hover:text-amber-700 dark:hover:text-amber-400"
                     >
                       {site.phoneDisplay}
                     </a>
                   </p>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                  <p className="text-sm text-[#5c574e] dark:text-[#c4bdb0]">
                     {site.addressLine}
                     <br />
                     {site.neighborhood}, {site.city}
@@ -347,7 +348,7 @@ export function Header() {
                 <Link
                   href="/reservar"
                   onClick={() => setIsMenuOpen(false)}
-                  className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-white dark:bg-amber-500 dark:text-zinc-950"
+                  className="inline-flex items-center justify-center rounded-full bg-[#1c1917] px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#f2f0eb] dark:bg-amber-600 dark:text-[#141210]"
                 >
                   Reservar
                 </Link>

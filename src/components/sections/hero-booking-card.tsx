@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Star } from "lucide-react";
+import { Plane } from "lucide-react";
 import { trackBeginCheckout } from "@/lib/analytics";
 import { mergeStayDraft, readStayDraft } from "@/lib/stay-draft";
 import { cn } from "@/lib/cn";
@@ -12,12 +12,14 @@ import {
   type LoftCategoryId,
 } from "@/data/loft-categories";
 
-const BARCODE_BARS = [3, 1, 2, 1, 3, 1, 1, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2];
+const BARCODE_BARS = [
+  2, 1, 3, 1, 2, 1, 1, 2, 3, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 1, 2, 3, 1, 1, 2,
+];
 
 function TicketBarcode({ className }: { className?: string }) {
   return (
     <div
-      className={cn("loft-ticket-barcode text-current", className)}
+      className={cn("loft-boarding-barcode text-current", className)}
       aria-hidden
     >
       {BARCODE_BARS.map((w, i) => (
@@ -27,113 +29,142 @@ function TicketBarcode({ className }: { className?: string }) {
   );
 }
 
-function PerforatedTicket({
+function formatPrice(n: number) {
+  return n.toLocaleString("es-CO");
+}
+
+function BoardingTicket({
   category,
-  compact,
+  index,
   onReserve,
 }: {
   category: LoftCategory;
-  compact?: boolean;
+  index: number;
   onReserve: (id: LoftCategoryId) => void;
 }) {
-  const loftLabel = category.loftNumbers
-    .map((n) => String(n).padStart(2, "0"))
-    .join(" · ");
-
+  const ticketNo = String(index + 1).padStart(3, "0");
   const capacityNote =
     category.id === "atrio"
-      ? `Hasta ${category.maxGuests} pers. · Loft 05 máx. 3`
+      ? `Hasta ${category.maxGuests} · Loft 05 máx. 3`
       : `Hasta ${category.maxGuests} pers. / loft`;
 
   return (
     <article
       className={cn(
-        "loft-ticket group relative flex w-[min(100%,20.5rem)] shrink-0 snap-center text-left transition duration-300",
-        compact ? "min-h-[13rem]" : "min-h-[14.5rem]",
-        "hover:-translate-y-0.5",
+        "loft-boarding group relative flex w-full max-w-[17.5rem] shrink-0 flex-col text-left transition duration-300",
+        `loft-boarding--${category.theme}`,
+        "hover:-translate-y-1",
       )}
     >
-      <div
-        className={cn(
-          "relative flex flex-[0_0_74%] flex-col justify-between overflow-hidden",
-          compact ? "px-3.5 py-3" : "px-4 py-3.5",
-        )}
-      >
-        <div className="pointer-events-none absolute inset-0 opacity-[0.18]">
+      <div className="loft-boarding-inner relative flex flex-1 flex-col px-3.5 pb-3 pt-3 sm:px-4">
+        {/* Header */}
+        <header className="flex items-start justify-between gap-2">
+          <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--ticket-muted)] sm:text-[9px]">
+            Ticket de reserva #{ticketNo}
+          </p>
+          <div className="flex flex-col items-center leading-none">
+            <span
+              className="text-[10px] font-black tracking-tight text-[var(--ticket-accent)]"
+              aria-hidden
+            >
+              ⌂
+            </span>
+            <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-[var(--ticket-fg)]">
+              Lofthouse 14
+            </span>
+          </div>
+          <span
+            className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--ticket-line)] text-[var(--ticket-accent)]"
+            aria-hidden
+          >
+            <Plane className="h-3 w-3" strokeWidth={2} />
+          </span>
+        </header>
+
+        <h3 className="mt-2.5 font-display text-[1.35rem] font-bold uppercase leading-none tracking-tight text-[var(--ticket-fg)] sm:text-[1.5rem]">
+          {category.name}
+        </h3>
+
+        {/* Illustration */}
+        <div className="relative mt-2.5 aspect-[16/10] w-full overflow-hidden rounded-sm border border-[var(--ticket-line)] bg-[var(--ticket-stub)]">
           <Image
             src={category.image}
-            alt=""
+            alt={category.imageAlt}
             fill
             sizes="280px"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[var(--ticket-bg)] via-[var(--ticket-bg)]/90 to-[var(--ticket-bg)]" />
         </div>
 
-        <div className="relative z-[1]">
-          <div className="flex items-center gap-0.5 text-amber-600 dark:text-amber-400">
-            {[0, 1, 2].map((i) => (
-              <Star
-                key={i}
-                className="h-3 w-3 fill-current"
-                strokeWidth={0}
-                aria-hidden
-              />
-            ))}
+        <p className="loft-boarding-vista mt-0 border border-t-0 border-[var(--ticket-line)] bg-[var(--ticket-vista-bg)] px-2 py-1 text-center text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--ticket-vista-fg)]">
+          Vista: {category.vistaLabel}
+        </p>
+
+        {/* Amenities + price seal */}
+        <div className="relative mt-3 flex min-h-[5.5rem] gap-2 pr-1">
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--ticket-fg)]">
+              Amenidades comunes
+            </p>
+            <p className="text-[10px] leading-snug text-[var(--ticket-muted)]">
+              <span className="font-bold text-[var(--ticket-fg)]">Camas:</span>{" "}
+              {category.bedsLabel}
+            </p>
+            <p className="text-[10px] leading-snug text-[var(--ticket-muted)]">
+              <span className="font-bold text-[var(--ticket-fg)]">
+                Comodidades:
+              </span>{" "}
+              {category.amenities.join(", ")}
+            </p>
+            <p className="text-[9px] text-[var(--ticket-muted)]">{capacityNote}</p>
           </div>
-          <p className="mt-1.5 font-display text-[1.35rem] font-bold uppercase leading-none tracking-tight text-[var(--ticket-fg)] sm:text-[1.5rem]">
-            {category.name}
-          </p>
-          <p className="mt-1 text-[11px] font-medium leading-snug text-[var(--ticket-muted)]">
-            {category.tagline}
-          </p>
+
+          <div
+            className="loft-boarding-seal absolute -right-0.5 top-0 flex h-[4.6rem] w-[4.6rem] shrink-0 flex-col items-center justify-center rounded-full text-center shadow-md"
+            aria-label={`Desde ${formatPrice(category.priceFromCop)} COP`}
+          >
+            <span className="text-[8px] font-bold uppercase tracking-wider opacity-90">
+              Desde
+            </span>
+            <span className="text-[11px] font-black tabular-nums leading-tight">
+              {formatPrice(category.priceFromCop)}
+            </span>
+            <span className="text-[8px] font-bold uppercase tracking-wide">
+              COP
+            </span>
+          </div>
         </div>
 
-        <div className="relative z-[1] mt-3 space-y-2">
-          <p className="text-sm font-bold tabular-nums text-[var(--ticket-fg)]">
-            Desde {category.priceFromCop.toLocaleString("es-CO")}{" "}
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--ticket-muted)]">
-              COP/noche
-            </span>
-          </p>
-          <p className="text-[10px] font-medium text-[var(--ticket-muted)]">
-            {capacityNote}
-          </p>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ticket-muted)]">
-            Unidades {loftLabel}
-          </p>
-          <button
-            type="button"
-            onClick={() => onReserve(category.id)}
-            aria-label={`Reservar ${category.name}`}
-            className="mt-1 w-full rounded-full bg-zinc-900 py-2 text-[10px] font-bold uppercase tracking-wide text-white transition hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400"
-          >
-            Reservar
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => onReserve(category.id)}
+          aria-label={`Reservar ${category.name}`}
+          className="loft-boarding-cta mt-3 w-full py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] transition"
+        >
+          Reservar
+        </button>
+
+        <p className="mt-2 text-center text-[8px] font-semibold uppercase tracking-[0.18em] text-[var(--ticket-muted)]">
+          Boleto de selección de habitación
+        </p>
       </div>
 
-      <div className="loft-ticket-stub relative flex flex-[0_0_26%] flex-col items-center justify-between py-3">
-        <span
-          className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--ticket-muted)]"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-        >
-          {category.stubCode}
-        </span>
-        <TicketBarcode className="my-2" />
-        <span
-          className="text-[9px] font-bold tracking-widest text-[var(--ticket-muted)]"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-        >
-          L14
-        </span>
+      {/* Tear-off stub */}
+      <div className="loft-boarding-stub relative mx-3.5 border-t border-dashed border-[var(--ticket-line)] px-0 pb-3 pt-2.5 sm:mx-4">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-[var(--ticket-muted)]">
+            {category.stubLabel}
+          </span>
+          <span className="h-5 flex-1 rounded-sm border border-[var(--ticket-line)] bg-[var(--ticket-stub-field)]" />
+        </div>
+        <TicketBarcode />
       </div>
     </article>
   );
 }
 
 /**
- * Tres tiquetes perforados (Vista / Atrio / Cielo): info + CTA Reservar.
+ * Tres tickets tipo boarding pass (Vista / Atrio / Cielo): info + CTA Reservar.
  * Fechas y huéspedes viven en el banner superior.
  */
 export function HeroBookingCard({
@@ -160,23 +191,36 @@ export function HeroBookingCard({
 
   return (
     <div className={cn("relative z-20 w-full overflow-visible", className)}>
-      <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+      <p
+        className={cn(
+          "mb-2 text-[10px] font-bold uppercase tracking-[0.16em]",
+          compact ? "text-white/80" : "text-white/85",
+        )}
+      >
         Elige tu loft
       </p>
+      {/* Desktop/tablet: las 3 visibles. Móvil: scroll horizontal suave. */}
       <div
         className={cn(
-          "-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 pt-1 snap-x snap-mandatory",
-          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "flex gap-3 pb-1 pt-1",
+          "max-md:-mx-1 max-md:overflow-x-auto max-md:px-1 max-md:snap-x max-md:snap-mandatory",
+          "max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden",
+          "md:grid md:grid-cols-3 md:gap-3 md:overflow-visible",
+          "lg:gap-4",
         )}
         aria-label="Categorías de loft"
       >
-        {LOFT_CATEGORIES.map((cat) => (
-          <PerforatedTicket
+        {LOFT_CATEGORIES.map((cat, index) => (
+          <div
             key={cat.id}
-            category={cat}
-            compact={compact}
-            onReserve={onReserve}
-          />
+            className="flex justify-center max-md:w-[min(100%,17.5rem)] max-md:shrink-0 max-md:snap-center md:w-full"
+          >
+            <BoardingTicket
+              category={cat}
+              index={index}
+              onReserve={onReserve}
+            />
+          </div>
         ))}
       </div>
     </div>

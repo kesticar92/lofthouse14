@@ -12,45 +12,52 @@ import { PricingDetailsAccordion } from "@/components/sections/pricing-details-a
 
 const perks = ["WiFi", "Aire acondicionado", "Cocina equipada", "Smart TV"];
 
+/** Tarifas desde base Loft Cielo ($90.000): 1×, 2×, 3×; 4+ a consultar. */
+const CIELO_BASE = 90_000;
+
 const lofts = [
   {
     name: "Tu refugio personal",
     subName: "1 loft",
+    categoryLabel: "1 LOFT • LOFT CIELO",
     description:
-      "El espacio ideal para ti o para compartir en pareja. Un loft privado, moderno y totalmente equipado, diseñado para ser tu base de descanso después de recorrer San Fernando y vivir el ritmo de Cali.",
+      "El espacio ideal para ti o para compartir en pareja. Un Loft Cielo privado, moderno y totalmente equipado, diseñado para ser tu base de descanso después de recorrer San Fernando y vivir el ritmo de Cali.",
     capacity: "Ideal 2 personas · Máx. 5",
-    price: "Desde $90.000 por noche",
-    priceNote: "Tarifa base para 2 personas en temporada baja",
+    price: `Desde $${CIELO_BASE.toLocaleString("es-CO")} por noche`,
+    priceNote: "Tarifa base Loft Cielo · 2 personas · temporada baja",
     image: "/gallery/loft-cocina-equipada-miraflores-cali.webp",
   },
   {
     name: "Juntos, pero con espacio",
     subName: "2 lofts",
+    categoryLabel: "2 LOFTS • LOFT CIELO",
     description:
-      "La opción perfecta para familias o grupos pequeños que buscan comodidad. Disfruten de la ciudad juntos durante el día y descansen en lofts contiguos en la noche. Toda la cercanía, sin sacrificar la privacidad de nadie.",
+      "Dos Lofts Cielo contiguos para familias o grupos pequeños. Disfruten de la ciudad juntos durante el día y descansen con privacidad por la noche, sin sacrificar la cercanía.",
     capacity: "2 a 10 personas",
-    price: "Desde $160.000 por noche",
-    priceNote: "Según temporada y ocupación por loft",
+    price: `Desde $${(CIELO_BASE * 2).toLocaleString("es-CO")} por noche`,
+    priceNote: "2 × tarifa base Loft Cielo · temporada baja",
     image: "/gallery/loft-habitacion-miraflores-cali.webp",
   },
   {
     name: "El punto de encuentro",
     subName: "3 lofts",
+    categoryLabel: "3 LOFTS • LOFT CIELO",
     description:
-      "Pensado para familias grandes que quieren compartir la experiencia caleña al máximo. Mantén a todo tu grupo en el mismo edificio, distribuidos estratégicamente en tres espacios independientes con el mismo nivel de confort.",
+      "Tres Lofts Cielo en el mismo edificio para familias grandes que quieren compartir la experiencia caleña. Espacios independientes con el mismo nivel de confort.",
     capacity: "3 a 15 personas",
-    price: "Desde $240.000 por noche",
-    priceNote: "Según temporada y ocupación por loft",
+    price: `Desde $${(CIELO_BASE * 3).toLocaleString("es-CO")} por noche`,
+    priceNote: "3 × tarifa base Loft Cielo · temporada baja",
     image: "/gallery/loft-sala-sofa-miraflores-cali.webp",
   },
   {
     name: "Experiencia para grandes grupos",
     subName: "+4 lofts",
+    categoryLabel: "4 O + • LOFTS CIELO",
     description:
-      "¿Viajas con una delegación, equipo deportivo o una gran familia? Simplifica la logística reservando múltiples lofts. Asegúrate de que todo el grupo se hospede en el mismo lugar, con la tranquilidad y ubicación estratégica que necesitan.",
+      "¿Viajas con una delegación, equipo o gran familia? Cotizamos múltiples Lofts Cielo según fechas y capacidad. Todo el grupo en el mismo lugar, con ubicación estratégica.",
     capacity: "4 a 63 personas",
     price: "Precio a consultar",
-    priceNote: "Cotización personalizada según fechas y lofts",
+    priceNote: "Cotización personalizada · Lofts Cielo según fechas",
     image: "/gallery/loft-dormitorio-entrepiso-miraflores-cali.webp",
   },
 ];
@@ -116,7 +123,7 @@ export function Lofts() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-l-4 border-amber-600 pl-6">
                 <div className="flex-1">
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800 dark:text-amber-500">
-                    {activeLoft.subName} • Loft funcional
+                    {activeLoft.categoryLabel}
                   </p>
                   <h3 className="mt-2 font-display text-2xl tracking-tight text-zinc-900 dark:text-[#f2f0eb]">
                     {activeLoft.name}
@@ -137,13 +144,17 @@ export function Lofts() {
               <div className="pt-2">
                 <Link
                   href={waLink(
-                    `Hola, quiero consultar las fechas disponibles para ${activeLoft.subName} en LOFTHOUSE 14.`,
+                    activeIndex === 3
+                      ? "Hola, quiero cotizar 4 o más Lofts Cielo en LOFTHOUSE 14 (precio a consultar)."
+                      : `Hola, quiero consultar disponibilidad para ${activeLoft.subName} · Loft Cielo en LOFTHOUSE 14.`,
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 py-4 text-sm font-bold text-white transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900 dark:hover:bg-white sm:w-auto sm:px-10 shadow-lg"
                 >
-                  Consultar capacidad por WhatsApp
+                  {activeIndex === 3
+                    ? "Consultar precio por WhatsApp"
+                    : "Consultar capacidad por WhatsApp"}
                 </Link>
               </div>
             </motion.div>

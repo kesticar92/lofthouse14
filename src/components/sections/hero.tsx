@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { BadgeCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { HeroBookingCard } from "@/components/sections/hero-booking-card";
+import { HeroMobileBackdrop } from "@/components/sections/hero-mobile-backdrop";
 
 /** Mismas rutas en /public/hero — comprimidos sin audio (~3–6 MB c/u). */
 export const HERO_VIDEO_SLIDES = [
@@ -48,20 +49,24 @@ function HeroVideoSlide({
       className="relative h-full w-full shrink-0 grow-0 basis-full snap-center snap-always overflow-hidden"
       aria-label={label}
     >
+      {/* Placeholder sutil sin foto de fachada mientras carga el video */}
+      <div
+        className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-950"
+        aria-hidden
+      />
       <video
         ref={ref}
         src={src}
         muted
         playsInline
-        preload={isActive ? "auto" : "none"}
-        poster="/gallery/immersive/09-fachada_diurna.webp"
+        preload={isActive ? "auto" : "metadata"}
         onEnded={() => {
           if (isActive) onEnded?.();
         }}
-        className="h-full w-full object-cover object-center"
+        className="relative z-[1] h-full w-full object-cover object-center"
         aria-hidden
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/35" />
+      <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-black/30 to-black/35" />
     </div>
   );
 }
@@ -147,15 +152,12 @@ export function Hero() {
       {/* —— Móvil —— */}
       <section
         id="inicio"
-        className="relative md:hidden"
+        className="relative overflow-hidden md:hidden"
         aria-label="Inicio y cotización rápida"
       >
+        <HeroMobileBackdrop />
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "linear-gradient(180deg, rgba(0,0,0,.55), rgba(15,15,15,.88)), url(/gallery/immersive/09-fachada_diurna.webp)",
-          }}
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/45"
           aria-hidden
         />
         <div className="relative z-20 px-4 pb-8 pt-28">
@@ -178,8 +180,8 @@ export function Hero() {
             Apartaestudios Dúplex en Cali, Miraflores
           </h1>
           <p className="mt-2 max-w-md text-sm leading-snug text-white/85">
-            Cocina equipada, A/C, Wifi y Check In Autonomo. Desde $90.000 la
-            noche. Reserva Directo con Lofthouse 14.
+            Cocina equipada, Aire Condicionado, Wifi y Check In Autonomo. Desde
+            $90.000 la noche. Reserva Directo con Lofthouse 14.
           </p>
         </div>
       </section>
@@ -230,28 +232,10 @@ export function Hero() {
           <ChevronRight className="h-6 w-6" strokeWidth={2.5} />
         </button>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-[42%] z-20 flex justify-center gap-2 lg:bottom-[48%]">
-          {HERO_VIDEO_SLIDES.map((slide, index) => (
-            <button
-              key={slide.id}
-              type="button"
-              aria-label={`Ver video ${index + 1}: ${slide.label}`}
-              aria-current={index === activeIndex ? "true" : undefined}
-              onClick={() => goToSlide(index)}
-              className={cn(
-                "pointer-events-auto h-2 rounded-full transition-all",
-                index === activeIndex
-                  ? "w-8 bg-white"
-                  : "w-2 bg-white/45 hover:bg-white/70",
-              )}
-            />
-          ))}
-        </div>
-
-        <div className="relative z-10 w-full px-8 pb-10 pt-28 lg:px-12 lg:pb-12">
-          <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6">
-            {/* Tiquetes Vista / Atrio / Cielo — encima del título */}
-            <div className="pointer-events-auto relative z-30 w-full max-w-xl isolate">
+        <div className="relative z-10 w-full px-6 pb-10 pt-28 lg:px-10 lg:pb-12">
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-start gap-6">
+            {/* Tickets Vista / Atrio / Cielo — las 3 visibles */}
+            <div className="pointer-events-auto relative z-30 w-full isolate">
               <HeroBookingCard compact />
             </div>
 
@@ -275,8 +259,8 @@ export function Hero() {
                 </span>
               </h1>
               <p className="mt-4 max-w-2xl text-lg leading-snug text-gray-200 drop-shadow-md lg:text-xl">
-                Cocina equipada, A/C, Wifi y Check In Autonomo. Desde $90.000 la
-                noche, Reserva Directo con Lofthouse 14
+                Cocina equipada, Aire Condicionado, Wifi y Check In Autonomo.
+                Desde $90.000 la noche, Reserva Directo con Lofthouse 14
               </p>
               <motion.div
                 initial={{ opacity: 0, y: 8 }}

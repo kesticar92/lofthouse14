@@ -15,11 +15,21 @@ import {
 
 export type LoftCategoryId = MarketingCategory;
 
+export type LoftCategoryTheme = "vista" | "atrio" | "cielo";
+
 export type LoftCategory = {
   id: LoftCategoryId;
   name: string;
   shortLabel: string;
   tagline: string;
+  /** Etiqueta de vista para el ticket (ej. "Ciudad"). */
+  vistaLabel: string;
+  /** Descripción corta de camas. */
+  bedsLabel: string;
+  /** Comodidades mostradas en el ticket. */
+  amenities: string[];
+  /** Código del stub inferior del ticket. */
+  stubLabel: string;
   windowKind: "exterior" | "interior" | "cerrado";
   loftNumbers: number[];
   /** Precio desde (COP / noche, temporada baja, 1–2 huéspedes). */
@@ -31,7 +41,15 @@ export type LoftCategory = {
   stubCode: string;
   image: string;
   imageAlt: string;
+  theme: LoftCategoryTheme;
 };
+
+const COMMON_AMENITIES = [
+  "Aire Condicionado",
+  "Smart TV",
+  "WiFi",
+  "Smart Entry",
+];
 
 export const LOFT_CATEGORIES: LoftCategory[] = [
   {
@@ -39,42 +57,57 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     name: "Loft Vista",
     shortLabel: "Vista",
     tagline: "Ventana exterior · luz de barrio",
+    vistaLabel: "Ciudad",
+    bedsLabel: "1 Cama Doble + 3 Sofacamas",
+    amenities: COMMON_AMENITIES,
+    stubLabel: "CHECK-IN",
     windowKind: "exterior",
     loftNumbers: loftNumbersForCategory("vista"),
     priceFromCop: 120_000,
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("vista"),
     stubCode: "VIS",
-    image: "/gallery/immersive/09-fachada_diurna.webp",
-    imageAlt: "Fachada con luz natural — Loft Vista",
+    image: "/gallery/immersive/25-loft-luz-natural-miraflores-cali.webp",
+    imageAlt: "Interior con luz natural y vista — Loft Vista",
+    theme: "vista",
   },
   {
     id: "atrio",
     name: "Loft Atrio",
     shortLabel: "Atrio",
     tagline: "Ventana interior · patio del conjunto",
+    vistaLabel: "Patio Interior",
+    bedsLabel: "1 Cama Doble + 3 Sofacamas",
+    amenities: COMMON_AMENITIES,
+    stubLabel: "FECHA",
     windowKind: "interior",
     loftNumbers: loftNumbersForCategory("atrio"),
     priceFromCop: 105_000,
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("atrio"),
     stubCode: "ATR",
-    image: "/gallery/loft-sala-sofa-miraflores-cali.webp",
-    imageAlt: "Interior luminoso — Loft Atrio",
+    image: "/gallery/immersive/30-loft-vista-interior-cali.webp",
+    imageAlt: "Interior hacia patio — Loft Atrio",
+    theme: "atrio",
   },
   {
     id: "cielo",
     name: "Loft Cielo",
     shortLabel: "Cielo",
     tagline: "Loft cerrado · intimidad total",
+    vistaLabel: "Claraboya al Cielo",
+    bedsLabel: "1 Cama Doble + 3 Sofacamas",
+    amenities: COMMON_AMENITIES,
+    stubLabel: "VIP",
     windowKind: "cerrado",
     loftNumbers: loftNumbersForCategory("cielo"),
     priceFromCop: 90_000,
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("cielo"),
     stubCode: "CIE",
-    image: "/gallery/loft-habitacion-miraflores-cali.webp",
+    image: "/gallery/immersive/31-loft-habitacion-entrepiso-cali.webp",
     imageAlt: "Habitación íntima — Loft Cielo",
+    theme: "cielo",
   },
 ];
 

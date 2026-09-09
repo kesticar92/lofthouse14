@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { GALLERY_PHOTOS, type GalleryPhoto } from "@/data/gallery-photos";
 import { GalleryColumn } from "@/components/layout/gallery-column";
 import { ImmersiveGallery } from "@/components/layout/immersive-gallery";
+import { carouselDurationForCount } from "@/components/layout/testimonial";
 import Image from "next/image";
 
 function splitIntoColumns(
@@ -19,10 +20,10 @@ function splitIntoColumns(
   return cols;
 }
 
-function durationForCount(count: number): number {
-  // Similar ritmo al carrusel de reseñas: más fotos → scroll más largo
-  return Math.max(36, Math.min(90, 28 + count * 3.2));
-}
+/** Mismo factor de desplazamiento que la sección de reseñas. */
+const scrollFactor = 3.4;
+const columnDuration = (count: number) =>
+  carouselDurationForCount(count, scrollFactor);
 
 export function Gallery() {
   const reduceMotion = useReducedMotion();
@@ -74,7 +75,7 @@ export function Gallery() {
                 key={photo.src}
                 type="button"
                 onClick={() => setActive(i)}
-                className="overflow-hidden rounded-2xl border border-black/10 shadow-lg dark:border-white/10"
+                className="overflow-hidden rounded-3xl border border-zinc-200/90 shadow-lg shadow-zinc-900/5 dark:border-white/10 dark:shadow-black/30"
                 aria-label={`Abrir ${photo.alt} a pantalla completa`}
               >
                 <div className="relative aspect-[4/3] w-full">
@@ -82,7 +83,7 @@ export function Gallery() {
                     src={photo.src}
                     alt={photo.alt}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, 20rem"
                     className="object-cover"
                   />
                 </div>
@@ -94,7 +95,7 @@ export function Gallery() {
             <div className="mx-auto flex w-full min-w-0 justify-center gap-4 sm:hidden [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
               <GalleryColumn
                 images={cols.mobile[0] ?? []}
-                duration={durationForCount(photos.length)}
+                duration={columnDuration(photos.length)}
                 onImageClick={openPhoto}
               />
             </div>
@@ -103,7 +104,7 @@ export function Gallery() {
                 <GalleryColumn
                   key={`t-${i}`}
                   images={col}
-                  duration={durationForCount(col.length)}
+                  duration={columnDuration(col.length)}
                   onImageClick={openPhoto}
                 />
               ))}
@@ -113,7 +114,7 @@ export function Gallery() {
                 <GalleryColumn
                   key={`d-${i}`}
                   images={col}
-                  duration={durationForCount(col.length)}
+                  duration={columnDuration(col.length)}
                   onImageClick={openPhoto}
                 />
               ))}

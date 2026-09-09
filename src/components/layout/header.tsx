@@ -156,7 +156,7 @@ export function Header() {
             setGuests(next);
             persistStay({ guests: next });
           }}
-          className="rounded-xl border border-[#1c1917]/18 bg-[#f2f0eb] px-2 py-1.5 text-xs font-semibold text-[#141210] dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb]"
+          className="rounded-xl border border-[#1c1917]/18 bg-[#ebe6dc] px-2 py-1.5 text-xs font-semibold text-[#141210] dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb]"
         >
           {GUEST_OPTIONS.map((n) => (
             <option key={n} value={n}>
@@ -206,8 +206,8 @@ export function Header() {
         </button>
 
         <Link href="/" className="shrink-0" aria-label={site.name}>
-          {/* Día: tipografía clara sobre chip charcoal. Noche: tipografía oscura sobre crema. */}
-          <span className="inline-block rounded-sm border-y-2 border-[#f2f0eb] bg-[#1c1917] px-1.5 py-0.5 font-display text-xs font-extrabold uppercase tracking-[0.14em] text-[#f2f0eb] dark:border-[#141210] dark:bg-[#ebe6dc] dark:text-[#141210] sm:px-2 sm:text-sm md:text-base">
+          {/* Misma superficie/contraste que MENÚ, AYUDA y FABs: crema de día, charcoal de noche. */}
+          <span className="inline-block rounded-sm border-y-2 border-[#141210] bg-[#ebe6dc] px-1.5 py-0.5 font-display text-xs font-extrabold uppercase tracking-[0.14em] text-[#141210] dark:border-[#f2f0eb] dark:bg-[#1c1917] dark:text-[#f2f0eb] sm:px-2 sm:text-sm md:text-base">
             LOFTHOUSE14
           </span>
         </Link>

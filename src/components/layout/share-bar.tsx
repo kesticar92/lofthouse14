@@ -106,7 +106,7 @@ export function ShareBar() {
         <AppleActionButton
           onClick={handleShare}
           label="Compartir"
-          className="bg-[#f2f0eb] text-[#141210] hover:bg-[#e2dccf] dark:bg-[#25211d] dark:text-[#f2f0eb] dark:hover:bg-[#2f2a25]"
+          className="bg-[#ebe6dc] text-[#141210] hover:bg-[#e2dccf] dark:bg-[#1c1917] dark:text-[#f2f0eb] dark:hover:bg-[#25211d]"
         >
           <ShareIosIcon />
         </AppleActionButton>
@@ -114,7 +114,7 @@ export function ShareBar() {
         <AppleActionButton
           href={site.google_url}
           label="Ubicación en Google Maps"
-          className="bg-[#f2f0eb] hover:bg-[#e2dccf] dark:bg-[#25211d] dark:hover:bg-[#2f2a25]"
+          className="bg-[#ebe6dc] text-[#141210] hover:bg-[#e2dccf] dark:bg-[#1c1917] dark:text-[#f2f0eb] dark:hover:bg-[#25211d]"
         >
           <GoogleMapsIcon />
         </AppleActionButton>
@@ -122,7 +122,7 @@ export function ShareBar() {
         <AppleActionButton
           href={waLink()}
           label={`WhatsApp — ${site.name}`}
-          className="bg-[#f2f0eb] hover:bg-[#e2dccf] dark:bg-[#25211d] dark:hover:bg-[#2f2a25]"
+          className="bg-[#ebe6dc] text-[#141210] hover:bg-[#e2dccf] dark:bg-[#1c1917] dark:text-[#f2f0eb] dark:hover:bg-[#25211d]"
           onClick={() => trackWhatsAppClick("fab")}
         >
           <WhatsAppLogoIcon className="size-[1.65rem]" />

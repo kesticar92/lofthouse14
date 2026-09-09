@@ -43,9 +43,10 @@ export type LoftCategory = {
 };
 
 const COMMON_AMENITIES = [
-  "Aire Condicionado",
-  "Cocina",
-  "Smart TV",
+  "Aire acondicionado",
+  "Cocina Equipada",
+  "Smart TV con ROKU",
+  "Baño",
   "WiFi",
   "Smart Entry",
 ];

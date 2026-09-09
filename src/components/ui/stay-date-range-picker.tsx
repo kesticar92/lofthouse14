@@ -142,8 +142,8 @@ export function StayDateRangePicker({
       compact
         ? cn(
             "rounded-xl border px-2.5 py-1.5",
-            "border-[#1c1917]/18 bg-[#f2f0eb] text-[#141210]",
-            "dark:border-[#f2f0eb]/15 dark:bg-[#141210] dark:text-[#f2f0eb]",
+            "border-[#1c1917]/18 bg-[#ebe6dc] text-[#141210]",
+            "dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb]",
             active && "ring-2 ring-amber-600/35",
           )
         : cn(

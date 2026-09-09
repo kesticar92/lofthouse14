@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
+  Bath,
   BedDouble,
   CookingPot,
   KeyRound,
@@ -22,9 +23,10 @@ import {
 } from "@/data/loft-categories";
 
 const AMENITY_ICONS: Record<string, LucideIcon> = {
-  "Aire Condicionado": Wind,
-  Cocina: CookingPot,
-  "Smart TV": Tv,
+  "Aire acondicionado": Wind,
+  "Cocina Equipada": CookingPot,
+  "Smart TV con ROKU": Tv,
+  Baño: Bath,
   WiFi: Wifi,
   "Smart Entry": KeyRound,
 };

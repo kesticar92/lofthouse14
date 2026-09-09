@@ -27,7 +27,7 @@ const SHARED_AMENITIES = [
   "WiFi",
   "Aire acondicionado",
   "Cocina equipada",
-  "Smart TV",
+  "Smart TV con ROKU",
   "Baño privado",
   "Check-in autónomo",
 ];

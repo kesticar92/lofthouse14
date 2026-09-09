@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { BadgeCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { BadgeCheck, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { HeroBookingCard } from "@/components/sections/hero-booking-card";
 import { HeroMobileBackdrop } from "@/components/sections/hero-mobile-backdrop";
@@ -169,19 +169,26 @@ export function Hero() {
               ★
             </span>{" "}
             4.8 · 388 reseñas
-            <BadgeCheck
-              className="h-3.5 w-3.5 text-[#1D9BF0]"
-              fill="currentColor"
-              strokeWidth={0}
-              aria-label="Verificado"
-            />
+            <span className="relative inline-flex h-3.5 w-3.5" aria-label="Verificado">
+              <BadgeCheck
+                className="h-3.5 w-3.5 text-[#1D9BF0]"
+                fill="currentColor"
+                strokeWidth={0}
+                aria-hidden
+              />
+              <Check
+                className="absolute inset-0 m-auto h-2 w-2 text-white"
+                strokeWidth={3.5}
+                aria-hidden
+              />
+            </span>
           </p>
           <h1 className="mt-3 font-display text-[1.65rem] font-bold uppercase leading-tight text-white drop-shadow-md">
             Apartaestudios Dúplex en Cali, Miraflores
           </h1>
           <p className="mt-2 max-w-md text-sm leading-snug text-white/85">
-            Cocina equipada, Aire Condicionado, Wifi y Check In Autonomo. Desde
-            $90.000 la noche. Reserva Directo con Lofthouse 14.
+            Cocina equipada, Aire acondicionado, WiFi y Check-in Autónomo. Desde
+            $90.000 la noche. Reserva directo con Lofthouse 14.
           </p>
         </div>
       </section>
@@ -245,12 +252,19 @@ export function Hero() {
                   ★
                 </span>
                 <span>4.8 · 388 reseñas</span>
-                <BadgeCheck
-                  className="h-4 w-4 text-[#1D9BF0]"
-                  fill="currentColor"
-                  strokeWidth={0}
-                  aria-label="Verificado"
-                />
+                <span className="relative inline-flex h-4 w-4" aria-label="Verificado">
+                  <BadgeCheck
+                    className="h-4 w-4 text-[#1D9BF0]"
+                    fill="currentColor"
+                    strokeWidth={0}
+                    aria-hidden
+                  />
+                  <Check
+                    className="absolute inset-0 m-auto h-2.5 w-2.5 text-white"
+                    strokeWidth={3.5}
+                    aria-hidden
+                  />
+                </span>
               </p>
               <h1 className="font-display text-4xl font-bold uppercase leading-[1.05] text-white drop-shadow-md lg:text-5xl xl:text-6xl">
                 Apartaestudios Dúplex en Cali, Miraflores,{" "}
@@ -259,8 +273,8 @@ export function Hero() {
                 </span>
               </h1>
               <p className="mt-4 max-w-2xl text-lg leading-snug text-gray-200 drop-shadow-md lg:text-xl">
-                Cocina equipada, Aire Condicionado, Wifi y Check In Autonomo.
-                Desde $90.000 la noche, Reserva Directo con Lofthouse 14
+                Cocina equipada, Aire acondicionado, WiFi y Check-in Autónomo.
+                Desde $90.000 la noche. Reserva directo con Lofthouse 14.
               </p>
               <motion.div
                 initial={{ opacity: 0, y: 8 }}

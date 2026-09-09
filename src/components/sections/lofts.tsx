@@ -10,7 +10,12 @@ import { cn } from "@/lib/cn";
 
 import { PricingDetailsAccordion } from "@/components/sections/pricing-details-accordion";
 
-const perks = ["WiFi", "Aire acondicionado", "Cocina equipada", "Smart TV"];
+const perks = [
+  "WiFi",
+  "Aire acondicionado",
+  "Cocina equipada",
+  "Smart TV con ROKU",
+];
 
 /** Tarifas desde base Loft Cielo ($90.000): 1×, 2×, 3×; 4+ a consultar. */
 const CIELO_BASE = 90_000;

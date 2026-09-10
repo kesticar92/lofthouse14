@@ -126,10 +126,10 @@ function resolveEntryStep(draft: StayDraft): number {
 }
 
 export function GuidedReservation({
-  hideIntro = false,
+  /** Densidad: en `/reservar` y home embed, sin padding de sección marketing. */
+  compact = false,
 }: {
-  /** En `/reservar` el header de página ya muestra el título; solo el stepper. */
-  hideIntro?: boolean;
+  compact?: boolean;
 } = {}) {
   const [step, setStep] = useState(0);
   const [transitionTo, setTransitionTo] = useState<number | null>(null);
@@ -769,64 +769,32 @@ export function GuidedReservation({
       id="reservas"
       className={cn(
         "scroll-mt-24 bg-[#f2f0eb] dark:bg-zinc-950",
-        hideIntro
+        compact
           ? "px-0 py-2 md:py-4"
-          : "border-y border-zinc-200 px-4 py-14 dark:border-zinc-800 md:px-20 md:py-20",
+          : "border-y border-zinc-200 px-4 py-14 dark:border-zinc-800 md:px-6 md:py-16",
       )}
     >
-      <div className={cn("mx-auto", hideIntro ? "max-w-5xl" : "max-w-4xl")}>
-        {hideIntro ? (
-          <div className="mb-8 flex justify-center">
-            <ConfiguratorOrbitalSteps
-              activeStep={displayStep}
-              coveredSteps={coveredSteps}
-              onStepSelect={(i) => {
-                if (transitionTo !== null) return;
-                if (i === STEP_TU_VIAJE && skipTripStep) return;
-                if (
-                  skipStaySteps &&
-                  (i === STEP_FECHAS || i === STEP_HUESPEDES)
-                ) {
-                  return;
-                }
-                if (i === STEP_LOFT && skipLoftStep) return;
-                goToStep(i);
-              }}
-              className="mx-auto max-w-lg"
-            />
-          </div>
-        ) : (
-          <div className="mb-8 flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-10">
-            <div className="max-w-xl text-center md:text-left">
-              <h2 className="font-display text-4xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
-                Personaliza tu experiencia
-              </h2>
-              <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-                Completa extras y confirma. Si ya elegiste fechas, huéspedes o un
-                tipo de loft en el banner, no te pedimos «cómo vienes» ni
-                repetimos esos datos; al final te llevamos a WhatsApp con el
-                resumen.
-              </p>
-            </div>
-            <ConfiguratorOrbitalSteps
-              activeStep={displayStep}
-              coveredSteps={coveredSteps}
-              onStepSelect={(i) => {
-                if (transitionTo !== null) return;
-                if (i === STEP_TU_VIAJE && skipTripStep) return;
-                if (
-                  skipStaySteps &&
-                  (i === STEP_FECHAS || i === STEP_HUESPEDES)
-                ) {
-                  return;
-                }
-                if (i === STEP_LOFT && skipLoftStep) return;
-                goToStep(i);
-              }}
-              className="md:mr-2 md:max-w-md"
-            />
-          </div>
-        )}
+      <div className="mx-auto max-w-5xl">
+        {/* Solo stepper centrado + contenido del paso (sin intro duplicado). */}
+        <div className="mb-8 flex justify-center">
+          <ConfiguratorOrbitalSteps
+            activeStep={displayStep}
+            coveredSteps={coveredSteps}
+            onStepSelect={(i) => {
+              if (transitionTo !== null) return;
+              if (i === STEP_TU_VIAJE && skipTripStep) return;
+              if (
+                skipStaySteps &&
+                (i === STEP_FECHAS || i === STEP_HUESPEDES)
+              ) {
+                return;
+              }
+              if (i === STEP_LOFT && skipLoftStep) return;
+              goToStep(i);
+            }}
+            className="mx-auto max-w-lg"
+          />
+        </div>
 
         <AnimatePresence>
           {transitionTo !== null ? (

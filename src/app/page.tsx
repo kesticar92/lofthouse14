@@ -23,7 +23,12 @@ export default function Home() {
         <Gallery />
         <Lofts />
         <TestimonialsUsage />
-        <GuidedReservation />
+        {/* Misma UI que `/reservar`: stepper + paso (sin intro). */}
+        <div className="border-y border-zinc-200 dark:border-zinc-800">
+          <div className="mx-auto max-w-5xl px-4 py-10 md:px-6 md:py-14">
+            <GuidedReservation compact />
+          </div>
+        </div>
         <Location />
         <FaqSection />
         <SocialWall />

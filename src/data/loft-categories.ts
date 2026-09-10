@@ -66,8 +66,10 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("vista"),
     stubCode: "VIS",
-    image: "/gallery/immersive/25-loft-luz-natural-miraflores-cali.webp",
-    imageAlt: "Interior con luz natural y vista — Loft Vista",
+    // Ventana a calle con coche aparcado — tipología exterior (no interior genérico).
+    image: "/gallery/immersive/34-loft-espacio-amplio-cali.webp",
+    imageAlt:
+      "Loft Vista: dormitorio con ventana a la calle y luz de barrio en Miraflores, Cali",
     theme: "vista",
   },
   {
@@ -84,8 +86,10 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("atrio"),
     stubCode: "ATR",
-    image: "/gallery/immersive/30-loft-vista-interior-cali.webp",
-    imageAlt: "Interior hacia patio — Loft Atrio",
+    // Ventana con follaje del patio/jardín interior — tipología atrio.
+    image: "/gallery/cuarto_2.webp",
+    imageAlt:
+      "Loft Atrio: cama junto a ventana con vista al patio interior y vegetación",
     theme: "atrio",
   },
   {
@@ -102,8 +106,10 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("cielo"),
     stubCode: "CIE",
-    image: "/gallery/immersive/31-loft-habitacion-entrepiso-cali.webp",
-    imageAlt: "Habitación íntima — Loft Cielo",
+    // Entrepiso con barandilla, sin ventana a calle — tipología íntima.
+    image: "/gallery/immersive/28-loft-ambiente-miraflores-cali.webp",
+    imageAlt:
+      "Loft Cielo: dormitorio en entrepiso con barandilla, sin ventana a la calle",
     theme: "cielo",
   },
 ];

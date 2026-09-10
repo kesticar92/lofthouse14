@@ -2,60 +2,173 @@
 export type GalleryPhoto = {
   src: string;
   alt: string;
+  /** Etiqueta corta visible en lightbox (espacio · momento). */
+  caption?: string;
+  /** Momento o matiz (día/noche, detalle); se combina con caption si ambos existen. */
+  moment?: string;
 };
 
+/** Texto visible en UI: prioriza caption (+ moment) sobre alt SEO. */
+export function galleryPhotoLabel(photo: GalleryPhoto): string {
+  if (photo.caption && photo.moment) {
+    return `${photo.caption} · ${photo.moment}`;
+  }
+  return photo.caption ?? photo.moment ?? photo.alt;
+}
+
+/**
+ * Curada para identificar espacios: se eliminaron clones casi idénticos
+ * (varios sofácamas / gabinetes / dormitorios genéricos) y se etiquetaron
+ * pares día/noche del mismo sujeto.
+ */
 export const GALLERY_PHOTOS: GalleryPhoto[] = [
-  { src: "/gallery/immersive/09-fachada_diurna.webp", alt: "Fachada diurna de lofts en Miraflores Cali cerca del Parque del Perro — Lofthouse 14" },
-  { src: "/gallery/immersive/11-fachada_sillas_diurna.webp", alt: "Terraza exterior con sillas en lofts Miraflores Cali — Lofthouse 14" },
-  { src: "/gallery/immersive/10-fachada_nocturna.webp", alt: "Fachada nocturna de Lofthouse 14 en Miraflores, Cali" },
-  { src: "/gallery/immersive/06-corredor_salida.webp", alt: "Corredor de acceso a lofts en Miraflores Cali" },
-  { src: "/gallery/immersive/05-corredor.webp", alt: "Corredor interior de lofts en Miraflores Cali" },
-  { src: "/gallery/immersive/18-sala_cocina_escalera.webp", alt: "Loft en Cali con sala, cocina equipada y escalera al entrepiso" },
-  { src: "/gallery/immersive/19-sofa_cocina_escalera.webp", alt: "Sofá frente a cocina abierta en loft Miraflores Cali" },
-  { src: "/gallery/immersive/20-sofaca_escalera_5.webp", alt: "Sofá cama y escalera en loft amoblado en Cali" },
-  { src: "/gallery/immersive/22-sofacamas_izquierda_con_ventilador.webp", alt: "Área de sofá camas con ventilador en loft Lofthouse 14" },
-  { src: "/gallery/immersive/21-sofacamas_izquierda.webp", alt: "Zona de sofá camas en loft Miraflores cerca del Parque del Perro" },
-  { src: "/gallery/immersive/17-puerta_sofacama_10.webp", alt: "Entrada al loft con sofá cama — hospedaje en Cali" },
-  { src: "/gallery/immersive/07-escalera_5.webp", alt: "Escalera al entrepiso de loft en Miraflores Cali" },
-  { src: "/gallery/immersive/01-cocina_completa_comedor_escalera_izquierda.webp", alt: "Cocina completa y comedor de loft en Miraflores Cali" },
-  { src: "/gallery/immersive/03-cocina_escalera_derecha.webp", alt: "Cocina bajo la escalera en loft Lofthouse 14 Cali" },
-  { src: "/gallery/immersive/02-cocina_derecha.webp", alt: "Cocina y comedor modernos en loft Miraflores" },
-  { src: "/gallery/immersive/53-comedor_con_cena.webp", alt: "Comedor preparado para cenar en loft Cali Miraflores" },
-  { src: "/gallery/immersive/04-comedor_con_vino_izquierdo.webp", alt: "Comedor con vino en loft romántico en Cali" },
-  { src: "/gallery/immersive/08-estufa_completa_izquierda.webp", alt: "Estufa y utensilios de cocina equipada en loft Cali" },
-  { src: "/gallery/immersive/13-gabinete_superior_cocina_izquierda.webp", alt: "Gabinete superior de cocina en loft Miraflores" },
-  { src: "/gallery/immersive/12-gabinete_superior.webp", alt: "Vajilla organizada en gabinete de loft Lofthouse 14" },
-  { src: "/gallery/immersive/15-gabinetes_inferior.webp", alt: "Almacenamiento bajo mesón en cocina de loft Cali" },
-  { src: "/gallery/immersive/14-gabinetes_cocina.webp", alt: "Gabinetes de cocina completa en loft Miraflores Cali" },
-  { src: "/gallery/immersive/16-horno_microhondas.webp", alt: "Horno microondas en cocina equipada de loft en Cali" },
-  { src: "/gallery/immersive/23-utencilios_cocina.webp", alt: "Utensilios de cocina listos en loft Lofthouse 14" },
-  { src: "/gallery/immersive/24-loft-interior-miraflores-cali.webp", alt: "Interior de loft moderno en Miraflores Cali — Lofthouse 14" },
-  { src: "/gallery/immersive/25-loft-luz-natural-miraflores-cali.webp", alt: "Loft con luz natural en Miraflores Cali — Lofthouse 14" },
-  { src: "/gallery/immersive/26-loft-detalle-decoracion-cali.webp", alt: "Detalle de decoración en loft Miraflores Cali" },
-  { src: "/gallery/immersive/27-loft-espacio-moderno-cali.webp", alt: "Espacio moderno de loft para estadía en Cali" },
-  { src: "/gallery/immersive/28-loft-ambiente-miraflores-cali.webp", alt: "Ambiente acogedor de loft en Miraflores Cali" },
-  { src: "/gallery/immersive/29-loft-detalle-acabados-cali.webp", alt: "Detalle de acabados en loft Lofthouse 14 Cali" },
-  { src: "/gallery/immersive/30-loft-vista-interior-cali.webp", alt: "Vista interior de loft amoblado en Cali" },
-  { src: "/gallery/immersive/31-loft-habitacion-entrepiso-cali.webp", alt: "Habitación en entrepiso de loft Miraflores Cali" },
-  { src: "/gallery/immersive/32-bano-privado-loft-cali.webp", alt: "Baño privado de loft en Cali — Lofthouse 14" },
-  { src: "/gallery/immersive/33-bano-detalles-loft-cali.webp", alt: "Detalles de baño privado en loft Miraflores" },
-  { src: "/gallery/immersive/34-loft-espacio-amplio-cali.webp", alt: "Espacio amplio de loft para pareja o nómada en Cali" },
-  { src: "/gallery/immersive/35-loft-amoblado-miraflores-cali.webp", alt: "Loft amoblado en Miraflores Cali — Lofthouse 14" },
-  { src: "/gallery/immersive/36-loft-amoblado-sala-cali.webp", alt: "Sala de loft amoblado cerca del Parque del Perro" },
-  { src: "/gallery/immersive/37-loft-amoblado-cocina-cali.webp", alt: "Cocina de loft amoblado en Miraflores Cali" },
-  { src: "/gallery/immersive/38-loft-ambientacion-miraflores.webp", alt: "Ambientación de loft en barrio Miraflores Cali" },
-  { src: "/gallery/immersive/39-loft-detalle-miraflores-cali.webp", alt: "Detalle de hospedaje loft en Miraflores Cali" },
-  { src: "/gallery/immersive/40-bano-minimalista-loft-cali.webp", alt: "Baño minimalista privado en loft Cali" },
-  { src: "/gallery/immersive/41-bano-privado-moderno-cali.webp", alt: "Baño privado moderno de loft en Cali — Lofthouse 14" },
-  { src: "/gallery/immersive/42-loft-interior-moderno-cali.webp", alt: "Interior moderno de loft en Miraflores Cali" },
-  { src: "/gallery/immersive/43-loft-amoblado-parque-del-perro.webp", alt: "Loft amoblado cerca del Parque del Perro en Cali" },
-  { src: "/gallery/immersive/44-loft-espacio-estadia-cali.webp", alt: "Espacio de estadía en loft Lofthouse 14 Cali" },
-  { src: "/gallery/immersive/45-loft-ambientacion-cali.webp", alt: "Ambientación de loft para turismo en Cali" },
-  { src: "/gallery/immersive/46-loft-detalle-hospedaje-cali.webp", alt: "Detalle de hospedaje loft en Cali Miraflores" },
-  { src: "/gallery/immersive/47-loft-amoblado-miraflores.webp", alt: "Loft amoblado en Miraflores listo para reservar" },
-  { src: "/gallery/immersive/48-bano-privado-lofthouse-14.webp", alt: "Baño privado Lofthouse 14 en loft Cali" },
-  { src: "/gallery/immersive/49-bano-detalle-acabados-cali.webp", alt: "Acabados de baño en loft Miraflores Cali" },
-  { src: "/gallery/immersive/50-loft-espacio-reserva-cali.webp", alt: "Espacio de loft disponible para reserva en Cali" },
-  { src: "/gallery/immersive/51-loft-amoblado-cali-miraflores.webp", alt: "Loft amoblado en Cali Miraflores — Lofthouse 14" },
-  { src: "/gallery/immersive/52-loft-ambientacion-hospedaje-cali.webp", alt: "Ambientación de hospedaje loft en Cali" },
-] as const;
+  {
+    src: "/gallery/immersive/09-fachada_diurna.webp",
+    alt: "Fachada diurna de lofts en Miraflores Cali cerca del Parque del Perro — Lofthouse 14",
+    caption: "Fachada",
+    moment: "Día",
+  },
+  {
+    src: "/gallery/immersive/11-fachada_sillas_diurna.webp",
+    alt: "Terraza exterior con sillas en lofts Miraflores Cali — Lofthouse 14",
+    caption: "Patio exterior",
+    moment: "Día",
+  },
+  {
+    src: "/gallery/immersive/10-fachada_nocturna.webp",
+    alt: "Fachada nocturna de Lofthouse 14 en Miraflores, Cali",
+    caption: "Fachada",
+    moment: "Noche",
+  },
+  {
+    src: "/gallery/immersive/06-corredor_salida.webp",
+    alt: "Corredor de acceso a lofts en Miraflores Cali",
+    caption: "Corredor",
+    moment: "Salida al patio",
+  },
+  {
+    src: "/gallery/immersive/05-corredor.webp",
+    alt: "Corredor interior de lofts en Miraflores Cali",
+    caption: "Corredor",
+    moment: "Acceso a lofts",
+  },
+  {
+    src: "/gallery/immersive/18-sala_cocina_escalera.webp",
+    alt: "Loft en Cali con sala, cocina equipada y escalera al entrepiso",
+    caption: "Sala · Cocina · Escalera",
+  },
+  {
+    src: "/gallery/immersive/21-sofacamas_izquierda.webp",
+    alt: "Zona de sofá camas en loft Miraflores cerca del Parque del Perro",
+    caption: "Sofá cama",
+    moment: "Zona de estar",
+  },
+  {
+    src: "/gallery/immersive/22-sofacamas_izquierda_con_ventilador.webp",
+    alt: "Área de sofá camas con ventilador en loft Lofthouse 14",
+    caption: "Sofá cama",
+    moment: "Con ventilador",
+  },
+  {
+    src: "/gallery/immersive/07-escalera_5.webp",
+    alt: "Escalera al entrepiso de loft en Miraflores Cali",
+    caption: "Escalera",
+    moment: "Al entrepiso",
+  },
+  {
+    src: "/gallery/immersive/01-cocina_completa_comedor_escalera_izquierda.webp",
+    alt: "Cocina completa y comedor de loft en Miraflores Cali",
+    caption: "Cocina",
+    moment: "Vista completa",
+  },
+  {
+    src: "/gallery/immersive/03-cocina_escalera_derecha.webp",
+    alt: "Cocina bajo la escalera en loft Lofthouse 14 Cali",
+    caption: "Cocina",
+    moment: "Bajo la escalera",
+  },
+  {
+    src: "/gallery/immersive/53-comedor_con_cena.webp",
+    alt: "Comedor preparado para cenar en loft Cali Miraflores",
+    caption: "Comedor",
+    moment: "Cena servida",
+  },
+  {
+    src: "/gallery/immersive/04-comedor_con_vino_izquierdo.webp",
+    alt: "Comedor con vino en loft romántico en Cali",
+    caption: "Comedor",
+    moment: "Ambiente romántico",
+  },
+  {
+    src: "/gallery/immersive/08-estufa_completa_izquierda.webp",
+    alt: "Estufa y utensilios de cocina equipada en loft Cali",
+    caption: "Cocina",
+    moment: "Estufa equipada",
+  },
+  {
+    src: "/gallery/immersive/23-utencilios_cocina.webp",
+    alt: "Utensilios de cocina listos en loft Lofthouse 14",
+    caption: "Cocina",
+    moment: "Utensilios",
+  },
+  {
+    src: "/gallery/immersive/34-loft-espacio-amplio-cali.webp",
+    alt: "Loft con ventana a la calle y luz de barrio en Miraflores Cali",
+    caption: "Ventana a calle",
+    moment: "Loft Vista",
+  },
+  {
+    src: "/gallery/cuarto_2.webp",
+    alt: "Dormitorio con ventana al patio interior y vegetación — Lofthouse 14",
+    caption: "Ventana a atrio",
+    moment: "Loft Atrio",
+  },
+  {
+    src: "/gallery/immersive/30-loft-vista-interior-cali.webp",
+    alt: "Dormitorio con TV y ventana interior en loft amoblado en Cali",
+    caption: "Dormitorio",
+    moment: "Ventana interior",
+  },
+  {
+    src: "/gallery/immersive/28-loft-ambiente-miraflores-cali.webp",
+    alt: "Dormitorio en entrepiso con barandilla en loft Miraflores Cali",
+    caption: "Entrepiso",
+    moment: "Loft Cielo",
+  },
+  {
+    src: "/gallery/immersive/31-loft-habitacion-entrepiso-cali.webp",
+    alt: "Habitación en entrepiso de loft Miraflores Cali",
+    caption: "Entrepiso",
+    moment: "Camas twin",
+  },
+  {
+    src: "/gallery/immersive/42-loft-interior-moderno-cali.webp",
+    alt: "Interior moderno de loft en Miraflores Cali con entrepiso",
+    caption: "Entrepiso",
+    moment: "Cama y TV",
+  },
+  {
+    src: "/gallery/immersive/44-loft-espacio-estadia-cali.webp",
+    alt: "Espacio de estadía en loft Lofthouse 14 Cali con escalera",
+    caption: "Loft completo",
+    moment: "Sala bajo escalera",
+  },
+  {
+    src: "/gallery/immersive/25-loft-luz-natural-miraflores-cali.webp",
+    alt: "Habitación íntima con luz cálida en loft Miraflores Cali",
+    caption: "Dormitorio",
+    moment: "Ambiente íntimo",
+  },
+  {
+    src: "/gallery/immersive/32-bano-privado-loft-cali.webp",
+    alt: "Baño privado de loft en Cali — Lofthouse 14",
+    caption: "Baño",
+    moment: "Privado",
+  },
+  {
+    src: "/gallery/immersive/40-bano-minimalista-loft-cali.webp",
+    alt: "Baño minimalista privado en loft Cali",
+    caption: "Baño",
+    moment: "Minimalista",
+  },
+];

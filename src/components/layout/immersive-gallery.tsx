@@ -17,7 +17,10 @@ import {
   useTransform,
 } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import type { GalleryPhoto } from "@/data/gallery-photos";
+import {
+  galleryPhotoLabel,
+  type GalleryPhoto,
+} from "@/data/gallery-photos";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -201,7 +204,16 @@ export function ImmersiveGallery({
           </div>
 
           <footer className="relative z-20 px-4 pb-5 pt-2 sm:px-8">
-            <p className="mb-3 text-center text-sm text-white/65">{photo.alt}</p>
+            <p className="mb-1 text-center font-display text-base tracking-wide text-white sm:text-lg">
+              {galleryPhotoLabel(photo)}
+            </p>
+            {photo.caption || photo.moment ? (
+              <p className="mb-3 text-center text-xs text-white/45 sm:text-sm">
+                {photo.alt}
+              </p>
+            ) : (
+              <div className="mb-3" />
+            )}
             <div className="mx-auto flex max-w-3xl gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {photos.map((p, i) => (
                 <button
@@ -214,7 +226,7 @@ export function ImmersiveGallery({
                       ? "ring-2 ring-white"
                       : "opacity-45 hover:opacity-90",
                   )}
-                  aria-label={`Ir a foto ${i + 1}`}
+                  aria-label={`Ir a ${galleryPhotoLabel(p)}`}
                   aria-current={i === index}
                 >
                   <Image

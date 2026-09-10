@@ -173,11 +173,14 @@ export default function CotizacionesPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl tracking-wide sm:text-4xl">
-            COTIZADOR
+            TARIFAS / COTIZADOR
           </h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-            Calcula el precio exacto de una reserva. La lógica replica la
-            Calculadora de Tarifas de LOFTHOUSE 14.
+            Panel de reglas de precio (base, fin de semana, aseo, descuentos) y
+            cotizaciones guardadas. Path:{" "}
+            <code className="rounded bg-black/5 px-1 font-mono text-xs dark:bg-white/10">
+              /admin/cotizaciones
+            </code>
           </p>
         </div>
       </div>
@@ -381,6 +384,52 @@ export default function CotizacionesPage() {
           </div>
         </AdminCard>
       )}
+
+      <AdminCard
+        title="Reglas de revenue (este panel)"
+        subtitle="Lugar canónico para base L–J / V–D, aseo, descuentos de larga estadía y cotizaciones guardadas. La web pública aplica además la categoría marketing (Vista 120k · Atrio 105k · Cielo 90k) sobre el ratio fin de semana."
+      >
+        <ul className="list-inside list-disc space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
+          <li>
+            Tarifa base (L–J) y fin de semana (V–D) — edítalas abajo en
+            «Configuración de tarifas».
+          </li>
+          <li>
+            Categorías marketing: el wizard y{" "}
+            <code className="rounded bg-black/5 px-1 dark:bg-white/10">
+              unifiedQuote
+            </code>{" "}
+            amarran Vista / Atrio / Cielo vía{" "}
+            <code className="rounded bg-black/5 px-1 dark:bg-white/10">
+              priceFromCop
+            </code>
+            .
+          </li>
+          <li>
+            Temporadas / restricciones avanzadas: hoy viven en el motor unificado
+            (season multipliers); este panel es la UI operativa diaria.
+          </li>
+        </ul>
+        <div className="mt-4 rounded-2xl border border-dashed border-amber-500/40 bg-amber-500/5 p-4">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            PriceLabs sync
+          </p>
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+            Stub de arquitectura — no hay sync real todavía.{" "}
+            <span className="font-mono text-[11px] uppercase tracking-wide text-amber-700 dark:text-amber-400">
+              TODO: REAL INTEGRATION
+            </span>
+          </p>
+          <button
+            type="button"
+            disabled
+            title="TODO: REAL INTEGRATION"
+            className="mt-3 cursor-not-allowed rounded-full border border-black/10 bg-white/60 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:border-white/10 dark:bg-zinc-900/40"
+          >
+            Sync PriceLabs (próximamente)
+          </button>
+        </div>
+      </AdminCard>
 
       <AdminCard
         title="Configuración de tarifas"

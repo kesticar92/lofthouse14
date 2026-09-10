@@ -11,6 +11,7 @@ import {
   PUBLIC_PRICING_CONFIG,
   publicStayQuote,
 } from "@/lib/public-stay-quote";
+import { pricingConfigForCategory } from "@/lib/pricing/unified";
 import { StayDateRangePicker } from "@/components/ui/stay-date-range-picker";
 import {
   CONFIGURATOR_EXTRAS,
@@ -31,6 +32,7 @@ import {
 } from "@/components/sections/configurator-orbital-steps";
 import {
   STAY_DRAFT_EVENT,
+  mergeStayDraft,
   readStayDraft,
   type StayDraft,
 } from "@/lib/stay-draft";
@@ -101,7 +103,12 @@ function resolveEntryStep(draft: StayDraft): number {
   return next;
 }
 
-export function GuidedReservation() {
+export function GuidedReservation({
+  hideIntro = false,
+}: {
+  /** En `/reservar` el header de página ya muestra el título; solo el stepper. */
+  hideIntro?: boolean;
+} = {}) {
   const [step, setStep] = useState(0);
   const [transitionTo, setTransitionTo] = useState<number | null>(null);
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -262,15 +269,23 @@ export function GuidedReservation() {
   const quoteLofts =
     step === 1 ? Math.max(lofts, minLoftsForGuests) : lofts;
 
+  const quotePricing = useMemo(
+    () => pricingConfigForCategory(categoryId, PUBLIC_PRICING_CONFIG),
+    [categoryId],
+  );
+
   const quoteResult = useMemo(
     () =>
-      publicStayQuote({
-        checkIn,
-        checkOut,
-        huespedes: guests,
-        lofts: quoteLofts,
-      }),
-    [checkIn, checkOut, guests, quoteLofts],
+      publicStayQuote(
+        {
+          checkIn,
+          checkOut,
+          huespedes: guests,
+          lofts: quoteLofts,
+        },
+        quotePricing,
+      ),
+    [checkIn, checkOut, guests, quoteLofts, quotePricing],
   );
 
   const mealDaysDefault = useMemo(
@@ -306,7 +321,7 @@ export function GuidedReservation() {
 
   const priceBreakdownLines = useMemo(() => {
     if (!quoteResult.ok) return [];
-    const cfg = PUBLIC_PRICING_CONFIG;
+    const cfg = quotePricing;
     const lines: {
       id: string;
       label: string;
@@ -403,6 +418,7 @@ export function GuidedReservation() {
     return lines;
   }, [
     quoteResult,
+    quotePricing,
     lofts,
     selectedExtras,
     mealQuantities,
@@ -694,38 +710,64 @@ export function GuidedReservation() {
   return (
     <section
       id="reservas"
-      className="scroll-mt-24 border-y border-zinc-200 bg-[#f2f0eb] px-4 py-14 dark:border-zinc-800 dark:bg-zinc-950 md:px-20 md:py-20"
+      className={cn(
+        "scroll-mt-24 bg-[#f2f0eb] dark:bg-zinc-950",
+        hideIntro
+          ? "px-0 py-2 md:py-4"
+          : "border-y border-zinc-200 px-4 py-14 dark:border-zinc-800 md:px-20 md:py-20",
+      )}
     >
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-10">
-          <div className="max-w-xl text-center md:text-left">
-            <h2 className="font-display text-4xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
-              Personaliza tu experiencia
-            </h2>
-            <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-              Completa extras y confirma. Si ya elegiste fechas, huéspedes o un
-              tipo de loft en el banner, no te pedimos «cómo vienes» ni
-              repetimos esos datos; al final te llevamos a WhatsApp con el
-              resumen.
-            </p>
+      <div className={cn("mx-auto", hideIntro ? "max-w-5xl" : "max-w-4xl")}>
+        {hideIntro ? (
+          <div className="mb-8 flex justify-center">
+            <ConfiguratorOrbitalSteps
+              activeStep={displayStep}
+              coveredSteps={coveredSteps}
+              onStepSelect={(i) => {
+                if (transitionTo !== null) return;
+                if (i === STEP_TU_VIAJE && skipTripStep) return;
+                if (
+                  skipStaySteps &&
+                  (i === STEP_FECHAS || i === STEP_HUESPEDES)
+                ) {
+                  return;
+                }
+                goToStep(i);
+              }}
+              className="mx-auto max-w-lg"
+            />
           </div>
-          <ConfiguratorOrbitalSteps
-            activeStep={displayStep}
-            coveredSteps={coveredSteps}
-            onStepSelect={(i) => {
-              if (transitionTo !== null) return;
-              if (i === STEP_TU_VIAJE && skipTripStep) return;
-              if (
-                skipStaySteps &&
-                (i === STEP_FECHAS || i === STEP_HUESPEDES)
-              ) {
-                return;
-              }
-              goToStep(i);
-            }}
-            className="md:mr-2 md:max-w-md"
-          />
-        </div>
+        ) : (
+          <div className="mb-8 flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-10">
+            <div className="max-w-xl text-center md:text-left">
+              <h2 className="font-display text-4xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
+                Personaliza tu experiencia
+              </h2>
+              <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
+                Completa extras y confirma. Si ya elegiste fechas, huéspedes o un
+                tipo de loft en el banner, no te pedimos «cómo vienes» ni
+                repetimos esos datos; al final te llevamos a WhatsApp con el
+                resumen.
+              </p>
+            </div>
+            <ConfiguratorOrbitalSteps
+              activeStep={displayStep}
+              coveredSteps={coveredSteps}
+              onStepSelect={(i) => {
+                if (transitionTo !== null) return;
+                if (i === STEP_TU_VIAJE && skipTripStep) return;
+                if (
+                  skipStaySteps &&
+                  (i === STEP_FECHAS || i === STEP_HUESPEDES)
+                ) {
+                  return;
+                }
+                goToStep(i);
+              }}
+              className="md:mr-2 md:max-w-md"
+            />
+          </div>
+        )}
 
         <AnimatePresence>
           {transitionTo !== null ? (
@@ -894,7 +936,10 @@ export function GuidedReservation() {
                             key={cat.id}
                             type="button"
                             disabled={!fits}
-                            onClick={() => setCategoryId(cat.id)}
+                            onClick={() => {
+                              setCategoryId(cat.id);
+                              mergeStayDraft({ categoryId: cat.id });
+                            }}
                             className={
                               "rounded-2xl border px-3 py-3 text-left transition " +
                               (active
@@ -1196,6 +1241,14 @@ export function GuidedReservation() {
                     <div className="flex justify-between gap-4">
                       <dt className="text-zinc-500">Viaje</dt>
                       <dd className="font-medium">{profileMeta?.title ?? "—"}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-zinc-500">Categoría</dt>
+                      <dd className="font-medium">
+                        {categoryId
+                          ? getLoftCategory(categoryId).name
+                          : "Sin preferencia (tarifa base)"}
+                      </dd>
                     </div>
                     <div className="flex justify-between gap-4">
                       <dt className="text-zinc-500">Fechas</dt>

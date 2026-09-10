@@ -24,31 +24,33 @@ describe("unified pricing", () => {
     expect(cfg.tarifaLJ).toBe(Math.round(90_000 * 1.5));
   });
 
-  it("cotiza con categoría cielo más cara que vista (sin plans DB)", () => {
+  it("Vista (120k) cotiza más que Cielo (90k), también con SEED plans", () => {
+    const input = {
+      checkIn: "2026-09-10",
+      checkOut: "2026-09-12",
+      huespedes: 2,
+      lofts: 1,
+    };
     const vista = unifiedQuote({
-      input: {
-        checkIn: "2026-03-02",
-        checkOut: "2026-03-04",
-        huespedes: 2,
-        lofts: 1,
-      },
+      input,
       categoryId: "vista",
+      plans: SEED_RATE_PLANS,
       publicMode: true,
     });
     const cielo = unifiedQuote({
-      input: {
-        checkIn: "2026-03-02",
-        checkOut: "2026-03-04",
-        huespedes: 2,
-        lofts: 1,
-      },
+      input,
       categoryId: "cielo",
+      plans: SEED_RATE_PLANS,
       publicMode: true,
     });
     expect(vista.ok && cielo.ok).toBe(true);
     if (vista.ok && cielo.ok) {
-      expect(cielo.totalReserva).toBeGreaterThan(vista.totalReserva);
-      expect(CATEGORY_RATE_MULTIPLIER.cielo).toBe(1.2);
+      // 1 L–J + 1 V–D: Vista 120k + ~133333; Cielo 90k + 100k
+      expect(vista.subtotalAlojamiento).toBe(120_000 + Math.round(120_000 * (100_000 / 90_000)));
+      expect(cielo.subtotalAlojamiento).toBe(190_000);
+      expect(vista.totalReserva).toBeGreaterThan(cielo.totalReserva);
+      expect(CATEGORY_RATE_MULTIPLIER.vista).toBeCloseTo(120_000 / 90_000);
+      expect(CATEGORY_RATE_MULTIPLIER.cielo).toBe(1);
     }
   });
 });

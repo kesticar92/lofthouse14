@@ -1,6 +1,9 @@
 /**
  * Pricing unificado (Fase 5): rate plans + seasons → PricingConfig.
  * Reutiliza `quote()` / `publicStayQuote()` existentes.
+ *
+ * Categorías marketing (Vista / Atrio / Cielo) usan `priceFromCop` como
+ * tarifa L–J; V–D mantiene el ratio del plan/base (p. ej. 100k/90k).
  */
 
 import {
@@ -12,6 +15,7 @@ import {
 } from "@/lib/pricing";
 import { publicStayQuote } from "@/lib/public-stay-quote";
 import type { MarketingCategory } from "@/lib/catalog/seed";
+import { getLoftCategory } from "@/data/loft-categories";
 
 export type RatePlanLike = {
   code: string;
@@ -30,12 +34,46 @@ export type SeasonRuleLike = {
   active?: boolean;
 };
 
-/** Multiplicadores sugeridos por categoría marketing (sobre tarifa base). */
+/**
+ * Multiplicadores vs tarifa base Cielo (90k).
+ * Vista 120k → 4/3 · Atrio 105k → 7/6 · Cielo 90k → 1.
+ */
 export const CATEGORY_RATE_MULTIPLIER: Record<MarketingCategory, number> = {
-  vista: 1.0,
-  atrio: 1.1,
-  cielo: 1.2,
+  cielo: 1,
+  atrio: 105_000 / 90_000,
+  vista: 120_000 / 90_000,
 };
+
+/** Ratio fin de semana del config (default 100k/90k). */
+export function weekendRateRatio(cfg: PricingConfig = DEFAULT_PRICING): number {
+  if (!cfg.tarifaLJ || cfg.tarifaLJ <= 0) return 100_000 / 90_000;
+  return cfg.tarifaVD / cfg.tarifaLJ;
+}
+
+/**
+ * Tarifas L–J / V–D para una categoría marketing (priceFromCop + ratio VD).
+ */
+export function pricingForMarketingCategory(
+  categoryId: MarketingCategory,
+  base: PricingConfig = DEFAULT_PRICING,
+): Pick<PricingConfig, "tarifaLJ" | "tarifaVD"> {
+  const priceFrom = getLoftCategory(categoryId).priceFromCop;
+  const ratio = weekendRateRatio(base);
+  return {
+    tarifaLJ: priceFrom,
+    tarifaVD: Math.round(priceFrom * ratio),
+  };
+}
+
+/** PricingConfig público/completo amarrado a categoría (o base si null). */
+export function pricingConfigForCategory(
+  categoryId: MarketingCategory | null | undefined,
+  base: PricingConfig = DEFAULT_PRICING,
+): PricingConfig {
+  if (!categoryId) return { ...base };
+  const rates = pricingForMarketingCategory(categoryId, base);
+  return { ...base, ...rates };
+}
 
 export function ratePlanToPricingConfig(
   plan: RatePlanLike | null | undefined,
@@ -101,12 +139,12 @@ export function unifiedQuote(params: {
     base,
   );
 
-  if (params.categoryId && (!params.plans || params.plans.length === 0)) {
-    const m = CATEGORY_RATE_MULTIPLIER[params.categoryId];
+  // Categoría marketing siempre manda sobre el plan seed/base:
+  // Vista 120k, Atrio 105k, Cielo 90k (+ ratio V–D del plan).
+  if (params.categoryId) {
     cfg = {
       ...cfg,
-      tarifaLJ: Math.round(cfg.tarifaLJ * m),
-      tarifaVD: Math.round(cfg.tarifaVD * m),
+      ...pricingForMarketingCategory(params.categoryId, cfg),
     };
   }
 

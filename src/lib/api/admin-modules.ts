@@ -22,7 +22,7 @@ export type AdminModuleKey = (typeof ADMIN_MODULE_KEYS)[number];
 
 /** Etiquetas para UI (lista de usuarios, checkboxes de permisos). */
 export const ADMIN_MODULE_LABELS = {
-  cotizaciones: "Cotizaciones",
+  cotizaciones: "Tarifas",
   inventario: "Inventario",
   reservas: "Reservas",
   gastos: "Gastos",

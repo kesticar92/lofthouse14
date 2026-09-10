@@ -38,7 +38,7 @@ export const ADMIN_NAV: NavItem[] = [
   },
   {
     href: "/admin/cotizaciones",
-    label: "Cotizaciones",
+    label: "Tarifas",
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -51,7 +51,7 @@ export const ADMIN_NAV: NavItem[] = [
         <path d="M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3.5 5 3.5 5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5" />
       </svg>
     ),
-    desc: "Calcula y guarda cotizaciones",
+    desc: "Tarifas, temporadas y cotizaciones",
   },
   {
     href: "/admin/inventario",

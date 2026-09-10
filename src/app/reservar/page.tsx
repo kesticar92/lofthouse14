@@ -43,7 +43,7 @@ export default function ReservarPage() {
           </p>
         </header>
 
-        <GuidedReservation />
+        <GuidedReservation hideIntro />
       </div>
     </div>
   );

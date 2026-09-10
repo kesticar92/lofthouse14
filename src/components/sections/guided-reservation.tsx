@@ -3,10 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { site, waLink } from "@/lib/site";
 import { formatCOP } from "@/lib/pricing";
-import { publicStayQuote } from "@/lib/public-stay-quote";
+import {
+  PUBLIC_PRICING_CONFIG,
+  publicStayQuote,
+} from "@/lib/public-stay-quote";
 import { StayDateRangePicker } from "@/components/ui/stay-date-range-picker";
 import {
   CONFIGURATOR_EXTRAS,
@@ -128,6 +131,7 @@ export function GuidedReservation() {
   >("direct");
   const [corporateName, setCorporateName] = useState("");
   const [referrerName, setReferrerName] = useState("");
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
 
@@ -289,6 +293,121 @@ export function GuidedReservation() {
     subtotalBeforeCoupon != null
       ? Math.max(0, subtotalBeforeCoupon - couponDiscount)
       : null;
+
+  const selectedExtras = useMemo(
+    () => CONFIGURATOR_EXTRAS.filter((e) => extras.includes(e.id)),
+    [extras],
+  );
+
+  const priceBreakdownLines = useMemo(() => {
+    if (!quoteResult.ok) return [];
+    const cfg = PUBLIC_PRICING_CONFIG;
+    const lines: {
+      id: string;
+      label: string;
+      amount: number | null;
+      muted?: boolean;
+    }[] = [];
+
+    if (quoteResult.nochesLJ > 0) {
+      const unit = cfg.tarifaLJ * lofts;
+      lines.push({
+        id: "stay-lj",
+        label: `${quoteResult.nochesLJ} noche${quoteResult.nochesLJ === 1 ? "" : "s"} L–J × ${formatCOP(cfg.tarifaLJ)} × ${lofts} loft${lofts === 1 ? "" : "s"}`,
+        amount: quoteResult.nochesLJ * unit,
+      });
+    }
+    if (quoteResult.nochesVD > 0) {
+      const unit = cfg.tarifaVD * lofts;
+      lines.push({
+        id: "stay-vd",
+        label: `${quoteResult.nochesVD} noche${quoteResult.nochesVD === 1 ? "" : "s"} V–D × ${formatCOP(cfg.tarifaVD)} × ${lofts} loft${lofts === 1 ? "" : "s"}`,
+        amount: quoteResult.nochesVD * unit,
+      });
+    }
+    if (quoteResult.recargoHuespedes > 0) {
+      lines.push({
+        id: "recargo",
+        label: "Recargo huéspedes adicionales",
+        amount: quoteResult.recargoHuespedes,
+      });
+    }
+    if (quoteResult.aseoTotal > 0) {
+      lines.push({
+        id: "aseo",
+        label: `Aseo × ${lofts} loft${lofts === 1 ? "" : "s"}`,
+        amount: quoteResult.aseoTotal,
+      });
+    }
+
+    for (const e of selectedExtras) {
+      if (e.interestOnly || e.priceCop <= 0) {
+        lines.push({
+          id: `extra-${e.id}`,
+          label: e.label,
+          amount: null,
+          muted: true,
+        });
+        continue;
+      }
+      const lineTotal = extraLineTotalCop(e, {
+        mealQty:
+          e.id === "breakfast" || e.id === "lunch"
+            ? mealQuantities[e.id]
+            : undefined,
+        airport: e.id === "airport-transfer" ? airportTransfer : undefined,
+      });
+      let detail = e.label;
+      if (e.pricing === "perGuestPerDay") {
+        const q = mealQuantities[e.id as MealExtraId];
+        const g = q?.guests ?? guests;
+        const d = q?.days ?? mealDaysDefault;
+        detail = `${e.label} (${formatCOP(e.priceCop)} × ${g} pers. × ${d} día${d === 1 ? "" : "s"})`;
+      } else if (e.pricing === "perAirportLeg") {
+        const legs = airportTransferLegCount(airportTransfer);
+        const parts: string[] = [];
+        if (airportTransfer.pickup) parts.push("recogida");
+        if (airportTransfer.dropoff) parts.push("ida");
+        detail = `${e.label} (${formatCOP(e.priceCop)} × ${legs} trayecto${legs === 1 ? "" : "s"}${parts.length ? `: ${parts.join(" + ")}` : ""})`;
+      }
+      lines.push({
+        id: `extra-${e.id}`,
+        label: detail,
+        amount: lineTotal,
+      });
+    }
+
+    if (couponDiscount > 0) {
+      lines.push({
+        id: "coupon",
+        label: couponCode.trim()
+          ? `Cupón ${couponCode.trim().toUpperCase()}`
+          : "Cupón",
+        amount: -couponDiscount,
+      });
+    }
+
+    if (grandTotal != null) {
+      lines.push({
+        id: "total",
+        label: "Total estimado",
+        amount: grandTotal,
+      });
+    }
+
+    return lines;
+  }, [
+    quoteResult,
+    lofts,
+    selectedExtras,
+    mealQuantities,
+    airportTransfer,
+    guests,
+    mealDaysDefault,
+    couponDiscount,
+    couponCode,
+    grandTotal,
+  ]);
 
   async function applyCoupon() {
     if (!subtotalBeforeCoupon || !couponCode.trim()) {
@@ -1085,17 +1204,14 @@ export function GuidedReservation() {
                         {guests} / {lofts}
                       </dd>
                     </div>
-                    {extrasCop > 0 || extras.length > 0 ? (
+                    {selectedExtras.length > 0 ? (
                       <div className="flex justify-between gap-4">
                         <dt className="text-zinc-500">Extras</dt>
-                        <dd className="max-w-[60%] text-right font-medium">
-                          {CONFIGURATOR_EXTRAS.filter((e) =>
-                            extras.includes(e.id),
-                          )
-                            .map((e) => e.label)
-                            .join(", ") || "—"}
+                        <dd className="text-right font-medium">
+                          {selectedExtras.length} servicio
+                          {selectedExtras.length === 1 ? "" : "s"}
                           {extrasCop > 0 ? (
-                            <span className="block text-xs font-normal text-zinc-500">
+                            <span className="ml-2 text-xs font-normal text-zinc-500">
                               {formatCOP(extrasCop)}
                             </span>
                           ) : null}
@@ -1103,6 +1219,59 @@ export function GuidedReservation() {
                       </div>
                     ) : null}
                   </dl>
+
+                  {quoteResult.ok && priceBreakdownLines.length > 0 ? (
+                    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700">
+                      <button
+                        type="button"
+                        onClick={() => setBreakdownOpen((v) => !v)}
+                        className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+                        aria-expanded={breakdownOpen}
+                      >
+                        <span>
+                          {breakdownOpen ? "Ocultar desglose" : "Ver desglose"}
+                        </span>
+                        <ChevronDown
+                          className={cn(
+                            "size-4 shrink-0 text-zinc-500 transition-transform",
+                            breakdownOpen && "rotate-180",
+                          )}
+                          aria-hidden
+                        />
+                      </button>
+                      {breakdownOpen ? (
+                        <ul className="space-y-2 border-t border-zinc-200 px-3 py-3 text-sm dark:border-zinc-700">
+                          {priceBreakdownLines.map((line) => {
+                            const isTotal = line.id === "total";
+                            const isCoupon = line.id === "coupon";
+                            return (
+                              <li
+                                key={line.id}
+                                className={cn(
+                                  "flex justify-between gap-3",
+                                  isTotal &&
+                                    "border-t border-zinc-200 pt-2 font-semibold text-zinc-900 dark:border-zinc-700 dark:text-white",
+                                  isCoupon &&
+                                    "text-emerald-800 dark:text-emerald-300",
+                                  line.muted && "text-zinc-500",
+                                )}
+                              >
+                                <span className="min-w-0 leading-snug">
+                                  {line.label}
+                                </span>
+                                <span className="shrink-0 tabular-nums">
+                                  {line.amount == null
+                                    ? "Consultar"
+                                    : formatCOP(line.amount)}
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : null}
+                    </div>
+                  ) : null}
+
                   <div>
                     <label className="mb-2 block text-sm font-medium">
                       Origen de la reserva

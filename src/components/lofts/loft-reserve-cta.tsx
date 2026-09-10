@@ -34,10 +34,17 @@ export function LoftReserveCta({
   }, []);
 
   function goReservar() {
+    const prev = readStayDraft() ?? {};
+    const hasDates = Boolean(
+      prev.checkIn && prev.checkOut && prev.checkOut > prev.checkIn,
+    );
+    const hasGuests = Boolean(prev.guests && prev.guests > 0);
+    const stayReady = hasDates && hasGuests;
     mergeStayDraft({
-      ...(readStayDraft() ?? {}),
-      categoryId: categoryId ?? readStayDraft()?.categoryId,
-      step: readStayDraft()?.checkIn ? 2 : 1,
+      ...prev,
+      categoryId: categoryId ?? prev.categoryId,
+      // Card de loft: salta «Cómo vienes». Con fechas+huéspedes → Extras.
+      step: stayReady ? 3 : hasDates ? 2 : 1,
     });
     const d = readStayDraft();
     const qs = new URLSearchParams();

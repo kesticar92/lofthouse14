@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -21,7 +21,10 @@ import {
   type TripProfile,
 } from "@/lib/configurator-extras";
 import { cn } from "@/lib/cn";
-import { ConfiguratorOrbitalSteps } from "@/components/sections/configurator-orbital-steps";
+import {
+  ConfiguratorOrbitalSteps,
+  ConfiguratorOrbitalTransition,
+} from "@/components/sections/configurator-orbital-steps";
 import {
   STAY_DRAFT_EVENT,
   readStayDraft,
@@ -42,8 +45,60 @@ const STEPS = [
   "Confirmar",
 ] as const;
 
+const STEP_TU_VIAJE = 0;
+const STEP_FECHAS = 1;
+const STEP_HUESPEDES = 2;
+const STEP_EXTRAS = 3;
+const STEP_CONFIRMAR = 4;
+
+const TRANSITION_MS = 900;
+
+function draftHasValidDates(draft: StayDraft) {
+  return Boolean(
+    draft.checkIn && draft.checkOut && draft.checkOut > draft.checkIn,
+  );
+}
+
+/** Paso inicial según borrador: salta Tu viaje / Fechas / Huéspedes cuando ya vienen del banner o de una card. */
+function resolveEntryStep(draft: StayDraft): number {
+  const hasDates = draftHasValidDates(draft);
+  const hasGuests = Boolean(draft.guests && draft.guests > 0);
+  const stayReady = hasDates && hasGuests;
+  const fromLoftCard = Boolean(draft.categoryId);
+  const skipTrip = stayReady || fromLoftCard;
+
+  let next =
+    typeof draft.step === "number"
+      ? Math.min(STEPS.length - 1, Math.max(0, draft.step))
+      : stayReady
+        ? STEP_EXTRAS
+        : skipTrip
+          ? hasDates
+            ? STEP_HUESPEDES
+            : STEP_FECHAS
+          : STEP_TU_VIAJE;
+
+  if (skipTrip && next === STEP_TU_VIAJE) {
+    next = stayReady
+      ? STEP_EXTRAS
+      : hasDates
+        ? STEP_HUESPEDES
+        : STEP_FECHAS;
+  }
+  if (stayReady && next > STEP_TU_VIAJE && next < STEP_EXTRAS) {
+    next = STEP_EXTRAS;
+  }
+  // Card o skip de viaje sin estadía completa: no abrir Extras aún.
+  if (skipTrip && !stayReady && next >= STEP_EXTRAS) {
+    next = hasDates ? STEP_HUESPEDES : STEP_FECHAS;
+  }
+  return next;
+}
+
 export function GuidedReservation() {
   const [step, setStep] = useState(0);
+  const [transitionTo, setTransitionTo] = useState<number | null>(null);
+  const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [profile, setProfile] = useState<TripProfile | null>(null);
   const [name, setName] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -78,6 +133,8 @@ export function GuidedReservation() {
 
   /** Si el banner ya trajo fechas+huéspedes, no volver a pedirlos. */
   const [skipStaySteps, setSkipStaySteps] = useState(false);
+  /** Banner con estadía lista o llegada desde card Vista/Atrio/Cielo → no pedir «Cómo vienes». */
+  const [skipTripStep, setSkipTripStep] = useState(false);
 
   useEffect(() => {
     const applyDraft = (draft: StayDraft | null) => {
@@ -98,31 +155,15 @@ export function GuidedReservation() {
         setCategoryId(draft.categoryId);
       }
 
-      const hasDates = Boolean(
-        draft.checkIn &&
-          draft.checkOut &&
-          draft.checkOut > draft.checkIn,
-      );
+      const hasDates = draftHasValidDates(draft);
       const hasGuests = Boolean(draft.guests && draft.guests > 0);
       const stayReady = hasDates && hasGuests;
+      const fromLoftCard = Boolean(draft.categoryId);
 
-      if (stayReady) {
-        setSkipStaySteps(true);
-      }
+      if (stayReady) setSkipStaySteps(true);
+      if (stayReady || fromLoftCard) setSkipTripStep(true);
 
-      if (typeof draft.step === "number") {
-        let next = Math.min(STEPS.length - 1, Math.max(0, draft.step));
-        // Si el draft pedía Fechas/Huéspedes pero ya están, arrancar en Tu viaje
-        // (Siguiente saltará a Extras) o en el paso pedido si es ≥ Extras.
-        if (stayReady && next > 0 && next < 3) {
-          next = 0;
-        }
-        setStep(next);
-      } else if (stayReady) {
-        setStep(0);
-      } else if (hasDates) {
-        setStep(2);
-      }
+      setStep(resolveEntryStep(draft));
       // No limpiamos el draft aquí: el banner y las cards siguen
       // enlazados al mismo borrador hasta sobrescribirlo.
     };
@@ -137,6 +178,16 @@ export function GuidedReservation() {
     return () => window.removeEventListener(STAY_DRAFT_EVENT, onDraft);
   }, []);
 
+  const coveredSteps = useMemo(() => {
+    const covered = new Set<number>();
+    if (skipTripStep) covered.add(STEP_TU_VIAJE);
+    if (skipStaySteps) {
+      covered.add(STEP_FECHAS);
+      covered.add(STEP_HUESPEDES);
+    }
+    return covered;
+  }, [skipTripStep, skipStaySteps]);
+
   const minLoftsForGuests = Math.max(
     1,
     Math.ceil(guests / site.maxGuestsPerLoft),
@@ -144,6 +195,59 @@ export function GuidedReservation() {
   const capacityOk =
     guests <= site.maxGuests && lofts >= minLoftsForGuests;
   const datesOk = Boolean(checkIn && checkOut && checkOut > checkIn);
+
+  useEffect(() => {
+    return () => {
+      if (transitionTimer.current) clearTimeout(transitionTimer.current);
+    };
+  }, []);
+
+  function goToStep(target: number, { animate = true } = {}) {
+    const clamped = Math.min(STEPS.length - 1, Math.max(0, target));
+    if (clamped === step && transitionTo === null) return;
+
+    if (transitionTimer.current) {
+      clearTimeout(transitionTimer.current);
+      transitionTimer.current = null;
+    }
+
+    if (!animate) {
+      setTransitionTo(null);
+      setStep(clamped);
+      return;
+    }
+
+    setTransitionTo(clamped);
+    transitionTimer.current = setTimeout(() => {
+      setStep(clamped);
+      setTransitionTo(null);
+      transitionTimer.current = null;
+    }, TRANSITION_MS);
+  }
+
+  function nextLogicalStep(from: number): number {
+    if (from === STEP_TU_VIAJE) {
+      return skipStaySteps ? STEP_EXTRAS : STEP_FECHAS;
+    }
+    if (from === STEP_FECHAS) return STEP_HUESPEDES;
+    if (from === STEP_HUESPEDES) return STEP_EXTRAS;
+    if (from === STEP_EXTRAS) return STEP_CONFIRMAR;
+    return from;
+  }
+
+  function prevLogicalStep(from: number): number | null {
+    if (from === STEP_CONFIRMAR) return STEP_EXTRAS;
+    if (from === STEP_EXTRAS) {
+      if (skipStaySteps) return skipTripStep ? null : STEP_TU_VIAJE;
+      return STEP_HUESPEDES;
+    }
+    if (from === STEP_HUESPEDES) return STEP_FECHAS;
+    if (from === STEP_FECHAS) return skipTripStep ? null : STEP_TU_VIAJE;
+    return null;
+  }
+
+  const canGoBack = prevLogicalStep(step) !== null;
+  const displayStep = transitionTo ?? step;
 
   /** En Fechas cotizamos con lofts suficientes para no bloquear por capacidad. */
   const quoteLofts =
@@ -475,17 +579,56 @@ export function GuidedReservation() {
               Personaliza tu experiencia
             </h2>
             <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-              Completa tu preferencia de viaje y extras. Si ya elegiste fechas y
-              huéspedes en el banner, no te los pedimos de nuevo; al final te
-              llevamos a WhatsApp con el resumen para confirmar.
+              Completa extras y confirma. Si ya elegiste fechas, huéspedes o un
+              tipo de loft en el banner, no te pedimos «cómo vienes» ni
+              repetimos esos datos; al final te llevamos a WhatsApp con el
+              resumen.
             </p>
           </div>
           <ConfiguratorOrbitalSteps
-            activeStep={step}
-            onStepSelect={(i) => setStep(i)}
-            className="md:mr-2"
+            activeStep={displayStep}
+            coveredSteps={coveredSteps}
+            onStepSelect={(i) => {
+              if (transitionTo !== null) return;
+              if (i === STEP_TU_VIAJE && skipTripStep) return;
+              if (
+                skipStaySteps &&
+                (i === STEP_FECHAS || i === STEP_HUESPEDES)
+              ) {
+                return;
+              }
+              goToStep(i);
+            }}
+            className="md:mr-2 md:max-w-md"
           />
         </div>
+
+        <AnimatePresence>
+          {transitionTo !== null ? (
+            <motion.div
+              key="orbital-transition"
+              className="fixed inset-0 z-[80] flex items-center justify-center bg-[#f2f0eb]/70 backdrop-blur-md dark:bg-zinc-950/70"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              aria-live="polite"
+              aria-label={`Pasando a ${STEPS[transitionTo]}`}
+            >
+              <motion.div
+                initial={{ scale: 0.92, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
+                transition={{ duration: 0.35 }}
+              >
+                <ConfiguratorOrbitalTransition
+                  activeStep={transitionTo}
+                  coveredSteps={coveredSteps}
+                />
+              </motion.div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
         <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 md:p-8">
           <AnimatePresence mode="wait">
@@ -1072,16 +1215,15 @@ export function GuidedReservation() {
               )}
             </div>
             <div className="flex gap-2">
-              {step > 0 ? (
+              {canGoBack ? (
                 <button
                   type="button"
-                  onClick={() =>
-                    setStep((s) => {
-                      if (skipStaySteps && s === 3) return 0;
-                      return s - 1;
-                    })
-                  }
-                  className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold dark:border-zinc-600"
+                  disabled={transitionTo !== null}
+                  onClick={() => {
+                    const prev = prevLogicalStep(step);
+                    if (prev !== null) goToStep(prev);
+                  }}
+                  className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold disabled:opacity-40 dark:border-zinc-600"
                 >
                   <ChevronLeft className="size-4" aria-hidden />
                   Atrás
@@ -1090,13 +1232,8 @@ export function GuidedReservation() {
               {step < STEPS.length - 1 ? (
                 <button
                   type="button"
-                  disabled={!canAdvance()}
-                  onClick={() =>
-                    setStep((s) => {
-                      if (skipStaySteps && s === 0 && datesOk) return 3;
-                      return s + 1;
-                    })
-                  }
+                  disabled={!canAdvance() || transitionTo !== null}
+                  onClick={() => goToStep(nextLogicalStep(step))}
                   className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
                 >
                   Siguiente

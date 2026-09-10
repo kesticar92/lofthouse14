@@ -11,7 +11,11 @@ export type StayDraft = {
   guests?: number;
   /** Preferencia de categoría: Vista / Atrio / Cielo. */
   categoryId?: LoftCategoryId;
-  /** Paso sugerido del configurador (0 = tu viaje, 1 = fechas, …). */
+  /**
+   * Paso sugerido del configurador
+   * (0 = tu viaje, 1 = fechas, 2 = huéspedes, 3 = extras, 4 = confirmar).
+   * Con fechas+huéspedes o categoryId, el wizard puede saltar Tu viaje.
+   */
   step?: number;
 };
 

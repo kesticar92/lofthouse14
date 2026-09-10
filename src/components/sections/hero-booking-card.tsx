@@ -196,11 +196,17 @@ export function HeroBookingCard({
     const draft = readStayDraft();
     const guests = draft?.guests && draft.guests > 0 ? draft.guests : 2;
     trackBeginCheckout({ guests });
+    const hasDates = Boolean(
+      draft?.checkIn &&
+        draft?.checkOut &&
+        draft.checkOut > draft.checkIn,
+    );
+    const stayReady = hasDates && guests > 0;
     mergeStayDraft({
       categoryId,
       guests,
-      // Si ya hay fechas/huéspedes en el banner, el wizard las aplica y salta esos pasos.
-      step: 0,
+      // Card: salta «Cómo vienes». Con fechas+huéspedes → Extras; si faltan, el wizard pide fechas/huéspedes.
+      step: stayReady ? 3 : 1,
     });
     router.push("/reservar");
   };

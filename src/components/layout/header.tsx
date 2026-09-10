@@ -125,8 +125,8 @@ export function Header() {
       return;
     }
     trackBeginCheckout({ guests });
-    // step 0 = Tu viaje; el wizard saltará Fechas/Huéspedes si ya están en el draft.
-    mergeStayDraft({ checkIn, checkOut, guests, step: 0 });
+    // El wizard salta Tu viaje (y Fechas/Huéspedes si ya están) → Extras.
+    mergeStayDraft({ checkIn, checkOut, guests, step: 3 });
     router.push("/reservar");
   };
 

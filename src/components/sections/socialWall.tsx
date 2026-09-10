@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Play } from "lucide-react";
 import { site } from "@/lib/site";
@@ -111,7 +110,9 @@ export function SocialWall() {
 
         <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <SocialProfileButton href={site.instagramUrl} handle="@lofthouse.14">
-            <Image
+            {/* SVG: next/image no optimiza .svg (400) → img estático */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/logos/instagram-wordmark.svg"
               alt="Instagram"
               width={132}
@@ -157,11 +158,12 @@ export function SocialWall() {
             ) : null}
 
             <div className="absolute left-3 top-3 rounded-md bg-white/95 p-1 shadow-sm dark:bg-zinc-950/90">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/logos/instagram-glyph.svg"
-                alt="Instagram"
-                width={32}
-                height={32}
+                alt=""
+                width={16}
+                height={16}
                 className="size-4"
               />
             </div>
@@ -179,7 +181,7 @@ export function SocialWall() {
 
       <div className="mx-auto mt-8 flex max-w-7xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {count} publicación{count === 1 ? "" : "es"}
+          {count === 1 ? "1 publicación" : `${count} publicaciones`}
           {source === "graph" ? " · actualizado desde Instagram" : null}
         </p>
         <a

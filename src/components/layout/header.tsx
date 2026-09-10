@@ -202,11 +202,13 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300",
+        "fixed inset-x-0 top-0 border-b transition-colors duration-300",
         // Día: crema brand. Noche: charcoal profundo.
         "border-[#1c1917]/12 bg-[#f2f0eb]/97 text-[#141210] backdrop-blur-md",
         "dark:border-[#f2f0eb]/10 dark:bg-[#141210]/97 dark:text-[#f2f0eb]",
         scrolled && "shadow-md",
+        // Por encima del overlay del menú para que el botón Menú siga cerrando
+        isMenuOpen ? "z-[220]" : "z-50",
       )}
     >
       <div className="relative z-[60] mx-auto flex h-14 max-w-[90rem] items-center gap-2 px-3 md:h-16 md:gap-3 md:px-5 lg:px-6">

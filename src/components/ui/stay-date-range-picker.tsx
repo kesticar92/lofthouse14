@@ -5,14 +5,17 @@ import { createPortal } from "react-dom";
 import { DayPicker, type DateRange } from "react-day-picker";
 import { es } from "react-day-picker/locale";
 import {
+  addMonths,
   format,
   isAfter,
   isSameDay,
   parseISO,
+  startOfMonth,
   startOfToday,
+  subMonths,
 } from "date-fns";
 import { es as esDateFns } from "date-fns/locale";
-import { ArrowRight, CalendarDays, X } from "lucide-react";
+import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import "react-day-picker/style.css";
 
@@ -60,6 +63,9 @@ export function StayDateRangePicker({
   const [focusField, setFocusField] = useState<FocusField>("checkIn");
   const [monthCount, setMonthCount] = useState(1);
   const [mounted, setMounted] = useState(false);
+  const [displayMonth, setDisplayMonth] = useState<Date>(() =>
+    startOfMonth(startOfToday()),
+  );
   const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const labelId = useId();
@@ -107,6 +113,8 @@ export function StayDateRangePicker({
 
   function openPicker(field: FocusField) {
     setFocusField(field);
+    const seed = parseLocalISO(checkIn) ?? today;
+    setDisplayMonth(startOfMonth(seed));
     setOpen(true);
   }
 
@@ -260,50 +268,58 @@ export function StayDateRangePicker({
                 </div>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 sm:px-6 sm:py-4">
+              <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2 pt-2 sm:px-6 sm:pt-3">
+                <div className="mb-2 flex items-center justify-center gap-2 sm:gap-3">
+                  <button
+                    type="button"
+                    aria-label="Mes anterior"
+                    onClick={() => setDisplayMonth((m) => subMonths(m, 1))}
+                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-900 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
+                  >
+                    <ChevronLeft className="size-5" strokeWidth={2.25} />
+                  </button>
+                  <p className="min-w-[10.5rem] text-center text-base font-semibold capitalize text-zinc-900 dark:text-zinc-50">
+                    {format(displayMonth, "MMMM yyyy", { locale: esDateFns })}
+                  </p>
+                  <button
+                    type="button"
+                    aria-label="Mes siguiente"
+                    onClick={() => setDisplayMonth((m) => addMonths(m, 1))}
+                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-900 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
+                  >
+                    <ChevronRight className="size-5" strokeWidth={2.25} />
+                  </button>
+                </div>
+
                 <DayPicker
                   mode="range"
                   locale={es}
-                  navLayout="around"
+                  hideNavigation
                   numberOfMonths={monthCount}
+                  month={displayMonth}
+                  onMonthChange={setDisplayMonth}
                   selected={selected}
                   onSelect={handleSelect}
                   disabled={{ before: today }}
-                  defaultMonth={selected?.from ?? today}
                   classNames={{
                     root: "rdp-root mx-auto w-full",
                     months:
                       "rdp-months !max-w-none flex w-full flex-col gap-5 sm:flex-row sm:justify-center sm:gap-6",
-                    month: "rdp-month relative w-full space-y-2",
-                    month_caption:
-                      "rdp-month_caption relative mb-1 flex h-11 items-center justify-center",
-                    caption_label:
-                      "rdp-caption_label text-base font-semibold capitalize text-zinc-900 dark:text-zinc-50",
-                    button_previous: cn(
-                      "rdp-button_previous absolute inset-y-0 left-0 z-10",
-                      "inline-flex size-11 items-center justify-center rounded-full",
-                      "bg-zinc-100 text-zinc-900 hover:bg-zinc-200",
-                      "dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700",
-                    ),
-                    button_next: cn(
-                      "rdp-button_next absolute inset-y-0 right-0 z-10",
-                      "inline-flex size-11 items-center justify-center rounded-full",
-                      "bg-zinc-100 text-zinc-900 hover:bg-zinc-200",
-                      "dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700",
-                    ),
-                    chevron: "rdp-chevron size-4 fill-current",
+                    month: "rdp-month w-full space-y-2",
+                    month_caption: "rdp-month_caption hidden",
+                    caption_label: "rdp-caption_label sr-only",
                     month_grid: "rdp-month_grid w-full border-collapse",
                     weekdays: "rdp-weekdays flex w-full",
                     weekday: cn(
                       "rdp-weekday flex-1 basis-0 text-center",
-                      "text-[0.7rem] font-semibold uppercase text-zinc-500 dark:text-zinc-400",
+                      "py-1 text-[0.7rem] font-semibold uppercase text-zinc-500 dark:text-zinc-400",
                     ),
                     weeks: "rdp-weeks",
                     week: "rdp-week mt-0.5 flex w-full",
                     day: "rdp-day relative flex-1 basis-0 p-0.5 text-center",
                     day_button: cn(
-                      "rdp-day_button mx-auto inline-flex aspect-square w-full max-w-11",
-                      "items-center justify-center rounded-full text-sm font-medium",
+                      "rdp-day_button mx-auto inline-flex aspect-square w-full max-w-12",
+                      "min-h-11 items-center justify-center rounded-full text-sm font-medium",
                       "text-zinc-900 hover:bg-zinc-100",
                       "dark:text-zinc-100 dark:hover:bg-zinc-800",
                     ),

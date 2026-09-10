@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, Users, X } from "lucide-react";
@@ -39,10 +40,15 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -278,104 +284,113 @@ export function Header() {
         ) : null}
       </form>
 
-      <AnimatePresence>
-        {isMenuOpen ? (
-          <>
-            <motion.button
-              type="button"
-              aria-label="Cerrar menú"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[65] bg-black/45 backdrop-blur-[2px]"
-              onClick={() => setIsMenuOpen(false)}
-            />
-            <motion.div
-              id="site-menu"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Menú del sitio"
-              initial={panelMotion.initial}
-              animate={panelMotion.animate}
-              exit={panelMotion.exit}
-              transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-              className={cn(
-                "fixed z-[70] overflow-y-auto border border-[#1c1917]/12 bg-[#f2f0eb] p-6 shadow-2xl dark:border-[#f2f0eb]/10 dark:bg-[#141210]",
-                // Móvil: panel completo de arriba hacia abajo
-                "inset-x-0 top-0 max-h-[100dvh] rounded-b-3xl pt-[4.5rem]",
-                // Escritorio: panel lateral L→R
-                "md:inset-y-0 md:left-0 md:right-auto md:top-0 md:h-full md:max-h-none md:w-[min(22rem,90vw)] md:rounded-none md:rounded-r-2xl md:border-l-0 md:pt-8",
-              )}
-            >
-              <div className="mb-4 flex items-center justify-between md:hidden">
-                <span className="font-display text-sm font-extrabold uppercase tracking-widest text-[#141210] dark:text-[#f2f0eb]">
-                  Menú
-                </span>
-                <button
-                  type="button"
-                  aria-label="Cerrar"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#1c1917]/18 bg-[#ebe6dc] text-[#141210] dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb]"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
+      {/*
+        El menú vive en un portal a document.body: el header usa backdrop-blur,
+        que crea containing block y atrapa position:fixed (el panel no se veía).
+      */}
+      {mounted
+        ? createPortal(
+            <AnimatePresence>
+              {isMenuOpen ? (
+                <>
+                  <motion.button
+                    type="button"
+                    aria-label="Cerrar menú"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[200] bg-black/45 backdrop-blur-[2px]"
+                    onClick={() => setIsMenuOpen(false)}
+                  />
+                  <motion.div
+                    id="site-menu"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Menú del sitio"
+                    initial={panelMotion.initial}
+                    animate={panelMotion.animate}
+                    exit={panelMotion.exit}
+                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    className={cn(
+                      "fixed z-[210] overflow-y-auto border border-[#1c1917]/12 bg-[#f2f0eb] p-6 shadow-2xl dark:border-[#f2f0eb]/10 dark:bg-[#141210]",
+                      // Móvil: panel de arriba hacia abajo
+                      "inset-x-0 top-0 max-h-[100dvh] rounded-b-3xl pt-6",
+                      // Escritorio: panel lateral L→R
+                      "md:inset-y-0 md:left-0 md:right-auto md:top-0 md:h-full md:max-h-none md:w-[min(22rem,90vw)] md:rounded-none md:rounded-r-2xl md:border-l-0 md:pt-8",
+                    )}
+                  >
+                    <div className="mb-4 flex items-center justify-between">
+                      <span className="font-display text-sm font-extrabold uppercase tracking-widest text-[#141210] dark:text-[#f2f0eb]">
+                        Menú
+                      </span>
+                      <button
+                        type="button"
+                        aria-label="Cerrar"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#1c1917]/18 bg-[#ebe6dc] text-[#141210] dark:border-[#f2f0eb]/15 dark:bg-[#1c1917] dark:text-[#f2f0eb]"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
 
-              <div className="grid gap-6">
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-[#5c574e] dark:text-[#c4bdb0]">
-                    Ir a
-                  </h4>
-                  <ul className="grid gap-1">
-                    {PAGE_NAV.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block rounded-lg px-2 py-3 text-base font-bold text-[#141210] transition hover:bg-[#1c1917]/5 hover:text-amber-800 dark:text-[#f2f0eb] dark:hover:bg-[#f2f0eb]/5 dark:hover:text-amber-400 md:py-2.5 md:text-sm"
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-[#5c574e] dark:text-[#c4bdb0]">
-                    Contacto
-                  </h4>
-                  <p className="text-sm text-[#5c574e] dark:text-[#c4bdb0]">
-                    <span className="font-semibold text-[#141210] dark:text-[#f2f0eb]">
-                      WhatsApp
-                    </span>
-                    <br />
-                    <a
-                      href={waLink()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-amber-700 dark:hover:text-amber-400"
-                    >
-                      {site.phoneDisplay}
-                    </a>
-                  </p>
-                  <p className="text-sm text-[#5c574e] dark:text-[#c4bdb0]">
-                    {site.addressLine}
-                    <br />
-                    {site.neighborhood}, {site.city}
-                  </p>
-                </div>
-                <Link
-                  href="/reservar"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="inline-flex items-center justify-center rounded-full bg-[#1c1917] px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#f2f0eb] dark:bg-amber-600 dark:text-[#141210]"
-                >
-                  Reservar
-                </Link>
-              </div>
-            </motion.div>
-          </>
-        ) : null}
-      </AnimatePresence>
+                    <div className="grid gap-6">
+                      <div className="space-y-3">
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-[#5c574e] dark:text-[#c4bdb0]">
+                          Ir a
+                        </h4>
+                        <ul className="grid gap-1">
+                          {PAGE_NAV.map((item) => (
+                            <li key={item.href}>
+                              <Link
+                                href={item.href}
+                                onClick={() => setIsMenuOpen(false)}
+                                className="block rounded-lg px-2 py-3 text-base font-bold text-[#141210] transition hover:bg-[#1c1917]/5 hover:text-amber-800 dark:text-[#f2f0eb] dark:hover:bg-[#f2f0eb]/5 dark:hover:text-amber-400 md:py-2.5 md:text-sm"
+                              >
+                                {item.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="space-y-3">
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-[#5c574e] dark:text-[#c4bdb0]">
+                          Contacto
+                        </h4>
+                        <p className="text-sm text-[#5c574e] dark:text-[#c4bdb0]">
+                          <span className="font-semibold text-[#141210] dark:text-[#f2f0eb]">
+                            WhatsApp
+                          </span>
+                          <br />
+                          <a
+                            href={waLink()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-amber-700 dark:hover:text-amber-400"
+                          >
+                            {site.phoneDisplay}
+                          </a>
+                        </p>
+                        <p className="text-sm text-[#5c574e] dark:text-[#c4bdb0]">
+                          {site.addressLine}
+                          <br />
+                          {site.neighborhood}, {site.city}
+                        </p>
+                      </div>
+                      <Link
+                        href="/reservar"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="inline-flex items-center justify-center rounded-full bg-[#1c1917] px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#f2f0eb] dark:bg-amber-600 dark:text-[#141210]"
+                      >
+                        Reservar
+                      </Link>
+                    </div>
+                  </motion.div>
+                </>
+              ) : null}
+            </AnimatePresence>,
+            document.body,
+          )
+        : null}
     </header>
   );
 }

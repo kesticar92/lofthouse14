@@ -4,7 +4,10 @@ import React from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/cn";
-import type { GalleryPhoto } from "@/data/gallery-photos";
+import {
+  galleryPhotoLabel,
+  type GalleryPhoto,
+} from "@/data/gallery-photos";
 
 interface GalleryColumnProps {
   images: GalleryPhoto[];
@@ -27,7 +30,7 @@ function GalleryPhotoCard({
         type="button"
         onClick={() => onImageClick?.(photo)}
         className="group relative block aspect-[4/3] w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
-        aria-label={`Abrir ${photo.alt} a pantalla completa`}
+        aria-label={`Abrir ${galleryPhotoLabel(photo)} a pantalla completa`}
       >
         <Image
           src={photo.src}
@@ -37,6 +40,11 @@ function GalleryPhotoCard({
           className="object-cover transition duration-500 group-hover:scale-[1.03]"
         />
         <span className="pointer-events-none absolute inset-0 bg-black/0 transition group-hover:bg-black/15" />
+        {(photo.caption || photo.moment) && (
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pb-2.5 pt-8 text-left text-xs font-medium tracking-wide text-white opacity-0 transition group-hover:opacity-100 sm:text-sm">
+            {galleryPhotoLabel(photo)}
+          </span>
+        )}
       </button>
     </figure>
   );

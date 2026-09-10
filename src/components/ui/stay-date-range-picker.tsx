@@ -319,7 +319,7 @@ export function StayDateRangePicker({
                         "linear-gradient(var(--rdp-gradient-direction), transparent 50%, #fef3c7 50%)",
                       "--rdp-range_end-background":
                         "linear-gradient(var(--rdp-gradient-direction), #fef3c7 50%, transparent 50%)",
-                    } as React.CSSProperties
+                    } as CSSProperties
                   }
                   classNames={{
                     root: "rdp-root mx-auto w-full",

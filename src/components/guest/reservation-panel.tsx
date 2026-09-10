@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { site, waLink } from "@/lib/site";
 import { formatCOP } from "@/lib/pricing";
 import {
@@ -103,9 +104,18 @@ export function ReservationPanel({
   const [payBusy, setPayBusy] = useState(false);
   const [payMsg, setPayMsg] = useState<string | null>(null);
   const [payErr, setPayErr] = useState<string | null>(null);
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [localPaymentStatus, setLocalPaymentStatus] = useState(
     reservation.payment_status,
   );
+  const stayOnly =
+    total != null ? Math.max(0, total - extrasTotal) : null;
+  const loftCount =
+    reservation.lofts ?? reservation.property_ids?.length ?? 1;
+  const extrasLines = reservation.extras ?? [];
+  const hasBreakdown =
+    total != null &&
+    (stayOnly != null || extrasLines.length > 0 || extrasTotal > 0);
 
   const balObj =
     payment?.balance && typeof payment.balance === "object"
@@ -258,6 +268,75 @@ export function ReservationPanel({
             Incluye extras {formatCOP(extrasTotal)}
           </p>
         ) : null}
+        {hasBreakdown ? (
+          <div className="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-700">
+            <button
+              type="button"
+              onClick={() => setBreakdownOpen((v) => !v)}
+              className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-xs font-semibold text-zinc-800 dark:text-zinc-100"
+              aria-expanded={breakdownOpen}
+            >
+              <span>{breakdownOpen ? "Ocultar desglose" : "Ver desglose"}</span>
+              <ChevronDown
+                className={cn(
+                  "size-4 shrink-0 text-zinc-500 transition-transform",
+                  breakdownOpen && "rotate-180",
+                )}
+                aria-hidden
+              />
+            </button>
+            {breakdownOpen ? (
+              <ul className="space-y-2 border-t border-zinc-200 px-3 py-2.5 text-xs dark:border-zinc-700">
+                {stayOnly != null && stayOnly > 0 ? (
+                  <li className="flex justify-between gap-3">
+                    <span className="min-w-0 leading-snug">
+                      Alojamiento
+                      {nights > 0
+                        ? ` · ${nights} noche${nights === 1 ? "" : "s"}`
+                        : ""}
+                      {loftCount > 1
+                        ? ` · ${loftCount} loft${loftCount === 1 ? "" : "s"}`
+                        : ""}
+                    </span>
+                    <span className="shrink-0 tabular-nums">
+                      {formatCOP(stayOnly)}
+                    </span>
+                  </li>
+                ) : null}
+                {extrasLines.map((e, i) => (
+                  <li
+                    key={`${e.id ?? e.label ?? "extra"}-${i}`}
+                    className="flex justify-between gap-3"
+                  >
+                    <span className="min-w-0 leading-snug">
+                      {e.label ?? e.id ?? "Extra"}
+                    </span>
+                    <span className="shrink-0 tabular-nums">
+                      {e.amountCop != null && e.amountCop > 0
+                        ? formatCOP(e.amountCop)
+                        : "Consultar"}
+                    </span>
+                  </li>
+                ))}
+                {total != null ? (
+                  <li className="flex justify-between gap-3 border-t border-zinc-200 pt-2 font-semibold text-zinc-900 dark:border-zinc-700 dark:text-white">
+                    <span>Total</span>
+                    <span className="tabular-nums">{formatCOP(total)}</span>
+                  </li>
+                ) : null}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
+        <p className="mt-2 text-[11px] text-zinc-500">
+          Políticas de cancelación y normas:{" "}
+          <Link
+            href="/politicas"
+            className="font-semibold text-amber-900 underline underline-offset-2 dark:text-amber-300"
+          >
+            /politicas
+          </Link>
+        </p>
         {depositAmount != null && depositAmount > 0 ? (
           <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
             {t("guest.depositLabel", locale)}

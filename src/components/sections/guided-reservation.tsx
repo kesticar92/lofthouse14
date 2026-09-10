@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { site, waLink } from "@/lib/site";
 import { formatCOP } from "@/lib/pricing";
@@ -39,6 +40,8 @@ import {
   getLoftCategory,
   type LoftCategoryId,
 } from "@/data/loft-categories";
+import { SEED_CANCELLATION_POLICY } from "@/lib/policies/cancellation";
+import { depositPercentFromEnv } from "@/lib/payments/deposit";
 
 const STEPS = [
   "Tu viaje",
@@ -132,6 +135,8 @@ export function GuidedReservation() {
   const [corporateName, setCorporateName] = useState("");
   const [referrerName, setReferrerName] = useState("");
   const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [policiesAccepted, setPoliciesAccepted] = useState(false);
+  const depositPct = depositPercentFromEnv();
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
 
@@ -498,7 +503,7 @@ export function GuidedReservation() {
       }
       return true;
     }
-    if (step === 4) return quoteResult.ok;
+    if (step === 4) return quoteResult.ok && policiesAccepted;
     return false;
   }
 
@@ -576,7 +581,7 @@ export function GuidedReservation() {
    * como canal de confirmación coexistente.
    */
   async function handleReservar() {
-    if (!quoteResult.ok || bookingBusy) return;
+    if (!quoteResult.ok || bookingBusy || !policiesAccepted) return;
     setBookingBusy(true);
     setBookingError(null);
 
@@ -1363,6 +1368,66 @@ export function GuidedReservation() {
                       </ul>
                     </div>
                   )}
+
+                  <div className="rounded-xl border border-zinc-200 bg-zinc-50/80 px-3 py-3 text-sm dark:border-zinc-700 dark:bg-zinc-900/40">
+                    <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                      Políticas de la casa
+                    </p>
+                    <ul className="mt-2 list-inside list-disc space-y-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                      <li>
+                        Anticipo del {depositPct}% para confirmar; saldo el día
+                        del check-in ({site.checkIn} / {site.checkOut}).
+                      </li>
+                      <li>
+                        Cancelación ({SEED_CANCELLATION_POLICY.name}):{" "}
+                        {SEED_CANCELLATION_POLICY.tiers
+                          .map(
+                            (t) =>
+                              `${t.label} ${t.feePercentOfDeposit}% del anticipo`,
+                          )
+                          .join("; ")}
+                        ; no-show{" "}
+                        {SEED_CANCELLATION_POLICY.noShowFeePercentOfDeposit}%.
+                      </li>
+                      <li>
+                        Normas: sin fiestas, silencio 11:00 PM–6:00 AM, no fumar
+                        en interiores.
+                      </li>
+                    </ul>
+                    <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+                      Detalle completo en{" "}
+                      <Link
+                        href="/politicas"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-amber-900 underline underline-offset-2 dark:text-amber-300"
+                      >
+                        /politicas
+                      </Link>
+                      .
+                    </p>
+                    <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-sm text-zinc-800 dark:text-zinc-100">
+                      <input
+                        type="checkbox"
+                        checked={policiesAccepted}
+                        onChange={(e) => setPoliciesAccepted(e.target.checked)}
+                        className="mt-0.5 size-4 shrink-0 rounded border-zinc-400"
+                      />
+                      <span>
+                        Acepto las{" "}
+                        <Link
+                          href="/politicas"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-amber-900 underline underline-offset-2 dark:text-amber-300"
+                        >
+                          políticas
+                        </Link>{" "}
+                        (cancelación, anticipos y normas de la casa). Al pulsar
+                        RESERVAR confirmo haberlas leído.
+                      </span>
+                    </label>
+                  </div>
                 </div>
               )}
             </motion.div>
@@ -1415,9 +1480,16 @@ export function GuidedReservation() {
                       {bookingError}
                     </p>
                   ) : null}
+                  {!policiesAccepted ? (
+                    <p className="max-w-xs text-right text-[11px] text-amber-800 dark:text-amber-300">
+                      Marca «Acepto las políticas» para continuar.
+                    </p>
+                  ) : null}
                   <button
                     type="button"
-                    disabled={!quoteResult.ok || bookingBusy}
+                    disabled={
+                      !quoteResult.ok || bookingBusy || !policiesAccepted
+                    }
                     onClick={() => void handleReservar()}
                     className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
                   >
@@ -1432,8 +1504,8 @@ export function GuidedReservation() {
                     {bookingBusy ? "Creando reserva…" : "RESERVAR"}
                   </button>
                   <p className="max-w-xs text-right text-[11px] text-zinc-500">
-                    Crea la reserva en el motor y abre WhatsApp para confirmar
-                    (pueden coexistir).
+                    Al reservar aceptas las políticas. Se crea la reserva y se
+                    abre WhatsApp para confirmar.
                   </p>
                 </div>
               )}

@@ -111,6 +111,12 @@ export function adminModuleForPath(pathname: string): AdminModuleKey | null {
     return "reservas";
   }
   if (
+    p === "/admin/lofts-marketing" ||
+    p.startsWith("/admin/lofts-marketing/")
+  ) {
+    return "catalogo";
+  }
+  if (
     p === "/admin/notificaciones" ||
     p.startsWith("/admin/notificaciones/")
   ) {

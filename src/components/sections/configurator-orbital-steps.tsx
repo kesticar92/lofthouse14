@@ -5,6 +5,7 @@ import {
   CalendarCheck,
   CheckCircle,
   Compass,
+  House,
   Sparkle,
   Users,
 } from "@phosphor-icons/react";
@@ -14,6 +15,7 @@ export const CONFIGURATOR_STEP_NODES = [
   { label: "Tu viaje", icon: Compass },
   { label: "Fechas", icon: CalendarCheck },
   { label: "Huéspedes", icon: Users },
+  { label: "Loft", icon: House },
   { label: "Extras", icon: Sparkle },
   { label: "Confirmar", icon: CheckCircle },
 ] as const;
@@ -93,7 +95,7 @@ export function ConfiguratorOrbitalSteps({
 
   return (
     <div
-      className={cn("w-full max-w-xl shrink-0", className)}
+      className={cn("w-full max-w-2xl shrink-0", className)}
       aria-label={`Paso ${activeStep + 1} de ${total}: ${CONFIGURATOR_STEP_NODES[activeStep]?.label}`}
     >
       <ol

@@ -156,6 +156,24 @@ export const ADMIN_NAV: NavItem[] = [
     desc: "Property, tipos Vista/Atrio/Cielo y rooms",
   },
   {
+    href: "/admin/lofts-marketing",
+    label: "Lofts web",
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      >
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="M3 15l4.5-4.5L12 15l3-3 6 6" />
+        <circle cx="8.5" cy="9" r="1.2" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+    desc: "Fotos y amenities Vista/Atrio/Cielo del hero",
+  },
+  {
     href: "/admin/canales",
     label: "Canales",
     icon: (

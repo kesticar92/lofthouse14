@@ -12,6 +12,7 @@ import { trackBeginCheckout } from "@/lib/analytics";
 import {
   mergeStayDraft,
   readStayDraft,
+  saveStayDraft,
   STAY_DRAFT_EVENT,
   type StayDraft,
 } from "@/lib/stay-draft";
@@ -125,9 +126,27 @@ export function Header() {
       return;
     }
     trackBeginCheckout({ guests });
-    // El wizard salta Tu viaje (y Fechas/Huéspedes si ya están) → Extras.
-    mergeStayDraft({ checkIn, checkOut, guests, step: 3 });
-    router.push("/reservar");
+    // Banner: fechas+huéspedes listos → elegir tipo de loft (paso 3).
+    // Limpia categoría de una card previa.
+    const prev = readStayDraft() ?? {};
+    const { categoryId: _omit, ...rest } = prev;
+    void _omit;
+    saveStayDraft({
+      ...rest,
+      checkIn,
+      checkOut,
+      guests,
+      from: "banner",
+      step: 3,
+    });
+    const qs = new URLSearchParams({
+      check_in: checkIn,
+      check_out: checkOut,
+      guests: String(guests),
+      from: "banner",
+      step: "3",
+    });
+    router.push(`/reservar?${qs.toString()}`);
   };
 
   const bookingFields = (

@@ -5,6 +5,9 @@
  * - Vista: ventana exterior (1, 14)
  * - Atrio: ventana interior / patio (5, 7, 8) — loft 5 máx. 3 huéspedes
  * - Cielo: lofts cerrados (sin ventana a calle/atrio)
+ *
+ * Fotos del carrusel: inspeccionadas en `/public/gallery` (ventana / cortina /
+ * claraboya · cocina · baño o escaleras). Overrides admin en `.data/lofts-marketing.json`.
  */
 
 import {
@@ -37,7 +40,10 @@ export type LoftCategory = {
   /** Capacidad por número de loft (si difiere del default 5). */
   maxGuestsByLoft: Partial<Record<number, number>>;
   stubCode: string;
+  /** Portada (primera del carrusel). */
   image: string;
+  /** Carrusel de fotos reales (autoplay en cards hero). */
+  images: string[];
   imageAlt: string;
   theme: LoftCategoryTheme;
 };
@@ -51,6 +57,34 @@ const COMMON_AMENITIES = [
   "Smart Entry",
 ];
 
+/** Fotos por tipología — orden: rasgo distintivo → cocina → baño/escaleras. */
+const VISTA_IMAGES = [
+  // Ventana abierta con exterior (calle) visible
+  "/gallery/immersive/34-loft-espacio-amplio-cali.webp",
+  // Cocina detallada
+  "/gallery/immersive/02-cocina_derecha.webp",
+  // Baño
+  "/gallery/immersive/32-bano-privado-loft-cali.webp",
+] as const;
+
+const ATRIO_IMAGES = [
+  // Cortina cerrada (no abiertas)
+  "/gallery/immersive/42-loft-interior-moderno-cali.webp",
+  // Cocina detallada
+  "/gallery/immersive/01-cocina_completa_comedor_escalera_izquierda.webp",
+  // Escaleras
+  "/gallery/immersive/07-escalera_5.webp",
+] as const;
+
+const CIELO_IMAGES = [
+  // Luz clara entre 1er y 2º piso (claraboya / doble altura)
+  "/gallery/immersive/44-loft-espacio-estadia-cali.webp",
+    // Cocina detallada
+    "/gallery/cocina_3.webp",
+    // Baño
+    "/gallery/immersive/48-bano-privado-lofthouse-14.webp",
+] as const;
+
 export const LOFT_CATEGORIES: LoftCategory[] = [
   {
     id: "vista",
@@ -59,15 +93,15 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     tagline: "Ventana exterior · luz de barrio",
     vistaLabel: "Ciudad",
     bedsLabel: "1 Cama Doble + 3 Sofacamas",
-    amenities: COMMON_AMENITIES,
+    amenities: [...COMMON_AMENITIES],
     windowKind: "exterior",
     loftNumbers: loftNumbersForCategory("vista"),
     priceFromCop: 120_000,
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("vista"),
     stubCode: "VIS",
-    // Ventana a calle con coche aparcado — tipología exterior (no interior genérico).
-    image: "/gallery/immersive/34-loft-espacio-amplio-cali.webp",
+    image: VISTA_IMAGES[0],
+    images: [...VISTA_IMAGES],
     imageAlt:
       "Loft Vista: dormitorio con ventana a la calle y luz de barrio en Miraflores, Cali",
     theme: "vista",
@@ -79,17 +113,17 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     tagline: "Ventana interior · patio del conjunto",
     vistaLabel: "Patio Interior",
     bedsLabel: "1 Cama Doble + 3 Sofacamas",
-    amenities: COMMON_AMENITIES,
+    amenities: [...COMMON_AMENITIES],
     windowKind: "interior",
     loftNumbers: loftNumbersForCategory("atrio"),
     priceFromCop: 105_000,
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("atrio"),
     stubCode: "ATR",
-    // Ventana con follaje del patio/jardín interior — tipología atrio.
-    image: "/gallery/cuarto_2.webp",
+    image: ATRIO_IMAGES[0],
+    images: [...ATRIO_IMAGES],
     imageAlt:
-      "Loft Atrio: cama junto a ventana con vista al patio interior y vegetación",
+      "Loft Atrio: habitación con cortina cerrada y ambiente de patio interior",
     theme: "atrio",
   },
   {
@@ -99,17 +133,17 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     tagline: "Loft cerrado · intimidad total",
     vistaLabel: "Claraboya al Cielo",
     bedsLabel: "1 Cama Doble + 3 Sofacamas",
-    amenities: COMMON_AMENITIES,
+    amenities: [...COMMON_AMENITIES],
     windowKind: "cerrado",
     loftNumbers: loftNumbersForCategory("cielo"),
     priceFromCop: 90_000,
     maxGuests: 5,
     maxGuestsByLoft: maxGuestsOverridesForCategory("cielo"),
     stubCode: "CIE",
-    // Entrepiso con barandilla, sin ventana a calle — tipología íntima.
-    image: "/gallery/immersive/28-loft-ambiente-miraflores-cali.webp",
+    image: CIELO_IMAGES[0],
+    images: [...CIELO_IMAGES],
     imageAlt:
-      "Loft Cielo: dormitorio en entrepiso con barandilla, sin ventana a la calle",
+      "Loft Cielo: doble altura con luz clara entre primer y segundo piso",
     theme: "cielo",
   },
 ];
@@ -153,4 +187,37 @@ export function categoryFitsGuests(
   guests: number,
 ): boolean {
   return availableLoftsForGuests(category, guests).length > 0;
+}
+
+/** Aplica overrides de marketing (fotos / amenities) sobre el seed. */
+export function applyLoftMarketingOverrides(
+  categories: LoftCategory[],
+  overrides: Partial<
+    Record<
+      LoftCategoryId,
+      { images?: string[]; amenities?: string[] }
+    >
+  > | null | undefined,
+): LoftCategory[] {
+  if (!overrides) return categories.map((c) => ({ ...c, images: [...c.images], amenities: [...c.amenities] }));
+  return categories.map((cat) => {
+    const patch = overrides[cat.id];
+    if (!patch) {
+      return { ...cat, images: [...cat.images], amenities: [...cat.amenities] };
+    }
+    const images =
+      patch.images && patch.images.length > 0
+        ? [...patch.images]
+        : [...cat.images];
+    const amenities =
+      patch.amenities && patch.amenities.length > 0
+        ? [...patch.amenities]
+        : [...cat.amenities];
+    return {
+      ...cat,
+      images,
+      image: images[0] ?? cat.image,
+      amenities,
+    };
+  });
 }

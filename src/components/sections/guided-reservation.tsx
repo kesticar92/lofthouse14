@@ -34,7 +34,9 @@ import {
   STAY_DRAFT_EVENT,
   mergeStayDraft,
   readStayDraft,
+  stayDraftFromQuery,
   type StayDraft,
+  type StayDraftFrom,
 } from "@/lib/stay-draft";
 import {
   LOFT_CATEGORIES,
@@ -49,6 +51,7 @@ const STEPS = [
   "Tu viaje",
   "Fechas",
   "Huéspedes",
+  "Loft",
   "Extras",
   "Confirmar",
 ] as const;
@@ -56,8 +59,9 @@ const STEPS = [
 const STEP_TU_VIAJE = 0;
 const STEP_FECHAS = 1;
 const STEP_HUESPEDES = 2;
-const STEP_EXTRAS = 3;
-const STEP_CONFIRMAR = 4;
+const STEP_LOFT = 3;
+const STEP_EXTRAS = 4;
+const STEP_CONFIRMAR = 5;
 
 const TRANSITION_MS = 900;
 
@@ -67,37 +71,55 @@ function draftHasValidDates(draft: StayDraft) {
   );
 }
 
-/** Paso inicial según borrador: salta Tu viaje / Fechas / Huéspedes cuando ya vienen del banner o de una card. */
+/**
+ * Paso inicial según origen:
+ * - banner (fechas+huéspedes): → Loft (no repetir fechas)
+ * - card (categoría): → Fechas / Huéspedes (no repetir categoría)
+ * Skip «Tu viaje» cuando ya hay datos de estadía o categoría.
+ */
 function resolveEntryStep(draft: StayDraft): number {
   const hasDates = draftHasValidDates(draft);
   const hasGuests = Boolean(draft.guests && draft.guests > 0);
   const stayReady = hasDates && hasGuests;
-  const fromLoftCard = Boolean(draft.categoryId);
-  const skipTrip = stayReady || fromLoftCard;
+  const hasCategory = Boolean(draft.categoryId);
+  const from: StayDraftFrom | undefined =
+    draft.from ??
+    (hasCategory ? "card" : stayReady ? "banner" : undefined);
+
+  const skipTrip = Boolean(from) || stayReady || hasCategory;
 
   let next =
     typeof draft.step === "number"
       ? Math.min(STEPS.length - 1, Math.max(0, draft.step))
-      : stayReady
-        ? STEP_EXTRAS
-        : skipTrip
-          ? hasDates
-            ? STEP_HUESPEDES
-            : STEP_FECHAS
-          : STEP_TU_VIAJE;
+      : STEP_TU_VIAJE;
 
-  if (skipTrip && next === STEP_TU_VIAJE) {
-    next = stayReady
-      ? STEP_EXTRAS
-      : hasDates
-        ? STEP_HUESPEDES
-        : STEP_FECHAS;
+  if (from === "banner") {
+    // Fechas+huéspedes del banner → elegir tipo de loft.
+    if (stayReady) next = STEP_LOFT;
+    else if (hasDates) next = STEP_HUESPEDES;
+    else next = STEP_FECHAS;
+  } else if (from === "card") {
+    // Categoría de la card → fechas (y huéspedes si faltan); luego extras.
+    if (stayReady) next = STEP_EXTRAS;
+    else if (hasDates) next = STEP_HUESPEDES;
+    else next = STEP_FECHAS;
+  } else if (skipTrip && next === STEP_TU_VIAJE) {
+    if (stayReady && hasCategory) next = STEP_EXTRAS;
+    else if (stayReady) next = STEP_LOFT;
+    else if (hasDates) next = STEP_HUESPEDES;
+    else next = STEP_FECHAS;
   }
-  if (stayReady && next > STEP_TU_VIAJE && next < STEP_EXTRAS) {
-    next = STEP_EXTRAS;
+
+  // Banner nunca debe saltar a Extras sin categoría.
+  if (from === "banner" && !hasCategory && next >= STEP_EXTRAS) {
+    next = STEP_LOFT;
   }
-  // Card o skip de viaje sin estadía completa: no abrir Extras aún.
-  if (skipTrip && !stayReady && next >= STEP_EXTRAS) {
+  // Card nunca debe abrir el paso Loft (categoría ya elegida).
+  if (from === "card" && hasCategory && next === STEP_LOFT) {
+    next = stayReady ? STEP_EXTRAS : hasDates ? STEP_HUESPEDES : STEP_FECHAS;
+  }
+  // Sin estadía completa no abrir Extras.
+  if (!stayReady && next >= STEP_EXTRAS) {
     next = hasDates ? STEP_HUESPEDES : STEP_FECHAS;
   }
   return next;
@@ -151,6 +173,9 @@ export function GuidedReservation({
   const [skipStaySteps, setSkipStaySteps] = useState(false);
   /** Banner con estadía lista o llegada desde card Vista/Atrio/Cielo → no pedir «Cómo vienes». */
   const [skipTripStep, setSkipTripStep] = useState(false);
+  /** Desde card: categoría ya elegida → no reabrir paso Loft. */
+  const [skipLoftStep, setSkipLoftStep] = useState(false);
+  const [entryFrom, setEntryFrom] = useState<StayDraftFrom | null>(null);
 
   useEffect(() => {
     const applyDraft = (draft: StayDraft | null) => {
@@ -159,7 +184,6 @@ export function GuidedReservation({
       if (draft.checkOut) setCheckOut(draft.checkOut);
       if (draft.guests && draft.guests > 0) {
         setGuests(draft.guests);
-        // Ajusta lofts al llegar desde el banner si hay más personas.
         setLofts((prev) =>
           Math.max(
             prev,
@@ -169,22 +193,39 @@ export function GuidedReservation({
       }
       if (draft.categoryId) {
         setCategoryId(draft.categoryId);
+      } else if (draft.from === "banner") {
+        setCategoryId(null);
       }
 
       const hasDates = draftHasValidDates(draft);
       const hasGuests = Boolean(draft.guests && draft.guests > 0);
       const stayReady = hasDates && hasGuests;
-      const fromLoftCard = Boolean(draft.categoryId);
+      const hasCategory = Boolean(draft.categoryId);
+      const from: StayDraftFrom | undefined =
+        draft.from ??
+        (hasCategory ? "card" : stayReady ? "banner" : undefined);
 
+      if (from) setEntryFrom(from);
       if (stayReady) setSkipStaySteps(true);
-      if (stayReady || fromLoftCard) setSkipTripStep(true);
+      if (from || stayReady || hasCategory) setSkipTripStep(true);
+      if (from === "card" && hasCategory) setSkipLoftStep(true);
 
       setStep(resolveEntryStep(draft));
-      // No limpiamos el draft aquí: el banner y las cards siguen
-      // enlazados al mismo borrador hasta sobrescribirlo.
     };
 
-    applyDraft(readStayDraft());
+    // Query params tienen prioridad sobre sessionStorage (links compartibles).
+    let queryDraft: StayDraft | null = null;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if ([...params.keys()].length > 0) {
+        queryDraft = stayDraftFromQuery(params);
+        mergeStayDraft(queryDraft);
+      }
+    } catch {
+      /* ignore */
+    }
+
+    applyDraft(queryDraft ?? readStayDraft());
 
     const onDraft = (event: Event) => {
       const custom = event as CustomEvent<StayDraft>;
@@ -201,8 +242,9 @@ export function GuidedReservation({
       covered.add(STEP_FECHAS);
       covered.add(STEP_HUESPEDES);
     }
+    if (skipLoftStep) covered.add(STEP_LOFT);
     return covered;
-  }, [skipTripStep, skipStaySteps]);
+  }, [skipTripStep, skipStaySteps, skipLoftStep]);
 
   const minLoftsForGuests = Math.max(
     1,
@@ -243,10 +285,17 @@ export function GuidedReservation({
 
   function nextLogicalStep(from: number): number {
     if (from === STEP_TU_VIAJE) {
-      return skipStaySteps ? STEP_EXTRAS : STEP_FECHAS;
+      return skipStaySteps
+        ? skipLoftStep
+          ? STEP_EXTRAS
+          : STEP_LOFT
+        : STEP_FECHAS;
     }
     if (from === STEP_FECHAS) return STEP_HUESPEDES;
-    if (from === STEP_HUESPEDES) return STEP_EXTRAS;
+    if (from === STEP_HUESPEDES) {
+      return skipLoftStep ? STEP_EXTRAS : STEP_LOFT;
+    }
+    if (from === STEP_LOFT) return STEP_EXTRAS;
     if (from === STEP_EXTRAS) return STEP_CONFIRMAR;
     return from;
   }
@@ -254,6 +303,13 @@ export function GuidedReservation({
   function prevLogicalStep(from: number): number | null {
     if (from === STEP_CONFIRMAR) return STEP_EXTRAS;
     if (from === STEP_EXTRAS) {
+      if (skipLoftStep) {
+        if (skipStaySteps) return skipTripStep ? null : STEP_TU_VIAJE;
+        return STEP_HUESPEDES;
+      }
+      return STEP_LOFT;
+    }
+    if (from === STEP_LOFT) {
       if (skipStaySteps) return skipTripStep ? null : STEP_TU_VIAJE;
       return STEP_HUESPEDES;
     }
@@ -505,12 +561,13 @@ export function GuidedReservation({
   }
 
   function canAdvance(): boolean {
-    if (step === 0) return profile !== null;
+    if (step === STEP_TU_VIAJE) return profile !== null;
     // Fechas: solo rango válido. Capacidad se resuelve en Huéspedes.
-    if (step === 1) return datesOk;
-    if (step === 2)
+    if (step === STEP_FECHAS) return datesOk;
+    if (step === STEP_HUESPEDES)
       return guests >= 1 && lofts >= 1 && capacityOk && quoteResult.ok;
-    if (step === 3) {
+    if (step === STEP_LOFT) return categoryId !== null;
+    if (step === STEP_EXTRAS) {
       if (
         extras.includes("airport-transfer") &&
         airportTransferLegCount(airportTransfer) === 0
@@ -519,7 +576,7 @@ export function GuidedReservation({
       }
       return true;
     }
-    if (step === 4) return quoteResult.ok && policiesAccepted;
+    if (step === STEP_CONFIRMAR) return quoteResult.ok && policiesAccepted;
     return false;
   }
 
@@ -732,6 +789,7 @@ export function GuidedReservation({
                 ) {
                   return;
                 }
+                if (i === STEP_LOFT && skipLoftStep) return;
                 goToStep(i);
               }}
               className="mx-auto max-w-lg"
@@ -762,6 +820,7 @@ export function GuidedReservation({
                 ) {
                   return;
                 }
+                if (i === STEP_LOFT && skipLoftStep) return;
                 goToStep(i);
               }}
               className="md:mr-2 md:max-w-md"
@@ -925,45 +984,16 @@ export function GuidedReservation({
                       {profileMeta.hint}
                     </p>
                   ) : null}
-                  <div>
-                    <p className="mb-2 text-sm font-medium">Tipo de loft</p>
-                    <div className="grid gap-2 sm:grid-cols-3">
-                      {LOFT_CATEGORIES.map((cat) => {
-                        const fits = availableLoftsForGuests(cat, guests).length > 0;
-                        const active = categoryId === cat.id;
-                        return (
-                          <button
-                            key={cat.id}
-                            type="button"
-                            disabled={!fits}
-                            onClick={() => {
-                              setCategoryId(cat.id);
-                              mergeStayDraft({ categoryId: cat.id });
-                            }}
-                            className={
-                              "rounded-2xl border px-3 py-3 text-left transition " +
-                              (active
-                                ? "border-amber-500 bg-amber-50 dark:bg-amber-500/10"
-                                : "border-zinc-200 dark:border-zinc-700") +
-                              (fits ? "" : " cursor-not-allowed opacity-40")
-                            }
-                          >
-                            <span className="block text-sm font-semibold text-zinc-900 dark:text-white">
-                              {cat.name}
-                            </span>
-                            <span className="mt-0.5 block text-xs text-zinc-500">
-                              Desde {cat.priceFromCop.toLocaleString("es-CO")} COP
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {categoryId ? (
-                      <p className="mt-2 text-xs text-zinc-500">
-                        {getLoftCategory(categoryId).tagline}
-                      </p>
-                    ) : null}
-                  </div>
+                  {skipLoftStep && categoryId ? (
+                    <p className="rounded-2xl border border-amber-200/80 bg-amber-50/80 px-3 py-2 text-sm text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
+                      Tipo elegido:{" "}
+                      <strong>{getLoftCategory(categoryId).name}</strong>
+                      <span className="text-zinc-500 dark:text-amber-200/70">
+                        {" "}
+                        · {getLoftCategory(categoryId).tagline}
+                      </span>
+                    </p>
+                  ) : null}
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium">
@@ -1063,7 +1093,72 @@ export function GuidedReservation({
                 </div>
               )}
 
-              {step === 3 && (
+              {step === STEP_LOFT && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                    Elige tu tipo de loft
+                  </h3>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    {entryFrom === "banner"
+                      ? "Ya tienes fechas y huéspedes. Escoge Vista, Atrio o Cielo para continuar."
+                      : "Vista, Atrio o Cielo — precio desde por noche (temporada baja)."}
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {LOFT_CATEGORIES.map((cat) => {
+                      const fits =
+                        availableLoftsForGuests(cat, guests).length > 0;
+                      const active = categoryId === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          disabled={!fits}
+                          onClick={() => {
+                            setCategoryId(cat.id);
+                            mergeStayDraft({
+                              categoryId: cat.id,
+                              from: entryFrom ?? "banner",
+                            });
+                          }}
+                          className={cn(
+                            "overflow-hidden rounded-2xl border text-left transition",
+                            active
+                              ? "border-amber-500 ring-2 ring-amber-500/30"
+                              : "border-zinc-200 dark:border-zinc-700",
+                            fits
+                              ? "hover:border-amber-400/80"
+                              : "cursor-not-allowed opacity-40",
+                          )}
+                        >
+                          <div className="relative aspect-[16/10] w-full bg-zinc-100 dark:bg-zinc-800">
+                            <Image
+                              src={cat.images?.[0] ?? cat.image}
+                              alt={cat.imageAlt}
+                              fill
+                              sizes="220px"
+                              className="object-cover"
+                            />
+                          </div>
+                          <span className="block px-3 pb-3 pt-2">
+                            <span className="block text-sm font-semibold text-zinc-900 dark:text-white">
+                              {cat.name}
+                            </span>
+                            <span className="mt-0.5 block text-xs text-zinc-500">
+                              Desde {cat.priceFromCop.toLocaleString("es-CO")}{" "}
+                              COP / noche
+                            </span>
+                            <span className="mt-1 block text-[11px] text-zinc-500">
+                              {cat.tagline}
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {step === STEP_EXTRAS && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     ¿Algo más para tu viaje?
@@ -1232,7 +1327,7 @@ export function GuidedReservation({
                 </div>
               )}
 
-              {step === 4 && (
+              {step === STEP_CONFIRMAR && (
                 <div className="space-y-5">
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     Tu resumen

@@ -126,7 +126,7 @@ body {
   --ticket-cta-fg: #f2f0eb;
 }
 
-/* Cielo — crema más profunda + charcoal (intimidad) */
+/* Cielo — misma paleta de botones brand que Vista/Atrio (sello ámbar + CTA charcoal) */
 .loft-boarding--cielo {
   --ticket-bg: #e8e2d6;
   --ticket-fg: #141210;
@@ -134,11 +134,11 @@ body {
   --ticket-line: rgba(20, 18, 16, 0.24);
   --ticket-stub: #ddd5c6;
   --ticket-stub-field: rgba(255, 255, 255, 0.4);
-  --ticket-accent: #92400e;
+  --ticket-accent: #b45309;
   --ticket-vista-bg: #d9d0c0;
   --ticket-vista-fg: #1c1917;
-  --ticket-seal-bg: #1c1917;
-  --ticket-seal-fg: #f2f0eb;
+  --ticket-seal-bg: #b45309;
+  --ticket-seal-fg: #fff7ed;
   --ticket-cta-bg: #1c1917;
   --ticket-cta-fg: #f2f0eb;
 }

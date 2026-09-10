@@ -43,8 +43,9 @@ export function LoftReserveCta({
     mergeStayDraft({
       ...prev,
       categoryId: categoryId ?? prev.categoryId,
-      // Card de loft: salta «Cómo vienes». Con fechas+huéspedes → Extras.
-      step: stayReady ? 3 : hasDates ? 2 : 1,
+      from: "card",
+      // Card: fechas si faltan; con estadía lista → Extras (paso 4).
+      step: stayReady ? 4 : hasDates ? 2 : 1,
     });
     const d = readStayDraft();
     const qs = new URLSearchParams();
@@ -52,9 +53,10 @@ export function LoftReserveCta({
     if (d?.checkOut) qs.set("check_out", d.checkOut);
     if (d?.guests) qs.set("guests", String(d.guests));
     if (categoryId) qs.set("category", categoryId);
+    qs.set("from", "card");
     qs.set("loft", slug);
     const q = qs.toString();
-    window.location.assign(q ? `/#reservas?${q}` : "/#reservas");
+    window.location.assign(q ? `/reservar?${q}` : "/reservar");
   }
 
   const hasDates = Boolean(draft?.checkIn && draft?.checkOut);

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -14,7 +15,11 @@ import {
   Wind,
 } from "lucide-react";
 import { trackBeginCheckout } from "@/lib/analytics";
-import { mergeStayDraft, readStayDraft } from "@/lib/stay-draft";
+import {
+  mergeStayDraft,
+  readStayDraft,
+  stayDraftToQuery,
+} from "@/lib/stay-draft";
 import { cn } from "@/lib/cn";
 import {
   LOFT_CATEGORIES,
@@ -31,8 +36,68 @@ const AMENITY_ICONS: Record<string, LucideIcon> = {
   "Smart Entry": KeyRound,
 };
 
+/** Ciclo suave tipo hero videos (~5.5s por foto). */
+const CAROUSEL_MS = 5500;
+
 function formatPrice(n: number) {
   return n.toLocaleString("es-CO");
+}
+
+function TicketPhotoCarousel({
+  images,
+  alt,
+}: {
+  images: string[];
+  alt: string;
+}) {
+  const slides = images.length > 0 ? images : ["/gallery/sala_1.webp"];
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const id = window.setInterval(() => {
+      setActive((i) => (i + 1) % slides.length);
+    }, CAROUSEL_MS);
+    return () => window.clearInterval(id);
+  }, [slides.length]);
+
+  return (
+    <div className="relative mt-2.5 aspect-[16/10] w-full overflow-hidden rounded-sm border border-[var(--ticket-line)] bg-[var(--ticket-stub)]">
+      {slides.map((src, i) => (
+        <Image
+          key={src}
+          src={src}
+          alt={i === 0 ? alt : ""}
+          fill
+          sizes="280px"
+          className={cn(
+            "object-cover transition-opacity duration-[1200ms] ease-in-out",
+            i === active ? "opacity-100" : "opacity-0",
+          )}
+          priority={i === 0}
+          aria-hidden={i !== active}
+        />
+      ))}
+      {slides.length > 1 ? (
+        <div
+          className="pointer-events-none absolute bottom-1.5 left-1/2 z-[1] flex -translate-x-1/2 gap-1"
+          aria-hidden
+        >
+          {slides.map((_, i) => (
+            <span
+              key={i}
+              className={cn(
+                "h-1 rounded-full transition-all duration-500",
+                i === active
+                  ? "w-3 bg-white/90"
+                  : "w-1 bg-white/45",
+              )}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 function BoardingTicket({
@@ -59,24 +124,18 @@ function BoardingTicket({
       )}
     >
       <div className="loft-boarding-inner relative flex flex-1 flex-col px-3.5 pb-3.5 pt-3 sm:px-4">
-        {/* Header */}
+        {/* Header — solo logo imagen, sin texto LOFTHOUSE 14 */}
         <header className="flex items-start justify-between gap-2">
           <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-[var(--ticket-muted)] sm:text-[9px]">
             Ticket de reserva #{ticketNo}
           </p>
-          <div className="flex flex-col items-center gap-0.5 leading-none">
-            <Image
-              src="/logo-lofthouse.png"
-              alt=""
-              width={28}
-              height={28}
-              className="h-7 w-7 object-contain"
-              aria-hidden
-            />
-            <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-[var(--ticket-fg)]">
-              Lofthouse 14
-            </span>
-          </div>
+          <Image
+            src="/logo-lofthouse.png"
+            alt="LOFTHOUSE"
+            width={72}
+            height={28}
+            className="h-7 w-auto max-w-[4.5rem] object-contain object-center"
+          />
           <span
             className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--ticket-line)] text-[var(--ticket-accent)]"
             aria-hidden
@@ -89,22 +148,15 @@ function BoardingTicket({
           {category.name}
         </h3>
 
-        {/* Illustration */}
-        <div className="relative mt-2.5 aspect-[16/10] w-full overflow-hidden rounded-sm border border-[var(--ticket-line)] bg-[var(--ticket-stub)]">
-          <Image
-            src={category.image}
-            alt={category.imageAlt}
-            fill
-            sizes="280px"
-            className="object-cover"
-          />
-        </div>
+        <TicketPhotoCarousel
+          images={category.images?.length ? category.images : [category.image]}
+          alt={category.imageAlt}
+        />
 
         <p className="loft-boarding-vista mt-0 border border-t-0 border-[var(--ticket-line)] bg-[var(--ticket-vista-bg)] px-2 py-1 text-center text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--ticket-vista-fg)]">
           Vista: {category.vistaLabel}
         </p>
 
-        {/* Amenities — full width, sin solapamiento con el precio */}
         <div className="mt-3 space-y-1.5">
           <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--ticket-fg)]">
             Amenidades comunes
@@ -150,7 +202,6 @@ function BoardingTicket({
           <p className="text-[9px] text-[var(--ticket-muted)]">{capacityNote}</p>
         </div>
 
-        {/* Precio como badge inferior — no cubre amenities */}
         <div
           className="loft-boarding-seal mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-center"
           aria-label={`Desde ${formatPrice(category.priceFromCop)} COP`}
@@ -191,24 +242,81 @@ export function HeroBookingCard({
   compact?: boolean;
 }) {
   const router = useRouter();
+  const [categories, setCategories] = useState<LoftCategory[]>(LOFT_CATEGORIES);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/public/lofts-marketing");
+        if (!res.ok) return;
+        const json = (await res.json()) as {
+          categories?: Array<
+            Pick<
+              LoftCategory,
+              | "id"
+              | "amenities"
+              | "images"
+              | "image"
+              | "imageAlt"
+              | "name"
+              | "shortLabel"
+              | "tagline"
+              | "vistaLabel"
+              | "bedsLabel"
+              | "priceFromCop"
+              | "maxGuests"
+              | "theme"
+            >
+          >;
+        };
+        if (cancelled || !json.categories?.length) return;
+        setCategories((prev) =>
+          prev.map((base) => {
+            const remote = json.categories!.find((c) => c.id === base.id);
+            if (!remote) return base;
+            return {
+              ...base,
+              amenities: remote.amenities?.length
+                ? remote.amenities
+                : base.amenities,
+              images: remote.images?.length ? remote.images : base.images,
+              image: remote.image || base.image,
+              imageAlt: remote.imageAlt || base.imageAlt,
+              priceFromCop: remote.priceFromCop ?? base.priceFromCop,
+            };
+          }),
+        );
+      } catch {
+        /* seed local */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const onReserve = (categoryId: LoftCategoryId) => {
     const draft = readStayDraft();
-    const guests = draft?.guests && draft.guests > 0 ? draft.guests : 2;
-    trackBeginCheckout({ guests });
+    const guests = draft?.guests && draft.guests > 0 ? draft.guests : undefined;
+    trackBeginCheckout({ guests: guests ?? 2 });
     const hasDates = Boolean(
       draft?.checkIn &&
         draft?.checkOut &&
         draft.checkOut > draft.checkIn,
     );
-    const stayReady = hasDates && guests > 0;
-    mergeStayDraft({
+    const hasGuests = Boolean(guests && guests > 0);
+    const stayReady = hasDates && hasGuests;
+    // Card: categoría fija → fechas (o extras si ya hay estadía).
+    const next = {
       categoryId,
-      guests,
-      // Card: salta «Cómo vienes». Con fechas+huéspedes → Extras; si faltan, el wizard pide fechas/huéspedes.
-      step: stayReady ? 3 : 1,
-    });
-    router.push("/reservar");
+      guests: guests ?? draft?.guests,
+      from: "card" as const,
+      step: stayReady ? 4 : hasDates ? 2 : 1,
+    };
+    mergeStayDraft(next);
+    const q = stayDraftToQuery({ ...readStayDraft(), ...next });
+    router.push(q ? `/reservar?${q}` : "/reservar");
   };
 
   return (
@@ -221,7 +329,6 @@ export function HeroBookingCard({
       >
         Elige tu loft
       </p>
-      {/* Desktop/tablet: las 3 visibles. Móvil: scroll horizontal suave. */}
       <div
         className={cn(
           "flex gap-3 pb-1 pt-1",
@@ -232,7 +339,7 @@ export function HeroBookingCard({
         )}
         aria-label="Categorías de loft"
       >
-        {LOFT_CATEGORIES.map((cat, index) => (
+        {categories.map((cat, index) => (
           <div
             key={cat.id}
             className="flex justify-center max-md:w-[min(100%,17.5rem)] max-md:shrink-0 max-md:snap-center md:w-full"

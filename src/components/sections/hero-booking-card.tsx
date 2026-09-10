@@ -134,7 +134,7 @@ function BoardingTicket({
             alt="LOFTHOUSE"
             width={72}
             height={28}
-            className="h-7 w-auto max-w-[4.5rem] object-contain object-center"
+            className="loft-boarding-logo h-7 w-auto max-w-[4.5rem] object-contain object-center"
           />
           <span
             className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--ticket-line)] text-[var(--ticket-accent)]"

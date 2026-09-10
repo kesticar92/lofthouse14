@@ -59,6 +59,14 @@ import {
   type LoftCategoryId,
 } from "@/data/loft-categories";
 import { SEED_CANCELLATION_POLICY } from "@/lib/policies/cancellation";
+import {
+  ASEO_CORTA_COP,
+  ASEO_ESTANDAR_COP,
+  ASEO_SEMANAL_EXTRA_COP,
+  DAMAGE_DEPOSIT_LONG_COP,
+  DAMAGE_DEPOSIT_SHORT_COP,
+  MAX_STAY_NIGHTS,
+} from "@/lib/policies/house";
 import { depositPercentFromEnv } from "@/lib/payments/deposit";
 
 const TRANSITION_MS = 900;
@@ -364,8 +372,17 @@ export function GuidedReservation({
     if (quoteResult.aseoTotal > 0) {
       lines.push({
         id: "aseo",
-        label: `Aseo × ${lofts} loft${lofts === 1 ? "" : "s"}`,
+        label: quoteResult.aseoDetalle || `Aseo × ${lofts} loft${lofts === 1 ? "" : "s"}`,
         amount: quoteResult.aseoTotal,
+      });
+    }
+
+    if (quoteResult.depositoDanos > 0) {
+      lines.push({
+        id: "deposito-danos",
+        label: `Depósito de daños (${quoteResult.noches < 7 ? formatCOP(DAMAGE_DEPOSIT_SHORT_COP) : formatCOP(DAMAGE_DEPOSIT_LONG_COP)} × ${lofts} loft${lofts === 1 ? "" : "s"}; no incluido en el total)`,
+        amount: quoteResult.depositoDanos,
+        muted: true,
       });
     }
 
@@ -862,8 +879,22 @@ export function GuidedReservation({
                         ) : null}
                         {quoteResult.aseoTotal > 0 ? (
                           <li className="flex justify-between gap-3">
-                            <span>Aseo (una vez)</span>
-                            <span>{formatCOP(quoteResult.aseoTotal)}</span>
+                            <span className="min-w-0 flex-1">
+                              {quoteResult.aseoDetalle || "Aseo"}
+                            </span>
+                            <span className="shrink-0">
+                              {formatCOP(quoteResult.aseoTotal)}
+                            </span>
+                          </li>
+                        ) : null}
+                        {quoteResult.depositoDanos > 0 ? (
+                          <li className="flex justify-between gap-3 text-zinc-500">
+                            <span className="min-w-0 flex-1">
+                              Depósito de daños (estimado, no incluido)
+                            </span>
+                            <span className="shrink-0">
+                              {formatCOP(quoteResult.depositoDanos)}
+                            </span>
                           </li>
                         ) : null}
                         <li className="flex justify-between gap-3 border-t border-zinc-200 pt-2 font-semibold text-zinc-900 dark:border-zinc-700 dark:text-white">
@@ -1462,6 +1493,44 @@ export function GuidedReservation({
                     </p>
                     <ul className="mt-2 list-inside list-disc space-y-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
                       <li>
+                        <Link
+                          href="/politicas#deposito"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-amber-900 underline underline-offset-2 dark:text-amber-300"
+                        >
+                          Depósito de daños
+                        </Link>
+                        : {formatCOP(DAMAGE_DEPOSIT_SHORT_COP)} por loft (&lt;7
+                        días) · {formatCOP(DAMAGE_DEPOSIT_LONG_COP)} por loft
+                        (≥7 días). No está incluido en el total de la reserva.
+                      </li>
+                      <li>
+                        <Link
+                          href="/politicas#aseo"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-amber-900 underline underline-offset-2 dark:text-amber-300"
+                        >
+                          Aseo
+                        </Link>
+                        : {formatCOP(ASEO_CORTA_COP)} (1–2 noches) ·{" "}
+                        {formatCOP(ASEO_ESTANDAR_COP)} (a partir de 4 noches) · +
+                        {formatCOP(ASEO_SEMANAL_EXTRA_COP)}/semana si &gt;7 días.
+                      </li>
+                      <li>
+                        <Link
+                          href="/politicas#estadia"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-amber-900 underline underline-offset-2 dark:text-amber-300"
+                        >
+                          Duración máxima
+                        </Link>
+                        : {MAX_STAY_NIGHTS} días. Más tiempo = políticas
+                        diferentes / cotización especial.
+                      </li>
+                      <li>
                         Anticipo del {depositPct}% para confirmar; saldo el día
                         del check-in ({site.checkIn} / {site.checkOut}).
                       </li>
@@ -1510,8 +1579,35 @@ export function GuidedReservation({
                         >
                           políticas
                         </Link>{" "}
-                        (cancelación, anticipos y normas de la casa). Al pulsar
-                        RESERVAR confirmo haberlas leído.
+                        (
+                        <Link
+                          href="/politicas#deposito"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline underline-offset-2"
+                        >
+                          depósito
+                        </Link>
+                        ,{" "}
+                        <Link
+                          href="/politicas#aseo"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline underline-offset-2"
+                        >
+                          aseo
+                        </Link>
+                        ,{" "}
+                        <Link
+                          href="/politicas#estadia"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline underline-offset-2"
+                        >
+                          estadía
+                        </Link>
+                        , cancelación, anticipos y normas). Al pulsar RESERVAR
+                        confirmo haberlas leído.
                       </span>
                     </label>
                   </div>

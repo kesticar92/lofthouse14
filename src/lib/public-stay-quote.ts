@@ -1,10 +1,15 @@
 import {
   DEFAULT_PRICING,
+  formatCOP,
   quote,
   type PricingConfig,
   type QuoteInput,
   type QuoteResult,
 } from "@/lib/pricing";
+import {
+  MAX_STAY_NIGHTS,
+  damageDepositTotalCop,
+} from "@/lib/policies/house";
 import { site } from "@/lib/site";
 
 /** Tarifas web: mismas bases que admin, sin descuentos automáticos. */
@@ -18,6 +23,8 @@ export const PUBLIC_PRICING_CONFIG: PricingConfig = {
 
 export type PublicStayQuoteResult = QuoteResult & {
   disclaimers: string[];
+  /** Depósito de daños estimado (no suma al total de la reserva). */
+  depositoDanos: number;
 };
 
 function diffNights(checkIn: string, checkOut: string): number | null {
@@ -58,6 +65,7 @@ export function publicStayQuote(
     totalConComisionAirbnb: 0,
     nightByNight: [],
     disclaimers,
+    depositoDanos: 0,
   });
 
   if (huespedes < 1) return fail("Indica cuántas personas viajan.");
@@ -83,6 +91,11 @@ export function publicStayQuote(
   }
 
   const nights = diffNights(input.checkIn, input.checkOut);
+  if (nights !== null && nights > MAX_STAY_NIGHTS) {
+    return fail(
+      `La reserva máxima en línea es de ${MAX_STAY_NIGHTS} días. Para estadías más largas aplican políticas diferentes: contáctanos para una cotización especial.`,
+    );
+  }
   if (nights !== null && nights >= 7) {
     disclaimers.push(
       "Estadías de 7 noches o más: el valor final y posibles ajustes se confirman por WhatsApp.",
@@ -118,8 +131,13 @@ export function publicStayQuote(
   );
 
   if (!single.ok) {
-    return { ...single, disclaimers };
+    return { ...single, disclaimers, depositoDanos: 0 };
   }
+
+  const depositoDanos = damageDepositTotalCop(single.noches, lofts);
+  disclaimers.push(
+    `Depósito de daños estimado: ${formatCOP(depositoDanos)} (${single.noches < 7 ? "$200.000" : "$500.000"} por loft). No está incluido en el total de la reserva; se gestiona al check-in.`,
+  );
 
   if (lofts === 1) {
     const subtotalReserva =
@@ -135,12 +153,17 @@ export function publicStayQuote(
       comisionAirbnb: 0,
       totalConComisionAirbnb: subtotalReserva,
       disclaimers,
+      depositoDanos,
     };
   }
 
   const subtotalAlojamiento = single.subtotalAlojamiento * lofts;
   const recargoHuespedes = single.recargoHuespedes * lofts;
   const aseoTotal = single.aseoTotal * lofts;
+  const aseoDetalle = single.aseoDetalle.replace(
+    /× 1 loft\(s\)/,
+    `× ${lofts} loft(s)`,
+  );
   const subtotalReserva =
     subtotalAlojamiento + recargoHuespedes + aseoTotal;
 
@@ -149,6 +172,7 @@ export function publicStayQuote(
     subtotalAlojamiento,
     recargoHuespedes,
     aseoTotal,
+    aseoDetalle,
     subtotalReserva,
     descuento: 0,
     descuentoDetalle: "Descuentos de grupo o larga estadía: solo por WhatsApp.",
@@ -156,5 +180,6 @@ export function publicStayQuote(
     comisionAirbnb: 0,
     totalConComisionAirbnb: subtotalReserva,
     disclaimers,
+    depositoDanos,
   };
 }

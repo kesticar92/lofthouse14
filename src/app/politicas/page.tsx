@@ -2,12 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { SEED_CANCELLATION_POLICY } from "@/lib/policies/cancellation";
+import {
+  ASEO_CORTA_COP,
+  ASEO_ESTANDAR_COP,
+  ASEO_SEMANAL_EXTRA_COP,
+  DAMAGE_DEPOSIT_LONG_COP,
+  DAMAGE_DEPOSIT_SHORT_COP,
+  MAX_STAY_NIGHTS,
+} from "@/lib/policies/house";
 import { depositPercentFromEnv } from "@/lib/payments/deposit";
+import { formatCOP } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: `Políticas — ${site.name}`,
   description:
-    "Conoce nuestras políticas de reservas, tratamiento de datos, anticipos, cancelaciones y normas del alojamiento.",
+    "Conoce nuestras políticas de reservas, depósito de daños, aseo, duración máxima, anticipos, cancelaciones y normas del alojamiento.",
 };
 
 const depositPct = depositPercentFromEnv();
@@ -40,6 +49,56 @@ const sections = [
       {
         heading: "Horarios",
         body: `Check-in: ${site.checkIn}. Check-out: ${site.checkOut}. El ingreso antes o la salida después de los horarios establecidos requiere contratación de Early Check-in o Late Check-out respectivamente, sujeto a disponibilidad.`,
+      },
+    ],
+  },
+  {
+    id: "deposito",
+    title: "Depósito de daños",
+    content: [
+      {
+        heading: "Reservas de menos de 7 días",
+        body: `Se requiere un depósito de daños de ${formatCOP(DAMAGE_DEPOSIT_SHORT_COP)} por cada loft. Este valor se gestiona al check-in y se reembolsa al finalizar la estadía si no hay daños atribuibles al huésped.`,
+      },
+      {
+        heading: "Reservas de 7 días o más (≥ 7 días)",
+        body: `En reservas más extensas el depósito de daños es de ${formatCOP(DAMAGE_DEPOSIT_LONG_COP)} por cada loft, con las mismas condiciones de retención y devolución.`,
+      },
+      {
+        heading: "Alcance",
+        body: "El depósito de daños no forma parte del anticipo ni del total de alojamiento/aseo. Cubre posibles daños al inmueble, inventario o amenidades más allá del desgaste normal.",
+      },
+    ],
+  },
+  {
+    id: "aseo",
+    title: "Política de aseo",
+    content: [
+      {
+        heading: "Reservas de 1 o 2 noches",
+        body: `Se cobra aseo de ${formatCOP(ASEO_CORTA_COP)} por cada loft.`,
+      },
+      {
+        heading: "A partir de 4 noches (≥ 4 noches)",
+        body: `Se cobra aseo de ${formatCOP(ASEO_ESTANDAR_COP)} por cada loft. («Más de 3 noches» se interpreta como a partir de 4 noches / ≥ 4 noches.)`,
+      },
+      {
+        heading: "Reservas de más de 7 días",
+        body: `Además del aseo estándar de ${formatCOP(ASEO_ESTANDAR_COP)} (por estadía a partir de 4 noches), se cobra un aseo adicional una vez por semana de ${formatCOP(ASEO_SEMANAL_EXTRA_COP)} por loft.`,
+      },
+    ],
+  },
+  {
+    id: "estadia",
+    title: "Duración máxima de la estadía",
+    content: [
+      {
+        heading: `Máximo de reserva: ${MAX_STAY_NIGHTS} días`,
+        body: `La duración máxima de una reserva en línea es de ${MAX_STAY_NIGHTS} días.`,
+      },
+      {
+        heading: "Estadías mayores a 30 días",
+        body: "Si necesitas más de 30 días, aplican políticas diferentes. Contáctanos para una cotización especial y condiciones particulares.",
       },
     ],
   },
@@ -199,8 +258,20 @@ export default function PoliticasPage() {
           </Link>
           <div className="flex items-center gap-3">
             <a
-              href="#cancelaciones"
+              href="#deposito"
               className="hidden text-xs font-semibold uppercase tracking-wide text-[#f2f0eb]/70 hover:text-white sm:inline"
+            >
+              Depósito
+            </a>
+            <a
+              href="#aseo"
+              className="hidden text-xs font-semibold uppercase tracking-wide text-[#f2f0eb]/70 hover:text-white md:inline"
+            >
+              Aseo
+            </a>
+            <a
+              href="#cancelaciones"
+              className="hidden text-xs font-semibold uppercase tracking-wide text-[#f2f0eb]/70 hover:text-white lg:inline"
             >
               Cancelaciones
             </a>
@@ -223,8 +294,8 @@ export default function PoliticasPage() {
             POLÍTICAS
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
-            Condiciones de reserva, anticipo ({depositPct}%), cancelación
-            (política seed visible) y normas del alojamiento.
+            Condiciones de reserva, depósito de daños, aseo, duración máxima,
+            anticipo ({depositPct}%), cancelación y normas del alojamiento.
           </p>
           <p className="text-xs text-zinc-400">
             Última actualización: septiembre 2026 · Política seed:{" "}
@@ -232,11 +303,49 @@ export default function PoliticasPage() {
           </p>
         </div>
 
-        <div className="mb-10 rounded-2xl border border-amber-900/20 bg-amber-500/10 px-5 py-4 dark:border-amber-400/25 dark:bg-amber-500/10">
-          <p className="text-sm font-semibold text-amber-950 dark:text-amber-200">
+        <div className="mb-10 grid gap-3 sm:grid-cols-3">
+          <a
+            href="#deposito"
+            className="rounded-2xl border border-amber-900/20 bg-amber-500/10 px-5 py-4 transition hover:bg-amber-500/15 dark:border-amber-400/25 dark:bg-amber-500/10"
+          >
+            <p className="text-sm font-semibold text-amber-950 dark:text-amber-200">
+              Depósito de daños
+            </p>
+            <p className="mt-1 text-xs text-amber-950/80 dark:text-amber-100/80">
+              {formatCOP(DAMAGE_DEPOSIT_SHORT_COP)} (&lt;7 días) ·{" "}
+              {formatCOP(DAMAGE_DEPOSIT_LONG_COP)} (≥7 días) por loft
+            </p>
+          </a>
+          <a
+            href="#aseo"
+            className="rounded-2xl border border-amber-900/20 bg-amber-500/10 px-5 py-4 transition hover:bg-amber-500/15 dark:border-amber-400/25 dark:bg-amber-500/10"
+          >
+            <p className="text-sm font-semibold text-amber-950 dark:text-amber-200">
+              Aseo
+            </p>
+            <p className="mt-1 text-xs text-amber-950/80 dark:text-amber-100/80">
+              {formatCOP(ASEO_CORTA_COP)} (1–2) · {formatCOP(ASEO_ESTANDAR_COP)}{" "}
+              (≥4) · +{formatCOP(ASEO_SEMANAL_EXTRA_COP)}/semana si &gt;7 días
+            </p>
+          </a>
+          <a
+            href="#estadia"
+            className="rounded-2xl border border-amber-900/20 bg-amber-500/10 px-5 py-4 transition hover:bg-amber-500/15 dark:border-amber-400/25 dark:bg-amber-500/10"
+          >
+            <p className="text-sm font-semibold text-amber-950 dark:text-amber-200">
+              Duración máxima
+            </p>
+            <p className="mt-1 text-xs text-amber-950/80 dark:text-amber-100/80">
+              Hasta {MAX_STAY_NIGHTS} días · más tiempo = cotización especial
+            </p>
+          </a>
+        </div>
+
+        <div className="mb-10 rounded-2xl border border-black/10 bg-white/70 px-5 py-4 dark:border-white/10 dark:bg-zinc-900/60">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
             Cancelaciones
           </p>
-          <p className="mt-1 text-sm text-amber-950/80 dark:text-amber-100/80">
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
             {SEED_CANCELLATION_POLICY.description}{" "}
             <a href="#cancelaciones" className="font-semibold underline">
               Ver detalle

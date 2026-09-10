@@ -51,12 +51,12 @@ export function ConfigTarifasCard({
           onChange={(v) => onChange("aseoCorta", v)}
         />
         <MoneyField
-          label="Aseo 3–7 noches (por loft)"
+          label="Aseo ≥4 noches / estándar (por loft)"
           value={config.aseoMedia}
           onChange={(v) => onChange("aseoMedia", v)}
         />
         <MoneyField
-          label="Aseo por semana (>7 noches)"
+          label="Aseo semanal extra (>7 días, por loft)"
           value={config.aseoSemanal}
           onChange={(v) => onChange("aseoSemanal", v)}
         />

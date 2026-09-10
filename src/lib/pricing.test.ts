@@ -54,6 +54,7 @@ describe("quote", () => {
       expect(d7.descuento).toBeCloseTo(
         -(d7.subtotalAlojamiento + d7.recargoHuespedes) * 0.15,
       );
+      expect(d7.aseoTotal).toBe(60_000);
     }
 
     const d14 = quote(
@@ -67,6 +68,8 @@ describe("quote", () => {
       expect(d14.descuento).toBeCloseTo(
         -(d14.subtotalAlojamiento + d14.recargoHuespedes) * 0.25,
       );
+      // ≥4 + >7: 60k + 2×30k
+      expect(d14.aseoTotal).toBe(60_000 + 2 * 30_000);
     }
 
     const d30 = quote(
@@ -80,6 +83,32 @@ describe("quote", () => {
       expect(d30.descuento).toBeCloseTo(
         -(d30.subtotalAlojamiento + d30.recargoHuespedes) * 0.4,
       );
+      expect(d30.aseoTotal).toBe(60_000 + 4 * 30_000);
     }
+  });
+
+  it("aseo: 1–2 corto, ≥4 estándar, >7 con semanal extra", () => {
+    const corta = quote(
+      {
+        checkIn: "2026-01-05",
+        checkOut: "2026-01-07",
+        huespedes: 2,
+        lofts: 1,
+      },
+      DEFAULT_PRICING,
+    );
+    expect(corta.ok && corta.aseoTotal).toBe(30_000);
+
+    const estandar = quote(
+      {
+        checkIn: "2026-01-05",
+        checkOut: "2026-01-10",
+        huespedes: 2,
+        lofts: 1,
+      },
+      DEFAULT_PRICING,
+    );
+    expect(estandar.ok && estandar.noches).toBe(5);
+    expect(estandar.ok && estandar.aseoTotal).toBe(60_000);
   });
 });

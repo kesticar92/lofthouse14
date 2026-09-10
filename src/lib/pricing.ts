@@ -8,13 +8,17 @@
  *  - Viernes a Domingo:  100.000 COP por noche (base 1–2 huéspedes)
  *  - Recargo por huésped adicional (3º–5º):  30.000 COP por huésped × noche
  *  - Aseo 1–2 noches (por loft):  30.000 COP
- *  - Aseo 3–7 noches (por loft):  60.000 COP
- *  - Aseo >7 noches (por loft): ROUNDUP(noches/7) × 30.000 COP
+ *  - Aseo a partir de 4 noches (≥4, por loft):  60.000 COP
+ *  - Aseo >7 días (por loft): 60.000 + floor(noches/7) × 30.000 adicionales
  *  - Descuento ≥7 noches:  15 %   (sobre alojamiento + recargo huéspedes)
  *  - Descuento ≥14 noches: 25 %   (reemplaza al de 7)
  *  - Descuento ≥30 noches: 40 %   (reemplaza al de 14)
  *  - Comisión Airbnb (opcional): + 12 %
+ *
+ * Ver también `@/lib/policies/house` (depósito de daños, duración máx. 30 días).
  */
+
+import { computeAseo } from "@/lib/policies/house";
 
 export type PricingConfig = {
   tarifaLJ: number;
@@ -166,23 +170,16 @@ export function quote(
   const recargoHuespedes =
     huespedes <= 2 ? 0 : (huespedes - 2) * cfg.recargoHuesped * noches;
 
-  let aseoTotal = 0;
-  let aseoDetalle = "";
-  if (noches <= 2) {
-    aseoTotal = cfg.aseoCorta * lofts;
-    aseoDetalle = `Aseo corto (1–2 noches): ${formatCOP(
-      cfg.aseoCorta,
-    )} × ${lofts} loft(s)`;
-  } else if (noches <= 7) {
-    aseoTotal = cfg.aseoMedia * lofts;
-    aseoDetalle = `Aseo medio (3–7 noches): ${formatCOP(
-      cfg.aseoMedia,
-    )} × ${lofts} loft(s)`;
-  } else {
-    const semanas = Math.ceil(noches / 7);
-    aseoTotal = semanas * cfg.aseoSemanal * lofts;
-    aseoDetalle = `${semanas} semana(s) × ${formatCOP(cfg.aseoSemanal)} × ${lofts} loft(s)`;
-  }
+  const aseo = computeAseo({
+    noches,
+    lofts,
+    aseoCorta: cfg.aseoCorta,
+    aseoMedia: cfg.aseoMedia,
+    aseoSemanal: cfg.aseoSemanal,
+    formatMoney: formatCOP,
+  });
+  const aseoTotal = aseo.total;
+  const aseoDetalle = aseo.detalle;
 
   const subtotalReserva = subtotalAlojamiento + recargoHuespedes + aseoTotal;
 

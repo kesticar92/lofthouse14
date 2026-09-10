@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { DayPicker, type DateRange } from "react-day-picker";
 import { es } from "react-day-picker/locale";
@@ -301,6 +301,26 @@ export function StayDateRangePicker({
                   selected={selected}
                   onSelect={handleSelect}
                   disabled={{ before: today }}
+                  style={
+                    {
+                      "--rdp-accent-color": "#18181b",
+                      "--rdp-accent-background-color": "#fef3c7",
+                      "--rdp-today-color": "#b45309",
+                      "--rdp-day-width": "100%",
+                      "--rdp-day-height": "2.75rem",
+                      "--rdp-day_button-width": "100%",
+                      "--rdp-day_button-height": "2.75rem",
+                      "--rdp-day_button-border": "2px solid transparent",
+                      "--rdp-selected-border": "2px solid transparent",
+                      "--rdp-range_start-date-background-color": "#18181b",
+                      "--rdp-range_end-date-background-color": "#18181b",
+                      "--rdp-range_middle-background-color": "#fef3c7",
+                      "--rdp-range_start-background":
+                        "linear-gradient(var(--rdp-gradient-direction), transparent 50%, #fef3c7 50%)",
+                      "--rdp-range_end-background":
+                        "linear-gradient(var(--rdp-gradient-direction), #fef3c7 50%, transparent 50%)",
+                    } as React.CSSProperties
+                  }
                   classNames={{
                     root: "rdp-root mx-auto w-full",
                     months:
@@ -311,28 +331,27 @@ export function StayDateRangePicker({
                     month_grid: "rdp-month_grid w-full border-collapse",
                     weekdays: "rdp-weekdays flex w-full",
                     weekday: cn(
-                      "rdp-weekday flex-1 basis-0 text-center",
+                      "rdp-weekday !w-auto flex-1 basis-0 text-center",
                       "py-1 text-[0.7rem] font-semibold uppercase text-zinc-500 dark:text-zinc-400",
                     ),
                     weeks: "rdp-weeks",
                     week: "rdp-week mt-0.5 flex w-full",
-                    day: "rdp-day relative flex-1 basis-0 p-0.5 text-center",
+                    day: "rdp-day relative !w-auto flex-1 basis-0 p-0.5 text-center",
                     day_button: cn(
-                      "rdp-day_button mx-auto inline-flex aspect-square w-full max-w-12",
-                      "min-h-11 items-center justify-center rounded-full text-sm font-medium",
+                      "rdp-day_button mx-auto inline-flex !h-11 !w-full items-center justify-center rounded-full text-sm font-medium",
                       "text-zinc-900 hover:bg-zinc-100",
                       "dark:text-zinc-100 dark:hover:bg-zinc-800",
                     ),
                     selected:
-                      "rdp-selected [&_.rdp-day_button]:bg-zinc-900 [&_.rdp-day_button]:text-white [&_.rdp-day_button]:hover:bg-zinc-800 dark:[&_.rdp-day_button]:bg-amber-500 dark:[&_.rdp-day_button]:text-zinc-950",
+                      "rdp-selected [&_.rdp-day_button]:!bg-zinc-900 [&_.rdp-day_button]:!text-white [&_.rdp-day_button]:hover:!bg-zinc-800 dark:[&_.rdp-day_button]:!bg-amber-500 dark:[&_.rdp-day_button]:!text-zinc-950",
                     range_start:
-                      "rdp-range_start rounded-l-full bg-amber-100/80 dark:bg-zinc-800/80 [&_.rdp-day_button]:bg-zinc-900 [&_.rdp-day_button]:text-white dark:[&_.rdp-day_button]:bg-amber-500 dark:[&_.rdp-day_button]:text-zinc-950",
+                      "rdp-range_start rounded-l-full [&_.rdp-day_button]:!bg-zinc-900 [&_.rdp-day_button]:!text-white dark:[&_.rdp-day_button]:!bg-amber-500 dark:[&_.rdp-day_button]:!text-zinc-950",
                     range_end:
-                      "rdp-range_end rounded-r-full bg-amber-100/80 dark:bg-zinc-800/80 [&_.rdp-day_button]:bg-zinc-900 [&_.rdp-day_button]:text-white dark:[&_.rdp-day_button]:bg-amber-500 dark:[&_.rdp-day_button]:text-zinc-950",
+                      "rdp-range_end rounded-r-full [&_.rdp-day_button]:!bg-zinc-900 [&_.rdp-day_button]:!text-white dark:[&_.rdp-day_button]:!bg-amber-500 dark:[&_.rdp-day_button]:!text-zinc-950",
                     range_middle:
-                      "rdp-range_middle rounded-none bg-amber-100 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-50 [&_.rdp-day_button]:rounded-none [&_.rdp-day_button]:bg-transparent",
+                      "rdp-range_middle rounded-none [&_.rdp-day_button]:rounded-none [&_.rdp-day_button]:!bg-transparent",
                     today:
-                      "rdp-today font-bold [&_.rdp-day_button]:ring-1 [&_.rdp-day_button]:ring-inset [&_.rdp-day_button]:ring-amber-500/50",
+                      "rdp-today font-bold [&_.rdp-day_button]:ring-1 [&_.rdp-day_button]:ring-inset [&_.rdp-day_button]:ring-amber-600/60",
                     outside: "rdp-outside text-zinc-300 dark:text-zinc-600",
                     disabled:
                       "rdp-disabled text-zinc-300 opacity-40 dark:text-zinc-600",

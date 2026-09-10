@@ -133,7 +133,7 @@ export function StayDateRangePicker({
     }
 
     onChange(toISO(from), toISO(to));
-    setOpen(false);
+    // Cierre vía CTA «Confirmar fechas» (no auto-cerrar).
   }
 
   const fieldClass = (active: boolean) =>
@@ -157,7 +157,7 @@ export function StayDateRangePicker({
     ? "Paso 1 · Elige tu fecha de entrada"
     : !checkOut
       ? "Paso 2 · Elige tu fecha de salida"
-      : "Fechas confirmadas · puedes ajustarlas";
+      : "Tus fechas de estadía · puedes ajustarlas";
 
   const calendarPanel =
     open && mounted
@@ -185,8 +185,8 @@ export function StayDateRangePicker({
                 "dark:sm:border-zinc-700",
               )}
             >
-              <header className="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200/80 px-4 py-4 dark:border-zinc-800 sm:px-6 sm:py-5">
-                <div className="min-w-0 flex items-start gap-2.5">
+              <header className="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200/80 px-4 py-3 dark:border-zinc-800 sm:px-6 sm:py-3.5">
+                <div className="flex min-w-0 items-start gap-2.5">
                   <CalendarDays className="mt-0.5 size-5 shrink-0 text-amber-700 dark:text-amber-400" />
                   <div className="min-w-0">
                     <p className="font-display text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
@@ -207,10 +207,10 @@ export function StayDateRangePicker({
                 </button>
               </header>
 
-              <div className="flex shrink-0 items-stretch gap-2 border-b border-zinc-200/80 px-4 py-3 dark:border-zinc-800 sm:px-6">
+              <div className="flex shrink-0 items-stretch gap-2 border-b border-zinc-200/80 px-4 py-2.5 dark:border-zinc-800 sm:px-6">
                 <div
                   className={cn(
-                    "flex min-w-0 flex-1 flex-col rounded-2xl border px-3 py-2.5",
+                    "flex min-w-0 flex-1 flex-col rounded-2xl border px-3 py-2",
                     focusField === "checkIn"
                       ? "border-amber-600/70 bg-white ring-2 ring-amber-500/25 dark:bg-zinc-900"
                       : "border-zinc-200 bg-white/70 dark:border-zinc-700 dark:bg-zinc-900/60",
@@ -238,7 +238,7 @@ export function StayDateRangePicker({
                 </div>
                 <div
                   className={cn(
-                    "flex min-w-0 flex-1 flex-col rounded-2xl border px-3 py-2.5",
+                    "flex min-w-0 flex-1 flex-col rounded-2xl border px-3 py-2",
                     focusField === "checkOut"
                       ? "border-amber-600/70 bg-white ring-2 ring-amber-500/25 dark:bg-zinc-900"
                       : "border-zinc-200 bg-white/70 dark:border-zinc-700 dark:bg-zinc-900/60",
@@ -260,76 +260,96 @@ export function StayDateRangePicker({
                 </div>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4 sm:px-6 sm:py-5">
+              <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 sm:px-6 sm:py-4">
                 <DayPicker
                   mode="range"
                   locale={es}
+                  navLayout="around"
                   numberOfMonths={monthCount}
                   selected={selected}
                   onSelect={handleSelect}
                   disabled={{ before: today }}
                   defaultMonth={selected?.from ?? today}
                   classNames={{
-                    root: "mx-auto w-full max-w-xl",
+                    root: "rdp-root mx-auto w-full",
                     months:
-                      "flex flex-col gap-6 sm:flex-row sm:justify-center sm:gap-8",
-                    month: "space-y-3",
-                    month_caption: "flex justify-center pb-1",
+                      "rdp-months !max-w-none flex w-full flex-col gap-5 sm:flex-row sm:justify-center sm:gap-6",
+                    month: "rdp-month relative w-full space-y-2",
+                    month_caption:
+                      "rdp-month_caption relative mb-1 flex h-11 items-center justify-center",
                     caption_label:
-                      "text-base font-semibold capitalize text-zinc-900 dark:text-zinc-50",
-                    nav: "flex items-center gap-1",
-                    button_previous:
-                      "inline-flex size-9 items-center justify-center rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700",
-                    button_next:
-                      "inline-flex size-9 items-center justify-center rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700",
-                    weekdays: "flex",
-                    weekday:
-                      "w-10 text-center text-[0.7rem] font-semibold uppercase text-zinc-500 sm:w-11",
-                    week: "flex",
-                    day: "p-0 text-center",
+                      "rdp-caption_label text-base font-semibold capitalize text-zinc-900 dark:text-zinc-50",
+                    button_previous: cn(
+                      "rdp-button_previous absolute inset-y-0 left-0 z-10",
+                      "inline-flex size-11 items-center justify-center rounded-full",
+                      "bg-zinc-100 text-zinc-900 hover:bg-zinc-200",
+                      "dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700",
+                    ),
+                    button_next: cn(
+                      "rdp-button_next absolute inset-y-0 right-0 z-10",
+                      "inline-flex size-11 items-center justify-center rounded-full",
+                      "bg-zinc-100 text-zinc-900 hover:bg-zinc-200",
+                      "dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700",
+                    ),
+                    chevron: "rdp-chevron size-4 fill-current",
+                    month_grid: "rdp-month_grid w-full border-collapse",
+                    weekdays: "rdp-weekdays flex w-full",
+                    weekday: cn(
+                      "rdp-weekday flex-1 basis-0 text-center",
+                      "text-[0.7rem] font-semibold uppercase text-zinc-500 dark:text-zinc-400",
+                    ),
+                    weeks: "rdp-weeks",
+                    week: "rdp-week mt-0.5 flex w-full",
+                    day: "rdp-day relative flex-1 basis-0 p-0.5 text-center",
                     day_button: cn(
-                      "inline-flex size-10 items-center justify-center rounded-full text-sm font-medium sm:size-11",
-                      "text-zinc-900 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800",
+                      "rdp-day_button mx-auto inline-flex aspect-square w-full max-w-11",
+                      "items-center justify-center rounded-full text-sm font-medium",
+                      "text-zinc-900 hover:bg-zinc-100",
+                      "dark:text-zinc-100 dark:hover:bg-zinc-800",
                     ),
                     selected:
-                      "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950",
+                      "rdp-selected [&_.rdp-day_button]:bg-zinc-900 [&_.rdp-day_button]:text-white [&_.rdp-day_button]:hover:bg-zinc-800 dark:[&_.rdp-day_button]:bg-amber-500 dark:[&_.rdp-day_button]:text-zinc-950",
                     range_start:
-                      "rounded-l-full bg-zinc-900 text-white dark:bg-amber-500 dark:text-zinc-950",
+                      "rdp-range_start rounded-l-full bg-amber-100/80 dark:bg-zinc-800/80 [&_.rdp-day_button]:bg-zinc-900 [&_.rdp-day_button]:text-white dark:[&_.rdp-day_button]:bg-amber-500 dark:[&_.rdp-day_button]:text-zinc-950",
                     range_end:
-                      "rounded-r-full bg-zinc-900 text-white dark:bg-amber-500 dark:text-zinc-950",
+                      "rdp-range_end rounded-r-full bg-amber-100/80 dark:bg-zinc-800/80 [&_.rdp-day_button]:bg-zinc-900 [&_.rdp-day_button]:text-white dark:[&_.rdp-day_button]:bg-amber-500 dark:[&_.rdp-day_button]:text-zinc-950",
                     range_middle:
-                      "rounded-none bg-amber-100 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-50",
-                    today: "font-bold ring-1 ring-amber-500/50 ring-inset",
-                    outside: "text-zinc-300 dark:text-zinc-600",
-                    disabled: "text-zinc-300 opacity-40 dark:text-zinc-600",
+                      "rdp-range_middle rounded-none bg-amber-100 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-50 [&_.rdp-day_button]:rounded-none [&_.rdp-day_button]:bg-transparent",
+                    today:
+                      "rdp-today font-bold [&_.rdp-day_button]:ring-1 [&_.rdp-day_button]:ring-inset [&_.rdp-day_button]:ring-amber-500/50",
+                    outside: "rdp-outside text-zinc-300 dark:text-zinc-600",
+                    disabled:
+                      "rdp-disabled text-zinc-300 opacity-40 dark:text-zinc-600",
                   }}
                 />
               </div>
 
-              <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-zinc-200/80 bg-[#ebe7df]/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/80 sm:px-6">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onChange("", "");
-                    setFocusField("checkIn");
-                  }}
-                  className="rounded-full px-3 py-2 text-xs font-semibold text-zinc-600 transition hover:bg-zinc-200/70 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                >
-                  Limpiar
-                </button>
-                <button
-                  type="button"
-                  disabled={!checkIn || !checkOut}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    "rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition",
-                    checkIn && checkOut
-                      ? "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400"
-                      : "cursor-not-allowed bg-zinc-300 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400",
-                  )}
-                >
-                  Listo
-                </button>
+              <footer className="shrink-0 border-t border-zinc-200/80 bg-[#ebe7df]/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] dark:border-zinc-800 dark:bg-zinc-900/95 sm:px-6">
+                <div className="mx-auto flex w-full max-w-lg flex-col items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={!checkIn || !checkOut}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "w-[90%] rounded-full py-3.5 text-sm font-bold uppercase tracking-wider transition",
+                      checkIn && checkOut
+                        ? "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400"
+                        : "cursor-not-allowed bg-zinc-300 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400",
+                    )}
+                  >
+                    Confirmar fechas
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onChange("", "");
+                      setFocusField("checkIn");
+                    }}
+                    className="rounded-full px-3 py-1.5 text-xs font-semibold text-zinc-600 transition hover:bg-zinc-200/70 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  >
+                    Limpiar
+                  </button>
+                </div>
               </footer>
             </div>
           </div>,

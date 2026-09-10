@@ -39,6 +39,20 @@ import {
   type StayDraftFrom,
 } from "@/lib/stay-draft";
 import {
+  WIZARD_STEPS as STEPS,
+  STEP_TU_VIAJE,
+  STEP_FECHAS,
+  STEP_HUESPEDES,
+  STEP_LOFT,
+  STEP_EXTRAS,
+  STEP_CONFIRMAR,
+  draftHasValidDates,
+  nextLogicalStep as nextWizardStep,
+  prevLogicalStep as prevWizardStep,
+  resolveEntryStep,
+  stepAfterSelectingLoft,
+} from "@/lib/wizard-flow";
+import {
   LOFT_CATEGORIES,
   availableLoftsForGuests,
   getLoftCategory,
@@ -47,83 +61,7 @@ import {
 import { SEED_CANCELLATION_POLICY } from "@/lib/policies/cancellation";
 import { depositPercentFromEnv } from "@/lib/payments/deposit";
 
-const STEPS = [
-  "Tu viaje",
-  "Fechas",
-  "Huéspedes",
-  "Loft",
-  "Extras",
-  "Confirmar",
-] as const;
-
-const STEP_TU_VIAJE = 0;
-const STEP_FECHAS = 1;
-const STEP_HUESPEDES = 2;
-const STEP_LOFT = 3;
-const STEP_EXTRAS = 4;
-const STEP_CONFIRMAR = 5;
-
 const TRANSITION_MS = 900;
-
-function draftHasValidDates(draft: StayDraft) {
-  return Boolean(
-    draft.checkIn && draft.checkOut && draft.checkOut > draft.checkIn,
-  );
-}
-
-/**
- * Paso inicial según origen:
- * - banner (fechas+huéspedes): → Loft (no repetir fechas)
- * - card (categoría): → Fechas / Huéspedes (no repetir categoría)
- * Skip «Tu viaje» cuando ya hay datos de estadía o categoría.
- */
-function resolveEntryStep(draft: StayDraft): number {
-  const hasDates = draftHasValidDates(draft);
-  const hasGuests = Boolean(draft.guests && draft.guests > 0);
-  const stayReady = hasDates && hasGuests;
-  const hasCategory = Boolean(draft.categoryId);
-  const from: StayDraftFrom | undefined =
-    draft.from ??
-    (hasCategory ? "card" : stayReady ? "banner" : undefined);
-
-  const skipTrip = Boolean(from) || stayReady || hasCategory;
-
-  let next =
-    typeof draft.step === "number"
-      ? Math.min(STEPS.length - 1, Math.max(0, draft.step))
-      : STEP_TU_VIAJE;
-
-  if (from === "banner") {
-    // Fechas+huéspedes del banner → elegir tipo de loft.
-    if (stayReady) next = STEP_LOFT;
-    else if (hasDates) next = STEP_HUESPEDES;
-    else next = STEP_FECHAS;
-  } else if (from === "card") {
-    // Categoría de la card → fechas (y huéspedes si faltan); luego extras.
-    if (stayReady) next = STEP_EXTRAS;
-    else if (hasDates) next = STEP_HUESPEDES;
-    else next = STEP_FECHAS;
-  } else if (skipTrip && next === STEP_TU_VIAJE) {
-    if (stayReady && hasCategory) next = STEP_EXTRAS;
-    else if (stayReady) next = STEP_LOFT;
-    else if (hasDates) next = STEP_HUESPEDES;
-    else next = STEP_FECHAS;
-  }
-
-  // Banner nunca debe saltar a Extras sin categoría.
-  if (from === "banner" && !hasCategory && next >= STEP_EXTRAS) {
-    next = STEP_LOFT;
-  }
-  // Card nunca debe abrir el paso Loft (categoría ya elegida).
-  if (from === "card" && hasCategory && next === STEP_LOFT) {
-    next = stayReady ? STEP_EXTRAS : hasDates ? STEP_HUESPEDES : STEP_FECHAS;
-  }
-  // Sin estadía completa no abrir Extras.
-  if (!stayReady && next >= STEP_EXTRAS) {
-    next = hasDates ? STEP_HUESPEDES : STEP_FECHAS;
-  }
-  return next;
-}
 
 export function GuidedReservation({
   /** Densidad: en `/reservar` y home embed, sin padding de sección marketing. */
@@ -175,6 +113,8 @@ export function GuidedReservation({
   const [skipTripStep, setSkipTripStep] = useState(false);
   /** Desde card: categoría ya elegida → no reabrir paso Loft. */
   const [skipLoftStep, setSkipLoftStep] = useState(false);
+  /** Huéspedes ya vindieron del draft (no el default UI). */
+  const [guestsFromDraft, setGuestsFromDraft] = useState(false);
   const [entryFrom, setEntryFrom] = useState<StayDraftFrom | null>(null);
 
   useEffect(() => {
@@ -184,6 +124,7 @@ export function GuidedReservation({
       if (draft.checkOut) setCheckOut(draft.checkOut);
       if (draft.guests && draft.guests > 0) {
         setGuests(draft.guests);
+        setGuestsFromDraft(true);
         setLofts((prev) =>
           Math.max(
             prev,
@@ -283,39 +224,51 @@ export function GuidedReservation({
     }, TRANSITION_MS);
   }
 
+  const flowFlags = {
+    skipTripStep,
+    skipStaySteps,
+    skipLoftStep,
+    hasDates: datesOk,
+    // Solo draft/banner (no el default UI de 2) para no saltar Huéspedes.
+    hasGuests: skipStaySteps || guestsFromDraft,
+    hasCategory: categoryId !== null,
+  };
+
   function nextLogicalStep(from: number): number {
-    if (from === STEP_TU_VIAJE) {
-      return skipStaySteps
-        ? skipLoftStep
-          ? STEP_EXTRAS
-          : STEP_LOFT
-        : STEP_FECHAS;
-    }
-    if (from === STEP_FECHAS) return STEP_HUESPEDES;
-    if (from === STEP_HUESPEDES) {
-      return skipLoftStep ? STEP_EXTRAS : STEP_LOFT;
-    }
-    if (from === STEP_LOFT) return STEP_EXTRAS;
-    if (from === STEP_EXTRAS) return STEP_CONFIRMAR;
-    return from;
+    return nextWizardStep(from, flowFlags);
   }
 
   function prevLogicalStep(from: number): number | null {
-    if (from === STEP_CONFIRMAR) return STEP_EXTRAS;
-    if (from === STEP_EXTRAS) {
-      if (skipLoftStep) {
-        if (skipStaySteps) return skipTripStep ? null : STEP_TU_VIAJE;
-        return STEP_HUESPEDES;
+    return prevWizardStep(from, flowFlags);
+  }
+
+  function persistStayDraft(extra: Partial<StayDraft> = {}) {
+    mergeStayDraft({
+      checkIn: checkIn || undefined,
+      checkOut: checkOut || undefined,
+      guests: guests > 0 ? guests : undefined,
+      ...(categoryId ? { categoryId } : {}),
+      ...(entryFrom ? { from: entryFrom } : {}),
+      ...extra,
+    });
+  }
+
+  function advanceFromCurrentStep() {
+    if (step === STEP_FECHAS || step === STEP_HUESPEDES) {
+      persistStayDraft();
+      if (step === STEP_HUESPEDES && datesOk && guests >= 1) {
+        setGuestsFromDraft(true);
+        setSkipStaySteps(true);
       }
-      return STEP_LOFT;
     }
-    if (from === STEP_LOFT) {
-      if (skipStaySteps) return skipTripStep ? null : STEP_TU_VIAJE;
-      return STEP_HUESPEDES;
+    if (step === STEP_LOFT && categoryId) {
+      if (datesOk && guests >= 1) setSkipStaySteps(true);
+      persistStayDraft({
+        categoryId,
+        step: STEP_EXTRAS,
+      });
     }
-    if (from === STEP_HUESPEDES) return STEP_FECHAS;
-    if (from === STEP_FECHAS) return skipTripStep ? null : STEP_TU_VIAJE;
-    return null;
+    goToStep(nextLogicalStep(step));
   }
 
   const canGoBack = prevLogicalStep(step) !== null;
@@ -1083,10 +1036,28 @@ export function GuidedReservation({
                           disabled={!fits}
                           onClick={() => {
                             setCategoryId(cat.id);
+                            const stayReadyNow = datesOk && guests >= 1;
+                            if (stayReadyNow) {
+                              setSkipStaySteps(true);
+                              setGuestsFromDraft(true);
+                            }
+                            const nextStep = stepAfterSelectingLoft({
+                              hasDates: datesOk,
+                              hasGuests: stayReadyNow || guestsFromDraft,
+                            });
+                            const from =
+                              entryFrom ??
+                              (stayReadyNow ? ("banner" as const) : undefined);
                             mergeStayDraft({
                               categoryId: cat.id,
-                              from: entryFrom ?? "banner",
+                              checkIn: checkIn || undefined,
+                              checkOut: checkOut || undefined,
+                              guests: guests > 0 ? guests : undefined,
+                              ...(from ? { from } : {}),
+                              step: nextStep,
                             });
+                            // Con fechas+huéspedes ya en state/draft → Extras (no repetir).
+                            if (stayReadyNow) goToStep(STEP_EXTRAS);
                           }}
                           className={cn(
                             "overflow-hidden rounded-2xl border text-left transition",
@@ -1583,7 +1554,7 @@ export function GuidedReservation({
                 <button
                   type="button"
                   disabled={!canAdvance() || transitionTo !== null}
-                  onClick={() => goToStep(nextLogicalStep(step))}
+                  onClick={() => advanceFromCurrentStep()}
                   className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
                 >
                   Siguiente

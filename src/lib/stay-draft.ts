@@ -45,7 +45,11 @@ export function saveStayDraft(draft: StayDraft) {
 /** Fusiona con el borrador existente (p. ej. fechas del banner + categoría de la card). */
 export function mergeStayDraft(patch: StayDraft) {
   const prev = readStayDraft() ?? {};
-  saveStayDraft({ ...prev, ...patch });
+  // No pisar claves existentes con `undefined` (p. ej. query sin `step`).
+  const cleaned = Object.fromEntries(
+    Object.entries(patch).filter(([, v]) => v !== undefined),
+  ) as StayDraft;
+  saveStayDraft({ ...prev, ...cleaned });
 }
 
 export function readStayDraft(): StayDraft | null {

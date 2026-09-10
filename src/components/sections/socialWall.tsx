@@ -1,44 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { Play } from "lucide-react";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
-
-const posts = [
-  {
-    id: 1,
-    url: "https://www.instagram.com/reel/DS7rZ57EUaw/",
-    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-02.webp",
-    isVideo: true,
-    caption: "Entrar, subir y sentir que ya estás en tu lugar.",
-  },
-  {
-    id: 2,
-    url: "https://www.instagram.com/reel/DZxlocpsg5n/",
-    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-04.webp",
-    isVideo: true,
-    caption:
-      "A veces no hace falta salir de tu ciudad para vivir algo distinto.",
-  },
-  {
-    id: 3,
-    url: "https://www.instagram.com/reel/DZdMqSyNjBh/",
-    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-03.webp",
-    isVideo: true,
-    caption: "Vive Cali como un local.",
-  },
-  {
-    id: 4,
-    url: "https://www.instagram.com/reel/DS_NhgWEQoS/",
-    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-01.webp",
-    isVideo: true,
-    caption: "Desde Cristo Rey, Cali se ilumina cada noche.",
-  },
-] as const;
+import type { InstagramFeedPost } from "@/lib/instagram/types";
+import { INSTAGRAM_POSTS_SEED } from "@/data/instagram-posts";
 
 function TikTokMark({ className }: { className?: string }) {
-  // Nota TikTok: cian + magenta + cuerpo que adapta a día/noche
   return (
     <svg
       viewBox="0 0 24 24"
@@ -88,7 +58,43 @@ function SocialProfileButton({
   );
 }
 
+function isRemoteThumb(src: string) {
+  return src.startsWith("http://") || src.startsWith("https://");
+}
+
 export function SocialWall() {
+  const [posts, setPosts] = useState<InstagramFeedPost[]>(
+    () => INSTAGRAM_POSTS_SEED as InstagramFeedPost[],
+  );
+  const [count, setCount] = useState(INSTAGRAM_POSTS_SEED.length);
+  const [source, setSource] = useState<string>("seed");
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/instagram/feed", { cache: "no-store" });
+        if (!res.ok) return;
+        const json = (await res.json()) as {
+          posts?: InstagramFeedPost[];
+          count?: number;
+          source?: string;
+        };
+        if (cancelled) return;
+        if (Array.isArray(json.posts) && json.posts.length > 0) {
+          setPosts(json.posts);
+          setCount(json.count ?? json.posts.length);
+          setSource(json.source ?? "store");
+        }
+      } catch {
+        /* keep seed */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section
       id="social-wall"
@@ -99,13 +105,12 @@ export function SocialWall() {
           Instagram y TikTok
         </h2>
         <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
-          Publicamos lo del día a día en el loft y en Cali. Entra al perfil que
-          uses y escríbenos por WhatsApp si quieres reservar.
+          Todas las publicaciones de @lofthouse.14 en un solo muro. Entra al
+          perfil o escríbenos por WhatsApp si quieres reservar.
         </p>
 
         <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <SocialProfileButton href={site.instagramUrl} handle="@lofthouse.14">
-            {/* Wordmark monócromo: se invierte a blanco en dark */}
             <Image
               src="/logos/instagram-wordmark.svg"
               alt="Instagram"
@@ -125,7 +130,7 @@ export function SocialWall() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4 xl:grid-cols-4">
         {posts.map((post) => (
           <a
             key={post.id}
@@ -134,10 +139,15 @@ export function SocialWall() {
             rel="noopener noreferrer"
             className="group relative block aspect-square overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element -- thumbs locales + CDN Instagram */}
             <img
               src={post.thumbnailUrl}
               alt=""
               className="h-full w-full object-cover transition group-hover:brightness-90"
+              loading="lazy"
+              referrerPolicy={
+                isRemoteThumb(post.thumbnailUrl) ? "no-referrer" : undefined
+              }
             />
 
             {post.isVideo ? (
@@ -156,13 +166,30 @@ export function SocialWall() {
               />
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-4 pt-10 opacity-0 transition group-hover:opacity-100">
-              <p className="line-clamp-3 text-left text-xs leading-snug text-white">
-                {post.caption}
-              </p>
-            </div>
+            {post.caption ? (
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-4 pt-10 opacity-0 transition group-hover:opacity-100">
+                <p className="line-clamp-3 text-left text-xs leading-snug text-white">
+                  {post.caption}
+                </p>
+              </div>
+            ) : null}
           </a>
         ))}
+      </div>
+
+      <div className="mx-auto mt-8 flex max-w-7xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          {count} publicación{count === 1 ? "" : "es"}
+          {source === "graph" ? " · actualizado desde Instagram" : null}
+        </p>
+        <a
+          href={site.instagramUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-zinc-900 underline-offset-4 hover:underline dark:text-[#f2f0eb]"
+        >
+          Ver todas en Instagram →
+        </a>
       </div>
     </section>
   );

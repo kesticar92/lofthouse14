@@ -59,8 +59,8 @@ const COMMON_AMENITIES = [
 
 /** Fotos por tipología — orden: rasgo distintivo → cocina → baño/escaleras. */
 const VISTA_IMAGES = [
-  // Ventana abierta con exterior (calle) visible
-  "/gallery/immersive/34-loft-espacio-amplio-cali.webp",
+  // Cama + ventana al exterior + TV (foto primaria card Vista)
+  "/gallery/cuarto_2.webp",
   // Cocina detallada
   "/gallery/immersive/02-cocina_derecha.webp",
   // Baño
@@ -103,7 +103,7 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     image: VISTA_IMAGES[0],
     images: [...VISTA_IMAGES],
     imageAlt:
-      "Loft Vista: dormitorio con ventana a la calle y luz de barrio en Miraflores, Cali",
+      "Loft Vista: cama doble, ventana al exterior y TV en Miraflores, Cali",
     theme: "vista",
   },
   {

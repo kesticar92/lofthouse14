@@ -36,6 +36,12 @@ describe("loft categories images", () => {
     }
   });
 
+  it("vista portada muestra cama + ventana + TV", () => {
+    const vista = LOFT_CATEGORIES.find((c) => c.id === "vista")!;
+    expect(vista.images[0]).toBe("/gallery/cuarto_2.webp");
+    expect(vista.image).toBe("/gallery/cuarto_2.webp");
+  });
+
   it("atrio no usa foto de cortina abierta como portada", () => {
     const atrio = LOFT_CATEGORIES.find((c) => c.id === "atrio")!;
     expect(atrio.images[0]).toContain("42-loft-interior-moderno");

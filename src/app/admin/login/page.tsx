@@ -44,15 +44,14 @@ function LoginForm() {
     setError(null);
     setLoading(true);
     try {
-      if (!supabasePublicEnv().ok) {
-        setError(
-          "Supabase no está configurado: añade NEXT_PUBLIC_SUPABASE_URL y la clave pública en .env.local.",
-        );
-        return;
-      }
+      const localMode = !supabasePublicEnv().ok;
       const result = await loginAdmin(email, pass);
       if (result === "bad_credentials") {
-        setError("Correo o contraseña incorrectos.");
+        setError(
+          localMode
+            ? "Correo o contraseña incorrectos. En modo local usa admin@lofthouse14.local / lofthouse14"
+            : "Correo o contraseña incorrectos.",
+        );
         return;
       }
       if (result === "no_profile") {
@@ -69,7 +68,9 @@ function LoginForm() {
       }
       if (result === "server") {
         setError(
-          "No se pudo iniciar sesión. Revisa el proyecto Supabase y que el email/contraseña estén habilitados (Authentication → Providers).",
+          localMode
+            ? "No se pudo iniciar sesión en modo local."
+            : "No se pudo iniciar sesión. Revisa el proyecto Supabase y que el email/contraseña estén habilitados (Authentication → Providers).",
         );
         return;
       }
@@ -100,7 +101,15 @@ function LoginForm() {
       <div className="w-full rounded-3xl border border-black/10 bg-white/75 p-7 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/70">
         <h1 className="text-xl font-semibold">Iniciar sesión</h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-          Accede con el correo y contraseña del staff (Supabase Auth).
+          {!supabasePublicEnv().ok ? (
+            <>
+              Modo local (sin Supabase). Usa{" "}
+              <span className="font-semibold">admin@lofthouse14.local</span> /{" "}
+              <span className="font-semibold">lofthouse14</span>.
+            </>
+          ) : (
+            <>Accede con el correo y contraseña del staff (Supabase Auth).</>
+          )}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">

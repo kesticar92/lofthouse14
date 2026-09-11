@@ -1,14 +1,48 @@
 "use client";
 
 import { getSupabaseBrowser } from "@/lib/supabase/client";
-import { isStaffRole } from "@/lib/supabase/env";
+import { isStaffRole, supabasePublicEnv } from "@/lib/supabase/env";
 
 export type AdminSessionInfo = {
   user: string;
   role: string;
+  mode?: "local" | "supabase";
 };
 
+export type LoginAdminResult =
+  | "ok"
+  | "bad_credentials"
+  | "network"
+  | "server"
+  | "no_profile";
+
+async function fetchLocalSession(): Promise<AdminSessionInfo | null> {
+  try {
+    const res = await fetch("/api/admin/local-auth", {
+      credentials: "include",
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      ok?: boolean;
+      user?: string;
+      role?: string;
+    };
+    if (!json.ok || !json.user) return null;
+    return {
+      user: json.user,
+      role: json.role ?? "super_admin",
+      mode: "local",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchAdminSession(): Promise<AdminSessionInfo | null> {
+  const local = await fetchLocalSession();
+  if (local) return local;
+
   const supabase = getSupabaseBrowser();
   if (!supabase) return null;
   const {
@@ -25,13 +59,29 @@ export async function fetchAdminSession(): Promise<AdminSessionInfo | null> {
 
   if (profErr || !profile?.role || !isStaffRole(profile.role)) return null;
 
-  return { user: user.email, role: profile.role };
+  return { user: user.email, role: profile.role, mode: "supabase" };
 }
 
 export async function loginAdmin(
   email: string,
   password: string,
-): Promise<"ok" | "bad_credentials" | "network" | "server" | "no_profile"> {
+): Promise<LoginAdminResult> {
+  if (!supabasePublicEnv().ok) {
+    try {
+      const res = await fetch("/api/admin/local-auth", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (res.status === 401) return "bad_credentials";
+      if (!res.ok) return "server";
+      return "ok";
+    } catch {
+      return "network";
+    }
+  }
+
   try {
     const supabase = getSupabaseBrowser();
     if (!supabase) return "server";
@@ -40,10 +90,8 @@ export async function loginAdmin(
       password,
     });
     if (error) {
-      if (
-        error.message.toLowerCase().includes("invalid") ||
-        error.message.toLowerCase().includes("credentials")
-      ) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes("invalid") || msg.includes("credentials")) {
         return "bad_credentials";
       }
       return "server";
@@ -75,6 +123,16 @@ export async function loginAdmin(
 }
 
 export async function logoutAdmin(): Promise<void> {
+  try {
+    await fetch("/api/admin/local-auth", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "logout" }),
+    });
+  } catch {
+    /* ignore */
+  }
   try {
     const supabase = getSupabaseBrowser();
     if (!supabase) return;

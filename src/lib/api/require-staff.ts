@@ -15,6 +15,11 @@ import {
   ACTIVE_ORG_COOKIE,
   parseActiveOrgCookie,
 } from "@/lib/tenant/active-org-cookie";
+import {
+  LOCAL_ADMIN_COOKIE,
+  localAdminEmail,
+  verifyLocalAdminToken,
+} from "@/lib/local-admin";
 
 export type StaffProfile = {
   role: StaffRole;
@@ -30,6 +35,8 @@ export type StaffContext = {
   organizationId: string | null;
   /** Rol en la org activa, si aplica. */
   orgRole: OrgMemberRole | null;
+  /** Sesión por cookie local (sin Supabase). */
+  local?: boolean;
 };
 
 export function staffHasModule(
@@ -54,7 +61,62 @@ export function enforceStaffModule(
 export async function requireStaff(): Promise<
   { ok: true; ctx: StaffContext } | { ok: false; response: Response }
 > {
-  const supabase = await createSupabaseServerClient();
+  try {
+    const jar = await cookies();
+    const token = jar.get(LOCAL_ADMIN_COOKIE)?.value;
+    if (await verifyLocalAdminToken(token)) {
+      const email = localAdminEmail();
+      const user = {
+        id: "local-admin",
+        email,
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+      } as User;
+      const supabase = new Proxy({} as SupabaseClient, {
+        get(_t, prop) {
+          if (prop === "auth") {
+            return {
+              getUser: async () => ({ data: { user }, error: null }),
+            };
+          }
+          return () => {
+            throw new Error(
+              "Modo admin local: esta operación requiere Supabase configurado.",
+            );
+          };
+        },
+      });
+      return {
+        ok: true,
+        ctx: {
+          supabase,
+          user,
+          profile: {
+            role: "super_admin",
+            status: "active",
+            allowed_modules: [],
+          },
+          organizationId: null,
+          orgRole: null,
+          local: true,
+        },
+      };
+    }
+  } catch {
+    /* fuera de request / cookies no disponibles */
+  }
+
+  let supabase: SupabaseClient;
+  try {
+    supabase = await createSupabaseServerClient();
+  } catch {
+    return {
+      ok: false,
+      response: apiErr("No autorizado", { status: 401, code: "UNAUTHORIZED" }),
+    };
+  }
   const {
     data: { user },
     error: authErr,

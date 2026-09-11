@@ -8,10 +8,11 @@ import {
   adminApiClientKey,
   publicApiClientKey,
 } from "@/lib/admin-rate-limit";
+import { checkCsrfOrigin, pathNeedsCsrf } from "@/lib/security/csrf";
 import {
-  checkCsrfOrigin,
-  pathNeedsCsrf,
-} from "@/lib/security/csrf";
+  LOCAL_ADMIN_COOKIE,
+  verifyLocalAdminToken,
+} from "@/lib/local-admin";
 
 function isRateLimitedPublicApi(pathname: string): boolean {
   return (
@@ -21,6 +22,12 @@ function isRateLimitedPublicApi(pathname: string): boolean {
     pathname.startsWith("/api/public/coupons") ||
     pathname.startsWith("/api/public/fx") ||
     pathname.startsWith("/api/public/reviews")
+  );
+}
+
+function hasLocalAdmin(request: NextRequest): Promise<boolean> {
+  return verifyLocalAdminToken(
+    request.cookies.get(LOCAL_ADMIN_COOKIE)?.value,
   );
 }
 
@@ -45,7 +52,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (pathNeedsCsrf(pathname)) {
+  if (
+    pathNeedsCsrf(pathname) &&
+    !pathname.startsWith("/api/admin/local-auth")
+  ) {
     const csrf = checkCsrfOrigin(request);
     if (!csrf.ok) {
       return NextResponse.json(
@@ -56,10 +66,29 @@ export async function middleware(request: NextRequest) {
   }
 
   const { url, key, ok } = supabasePublicEnv();
+  const localOk = await hasLocalAdmin(request);
 
   if (!ok) {
-    if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    if (pathname.startsWith("/admin/login")) {
+      if (localOk) {
+        return NextResponse.redirect(new URL("/admin", request.url));
+      }
+      return NextResponse.next();
+    }
+    if (pathname.startsWith("/admin")) {
+      if (localOk) return NextResponse.next();
       return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+    if (
+      pathname.startsWith("/api/admin") &&
+      !pathname.startsWith("/api/admin/local-auth")
+    ) {
+      if (!localOk) {
+        return NextResponse.json(
+          { error: "No autorizado", code: "UNAUTHORIZED" },
+          { status: 401 },
+        );
+      }
     }
     return NextResponse.next();
   }
@@ -102,6 +131,9 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/admin/login")) {
+    if (localOk) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
     if (user) {
       const role = await staffProfile();
       if (role) {
@@ -113,6 +145,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/admin")) {
+    if (localOk) return response;
     if (!user) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }

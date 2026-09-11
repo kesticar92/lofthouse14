@@ -12,7 +12,14 @@ import type { CotizacionGuardada } from "@/lib/cotizaciones-store";
 import type { AseoGuardado } from "@/lib/aseos-store";
 import type { InventarioGuardado } from "@/lib/inventarios-store";
 import { formatCOP } from "@/lib/pricing";
-import { buildStubOpsAlerts, type OpsAlert } from "@/lib/ops/alerts";
+
+type OpsAlert = {
+  id: string;
+  level: "info" | "warn" | "critical";
+  title: string;
+  message: string;
+  href?: string;
+};
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -53,14 +60,20 @@ export default function AdminHomePage() {
 
   useEffect(() => {
     recalc();
-    setAlerts(buildStubOpsAlerts());
-    void fetch("/api/admin/pms/metrics")
+    void fetch("/api/admin/ops-alerts", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const list = (d?.alerts ?? []) as OpsAlert[];
+        if (list.length) setAlerts(list);
+      })
+      .catch(() => null);
+    void fetch("/api/admin/pms/metrics", { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (d?.metrics) setMetrics(d.metrics);
       })
       .catch(() => null);
-    void fetch("/api/admin/notifications?unread=1")
+    void fetch("/api/admin/notifications?unread=1", { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         const notes = (d?.notifications ?? []) as Array<{

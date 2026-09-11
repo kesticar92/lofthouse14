@@ -378,20 +378,22 @@ export function Header() {
                           {site.neighborhood}, {site.city}
                         </p>
                       </div>
-                      <Link
-                        href="/reservar"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="inline-flex items-center justify-center rounded-full bg-[#1c1917] px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#f2f0eb] dark:bg-amber-600 dark:text-[#141210]"
-                      >
-                        Reservar
-                      </Link>
-                      <Link
-                        href="/admin/login"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="inline-flex items-center justify-center rounded-full border border-[#1c1917]/25 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#1c1917] transition hover:bg-[#1c1917]/5 dark:border-[#f2f0eb]/30 dark:text-[#f2f0eb] dark:hover:bg-[#f2f0eb]/10"
-                      >
-                        Panel admin
-                      </Link>
+                      <div className="flex flex-col gap-2">
+                        <Link
+                          href="/reservar"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="inline-flex items-center justify-center rounded-full bg-[#1c1917] px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#f2f0eb] dark:bg-amber-600 dark:text-[#141210]"
+                        >
+                          Reservar
+                        </Link>
+                        <Link
+                          href="/admin/login"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="inline-flex items-center justify-center rounded-full border border-[#1c1917]/25 px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#1c1917] transition hover:bg-[#1c1917]/5 dark:border-[#f2f0eb]/30 dark:text-[#f2f0eb] dark:hover:bg-[#f2f0eb]/10"
+                        >
+                          Panel admin
+                        </Link>
+                      </div>
                     </div>
                   </motion.div>
                 </>

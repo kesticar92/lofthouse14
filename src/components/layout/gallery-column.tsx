@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/cn";
 import {
   galleryPhotoLabel,
@@ -14,7 +14,7 @@ interface GalleryColumnProps {
   className?: string;
   /** Segundos por recorrer el bloque duplicado (mismo patrón que reseñas/FAQ). */
   duration?: number;
-  /** Invierte el sentido del scroll (como columnas externas en reseñas). */
+  /** Invierte el sentido del scroll (columnas externas). */
   reverse?: boolean;
   onImageClick?: (photo: GalleryPhoto) => void;
 }
@@ -89,16 +89,16 @@ export function GalleryColumn({
         className,
       )}
     >
-      <motion.div
-        initial={false}
-        animate={{ translateY: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
-        transition={{
-          duration: durationSec,
-          repeat: Infinity,
-          ease: "linear",
-          repeatType: "loop",
+      {/* CSS keyframes: más fiable que keyframes de framer-motion en loop infinito */}
+      <div
+        className="testimonial-scroll-track flex flex-col gap-5 pb-5 will-change-transform"
+        style={{
+          animationName: "testimonial-scroll",
+          animationDuration: `${durationSec}s`,
+          animationTimingFunction: "linear",
+          animationIterationCount: "infinite",
+          animationDirection: reverse ? "reverse" : "normal",
         }}
-        className="flex flex-col gap-5 pb-5"
       >
         {[0, 1].map((loop) => (
           <React.Fragment key={loop}>
@@ -111,7 +111,7 @@ export function GalleryColumn({
             ))}
           </React.Fragment>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }

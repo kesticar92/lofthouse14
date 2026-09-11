@@ -14,6 +14,8 @@ interface GalleryColumnProps {
   className?: string;
   /** Segundos por recorrer el bloque duplicado (mismo patrón que reseñas/FAQ). */
   duration?: number;
+  /** Invierte el sentido del scroll (como columnas externas en reseñas). */
+  reverse?: boolean;
   onImageClick?: (photo: GalleryPhoto) => void;
 }
 
@@ -54,6 +56,7 @@ export function GalleryColumn({
   images,
   className,
   duration,
+  reverse = false,
   onImageClick,
 }: GalleryColumnProps) {
   const reduceMotion = useReducedMotion();
@@ -82,12 +85,13 @@ export function GalleryColumn({
   return (
     <div
       className={cn(
-        "testimonial-scroll-column min-w-0 flex-1 max-w-xs",
+        "testimonial-scroll-column min-w-0 max-w-xs flex-1",
         className,
       )}
     >
       <motion.div
-        animate={{ translateY: "-50%" }}
+        initial={false}
+        animate={{ translateY: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
         transition={{
           duration: durationSec,
           repeat: Infinity,

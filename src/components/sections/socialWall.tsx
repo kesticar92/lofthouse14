@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Play } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Play, X } from "lucide-react";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import type { InstagramFeedPost } from "@/lib/instagram/types";
@@ -61,12 +61,30 @@ function isRemoteThumb(src: string) {
   return src.startsWith("http://") || src.startsWith("https://");
 }
 
+/** Permalink de reel/post → URL de embed oficial de Instagram. */
+function instagramEmbedUrl(permalink: string): string | null {
+  try {
+    const u = new URL(permalink);
+    if (!u.hostname.includes("instagram.com")) return null;
+    const path = u.pathname.replace(/\/+$/, "");
+    if (!path) return null;
+    return `https://www.instagram.com${path}/embed`;
+  } catch {
+    return null;
+  }
+}
+
+function isReelPost(post: InstagramFeedPost): boolean {
+  if (!post.isVideo) return false;
+  return /\/(reel|reels|tv)\//i.test(post.url) || post.isVideo;
+}
+
 export function SocialWall() {
   const [posts, setPosts] = useState<InstagramFeedPost[]>(
     () => INSTAGRAM_POSTS_SEED as InstagramFeedPost[],
   );
-  const [count, setCount] = useState(INSTAGRAM_POSTS_SEED.length);
   const [source, setSource] = useState<string>("seed");
+  const [activeReel, setActiveReel] = useState<InstagramFeedPost | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,13 +94,11 @@ export function SocialWall() {
         if (!res.ok) return;
         const json = (await res.json()) as {
           posts?: InstagramFeedPost[];
-          count?: number;
           source?: string;
         };
         if (cancelled) return;
         if (Array.isArray(json.posts) && json.posts.length > 0) {
           setPosts(json.posts);
-          setCount(json.count ?? json.posts.length);
           setSource(json.source ?? "store");
         }
       } catch {
@@ -94,6 +110,23 @@ export function SocialWall() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!activeReel) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActiveReel(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [activeReel]);
+
+  const reels = useMemo(() => posts.filter(isReelPost), [posts]);
+  const embedSrc = activeReel ? instagramEmbedUrl(activeReel.url) : null;
+
   return (
     <section
       id="social-wall"
@@ -101,16 +134,15 @@ export function SocialWall() {
     >
       <div className="mx-auto mb-10 max-w-2xl text-center">
         <h2 className="font-display text-4xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
-          Instagram y TikTok
+          Reels de Instagram
         </h2>
         <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
-          Todas las publicaciones de @lofthouse.14 en un solo muro. Entra al
-          perfil o escríbenos por WhatsApp si quieres reservar.
+          Solo reels de @lofthouse.14. Tócalos para verlos aquí mismo, sin salir
+          de la página.
         </p>
 
         <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           <SocialProfileButton href={site.instagramUrl} handle="@lofthouse.14">
-            {/* SVG: next/image no optimiza .svg (400) → img estático */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logos/instagram-wordmark.svg"
@@ -131,57 +163,71 @@ export function SocialWall() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4 xl:grid-cols-4">
-        {posts.map((post) => (
+      {reels.length === 0 ? (
+        <p className="mx-auto max-w-lg text-center text-sm text-zinc-500">
+          No hay reels disponibles por ahora.{" "}
           <a
-            key={post.id}
-            href={post.url}
+            href={site.instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative block aspect-square overflow-hidden rounded-xl bg-zinc-200 dark:bg-zinc-800"
+            className="underline underline-offset-2"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- thumbs locales + CDN Instagram */}
-            <img
-              src={post.thumbnailUrl}
-              alt=""
-              className="h-full w-full object-cover transition group-hover:brightness-90"
-              loading="lazy"
-              referrerPolicy={
-                isRemoteThumb(post.thumbnailUrl) ? "no-referrer" : undefined
-              }
-            />
-
-            {post.isVideo ? (
-              <div className="absolute right-3 top-3 rounded-full bg-black/55 p-1.5">
-                <Play className="size-3 fill-white text-white" aria-hidden />
-              </div>
-            ) : null}
-
-            <div className="absolute left-3 top-3 rounded-md bg-white/95 p-1 shadow-sm dark:bg-zinc-950/90">
+            Ver perfil en Instagram
+          </a>
+        </p>
+      ) : (
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+          {reels.map((post) => (
+            <button
+              key={post.id}
+              type="button"
+              onClick={() => setActiveReel(post)}
+              className="group relative block aspect-[9/16] overflow-hidden rounded-xl bg-zinc-200 text-left dark:bg-zinc-800"
+              aria-label={`Ver reel: ${post.caption || "Instagram"}`}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/logos/instagram-glyph.svg"
+                src={post.thumbnailUrl}
                 alt=""
-                width={16}
-                height={16}
-                className="size-4"
+                className="h-full w-full object-cover transition group-hover:brightness-90"
+                loading="lazy"
+                referrerPolicy={
+                  isRemoteThumb(post.thumbnailUrl) ? "no-referrer" : undefined
+                }
               />
-            </div>
 
-            {post.caption ? (
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-4 pt-10 opacity-0 transition group-hover:opacity-100">
-                <p className="line-clamp-3 text-left text-xs leading-snug text-white">
-                  {post.caption}
-                </p>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-90 transition group-hover:bg-black/35">
+                <span className="inline-flex size-12 items-center justify-center rounded-full bg-black/55 text-white shadow-lg">
+                  <Play className="size-5 fill-white" aria-hidden />
+                </span>
               </div>
-            ) : null}
-          </a>
-        ))}
-      </div>
+
+              <div className="absolute left-3 top-3 rounded-md bg-white/95 p-1 shadow-sm dark:bg-zinc-950/90">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logos/instagram-glyph.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="size-4"
+                />
+              </div>
+
+              {post.caption ? (
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-10">
+                  <p className="line-clamp-2 text-left text-xs leading-snug text-white">
+                    {post.caption}
+                  </p>
+                </div>
+              ) : null}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="mx-auto mt-8 flex max-w-7xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {count === 1 ? "1 publicación" : `${count} publicaciones`}
+          {reels.length === 1 ? "1 reel" : `${reels.length} reels`}
           {source === "graph" ? " · actualizado desde Instagram" : null}
         </p>
         <a
@@ -190,9 +236,62 @@ export function SocialWall() {
           rel="noopener noreferrer"
           className="text-sm font-medium text-zinc-900 underline-offset-4 hover:underline dark:text-[#f2f0eb]"
         >
-          Ver todas en Instagram →
+          Ver perfil en Instagram →
         </a>
       </div>
+
+      {activeReel ? (
+        <div
+          className="fixed inset-0 z-[240] flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Reel de Instagram"
+          onClick={() => setActiveReel(null)}
+        >
+          <div
+            className="relative flex h-[min(92dvh,820px)] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-zinc-950 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
+              <p className="truncate text-xs font-medium text-white/80">
+                {activeReel.caption || "Reel · @lofthouse.14"}
+              </p>
+              <button
+                type="button"
+                onClick={() => setActiveReel(null)}
+                className="inline-flex size-9 items-center justify-center rounded-full text-white hover:bg-white/10"
+                aria-label="Cerrar"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 bg-black">
+              {embedSrc ? (
+                <iframe
+                  title="Reel de Instagram"
+                  src={embedSrc}
+                  className="h-full w-full border-0"
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center text-sm text-white/80">
+                  <p>No se pudo incrustar este reel.</p>
+                  <a
+                    href={activeReel.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full bg-white px-4 py-2 text-xs font-bold uppercase tracking-wide text-zinc-900"
+                  >
+                    Abrir en Instagram
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

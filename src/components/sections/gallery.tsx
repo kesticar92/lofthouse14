@@ -104,7 +104,8 @@ export function Gallery() {
                 <GalleryColumn
                   key={`t-${i}`}
                   images={col}
-                  duration={columnDuration(col.length)}
+                  duration={columnDuration(col.length) * (i === 0 ? 0.82 : 1.18)}
+                  reverse={i % 2 === 0}
                   onImageClick={openPhoto}
                 />
               ))}
@@ -114,7 +115,12 @@ export function Gallery() {
                 <GalleryColumn
                   key={`d-${i}`}
                   images={col}
-                  duration={columnDuration(col.length)}
+                  // Ritmos distintos: izq. más rápida, centro media, der. más lenta (como FAQ).
+                  duration={
+                    columnDuration(col.length) *
+                    (i === 0 ? 0.78 : i === 2 ? 1.28 : 1)
+                  }
+                  reverse={i !== 1}
                   onImageClick={openPhoto}
                 />
               ))}

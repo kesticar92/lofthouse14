@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassPanel } from "@/components/ui/glass-panel";
-import { site, waLink } from "@/lib/site";
 import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/cn";
+import { mergeStayDraft } from "@/lib/stay-draft";
 
 import { PricingDetailsAccordion } from "@/components/sections/pricing-details-accordion";
 
@@ -147,20 +146,38 @@ export function Lofts() {
               </p>
 
               <div className="pt-2">
-                <Link
-                  href={waLink(
-                    activeIndex === 3
-                      ? "Hola, quiero cotizar 4 o más Lofts Cielo en LOFTHOUSE 14 (precio a consultar)."
-                      : `Hola, quiero consultar disponibilidad para ${activeLoft.subName} · Loft Cielo en LOFTHOUSE 14.`,
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 py-4 text-sm font-bold text-white transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900 dark:hover:bg-white sm:w-auto sm:px-10 shadow-lg"
+                <button
+                  type="button"
+                  onClick={() => {
+                    const loftCount =
+                      activeIndex === 3 ? 4 : activeIndex + 1;
+                    const guestsHint =
+                      activeIndex === 0
+                        ? 2
+                        : activeIndex === 1
+                          ? 4
+                          : activeIndex === 2
+                            ? 6
+                            : 8;
+                    mergeStayDraft({
+                      guests: guestsHint,
+                      from: "banner",
+                      step: 1,
+                    });
+                    const qs = new URLSearchParams({
+                      guests: String(guestsHint),
+                      from: "banner",
+                      step: "1",
+                      lofts: String(loftCount),
+                    });
+                    window.location.assign(`/reservar?${qs.toString()}`);
+                  }}
+                  className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900 dark:hover:bg-white sm:w-auto sm:px-10"
                 >
                   {activeIndex === 3
-                    ? "Consultar precio por WhatsApp"
-                    : "Consultar capacidad por WhatsApp"}
-                </Link>
+                    ? "Ir a reservar (4 o más lofts)"
+                    : "Reservar ahora"}
+                </button>
               </div>
             </motion.div>
           </AnimatePresence>

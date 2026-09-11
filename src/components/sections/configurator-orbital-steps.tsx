@@ -108,11 +108,8 @@ export function ConfiguratorOrbitalSteps({
         {CONFIGURATOR_STEP_NODES.map((node, index) => {
           const isActive = index === activeStep;
           const covered = isCovered(index, activeStep, coveredSteps);
-          // Solo pasos actuales o previos; no reabrir Tu viaje si quedó cubierto/saltado.
-          const selectable =
-            Boolean(onStepSelect) &&
-            index <= activeStep &&
-            !(index === 0 && covered && !isActive && activeStep > 0);
+          // Pasos actuales o ya alcanzados: se puede volver a editar datos.
+          const selectable = Boolean(onStepSelect) && index <= activeStep;
 
           return (
             <li
@@ -125,10 +122,21 @@ export function ConfiguratorOrbitalSteps({
                 onClick={() => selectable && onStepSelect?.(index)}
                 className={cn(
                   "relative flex flex-col items-center transition-all duration-300",
-                  selectable ? "cursor-pointer" : "cursor-default",
+                  selectable
+                    ? "cursor-pointer hover:opacity-90"
+                    : "cursor-default opacity-70",
                 )}
                 aria-current={isActive ? "step" : undefined}
-                title={node.label}
+                aria-label={
+                  selectable
+                    ? `Ir a ${node.label}`
+                    : `${node.label} (aún no disponible)`
+                }
+                title={
+                  selectable
+                    ? `Volver a ${node.label}`
+                    : node.label
+                }
               >
                 <StepGlyph
                   index={index}

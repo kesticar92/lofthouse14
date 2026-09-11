@@ -752,14 +752,20 @@ export function GuidedReservation({
             coveredSteps={coveredSteps}
             onStepSelect={(i) => {
               if (transitionTo !== null) return;
-              if (i === STEP_TU_VIAJE && skipTripStep) return;
+              if (i > step) return;
+              // Reabrir etapas saltadas para corregir fechas/huéspedes/loft.
+              if (i === STEP_TU_VIAJE && skipTripStep) {
+                setSkipTripStep(false);
+              }
               if (
                 skipStaySteps &&
                 (i === STEP_FECHAS || i === STEP_HUESPEDES)
               ) {
-                return;
+                setSkipStaySteps(false);
               }
-              if (i === STEP_LOFT && skipLoftStep) return;
+              if (i === STEP_LOFT && skipLoftStep) {
+                setSkipLoftStep(false);
+              }
               goToStep(i);
             }}
             className="mx-auto max-w-lg"
@@ -1631,21 +1637,20 @@ export function GuidedReservation({
                 </span>
               )}
             </div>
-            <div className="flex gap-2">
-              {canGoBack ? (
-                <button
-                  type="button"
-                  disabled={transitionTo !== null}
-                  onClick={() => {
-                    const prev = prevLogicalStep(step);
-                    if (prev !== null) goToStep(prev);
-                  }}
-                  className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold disabled:opacity-40 dark:border-zinc-600"
-                >
-                  <ChevronLeft className="size-4" aria-hidden />
-                  Atrás
-                </button>
-              ) : null}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                disabled={!canGoBack || transitionTo !== null}
+                onClick={() => {
+                  const prev = prevLogicalStep(step);
+                  if (prev !== null) goToStep(prev);
+                }}
+                className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600"
+                aria-label="Regresar al paso anterior"
+              >
+                <ChevronLeft className="size-4" aria-hidden />
+                Atrás
+              </button>
               {step < STEPS.length - 1 ? (
                 <button
                   type="button"

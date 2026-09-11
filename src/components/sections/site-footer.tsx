@@ -148,12 +148,31 @@ export function SiteFooter() {
                   {site.email}
                 </a>
               </li>
+              <li>
+                <Link
+                  href="/admin/login"
+                  className="text-amber-400 hover:underline"
+                >
+                  Panel admin →
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 py-6 text-center text-xs text-zinc-500">
-        © {new Date().getFullYear()} {site.name}. Todos los derechos reservados.
+      <div className="border-t border-white/10 px-4 py-6 text-center text-xs text-zinc-500">
+        <p>
+          © {new Date().getFullYear()} {site.name}. Todos los derechos
+          reservados.
+        </p>
+        <p className="mt-2">
+          <Link
+            href="/admin/login"
+            className="font-medium text-zinc-400 underline-offset-2 hover:text-amber-400 hover:underline"
+          >
+            Acceso administración
+          </Link>
+        </p>
       </div>
     </footer>
   );

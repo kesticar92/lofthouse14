@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { site, waLink } from "@/lib/site";
+import { trackWhatsAppClick, trackBeginCheckout } from "@/lib/analytics";
 import { formatCOP } from "@/lib/pricing";
 import {
   PUBLIC_PRICING_CONFIG,
@@ -667,6 +668,7 @@ export function GuidedReservation({
               "No hay disponibilidad para esas fechas / categoría. Ajusta fechas o continúa por WhatsApp.",
             );
             setBookingBusy(false);
+            trackWhatsAppClick("guided_reservation_unavailable");
             window.open(
               waLink(buildWhatsAppLines().join("\n")),
               "_blank",
@@ -727,6 +729,8 @@ export function GuidedReservation({
       setBookingBusy(false);
     }
 
+    trackWhatsAppClick("guided_reservation_submit");
+    trackBeginCheckout({ lofts: Number(lofts), guests: Number(guests) });
     window.open(
       waLink(buildWhatsAppLines(reservationCode).join("\n")),
       "_blank",

@@ -5,9 +5,16 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: `Reservar | ${site.name}`,
+  title: "Reservar loft en Cali (Miraflores)",
   description:
-    "Personaliza tu experiencia en Lofthouse 14: fechas, huéspedes, extras y confirmación directa por WhatsApp.",
+    "Elige fechas, huéspedes y extras. Cotiza y confirma tu loft en Miraflores, Cali, por WhatsApp. Check-in autónomo · desde $90.000/noche.",
+  alternates: { canonical: "/reservar" },
+  openGraph: {
+    title: "Reservar loft en Cali | Lofthouse 14",
+    description:
+      "Reserva directa: fechas, huéspedes y extras. Confirmación por WhatsApp.",
+    url: "/reservar",
+  },
 };
 
 /**

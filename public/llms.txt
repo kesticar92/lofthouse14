@@ -15,6 +15,7 @@
 
 ## Páginas principales
 
+- [Reservar](https://www.lofthouse14.com/reservar): motor de cotización
 - [Inicio](https://www.lofthouse14.com/): embudo de reserva, lofts, reseñas, FAQ
 - [Lofts](https://www.lofthouse14.com/lofts): listado de unidades
 - [Ubicación](https://www.lofthouse14.com/ubicacion-miraflores-cali): mapa y barrio

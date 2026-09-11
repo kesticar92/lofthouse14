@@ -1,15 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import type { ReviewSource } from "@/lib/reviews/types";
 
 const badgeShell =
-  "inline-flex items-center rounded-full border bg-white px-2.5 py-1.5 shadow-sm dark:bg-zinc-900/80";
+  "inline-flex items-center gap-1.5 rounded-full border bg-white px-2.5 py-1.5 shadow-sm dark:bg-zinc-900/80";
 
+/** SVG inline: evita cientos de <img>/_next/image en el carrusel de reseñas. */
 function GoogleBadge() {
   return (
     <span
-      className={`${badgeShell} gap-1.5 border-zinc-200/80 dark:border-white/10`}
+      className={`${badgeShell} border-zinc-200/80 dark:border-white/10`}
     >
       <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden>
         <path
@@ -36,20 +36,35 @@ function GoogleBadge() {
   );
 }
 
-function AirbnbBadge({ href }: { href?: string }) {
-  const logo = (
-    <Image
-      src="/logos/airbnb.svg"
-      alt="Airbnb"
-      width={320}
-      height={100}
-      className="h-[14px] w-auto"
-      priority={false}
-    />
+function AirbnbMark() {
+  return (
+    <svg
+      width="54"
+      height="14"
+      viewBox="0 0 320 100"
+      aria-label="Airbnb"
+      role="img"
+    >
+      <path
+        fill="#FF5A5F"
+        d="M160 20c-18 28-42 56-42 78 0 12 9 22 22 22s22-10 22-22c0-22-24-50-42-78zm0 0c18 28 42 56 42 78 0 12-9 22-22 22s-22-10-22-22c0-22 24-50 42-78z"
+      />
+      <text
+        x="210"
+        y="64"
+        fill="#FF5A5F"
+        fontSize="42"
+        fontFamily="system-ui,sans-serif"
+        fontWeight="700"
+      >
+        airbnb
+      </text>
+    </svg>
   );
+}
 
+function AirbnbBadge({ href }: { href?: string }) {
   const className = `${badgeShell} border-[#FF5A5F]/25 transition hover:border-[#FF5A5F]/50`;
-
   if (href) {
     return (
       <a
@@ -59,11 +74,15 @@ function AirbnbBadge({ href }: { href?: string }) {
         className={className}
         title="Ver publicación en Airbnb"
       >
-        {logo}
+        <AirbnbMark />
       </a>
     );
   }
-  return <span className={className}>{logo}</span>;
+  return (
+    <span className={className}>
+      <AirbnbMark />
+    </span>
+  );
 }
 
 function BookingBadge() {
@@ -71,14 +90,10 @@ function BookingBadge() {
     <span
       className={`${badgeShell} border-[#003580]/25 dark:border-sky-400/30`}
     >
-      <Image
-        src="/logos/booking.svg"
-        alt="Booking.com"
-        width={119}
-        height={20}
-        className="h-[14px] w-auto dark:brightness-0 dark:invert"
-        priority={false}
-      />
+      <span className="text-[11px] font-extrabold tracking-tight text-[#003580] dark:text-[#5b9cff]">
+        Booking
+        <span className="font-semibold text-[#009fe3]">.com</span>
+      </span>
     </span>
   );
 }

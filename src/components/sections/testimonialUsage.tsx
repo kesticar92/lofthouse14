@@ -111,9 +111,40 @@ const TestimonialsUsage = () => {
   const columnDuration = (count: number) =>
     carouselDurationForCount(count, scrollFactor);
 
-  const colsMobile = splitIntoColumns(filtered, 1);
-  const colsTablet = splitIntoColumns(filtered, 2);
-  const colsDesktop = splitIntoColumns(filtered, 3);
+  /**
+   * Cap del carrusel: renderizar las ~388 reseñas × 2 (loop) × 3 breakpoints
+   * hinchaba el HTML a ~8 MB. Mostramos un subset reciente; los filtros siguen
+   * aplicando sobre el total y el contador refleja el universo completo.
+   */
+  const CAROUSEL_CAP = 30;
+  const carouselItems = useMemo(
+    () => filtered.slice(0, CAROUSEL_CAP),
+    [filtered],
+  );
+
+  const [viewport, setViewport] = useState<"mobile" | "tablet" | "desktop">(
+    "mobile",
+  );
+  useEffect(() => {
+    const mqTablet = window.matchMedia("(min-width: 640px)");
+    const mqDesktop = window.matchMedia("(min-width: 768px)");
+    const sync = () => {
+      if (mqDesktop.matches) setViewport("desktop");
+      else if (mqTablet.matches) setViewport("tablet");
+      else setViewport("mobile");
+    };
+    sync();
+    mqTablet.addEventListener("change", sync);
+    mqDesktop.addEventListener("change", sync);
+    return () => {
+      mqTablet.removeEventListener("change", sync);
+      mqDesktop.removeEventListener("change", sync);
+    };
+  }, []);
+
+  const columnCount =
+    viewport === "desktop" ? 3 : viewport === "tablet" ? 2 : 1;
+  const cols = splitIntoColumns(carouselItems, columnCount);
 
   const selectClass =
     "w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-800 shadow-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-100 sm:w-auto sm:min-w-[200px]";
@@ -226,32 +257,15 @@ const TestimonialsUsage = () => {
         </p>
 
         {filtered.length > 0 ? (
-          <>
-            <div className="mx-auto flex w-full min-w-0 justify-center gap-4 sm:hidden [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
+          <div className="mx-auto flex w-full min-w-0 justify-center gap-4 sm:gap-5 md:gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
+            {cols.map((col, i) => (
               <TestimonialsColumn
-                testimonials={colsMobile[0] ?? []}
-                duration={columnDuration(filtered.length)}
+                key={`${viewport}-${i}`}
+                testimonials={col}
+                duration={columnDuration(col.length)}
               />
-            </div>
-            <div className="mx-auto hidden w-full min-w-0 justify-center gap-4 sm:flex md:hidden [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
-              {colsTablet.map((col, i) => (
-                <TestimonialsColumn
-                  key={`t-${i}`}
-                  testimonials={col}
-                  duration={columnDuration(col.length)}
-                />
-              ))}
-            </div>
-            <div className="mx-auto hidden w-full min-w-0 justify-center gap-4 md:flex sm:gap-5 md:gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)] max-h-[min(78vh,820px)] overflow-hidden">
-              {colsDesktop.map((col, i) => (
-                <TestimonialsColumn
-                  key={`d-${i}`}
-                  testimonials={col}
-                  duration={columnDuration(col.length)}
-                />
-              ))}
-            </div>
-          </>
+            ))}
+          </div>
         ) : (
           <div className="py-20 text-center text-zinc-500">
             No hay reseñas con estos filtros. Prueba otro mes o unidad.

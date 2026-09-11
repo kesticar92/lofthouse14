@@ -9,6 +9,8 @@ import TestimonialsUsage from "@/components/sections/testimonialUsage";
 import { FaqSection } from "@/components/sections/faq";
 import { Gallery } from "@/components/sections/gallery";
 import { SocialWall } from "@/components/sections/socialWall";
+import { JsonLd } from "@/components/seo/json-ld";
+import { faqPageJsonLd } from "@/lib/seo";
 
 /**
  * Embudo auditado: hero → galería → lofts → reseñas → reserva → ubicación → FAQ.
@@ -16,6 +18,7 @@ import { SocialWall } from "@/components/sections/socialWall";
 export default function Home() {
   return (
     <>
+      <JsonLd data={faqPageJsonLd()} />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[length:40px_40px] bg-grid-fade opacity-[0.35] dark:bg-grid-fade-dark dark:opacity-20" />
       <Header />
       <main>

@@ -183,9 +183,9 @@ export function Hero() {
               />
             </span>
           </p>
-          <h1 className="mt-3 font-display text-[1.65rem] font-bold uppercase leading-tight text-white drop-shadow-md">
+          <p className="mt-3 font-display text-[1.65rem] font-bold uppercase leading-tight text-white drop-shadow-md">
             Apartaestudios Dúplex en Cali, Miraflores
-          </h1>
+          </p>
           <p className="mt-2 max-w-md text-sm leading-snug text-white/85">
             Cocina equipada, Aire acondicionado, WiFi y Check-in Autónomo. Desde
             $90.000 la noche. Reserva directo con Lofthouse 14.

@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://www.lofthouse14.com";
+import { SITE_URL } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,30 +7,23 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/api/", "/preview-movil/"],
+        disallow: [
+          "/admin/",
+          "/api/",
+          "/preview-movil/",
+          "/mi-reserva",
+          "/mensajes",
+          "/confirmacion/",
+          "/ayuda",
+        ],
       },
-      {
-        userAgent: "GPTBot",
-        allow: ["/", "/llms.txt"],
-      },
-      {
-        userAgent: "ChatGPT-User",
-        allow: ["/", "/llms.txt"],
-      },
-      {
-        userAgent: "Google-Extended",
-        allow: ["/", "/llms.txt"],
-      },
-      {
-        userAgent: "anthropic-ai",
-        allow: ["/", "/llms.txt"],
-      },
-      {
-        userAgent: "ClaudeBot",
-        allow: ["/", "/llms.txt"],
-      },
+      { userAgent: "GPTBot", allow: ["/", "/llms.txt"] },
+      { userAgent: "ChatGPT-User", allow: ["/", "/llms.txt"] },
+      { userAgent: "Google-Extended", allow: ["/", "/llms.txt"] },
+      { userAgent: "anthropic-ai", allow: ["/", "/llms.txt"] },
+      { userAgent: "ClaudeBot", allow: ["/", "/llms.txt"] },
     ],
-    sitemap: `${BASE_URL}/sitemap.xml`,
-    host: BASE_URL,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

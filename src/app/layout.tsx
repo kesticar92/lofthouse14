@@ -12,8 +12,8 @@ import {
   SITE_URL,
   lodgingBusinessJsonLd,
   websiteJsonLd,
-  faqPageJsonLd,
 } from "@/lib/seo";
+import { site } from "@/lib/site";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-R9M0QWD1H3";
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "";
@@ -40,7 +40,20 @@ export const metadata: Metadata = {
   },
   description: SEO.description,
   keywords: [...SEO.keywords],
-  authors: [{ name: "Lofthouse 14" }],
+  authors: [{ name: "Lofthouse 14", url: SITE_URL }],
+  creator: "Lofthouse 14",
+  applicationName: "Lofthouse 14",
+  category: "travel",
+  other: {
+    "geo.region": "CO-VAC",
+    "geo.placename": "Miraflores, Cali",
+    "geo.position": `${site.coordinates.latitude};${site.coordinates.longitude}`,
+    ICBM: `${site.coordinates.latitude}, ${site.coordinates.longitude}`,
+  },
+  icons: {
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
+    apple: [{ url: "/logo-lofthouse.png" }],
+  },
   openGraph: {
     title: SEO.titleDefault,
     description: SEO.description,
@@ -75,6 +88,15 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+};
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f0eb" },
+    { media: "(prefers-color-scheme: dark)", color: "#141210" },
+  ],
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -113,7 +135,7 @@ export default function RootLayout({
         </ThemeProvider>
         <JsonLd data={lodgingBusinessJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
-        <JsonLd data={faqPageJsonLd()} />
+        {/* FAQPage solo en homepage (page.tsx) — no en todas las rutas */}
         <Script id="consent-default" strategy="beforeInteractive">
           {`
             window.dataLayer = window.dataLayer || [];

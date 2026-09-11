@@ -3,8 +3,41 @@ import { LOFTS } from "@/data/lofts";
 import { FAQ_ITEMS } from "@/data/faq";
 import { REVIEW_HIGHLIGHTS } from "@/data/reviews";
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://www.lofthouse14.com";
+/**
+ * URL canónica del sitio. Nunca publicar localhost/127.* en metadata/schema.
+ * Preferir www para alinear sitemap, robots y hreflang.
+ */
+function resolveSiteUrl(): string {
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.lofthouse14.com")
+    .trim()
+    .replace(/\/$/, "");
+
+  const fallback = "https://www.lofthouse14.com";
+  if (!raw) return fallback;
+
+  try {
+    const u = new URL(raw);
+    const host = u.hostname.toLowerCase();
+    if (
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host.endsWith(".local") ||
+      host.startsWith("192.168.") ||
+      host.startsWith("10.")
+    ) {
+      if (process.env.NODE_ENV === "production") return fallback;
+    }
+    // Unificar apex → www
+    if (host === "lofthouse14.com") {
+      return `https://www.lofthouse14.com`;
+    }
+    return `${u.protocol}//${u.host}`;
+  } catch {
+    return fallback;
+  }
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 export const SEO = {
   titleDefault:
@@ -99,6 +132,7 @@ export function lodgingBusinessJsonLd() {
 }
 
 export function websiteJsonLd() {
+  // Sin SearchAction: /lofts no implementa búsqueda por ?q= (evita Action engañosa).
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -106,14 +140,6 @@ export function websiteJsonLd() {
     name: site.name,
     url: SITE_URL,
     inLanguage: ["es-CO", "en"],
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${SITE_URL}/lofts?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 

@@ -34,6 +34,16 @@ function hasLocalAdmin(request: NextRequest): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Canonical host: apex → www (SEO + cookies)
+  const host = request.headers.get("host")?.split(":")[0]?.toLowerCase();
+  if (host === "lofthouse14.com") {
+    const url = request.nextUrl.clone();
+    url.host = "www.lofthouse14.com";
+    url.protocol = "https:";
+    return NextResponse.redirect(url, 308);
+  }
+
+
   if (pathname.startsWith("/api/admin")) {
     if (!allowAdminApiRequest(adminApiClientKey(request))) {
       return NextResponse.json(

@@ -148,14 +148,6 @@ export function SiteFooter() {
                   {site.email}
                 </a>
               </li>
-              <li>
-                <Link
-                  href="/admin/login"
-                  className="text-amber-400 hover:underline"
-                >
-                  Panel admin →
-                </Link>
-              </li>
             </ul>
           </div>
         </div>

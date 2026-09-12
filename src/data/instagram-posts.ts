@@ -19,6 +19,24 @@ export const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/lofthouse.14/";
 /** Todas las piezas conocidas / curadas del perfil público. */
 export const INSTAGRAM_POSTS_SEED: InstagramPostSeed[] = [
   {
+    id: "reel-DdKc3lKjVaB",
+    url: "https://www.instagram.com/reel/DdKc3lKjVaB/",
+    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-01.webp",
+    isVideo: true,
+    caption:
+      "Tour completo por tu próximo aparta-estudio. Reserva directo: mejor tarifa y trato personal.",
+    publishedAt: "2026-09-11T22:00:00.000Z",
+  },
+  {
+    id: "reel-DdHzLPtjdml",
+    url: "https://www.instagram.com/reel/DdHzLPtjdml/",
+    thumbnailUrl: "/gallery/lofthouse-14-redes-cali-02.webp",
+    isVideo: true,
+    caption:
+      "Recorre LOFTHOUSE 14 en 15 segundos. Reserva directo por WhatsApp.",
+    publishedAt: "2026-09-11T12:00:00.000Z",
+  },
+  {
     id: "reel-DZxlocpsg5n",
     url: "https://www.instagram.com/reel/DZxlocpsg5n/",
     thumbnailUrl: "/gallery/lofthouse-14-redes-cali-04.webp",

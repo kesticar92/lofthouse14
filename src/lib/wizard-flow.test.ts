@@ -5,8 +5,11 @@ import {
   STEP_HUESPEDES,
   STEP_LOFT,
   nextLogicalStep,
+  prevLogicalStep,
   resolveEntryStep,
   stepAfterSelectingLoft,
+  STEP_CONFIRMAR,
+  STEP_TU_VIAJE,
 } from "@/lib/wizard-flow";
 
 describe("resolveEntryStep", () => {
@@ -109,5 +112,26 @@ describe("nextLogicalStep / stepAfterSelectingLoft", () => {
         hasCategory: true,
       }),
     ).toBe(STEP_EXTRAS);
+  });
+});
+
+
+describe("prevLogicalStep", () => {
+  const skipped = {
+    skipStaySteps: true,
+    skipTripStep: true,
+    skipLoftStep: true,
+    hasDates: true,
+    hasGuests: true,
+    hasCategory: true,
+  };
+
+  it("siempre permite volver al paso canónico anterior aunque haya skips", () => {
+    expect(prevLogicalStep(STEP_CONFIRMAR, skipped)).toBe(STEP_EXTRAS);
+    expect(prevLogicalStep(STEP_EXTRAS, skipped)).toBe(STEP_LOFT);
+    expect(prevLogicalStep(STEP_LOFT, skipped)).toBe(STEP_HUESPEDES);
+    expect(prevLogicalStep(STEP_HUESPEDES, skipped)).toBe(STEP_FECHAS);
+    expect(prevLogicalStep(STEP_FECHAS, skipped)).toBe(STEP_TU_VIAJE);
+    expect(prevLogicalStep(STEP_TU_VIAJE, skipped)).toBeNull();
   });
 });

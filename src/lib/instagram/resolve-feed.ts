@@ -2,17 +2,25 @@
  * Resuelve el muro público: Graph (si hay token) → store local → seed.
  */
 
-import { INSTAGRAM_PROFILE_URL } from "@/data/instagram-posts";
+import {
+  INSTAGRAM_POSTS_SEED,
+  INSTAGRAM_PROFILE_URL,
+} from "@/data/instagram-posts";
 import {
   fetchAllInstagramGraphMedia,
   isInstagramGraphConfigured,
 } from "./graph";
+import { loadExtraReelPosts, mergeFeedPosts } from "./extra-reels";
 import {
   loadInstagramFeedStore,
   saveInstagramFeedStore,
   sortPostsNewestFirst,
 } from "./store";
-import type { InstagramFeedResult } from "./types";
+import type { InstagramFeedPost, InstagramFeedResult } from "./types";
+
+function seedVideoPosts(): InstagramFeedPost[] {
+  return INSTAGRAM_POSTS_SEED.filter((p) => p.isVideo).map((p) => ({ ...p }));
+}
 
 let memoryCache: { at: number; result: InstagramFeedResult } | null = null;
 const MEMORY_TTL_MS = 5 * 60 * 1000;
@@ -27,15 +35,18 @@ export async function resolveInstagramFeed(opts?: {
   }
 
   const graphConfigured = isInstagramGraphConfigured();
+  const extraReels = await loadExtraReelPosts();
 
   if (graphConfigured) {
     const { posts, error } = await fetchAllInstagramGraphMedia();
     if (!error && posts.length > 0) {
-      const sorted = sortPostsNewestFirst(posts);
+      const merged = sortPostsNewestFirst(
+        mergeFeedPosts(mergeFeedPosts(posts, extraReels), seedVideoPosts()),
+      );
       const syncedAt = new Date().toISOString();
-      saveInstagramFeedStore(sorted, "graph", syncedAt);
+      saveInstagramFeedStore(merged, "graph", syncedAt);
       const result: InstagramFeedResult = {
-        posts: sorted,
+        posts: merged,
         source: "graph",
         syncedAt,
         profileUrl: INSTAGRAM_PROFILE_URL,
@@ -51,8 +62,14 @@ export async function resolveInstagramFeed(opts?: {
   }
 
   const snap = loadInstagramFeedStore();
+  const merged = sortPostsNewestFirst(
+    mergeFeedPosts(
+      mergeFeedPosts(snap.posts, extraReels),
+      seedVideoPosts(),
+    ),
+  );
   const result: InstagramFeedResult = {
-    posts: sortPostsNewestFirst(snap.posts),
+    posts: merged,
     source: snap.source,
     syncedAt: snap.synced_at,
     profileUrl: INSTAGRAM_PROFILE_URL,

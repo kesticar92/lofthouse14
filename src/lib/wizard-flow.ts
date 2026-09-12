@@ -141,23 +141,19 @@ export function nextLogicalStep(from: number, flags: WizardFlowFlags): number {
   return from;
 }
 
+/**
+ * Atrás siempre recorre el orden canónico para poder reconfigurar,
+ * aunque se haya llegado por un atajo (banner/card) sin pasar por ese paso.
+ * Los flags de skip solo afectan el avance y la entrada, no el retroceso.
+ */
 export function prevLogicalStep(
   from: number,
-  flags: WizardFlowFlags,
+  _flags?: WizardFlowFlags,
 ): number | null {
   if (from === STEP_CONFIRMAR) return STEP_EXTRAS;
-  if (from === STEP_EXTRAS) {
-    if (flags.skipLoftStep) {
-      if (flags.skipStaySteps) return flags.skipTripStep ? null : STEP_TU_VIAJE;
-      return STEP_HUESPEDES;
-    }
-    return STEP_LOFT;
-  }
-  if (from === STEP_LOFT) {
-    if (flags.skipStaySteps) return flags.skipTripStep ? null : STEP_TU_VIAJE;
-    return STEP_HUESPEDES;
-  }
+  if (from === STEP_EXTRAS) return STEP_LOFT;
+  if (from === STEP_LOFT) return STEP_HUESPEDES;
   if (from === STEP_HUESPEDES) return STEP_FECHAS;
-  if (from === STEP_FECHAS) return flags.skipTripStep ? null : STEP_TU_VIAJE;
+  if (from === STEP_FECHAS) return STEP_TU_VIAJE;
   return null;
 }

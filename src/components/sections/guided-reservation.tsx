@@ -6,6 +6,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { site, waLink } from "@/lib/site";
+import {
+  stashWhatsAppReservationMessage,
+} from "@/lib/whatsapp-reservation-message";
 import { trackWhatsAppClick, trackBeginCheckout } from "@/lib/analytics";
 import { formatCOP } from "@/lib/pricing";
 import {
@@ -595,19 +598,46 @@ export function GuidedReservation({
     });
 
     const categoryMeta = categoryId ? getLoftCategory(categoryId) : null;
+    const nights = quoteResult.ok ? quoteResult.noches : null;
+    const channelLabel =
+      bookingChannel === "corporate"
+        ? "Corporativo / empresa"
+        : bookingChannel === "referral"
+          ? "Referido"
+          : bookingChannel === "whatsapp"
+            ? "WhatsApp"
+            : "Directo (web)";
+    const depositAmount =
+      grandTotal !== null && depositPct > 0
+        ? Math.round((grandTotal * depositPct) / 100)
+        : null;
     return [
       `Hola ${site.name}, quiero reservar:`,
       name.trim() ? `Nombre: ${name.trim()}` : "",
       reservationCode ? `Código reserva: ${reservationCode}` : "",
       profileMeta ? `Tipo de viaje: ${profileMeta.title}` : "",
       categoryMeta
-        ? `Preferencia: ${categoryMeta.name} (${categoryMeta.tagline})`
+        ? `Preferencia de loft: ${categoryMeta.name} (${categoryMeta.tagline})`
         : "",
-      checkIn && checkOut ? `Fechas: ${checkIn} → ${checkOut}` : "",
+      checkIn && checkOut
+        ? `Fechas: ${checkIn} → ${checkOut}${nights != null ? ` (${nights} noche${nights === 1 ? "" : "s"})` : ""}`
+        : "",
+      `Check-in: ${site.checkIn} · Check-out: ${site.checkOut}`,
       `Huéspedes: ${guests} · Lofts: ${lofts}`,
-      extraLines.length ? `\nExtras:\n${extraLines.join("\n")}` : "",
+      `Dirección: ${site.addressLine}, ${site.neighborhood}, ${site.city}`,
+      `Canal: ${channelLabel}`,
+      bookingChannel === "corporate" && corporateName.trim()
+        ? `Empresa: ${corporateName.trim()}`
+        : "",
+      bookingChannel === "referral" && referrerName.trim()
+        ? `Referido por: ${referrerName.trim()}`
+        : "",
+      extraLines.length ? `\nExtras:\n${extraLines.join("\n")}` : "\nExtras: ninguno",
       grandTotal !== null
         ? `\nTotal estimado (web): ${formatCOP(grandTotal)}`
+        : "",
+      depositAmount != null
+        ? `Anticipo sugerido (${depositPct}%): ${formatCOP(depositAmount)}`
         : "",
       couponDiscount > 0 && couponCode
         ? `Cupón ${couponCode.trim().toUpperCase()}: −${formatCOP(couponDiscount)}`
@@ -717,9 +747,12 @@ export function GuidedReservation({
       } else {
         reservationCode = data.reservation_code;
         if (reservationCode) {
+          stashWhatsAppReservationMessage(
+            buildWhatsAppLines(reservationCode).join("\n"),
+          );
           window.location.href = `/confirmacion/${encodeURIComponent(reservationCode)}?wa=1`;
           return;
-        }
+          }
       }
     } catch {
       setBookingError(
@@ -1647,7 +1680,15 @@ export function GuidedReservation({
                 disabled={!canGoBack || transitionTo !== null}
                 onClick={() => {
                   const prev = prevLogicalStep(step);
-                  if (prev !== null) goToStep(prev);
+                  if (prev === null) return;
+                  // Al volver, reabrir la sección para poder reconfigurar
+                  // aunque se haya llegado por un atajo (banner/card).
+                  if (prev === STEP_TU_VIAJE) setSkipTripStep(false);
+                  if (prev === STEP_FECHAS || prev === STEP_HUESPEDES) {
+                    setSkipStaySteps(false);
+                  }
+                  if (prev === STEP_LOFT) setSkipLoftStep(false);
+                  goToStep(prev);
                 }}
                 className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600"
                 aria-label="Regresar al paso anterior"

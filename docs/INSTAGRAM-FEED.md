@@ -16,3 +16,13 @@ La sección **Instagram y TikTok** del sitio carga `/api/instagram/feed` y muest
 - Cron: `GET /api/cron/sync-instagram` con `Authorization: Bearer $CRON_SECRET`
 
 Sin token Meta no se puede scrapear Instagram; usa el admin para pegar URLs/thumbs nuevas o conecta Graph API.
+
+## Reels extra sin Graph API
+
+Si publican reels nuevos y aún no hay token Meta, añade los permalinks en:
+
+```bash
+INSTAGRAM_EXTRA_REEL_URLS=https://www.instagram.com/reel/SHORTCODE1/,https://www.instagram.com/reel/SHORTCODE2/
+```
+
+También puedes pegarlos en `/admin/redes`. En el home se reproducen con el embed oficial de Instagram (modal).

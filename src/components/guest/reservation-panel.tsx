@@ -29,6 +29,10 @@ export type GuestReservationView = {
   lofts?: number;
   property_ids?: string[];
   is_walk_in?: boolean;
+  channel?: string;
+  corporate_name?: string | null;
+  referrer_name?: string | null;
+  notes?: string | null;
 };
 
 export type GuestPaymentView = {

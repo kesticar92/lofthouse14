@@ -68,7 +68,8 @@ function instagramEmbedUrl(permalink: string): string | null {
     if (!u.hostname.includes("instagram.com")) return null;
     const path = u.pathname.replace(/\/+$/, "");
     if (!path) return null;
-    return `https://www.instagram.com${path}/embed`;
+    // /embed/captioned permite reproducir el reel dentro de la página.
+    return `https://www.instagram.com${path}/embed/captioned/?cr=1&v=14&wp=1080`;
   } catch {
     return null;
   }
@@ -123,6 +124,26 @@ export function SocialWall() {
       window.removeEventListener("keydown", onKey);
     };
   }, [activeReel]);
+
+  // Instagram embed.js mejora el player (play/pause) del iframe captioned.
+  useEffect(() => {
+    if (!activeReel) return;
+    const id = "instagram-embed-js";
+    if (!document.getElementById(id)) {
+      const s = document.createElement("script");
+      s.id = id;
+      s.async = true;
+      s.src = "https://www.instagram.com/embed.js";
+      document.body.appendChild(s);
+    } else {
+      try {
+        (window as unknown as { instgrm?: { Embeds?: { process?: () => void } } }).instgrm?.Embeds?.process?.();
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [activeReel]);
+
 
   const reels = useMemo(() => posts.filter(isReelPost), [posts]);
   const embedSrc = activeReel ? instagramEmbedUrl(activeReel.url) : null;
@@ -271,9 +292,10 @@ export function SocialWall() {
                   title="Reel de Instagram"
                   src={embedSrc}
                   className="h-full w-full border-0"
-                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen"
                   allowFullScreen
-                  loading="lazy"
+                  loading="eager"
+                  referrerPolicy="strict-origin-when-cross-origin"
                 />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center text-sm text-white/80">

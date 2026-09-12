@@ -3,6 +3,10 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { site, waLink } from "@/lib/site";
+import {
+  buildReservationWhatsAppMessage,
+  takeWhatsAppReservationMessage,
+} from "@/lib/whatsapp-reservation-message";
 import { formatCOP } from "@/lib/pricing";
 import {
   ReservationPanel,
@@ -77,14 +81,37 @@ function ConfirmacionInner() {
 
       if (search.get("wa") === "1" && (data as { reservation?: GuestReservationView }).reservation) {
         const r = (data as { reservation: GuestReservationView }).reservation;
-        const lines = [
-          `Hola ${site.name}, confirmo mi reserva ${r.reservation_code}:`,
-          `Nombre: ${r.guest_name ?? ""}`,
-          `Fechas: ${r.check_in} → ${r.check_out}`,
-          `Huéspedes: ${r.guests ?? ""}`,
-          r.price != null ? `Total estimado: ${formatCOP(r.price)}` : "",
-        ].filter(Boolean);
-        window.open(waLink(lines.join("\n")), "_blank", "noopener");
+        const stashed = takeWhatsAppReservationMessage();
+        const message =
+          stashed ??
+          buildReservationWhatsAppMessage({
+            reservationCode: r.reservation_code,
+            guestName: r.guest_name,
+            checkIn: r.check_in,
+            checkOut: r.check_out,
+            guests: r.guests,
+            lofts: r.lofts ?? r.property_ids?.length,
+            price: r.price,
+            extras: (r.extras ?? []).map((e) => {
+              const anyE = e as {
+                id?: string;
+                label?: string;
+                amountCop?: number;
+                amount_cop?: number;
+                amount?: number;
+              };
+              return {
+                id: anyE.id,
+                label: anyE.label ?? anyE.id,
+                amountCop: anyE.amountCop ?? anyE.amount_cop ?? anyE.amount,
+              };
+            }),
+            channel: r.channel,
+            corporateName: r.corporate_name,
+            referrerName: r.referrer_name,
+            notes: r.notes,
+          });
+        window.open(waLink(message), "_blank", "noopener");
       }
     } catch {
       setError("Error de red");

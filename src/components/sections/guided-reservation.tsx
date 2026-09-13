@@ -112,7 +112,13 @@ export function GuidedReservation({
     priceFromCop: number;
     assignedUnits: number[];
     warning?: string;
+    /** Tipos sin cupo en las fechas pedidas (se deshabilitan en el paso loft). */
+    blockedCategoryIds: LoftCategoryId[];
   } | null>(null);
+  /** Tipos bloqueados por iCal aunque se cierre el aviso. */
+  const [blockedCategoryIds, setBlockedCategoryIds] = useState<LoftCategoryId[]>(
+    [],
+  );
   const [liveWarning, setLiveWarning] = useState<string | null>(null);
   const [assignedUnitsHint, setAssignedUnitsHint] = useState<number[] | null>(
     null,
@@ -218,6 +224,12 @@ export function GuidedReservation({
   const capacityOk =
     guests <= site.maxGuests && lofts >= minLoftsForGuests;
   const datesOk = Boolean(checkIn && checkOut && checkOut > checkIn);
+
+  // Si cambian las fechas, liberar bloqueos de disponibilidad en vivo.
+  useEffect(() => {
+    setBlockedCategoryIds([]);
+    setLiveOffer(null);
+  }, [checkIn, checkOut, guests]);
 
   useEffect(() => {
     return () => {
@@ -719,6 +731,12 @@ export function GuidedReservation({
               priceFromCop: number;
               assignedUnits: number[];
             } | null;
+            alternatives?: Array<{
+              categoryId: LoftCategoryId;
+              name: string;
+              priceFromCop: number;
+              assignedUnits: number[];
+            }>;
             reason?: string;
           };
 
@@ -727,6 +745,22 @@ export function GuidedReservation({
 
           if (!live.ok) {
             if (live.alternative) {
+              const availableIds = new Set<LoftCategoryId>([
+                live.alternative.categoryId,
+                ...(live.alternatives ?? []).map((a) => a.categoryId),
+              ]);
+              const blocked = LOFT_CATEGORIES.map((c) => c.id).filter(
+                (id) => !availableIds.has(id),
+              );
+              // El tipo pedido también queda bloqueado si falló.
+              if (
+                effectiveCategory &&
+                !availableIds.has(effectiveCategory) &&
+                !blocked.includes(effectiveCategory)
+              ) {
+                blocked.push(effectiveCategory);
+              }
+              setBlockedCategoryIds(blocked);
               setLiveOffer({
                 message:
                   live.message ??
@@ -736,9 +770,16 @@ export function GuidedReservation({
                 priceFromCop: live.alternative.priceFromCop,
                 assignedUnits: live.alternative.assignedUnits,
                 warning: live.warning,
+                blockedCategoryIds: blocked,
               });
+              setCategoryId(live.alternative.categoryId);
+              setAssignedUnitsHint(live.alternative.assignedUnits);
+              setLofts(Math.max(1, live.alternative.assignedUnits.length));
+              setSkipLoftStep(false);
               setBookingError(null);
               setBookingBusy(false);
+              // Volver al paso loft con la misma animación orbital del wizard.
+              goToStep(STEP_LOFT);
               return;
             }
             setBookingError(
@@ -839,14 +880,21 @@ export function GuidedReservation({
 
   function acceptLiveOffer() {
     if (!liveOffer) return;
-    setCategoryId(liveOffer.categoryId);
-    setAssignedUnitsHint(liveOffer.assignedUnits);
-    setLofts(Math.max(1, liveOffer.assignedUnits.length));
+    const offer = liveOffer;
+    setCategoryId(offer.categoryId);
+    setAssignedUnitsHint(offer.assignedUnits);
+    setLofts(Math.max(1, offer.assignedUnits.length));
     setLiveOffer(null);
+    setBlockedCategoryIds([]);
     void completeBooking({
-      categoryOverride: liveOffer.categoryId,
-      assignedUnits: liveOffer.assignedUnits,
+      categoryOverride: offer.categoryId,
+      assignedUnits: offer.assignedUnits,
     });
+  }
+
+  function dismissLiveOffer() {
+    // Quedarse en loft con tipos sin cupo deshabilitados.
+    setLiveOffer(null);
   }
 
   return (
@@ -891,13 +939,17 @@ export function GuidedReservation({
           {transitionTo !== null ? (
             <motion.div
               key="orbital-transition"
-              className="fixed inset-0 z-[80] flex items-center justify-center bg-[#f2f0eb]/70 backdrop-blur-md dark:bg-zinc-950/70"
+              className="fixed inset-0 z-[80] flex flex-col items-center justify-center gap-6 bg-[#f2f0eb]/70 px-4 backdrop-blur-md dark:bg-zinc-950/70"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               aria-live="polite"
-              aria-label={`Pasando a ${STEPS[transitionTo]}`}
+              aria-label={
+                liveOffer && transitionTo === STEP_LOFT
+                  ? "Buscando loft disponible"
+                  : `Pasando a ${STEPS[transitionTo]}`
+              }
             >
               <motion.div
                 initial={{ scale: 0.92, opacity: 0 }}
@@ -910,6 +962,24 @@ export function GuidedReservation({
                   coveredSteps={coveredSteps}
                 />
               </motion.div>
+              {liveOffer && transitionTo === STEP_LOFT ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15, duration: 0.35 }}
+                  className="max-w-md rounded-2xl border border-amber-300/80 bg-amber-50/95 px-5 py-4 text-center shadow-lg dark:border-amber-700/60 dark:bg-amber-950/90"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-950 dark:text-amber-100">
+                    Disponibilidad en vivo
+                  </p>
+                  <p className="mt-2 text-sm text-amber-900 dark:text-amber-200">
+                    {liveOffer.message}
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-white">
+                    Te llevamos a elegir {liveOffer.name}
+                  </p>
+                </motion.div>
+              ) : null}
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -1176,10 +1246,68 @@ export function GuidedReservation({
                       ? "Ya tienes fechas y huéspedes. Escoge Vista, Atrio o Cielo para continuar."
                       : "Vista, Atrio o Cielo — precio desde por noche (temporada baja)."}
                   </p>
+                  <AnimatePresence>
+                    {liveOffer ? (
+                      <motion.div
+                        key="live-offer-banner"
+                        initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        className="rounded-2xl border border-amber-300/80 bg-amber-50 px-4 py-3 text-left dark:border-amber-700/60 dark:bg-amber-950/40"
+                      >
+                        <p className="text-xs font-semibold text-amber-950 dark:text-amber-100">
+                          Disponibilidad en vivo
+                        </p>
+                        <p className="mt-1 text-xs text-amber-900 dark:text-amber-200">
+                          {liveOffer.message}
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-white">
+                          {liveOffer.name}{" "}
+                          <span className="font-normal text-zinc-600 dark:text-zinc-400">
+                            desde {formatCOP(liveOffer.priceFromCop)}/noche
+                          </span>
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-zinc-500">
+                          Unidades libres ahora: loft{" "}
+                          {liveOffer.assignedUnits.join(", ")}
+                        </p>
+                        <div className="mt-3 flex flex-wrap justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => dismissLiveOffer()}
+                            className="rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-xs font-semibold dark:border-zinc-600 dark:bg-transparent"
+                          >
+                            Elegir otro
+                          </button>
+                          <button
+                            type="button"
+                            disabled={bookingBusy}
+                            onClick={() => acceptLiveOffer()}
+                            className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-bold text-white dark:bg-white dark:text-zinc-900"
+                          >
+                            Reservar {liveOffer.name}
+                          </button>
+                        </div>
+                      </motion.div>
+                    ) : blockedCategoryIds.length > 0 ? (
+                      <motion.p
+                        key="blocked-hint"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-xs text-amber-800 dark:text-amber-300"
+                      >
+                        Algunos tipos no tienen cupo en esas fechas y quedaron
+                        deshabilitados. Elige uno disponible para continuar.
+                      </motion.p>
+                    ) : null}
+                  </AnimatePresence>
                   <div className="grid gap-3 sm:grid-cols-3">
                     {LOFT_CATEGORIES.map((cat) => {
-                      const fits =
+                      const fitsGuests =
                         availableLoftsForGuests(cat, guests).length > 0;
+                      const blockedByDates = blockedCategoryIds.includes(cat.id);
+                      const fits = fitsGuests && !blockedByDates;
                       const active = categoryId === cat.id;
                       return (
                         <button
@@ -1188,6 +1316,7 @@ export function GuidedReservation({
                           disabled={!fits}
                           onClick={() => {
                             setCategoryId(cat.id);
+                            setLiveOffer(null);
                             const stayReadyNow = datesOk && guests >= 1;
                             if (stayReadyNow) {
                               setSkipStaySteps(true);
@@ -1218,7 +1347,7 @@ export function GuidedReservation({
                               : "border-zinc-200 dark:border-zinc-700",
                             fits
                               ? "hover:border-amber-400/80"
-                              : "cursor-not-allowed opacity-40",
+                              : "cursor-not-allowed opacity-40 grayscale",
                           )}
                         >
                           <div className="relative aspect-[16/10] w-full bg-zinc-100 dark:bg-zinc-800">
@@ -1241,6 +1370,11 @@ export function GuidedReservation({
                             <span className="mt-1 block text-[11px] text-zinc-500">
                               {cat.tagline}
                             </span>
+                            {blockedByDates ? (
+                              <span className="mt-1 block text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                                Sin cupo en esas fechas
+                              </span>
+                            ) : null}
                           </span>
                         </button>
                       );
@@ -1786,43 +1920,6 @@ export function GuidedReservation({
                 </button>
               ) : (
                 <div className="flex flex-col items-end gap-2">
-                  {liveOffer ? (
-                    <div className="max-w-sm rounded-2xl border border-amber-300/80 bg-amber-50 px-4 py-3 text-left dark:border-amber-700/60 dark:bg-amber-950/40">
-                      <p className="text-xs font-semibold text-amber-950 dark:text-amber-100">
-                        Disponibilidad en vivo
-                      </p>
-                      <p className="mt-1 text-xs text-amber-900 dark:text-amber-200">
-                        {liveOffer.message}
-                      </p>
-                      <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-white">
-                        {liveOffer.name}{" "}
-                        <span className="font-normal text-zinc-600 dark:text-zinc-400">
-                          desde {formatCOP(liveOffer.priceFromCop)}/noche
-                        </span>
-                      </p>
-                      <p className="mt-0.5 text-[11px] text-zinc-500">
-                        Unidades libres ahora: loft{" "}
-                        {liveOffer.assignedUnits.join(", ")}
-                      </p>
-                      <div className="mt-3 flex flex-wrap justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setLiveOffer(null)}
-                          className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold dark:border-zinc-600"
-                        >
-                          Elegir otro
-                        </button>
-                        <button
-                          type="button"
-                          disabled={bookingBusy}
-                          onClick={() => acceptLiveOffer()}
-                          className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-bold text-white dark:bg-white dark:text-zinc-900"
-                        >
-                          Reservar {liveOffer.name}
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
                   {bookingError ? (
                     <p className="max-w-xs text-right text-xs text-amber-800 dark:text-amber-300">
                       {bookingError}
@@ -1843,8 +1940,7 @@ export function GuidedReservation({
                     disabled={
                       !quoteResult.ok ||
                       bookingBusy ||
-                      !policiesAccepted ||
-                      Boolean(liveOffer)
+                      !policiesAccepted
                     }
                     onClick={() => void handleReservar()}
                     className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"

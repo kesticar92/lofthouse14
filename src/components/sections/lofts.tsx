@@ -66,15 +66,110 @@ const lofts = [
   },
 ];
 
+type LoftItem = (typeof lofts)[number];
+
+function LoftHeroImage({
+  loft,
+  className,
+  priority = false,
+}: {
+  loft: LoftItem;
+  className?: string;
+  priority?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-3xl shadow-2xl",
+        className,
+      )}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={loft.image}
+          initial={{ scale: 1.05, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          className="absolute inset-0 z-0 h-full w-full"
+        >
+          <Image
+            src={loft.image}
+            alt={loft.name}
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            quality={95}
+            priority={priority}
+            className="object-cover object-center"
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+      <div className="absolute bottom-6 left-0 z-20 w-full overflow-hidden md:bottom-12">
+        <motion.ul
+          initial="hidden"
+          whileInView="visible"
+          variants={{
+            visible: { transition: { staggerChildren: 0.1 } },
+          }}
+          className="flex flex-wrap justify-center gap-2 px-3 md:gap-3 md:px-4"
+        >
+          {perks.map((p) => (
+            <motion.li
+              key={p}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
+            >
+              <GlassPanel className="flex items-center justify-center gap-2 border-white/20 px-3 py-1.5 text-white backdrop-blur-md md:px-4 md:py-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
+                <span className="text-xs font-semibold tracking-wide md:text-sm">
+                  {p}
+                </span>
+              </GlassPanel>
+            </motion.li>
+          ))}
+        </motion.ul>
+      </div>
+    </div>
+  );
+}
+
 export function Lofts() {
   const [activeIndex, setActiveIndex] = useState(0);
-
   const activeLoft = lofts[activeIndex];
+
+  function goToReserve() {
+    const loftCount = activeIndex === 3 ? 4 : activeIndex + 1;
+    const guestsHint =
+      activeIndex === 0
+        ? 2
+        : activeIndex === 1
+          ? 4
+          : activeIndex === 2
+            ? 6
+            : 8;
+    mergeStayDraft({
+      guests: guestsHint,
+      from: "banner",
+      step: 1,
+    });
+    const qs = new URLSearchParams({
+      guests: String(guestsHint),
+      from: "banner",
+      step: "1",
+      lofts: String(loftCount),
+    });
+    window.location.assign(`/reservar?${qs.toString()}`);
+  }
 
   return (
     <section
       id="lofts"
-      className="grid grid-cols-1 lg:grid-cols-2 w-full items-center gap-10 py-12 px-4 md:py-20 md:px-20"
+      className="grid w-full grid-cols-1 items-center gap-6 px-4 py-12 md:gap-10 md:px-20 md:py-20 lg:grid-cols-2"
     >
       <div className="flex flex-col items-start justify-center">
         <motion.div
@@ -82,30 +177,35 @@ export function Lofts() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="w-full flex justify-center items-start flex-col px-6"
+          className="flex w-full flex-col items-start justify-center px-2 sm:px-6"
         >
-          <h2 className="font-display text-4xl md:text-5xl tracking-wide text-zinc-900 dark:text-[#f2f0eb]">
+          <h2 className="font-display text-3xl tracking-wide text-zinc-900 dark:text-[#f2f0eb] md:text-5xl">
             ¿Cuántos lofts necesitas?
           </h2>
 
-          {/* Selector de Lofts con estilo elegante */}
-          <div className="w-full grid grid-cols-4 gap-4 mt-8">
+          <div className="mt-6 grid w-full grid-cols-4 gap-3 md:mt-8 md:gap-4">
             {[1, 2, 3, "+4"].map((num, i) => (
               <button
                 key={num}
+                type="button"
                 className={cn(
-                  "relative flex-1 h-20 rounded-xl text-xl font-bold transition-colors overflow-hidden",
+                  "relative h-16 flex-1 overflow-hidden rounded-xl text-xl font-bold transition-colors md:h-20",
                   activeIndex === i
                     ? "text-white"
                     : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700",
                 )}
                 onClick={() => setActiveIndex(i)}
+                aria-pressed={activeIndex === i}
               >
                 {activeIndex === i && (
                   <motion.div
                     layoutId="loftIndicator"
                     className="absolute inset-0 bg-zinc-900 dark:bg-amber-600"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    transition={{
+                      type: "spring",
+                      bounce: 0.2,
+                      duration: 0.6,
+                    }}
                   />
                 )}
                 <span className="relative z-10">{num}</span>
@@ -114,64 +214,47 @@ export function Lofts() {
           </div>
         </motion.div>
 
-        <div className="mx-auto w-full max-w-3xl space-y-6 px-6 py-12">
+        {/* Móvil: la foto del loft gana protagonismo justo tras el selector */}
+        <LoftHeroImage
+          loft={activeLoft}
+          priority
+          className="mt-5 aspect-[4/5] max-h-[68vh] w-full lg:hidden"
+        />
+
+        <div className="mx-auto w-full max-w-3xl space-y-4 px-2 py-5 sm:px-6 md:space-y-6 md:py-12">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-6"
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.35 }}
+              className="space-y-4 md:space-y-6"
             >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-l-4 border-amber-600 pl-6">
-                <div className="flex-1">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-800 dark:text-amber-500">
-                    {activeLoft.categoryLabel}
-                  </p>
-                  <h3 className="mt-2 font-display text-2xl tracking-tight text-zinc-900 dark:text-[#f2f0eb]">
-                    {activeLoft.name}
-                  </h3>
-                </div>
+              <div className="border-l-4 border-amber-600 pl-4 sm:pl-6">
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800 dark:text-amber-500 md:text-xs">
+                  {activeLoft.categoryLabel}
+                </p>
+                <h3 className="mt-1 font-display text-xl tracking-tight text-zinc-900 dark:text-[#f2f0eb] md:mt-2 md:text-2xl">
+                  {activeLoft.name}
+                </h3>
               </div>
 
-              <PricingDetailsAccordion
-                price={activeLoft.price}
-                priceNote={activeLoft.priceNote}
-                capacity={activeLoft.capacity}
-              />
-
-              <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
+              <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300 md:text-base">
                 {activeLoft.description}
               </p>
 
-              <div className="pt-2">
+              {/* Precio solo inmediatamente antes de Reservar ahora */}
+              <div className="space-y-3 pt-1">
+                <PricingDetailsAccordion
+                  price={activeLoft.price}
+                  priceNote={activeLoft.priceNote}
+                  capacity={activeLoft.capacity}
+                />
+
                 <button
                   type="button"
-                  onClick={() => {
-                    const loftCount =
-                      activeIndex === 3 ? 4 : activeIndex + 1;
-                    const guestsHint =
-                      activeIndex === 0
-                        ? 2
-                        : activeIndex === 1
-                          ? 4
-                          : activeIndex === 2
-                            ? 6
-                            : 8;
-                    mergeStayDraft({
-                      guests: guestsHint,
-                      from: "banner",
-                      step: 1,
-                    });
-                    const qs = new URLSearchParams({
-                      guests: String(guestsHint),
-                      from: "banner",
-                      step: "1",
-                      lofts: String(loftCount),
-                    });
-                    window.location.assign(`/reservar?${qs.toString()}`);
-                  }}
+                  onClick={goToReserve}
                   className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-zinc-800 dark:bg-[#f2f0eb] dark:text-zinc-900 dark:hover:bg-white sm:w-auto sm:px-10"
                 >
                   {activeIndex === 3
@@ -184,58 +267,11 @@ export function Lofts() {
         </div>
       </div>
 
-      {/* Galería con Glassmorphism */}
-      <div className="w-full h-[400px] md:h-[600px] lg:h-[700px] max-h-[80vh] rounded-3xl overflow-hidden relative group shadow-2xl lg:mr-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeLoft.image}
-            initial={{ scale: 1.05, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="absolute inset-0 h-full w-full z-0"
-          >
-            <Image
-              src={activeLoft.image}
-              alt={activeLoft.name}
-              width={1200}
-              height={1500}
-              quality={95}
-              className="h-full w-full object-cover object-center"
-            />
-          </motion.div>
-        </AnimatePresence>
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none z-10" />
-
-        <div className="absolute bottom-12 left-0 w-full z-20 overflow-hidden">
-          <motion.ul
-            initial="hidden"
-            whileInView="visible"
-            variants={{
-              visible: { transition: { staggerChildren: 0.1 } },
-            }}
-            className="flex flex-wrap gap-3 justify-center px-4"
-          >
-            {perks.map((p) => (
-              <motion.li
-                key={p}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-              >
-                <GlassPanel className="flex items-center justify-center gap-2 px-4 py-2 border-white/20 text-white backdrop-blur-md">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
-                  <span className="text-sm font-semibold tracking-wide">
-                    {p}
-                  </span>
-                </GlassPanel>
-              </motion.li>
-            ))}
-          </motion.ul>
-        </div>
-      </div>
+      {/* Desktop: galería a la derecha */}
+      <LoftHeroImage
+        loft={activeLoft}
+        className="hidden h-[400px] max-h-[80vh] w-full md:h-[600px] lg:mr-6 lg:block lg:h-[700px]"
+      />
     </section>
   );
 }

@@ -36,34 +36,21 @@ function GoogleBadge() {
   );
 }
 
-function AirbnbMark() {
-  return (
-    <svg
-      width="54"
-      height="14"
-      viewBox="0 0 320 100"
-      aria-label="Airbnb"
-      role="img"
-    >
-      <path
-        fill="#FF5A5F"
-        d="M160 20c-18 28-42 56-42 78 0 12 9 22 22 22s22-10 22-22c0-22-24-50-42-78zm0 0c18 28 42 56 42 78 0 12-9 22-22 22s-22-10-22-22c0-22 24-50 42-78z"
-      />
-      <text
-        x="210"
-        y="64"
-        fill="#FF5A5F"
-        fontSize="42"
-        fontFamily="system-ui,sans-serif"
-        fontWeight="700"
-      >
-        airbnb
-      </text>
-    </svg>
-  );
-}
-
 function AirbnbBadge({ href }: { href?: string }) {
+  // Logo oficial en /public/logos/airbnb.svg — no sustituir por marcas inventadas.
+  // <img> nativo: mismo asset original, sin multiplicar next/image en el carrusel.
+  const logo = (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/logos/airbnb.svg"
+      alt="Airbnb"
+      width={78}
+      height={24}
+      className="h-[14px] w-auto"
+      decoding="async"
+      loading="lazy"
+    />
+  );
   const className = `${badgeShell} border-[#FF5A5F]/25 transition hover:border-[#FF5A5F]/50`;
   if (href) {
     return (
@@ -74,15 +61,11 @@ function AirbnbBadge({ href }: { href?: string }) {
         className={className}
         title="Ver publicación en Airbnb"
       >
-        <AirbnbMark />
+        {logo}
       </a>
     );
   }
-  return (
-    <span className={className}>
-      <AirbnbMark />
-    </span>
-  );
+  return <span className={className}>{logo}</span>;
 }
 
 function BookingBadge() {

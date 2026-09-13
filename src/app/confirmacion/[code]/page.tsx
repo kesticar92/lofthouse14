@@ -82,6 +82,16 @@ function ConfirmacionInner() {
       if (search.get("wa") === "1" && (data as { reservation?: GuestReservationView }).reservation) {
         const r = (data as { reservation: GuestReservationView }).reservation;
         const stashed = takeWhatsAppReservationMessage();
+        const notes = r.notes?.trim() || null;
+        const categoryFromNotes = notes?.match(
+          /Tipo de loft confirmado:\s*([^·\n]+)/i,
+        )?.[1]?.trim();
+        const notesForWa = notes
+          ?.replace(
+            /Tipo de loft confirmado:\s*[^·\n]+(?:\s*·\s*)?/i,
+            "",
+          )
+          .trim() || null;
         const message =
           stashed ??
           buildReservationWhatsAppMessage({
@@ -109,7 +119,8 @@ function ConfirmacionInner() {
             channel: r.channel,
             corporateName: r.corporate_name,
             referrerName: r.referrer_name,
-            notes: r.notes,
+            categoryLabel: categoryFromNotes ?? null,
+            notes: notesForWa,
           });
         window.open(waLink(message), "_blank", "noopener");
       }

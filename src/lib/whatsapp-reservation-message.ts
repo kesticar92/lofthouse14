@@ -82,7 +82,7 @@ export function buildReservationWhatsAppMessage(
       : "",
     payload.tripType ? `Tipo de viaje: ${payload.tripType}` : "",
     payload.categoryLabel
-      ? `Preferencia de loft: ${payload.categoryLabel}`
+      ? `Tipo de loft confirmado: ${payload.categoryLabel}`
       : "",
     payload.checkIn && payload.checkOut
       ? `Fechas: ${payload.checkIn} → ${payload.checkOut}${

@@ -594,7 +594,41 @@ export function GuidedReservation({
     }));
   }
 
-  function buildWhatsAppLines(reservationCode?: string) {
+  function buildWhatsAppLines(
+    reservationCode?: string,
+    overrides?: {
+      categoryId?: LoftCategoryId | null;
+      lofts?: number;
+      assignedUnits?: number[];
+    },
+  ) {
+    const effectiveCategoryId =
+      overrides?.categoryId !== undefined ? overrides.categoryId : categoryId;
+    const effectiveLofts = Math.max(
+      1,
+      overrides?.lofts ??
+        overrides?.assignedUnits?.length ??
+        lofts,
+    );
+    const assignedUnits = overrides?.assignedUnits;
+
+    const quotePricingForMsg = pricingConfigForCategory(
+      effectiveCategoryId,
+      PUBLIC_PRICING_CONFIG,
+    );
+    const quoteForMsg = publicStayQuote(
+      {
+        checkIn,
+        checkOut,
+        huespedes: guests,
+        lofts: effectiveLofts,
+      },
+      quotePricingForMsg,
+    );
+    const stayTotal = quoteForMsg.ok ? quoteForMsg.totalReserva : null;
+    const totalForMsg =
+      stayTotal != null ? Math.max(0, stayTotal + extrasCop - couponDiscount) : null;
+
     const extraLines = CONFIGURATOR_EXTRAS.filter((e) =>
       extras.includes(e.id),
     ).map((e) => {
@@ -621,8 +655,10 @@ export function GuidedReservation({
       return `• ${e.label}: ${formatCOP(e.priceCop)} (estimado)`;
     });
 
-    const categoryMeta = categoryId ? getLoftCategory(categoryId) : null;
-    const nights = quoteResult.ok ? quoteResult.noches : null;
+    const categoryMeta = effectiveCategoryId
+      ? getLoftCategory(effectiveCategoryId)
+      : null;
+    const nights = quoteForMsg.ok ? quoteForMsg.noches : null;
     const channelLabel =
       bookingChannel === "corporate"
         ? "Corporativo / empresa"
@@ -632,8 +668,8 @@ export function GuidedReservation({
             ? "WhatsApp"
             : "Directo (web)";
     const depositAmount =
-      grandTotal !== null && depositPct > 0
-        ? Math.round((grandTotal * depositPct) / 100)
+      totalForMsg !== null && depositPct > 0
+        ? Math.round((totalForMsg * depositPct) / 100)
         : null;
     return [
       `Hola ${site.name}, quiero reservar:`,
@@ -641,13 +677,16 @@ export function GuidedReservation({
       reservationCode ? `Código reserva: ${reservationCode}` : "",
       profileMeta ? `Tipo de viaje: ${profileMeta.title}` : "",
       categoryMeta
-        ? `Preferencia de loft: ${categoryMeta.name} (${categoryMeta.tagline})`
+        ? `Tipo de loft confirmado: ${categoryMeta.name} (${categoryMeta.tagline})`
+        : "",
+      assignedUnits?.length
+        ? `Unidad(es) asignada(s): loft ${assignedUnits.join(", ")}`
         : "",
       checkIn && checkOut
         ? `Fechas: ${checkIn} → ${checkOut}${nights != null ? ` (${nights} noche${nights === 1 ? "" : "s"})` : ""}`
         : "",
       `Check-in: ${site.checkIn} · Check-out: ${site.checkOut}`,
-      `Huéspedes: ${guests} · Lofts: ${lofts}`,
+      `Huéspedes: ${guests} · Lofts: ${effectiveLofts}`,
       `Dirección: ${site.addressLine}, ${site.neighborhood}, ${site.city}`,
       `Canal: ${channelLabel}`,
       bookingChannel === "corporate" && corporateName.trim()
@@ -657,8 +696,8 @@ export function GuidedReservation({
         ? `Referido por: ${referrerName.trim()}`
         : "",
       extraLines.length ? `\nExtras:\n${extraLines.join("\n")}` : "\nExtras: ninguno",
-      grandTotal !== null
-        ? `\nTotal estimado (web): ${formatCOP(grandTotal)}`
+      totalForMsg !== null
+        ? `\nTotal estimado (web): ${formatCOP(totalForMsg)}`
         : "",
       depositAmount != null
         ? `Anticipo sugerido (${depositPct}%): ${formatCOP(depositAmount)}`
@@ -666,8 +705,8 @@ export function GuidedReservation({
       couponDiscount > 0 && couponCode
         ? `Cupón ${couponCode.trim().toUpperCase()}: −${formatCOP(couponDiscount)}`
         : "",
-      quoteResult.ok
-        ? `(Alojamiento+aseo: ${formatCOP(quoteResult.totalReserva)}${extrasCop ? ` + extras ${formatCOP(extrasCop)}` : ""})`
+      quoteForMsg.ok && stayTotal != null
+        ? `(Alojamiento+aseo: ${formatCOP(stayTotal)}${extrasCop ? ` + extras ${formatCOP(extrasCop)}` : ""})`
         : "",
       "",
       "Confirmo que la tarifa final y descuentos de grupo o larga estadía se cierran por WhatsApp.",
@@ -789,7 +828,13 @@ export function GuidedReservation({
             setBookingBusy(false);
             trackWhatsAppClick("guided_reservation_unavailable");
             window.open(
-              waLink(buildWhatsAppLines().join("\n")),
+              waLink(
+                buildWhatsAppLines(undefined, {
+                  categoryId: effectiveCategory,
+                  lofts,
+                  assignedUnits: assignedUnitsHint ?? undefined,
+                }).join("\n"),
+              ),
               "_blank",
               "noopener",
             );
@@ -806,6 +851,14 @@ export function GuidedReservation({
 
       const unitsForNotes =
         opts?.assignedUnits ?? confirmedUnits ?? assignedUnitsHint ?? undefined;
+      const verifiedLofts = unitsForNotes?.length
+        ? unitsForNotes.length
+        : lofts;
+      const waMessageOverrides = {
+        categoryId: effectiveCategory,
+        lofts: verifiedLofts,
+        assignedUnits: unitsForNotes,
+      };
 
       const res = await fetch("/api/public/booking", {
         method: "POST",
@@ -814,9 +867,7 @@ export function GuidedReservation({
           check_in: checkIn,
           check_out: checkOut,
           guests,
-          lofts: unitsForNotes?.length
-            ? unitsForNotes.length
-            : lofts,
+          lofts: verifiedLofts,
           guest_name: name.trim() || "Huésped web",
           category_id: effectiveCategory ?? undefined,
           extras: extrasPayload,
@@ -831,9 +882,16 @@ export function GuidedReservation({
             bookingChannel === "referral"
               ? referrerName.trim() || undefined
               : undefined,
-          notes: unitsForNotes?.length
-            ? `Unidades sugeridas (iCal): loft ${unitsForNotes.join(", ")}`
-            : undefined,
+          notes: [
+            effectiveCategory
+              ? `Tipo de loft confirmado: ${getLoftCategory(effectiveCategory).name}`
+              : null,
+            unitsForNotes?.length
+              ? `Unidades sugeridas (iCal): loft ${unitsForNotes.join(", ")}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(" · ") || undefined,
         }),
       });
       const data = (await res.json()) as {
@@ -851,12 +909,26 @@ export function GuidedReservation({
         reservationCode = data.reservation_code;
         if (reservationCode) {
           stashWhatsAppReservationMessage(
-            buildWhatsAppLines(reservationCode).join("\n"),
+            buildWhatsAppLines(reservationCode, waMessageOverrides).join("\n"),
           );
           window.location.href = `/confirmacion/${encodeURIComponent(reservationCode)}?wa=1`;
           return;
         }
       }
+
+      trackWhatsAppClick("guided_reservation_submit");
+      trackBeginCheckout({
+        lofts: Number(verifiedLofts),
+        guests: Number(guests),
+      });
+      window.open(
+        waLink(
+          buildWhatsAppLines(reservationCode, waMessageOverrides).join("\n"),
+        ),
+        "_blank",
+        "noopener",
+      );
+      return;
     } catch {
       setBookingError(
         "Motor de reservas no disponible — abriendo WhatsApp (fallback).",
@@ -865,10 +937,22 @@ export function GuidedReservation({
       setBookingBusy(false);
     }
 
+    const fallbackUnits =
+      opts?.assignedUnits ?? assignedUnitsHint ?? undefined;
+    const fallbackOverrides = {
+      categoryId: effectiveCategory,
+      lofts: fallbackUnits?.length ?? lofts,
+      assignedUnits: fallbackUnits,
+    };
     trackWhatsAppClick("guided_reservation_submit");
-    trackBeginCheckout({ lofts: Number(lofts), guests: Number(guests) });
+    trackBeginCheckout({
+      lofts: Number(fallbackOverrides.lofts),
+      guests: Number(guests),
+    });
     window.open(
-      waLink(buildWhatsAppLines(reservationCode).join("\n")),
+      waLink(
+        buildWhatsAppLines(reservationCode, fallbackOverrides).join("\n"),
+      ),
       "_blank",
       "noopener",
     );

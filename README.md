@@ -64,7 +64,9 @@ Guías:
 
 Tras promover, la migración `017` (o un re-run del backfill de memberships) asocia el usuario a la org **LOFTHOUSE**.
 
-Los módulos operativos usan tablas Supabase + APIs; algunos flujos aún tienen banners de migración desde localStorage. Booking público: wizard → motor de reservas + WhatsApp coexistente (`/confirmacion`, `/mi-reserva`).
+Los módulos operativos usan tablas Supabase + APIs; algunos flujos aún tienen banners de migración desde localStorage. Booking público: wizard → **chequeo iCal Airbnb en vivo** (`POST /api/public/availability/live`) → motor de reservas + WhatsApp (`/confirmacion`, `/mi-reserva`).
+
+**Disponibilidad Airbnb:** pega las URLs iCal de cada loft (1–14) en `LOFT_ICAL_URL_N`, `LOFT_ICAL_URLS_JSON` o `.data/loft-ical-urls.json` (plantilla: `loft-ical-urls.example.json`). Reglas Atrio: loft 5 máx. 3 huéspedes; con 4–10 solo lofts 7 y 8; con 11–13 también el 5. Si el tipo elegido no tiene cupo, el wizard ofrece otro tipo disponible (más caro primero: Vista → Atrio → Cielo).
 
 ### Modelo de amenaza (resumen)
 

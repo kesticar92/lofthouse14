@@ -15,6 +15,10 @@ import {
   maxGuestsOverridesForCategory,
   type MarketingCategory,
 } from "@/lib/catalog/seed";
+import {
+  candidateLoftsForCategory,
+  poolCapacity,
+} from "@/lib/availability/loft-priority";
 
 export type LoftCategoryId = MarketingCategory;
 
@@ -117,7 +121,8 @@ export const LOFT_CATEGORIES: LoftCategory[] = [
     windowKind: "interior",
     loftNumbers: loftNumbersForCategory("atrio"),
     priceFromCop: 105_000,
-    maxGuests: 5,
+    /** Capacidad conjunta 7+8+5 (loft 5 máx. 3). */
+    maxGuests: 13,
     maxGuestsByLoft: maxGuestsOverridesForCategory("atrio"),
     stubCode: "ATR",
     image: ATRIO_IMAGES[0],
@@ -168,25 +173,25 @@ export function priceForLoftNumber(n: number): number {
 
 /**
  * Unidades de una categoría aptas para `guests`.
- * Si el grupo supera 5 personas, se necesitan varios lofts: se listan todas
- * las unidades de la categoría (preferencia de tipo). Si cabe en un loft,
- * se excluyen las que no alcanzan (p. ej. loft 5 con máx. 3).
+ *
+ * Atrio: loft 5 máx. 3; con 4–10 solo 7 y 8; con 11–13 también el 5.
+ * Vista / Cielo: unidades cuya capacidad individual o conjunta cubre el grupo.
  */
 export function availableLoftsForGuests(
   category: LoftCategory,
   guests: number,
 ): number[] {
-  if (guests > 5) return [...category.loftNumbers];
-  return category.loftNumbers.filter(
-    (n) => (category.maxGuestsByLoft[n] ?? 5) >= guests,
-  );
+  const candidates = candidateLoftsForCategory(category.id, guests);
+  if (poolCapacity(candidates) < guests) return [];
+  return candidates.map((c) => c.unitNumber);
 }
 
 export function categoryFitsGuests(
   category: LoftCategory,
   guests: number,
 ): boolean {
-  return availableLoftsForGuests(category, guests).length > 0;
+  const candidates = candidateLoftsForCategory(category.id, guests);
+  return poolCapacity(candidates) >= guests;
 }
 
 /** Aplica overrides de marketing (fotos / amenities) sobre el seed. */

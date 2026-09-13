@@ -105,6 +105,18 @@ export function GuidedReservation({
     });
   const [bookingBusy, setBookingBusy] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [liveOffer, setLiveOffer] = useState<{
+    message: string;
+    categoryId: LoftCategoryId;
+    name: string;
+    priceFromCop: number;
+    assignedUnits: number[];
+    warning?: string;
+  } | null>(null);
+  const [liveWarning, setLiveWarning] = useState<string | null>(null);
+  const [assignedUnitsHint, setAssignedUnitsHint] = useState<number[] | null>(
+    null,
+  );
   const [couponCode, setCouponCode] = useState("");
   const [couponMsg, setCouponMsg] = useState<string | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
@@ -651,13 +663,18 @@ export function GuidedReservation({
   }
 
   /**
-   * Fase 4: crea reserva en motor (DB o mock local) y abre WhatsApp
-   * como canal de confirmación coexistente.
+   * Fase 4: verifica disponibilidad Airbnb/iCal en vivo, crea reserva
+   * y abre WhatsApp como canal de confirmación.
    */
-  async function handleReservar() {
+  async function completeBooking(opts?: {
+    categoryOverride?: LoftCategoryId;
+    assignedUnits?: number[];
+  }) {
     if (!quoteResult.ok || bookingBusy || !policiesAccepted) return;
+    const effectiveCategory = opts?.categoryOverride ?? categoryId;
     setBookingBusy(true);
     setBookingError(null);
+    setLiveOffer(null);
 
     const extrasPayload = CONFIGURATOR_EXTRAS.filter((e) =>
       extras.includes(e.id),
@@ -677,25 +694,56 @@ export function GuidedReservation({
     }));
 
     let reservationCode: string | undefined;
+    let confirmedUnits: number[] | undefined = opts?.assignedUnits;
     try {
-      // Preflight availability (mismo motor que booking)
-      if (checkIn && checkOut) {
-        const availQs = new URLSearchParams({
-          check_in: checkIn,
-          check_out: checkOut,
-          guests: String(guests),
+      if (checkIn && checkOut && effectiveCategory) {
+        const liveRes = await fetch("/api/public/availability/live", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            check_in: checkIn,
+            check_out: checkOut,
+            guests,
+            category_id: effectiveCategory,
+          }),
         });
-        if (categoryId) availQs.set("category", categoryId);
-        const availRes = await fetch(
-          `/api/public/availability?${availQs.toString()}`,
-        );
-        if (availRes.ok) {
-          const avail = (await availRes.json()) as {
-            available_count?: number;
+        if (liveRes.ok) {
+          const live = (await liveRes.json()) as {
+            ok?: boolean;
+            message?: string;
+            warning?: string;
+            assignedUnits?: number[];
+            alternative?: {
+              categoryId: LoftCategoryId;
+              name: string;
+              priceFromCop: number;
+              assignedUnits: number[];
+            } | null;
+            reason?: string;
           };
-          if ((avail.available_count ?? 0) < Math.max(1, lofts)) {
+
+          if (live.warning) setLiveWarning(live.warning);
+          else setLiveWarning(null);
+
+          if (!live.ok) {
+            if (live.alternative) {
+              setLiveOffer({
+                message:
+                  live.message ??
+                  "No hay cupo del tipo elegido. Hay otra opción disponible.",
+                categoryId: live.alternative.categoryId,
+                name: live.alternative.name,
+                priceFromCop: live.alternative.priceFromCop,
+                assignedUnits: live.alternative.assignedUnits,
+                warning: live.warning,
+              });
+              setBookingError(null);
+              setBookingBusy(false);
+              return;
+            }
             setBookingError(
-              "No hay disponibilidad para esas fechas / categoría. Ajusta fechas o continúa por WhatsApp.",
+              live.message ??
+                "No hay disponibilidad para esas fechas. Ajusta fechas o continúa por WhatsApp.",
             );
             setBookingBusy(false);
             trackWhatsAppClick("guided_reservation_unavailable");
@@ -706,8 +754,17 @@ export function GuidedReservation({
             );
             return;
           }
+
+          if (live.assignedUnits?.length) {
+            setAssignedUnitsHint(live.assignedUnits);
+            setLofts(Math.max(1, live.assignedUnits.length));
+            confirmedUnits = live.assignedUnits;
+          }
         }
       }
+
+      const unitsForNotes =
+        opts?.assignedUnits ?? confirmedUnits ?? assignedUnitsHint ?? undefined;
 
       const res = await fetch("/api/public/booking", {
         method: "POST",
@@ -716,9 +773,11 @@ export function GuidedReservation({
           check_in: checkIn,
           check_out: checkOut,
           guests,
-          lofts,
+          lofts: unitsForNotes?.length
+            ? unitsForNotes.length
+            : lofts,
           guest_name: name.trim() || "Huésped web",
-          category_id: categoryId ?? undefined,
+          category_id: effectiveCategory ?? undefined,
           extras: extrasPayload,
           coupon_code: couponCode.trim() || undefined,
           also_whatsapp: true,
@@ -731,6 +790,9 @@ export function GuidedReservation({
             bookingChannel === "referral"
               ? referrerName.trim() || undefined
               : undefined,
+          notes: unitsForNotes?.length
+            ? `Unidades sugeridas (iCal): loft ${unitsForNotes.join(", ")}`
+            : undefined,
         }),
       });
       const data = (await res.json()) as {
@@ -752,7 +814,7 @@ export function GuidedReservation({
           );
           window.location.href = `/confirmacion/${encodeURIComponent(reservationCode)}?wa=1`;
           return;
-          }
+        }
       }
     } catch {
       setBookingError(
@@ -769,6 +831,22 @@ export function GuidedReservation({
       "_blank",
       "noopener",
     );
+  }
+
+  function handleReservar() {
+    return completeBooking();
+  }
+
+  function acceptLiveOffer() {
+    if (!liveOffer) return;
+    setCategoryId(liveOffer.categoryId);
+    setAssignedUnitsHint(liveOffer.assignedUnits);
+    setLofts(Math.max(1, liveOffer.assignedUnits.length));
+    setLiveOffer(null);
+    void completeBooking({
+      categoryOverride: liveOffer.categoryId,
+      assignedUnits: liveOffer.assignedUnits,
+    });
   }
 
   return (
@@ -1708,9 +1786,51 @@ export function GuidedReservation({
                 </button>
               ) : (
                 <div className="flex flex-col items-end gap-2">
+                  {liveOffer ? (
+                    <div className="max-w-sm rounded-2xl border border-amber-300/80 bg-amber-50 px-4 py-3 text-left dark:border-amber-700/60 dark:bg-amber-950/40">
+                      <p className="text-xs font-semibold text-amber-950 dark:text-amber-100">
+                        Disponibilidad en vivo
+                      </p>
+                      <p className="mt-1 text-xs text-amber-900 dark:text-amber-200">
+                        {liveOffer.message}
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-white">
+                        {liveOffer.name}{" "}
+                        <span className="font-normal text-zinc-600 dark:text-zinc-400">
+                          desde {formatCOP(liveOffer.priceFromCop)}/noche
+                        </span>
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-zinc-500">
+                        Unidades libres ahora: loft{" "}
+                        {liveOffer.assignedUnits.join(", ")}
+                      </p>
+                      <div className="mt-3 flex flex-wrap justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setLiveOffer(null)}
+                          className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-semibold dark:border-zinc-600"
+                        >
+                          Elegir otro
+                        </button>
+                        <button
+                          type="button"
+                          disabled={bookingBusy}
+                          onClick={() => acceptLiveOffer()}
+                          className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-bold text-white dark:bg-white dark:text-zinc-900"
+                        >
+                          Reservar {liveOffer.name}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
                   {bookingError ? (
                     <p className="max-w-xs text-right text-xs text-amber-800 dark:text-amber-300">
                       {bookingError}
+                    </p>
+                  ) : null}
+                  {liveWarning && !liveOffer ? (
+                    <p className="max-w-xs text-right text-[11px] text-zinc-500">
+                      {liveWarning}
                     </p>
                   ) : null}
                   {!policiesAccepted ? (
@@ -1721,7 +1841,10 @@ export function GuidedReservation({
                   <button
                     type="button"
                     disabled={
-                      !quoteResult.ok || bookingBusy || !policiesAccepted
+                      !quoteResult.ok ||
+                      bookingBusy ||
+                      !policiesAccepted ||
+                      Boolean(liveOffer)
                     }
                     onClick={() => void handleReservar()}
                     className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"

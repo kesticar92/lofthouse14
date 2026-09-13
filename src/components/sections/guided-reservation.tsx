@@ -1828,7 +1828,7 @@ export function GuidedReservation({
 
                   <div className="rounded-xl border border-zinc-200 bg-zinc-50/80 px-3 py-3 text-sm dark:border-zinc-700 dark:bg-zinc-900/40">
                     <p className="font-semibold text-zinc-900 dark:text-zinc-100">
-                      Políticas de la casa
+                      Políticas de Lofthouse 14
                     </p>
                     <ul className="mt-2 list-inside list-disc space-y-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
                       <li>
@@ -1899,63 +1899,15 @@ export function GuidedReservation({
                       >
                         /politicas
                       </Link>
-                      .
+                      . Debes aceptarlas abajo, junto a RESERVAR.
                     </p>
-                    <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-sm text-zinc-800 dark:text-zinc-100">
-                      <input
-                        type="checkbox"
-                        checked={policiesAccepted}
-                        onChange={(e) => setPoliciesAccepted(e.target.checked)}
-                        className="mt-0.5 size-4 shrink-0 rounded border-zinc-400"
-                      />
-                      <span>
-                        Acepto las{" "}
-                        <Link
-                          href="/politicas"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-semibold text-amber-900 underline underline-offset-2 dark:text-amber-300"
-                        >
-                          políticas
-                        </Link>{" "}
-                        (
-                        <Link
-                          href="/politicas#deposito"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline underline-offset-2"
-                        >
-                          depósito
-                        </Link>
-                        ,{" "}
-                        <Link
-                          href="/politicas#aseo"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline underline-offset-2"
-                        >
-                          aseo
-                        </Link>
-                        ,{" "}
-                        <Link
-                          href="/politicas#estadia"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline underline-offset-2"
-                        >
-                          estadía
-                        </Link>
-                        , cancelación, anticipos y normas). Al pulsar RESERVAR
-                        confirmo haberlas leído.
-                      </span>
-                    </label>
                   </div>
                 </div>
               )}
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-8 flex flex-col gap-4 border-t border-zinc-100 pt-6 dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-8 flex flex-col gap-4 border-t border-zinc-100 pt-6 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between">
             <div className="text-sm">
               {grandTotal !== null && step >= 1 ? (
                 <>
@@ -1970,7 +1922,7 @@ export function GuidedReservation({
                 </span>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex w-full flex-wrap items-end justify-end gap-3">
               <button
                 type="button"
                 disabled={!canGoBack || transitionTo !== null}
@@ -2003,31 +1955,45 @@ export function GuidedReservation({
                   <ChevronRight className="size-4" aria-hidden />
                 </button>
               ) : (
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex w-full max-w-md flex-col gap-2 sm:w-auto">
+                  <label
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-2xl border px-3.5 py-3 text-sm transition",
+                      policiesAccepted
+                        ? "border-emerald-300 bg-emerald-50/80 text-zinc-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-zinc-100"
+                        : "border-amber-300 bg-amber-50 text-zinc-900 shadow-[0_0_0_1px_rgba(245,158,11,0.35)] dark:border-amber-800 dark:bg-amber-950/40 dark:text-zinc-100",
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={policiesAccepted}
+                      onChange={(e) => setPoliciesAccepted(e.target.checked)}
+                      className="mt-0.5 size-5 shrink-0 rounded border-zinc-400"
+                    />
+                    <span className="font-semibold leading-snug">
+                      Acepto las políticas de Lofthouse 14
+                    </span>
+                  </label>
                   {bookingError ? (
-                    <p className="max-w-xs text-right text-xs text-amber-800 dark:text-amber-300">
+                    <p className="text-xs text-amber-800 dark:text-amber-300">
                       {bookingError}
                     </p>
                   ) : null}
                   {liveWarning && !liveOffer ? (
-                    <p className="max-w-xs text-right text-[11px] text-zinc-500">
-                      {liveWarning}
-                    </p>
+                    <p className="text-[11px] text-zinc-500">{liveWarning}</p>
                   ) : null}
                   {!policiesAccepted ? (
-                    <p className="max-w-xs text-right text-[11px] text-amber-800 dark:text-amber-300">
-                      Marca «Acepto las políticas» para continuar.
+                    <p className="text-[11px] font-medium text-amber-800 dark:text-amber-300">
+                      Márcalo para habilitar el botón RESERVAR.
                     </p>
                   ) : null}
                   <button
                     type="button"
                     disabled={
-                      !quoteResult.ok ||
-                      bookingBusy ||
-                      !policiesAccepted
+                      !quoteResult.ok || bookingBusy || !policiesAccepted
                     }
                     onClick={() => void handleReservar()}
-                    className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-5 py-3 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
                   >
                     <Image
                       src="/logos/whatsapp.svg"
@@ -2039,9 +2005,8 @@ export function GuidedReservation({
                     />
                     {bookingBusy ? "Creando reserva…" : "RESERVAR"}
                   </button>
-                  <p className="max-w-xs text-right text-[11px] text-zinc-500">
-                    Al reservar aceptas las políticas. Se crea la reserva y se
-                    abre WhatsApp para confirmar.
+                  <p className="text-[11px] text-zinc-500">
+                    Se crea la reserva y se abre WhatsApp para confirmar.
                   </p>
                 </div>
               )}

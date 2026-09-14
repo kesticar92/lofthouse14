@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Lofthouse 14 — estructura del sitio",
+  "generatedAt": "2026-09-14",
+  "siteUrl": "https://www.lofthouse14.com",
+  "defaultOpenGraphImage": "/gallery/immersive/09-fachada_diurna.webp",
+  "defaultOpenGraphImageAlt": "Fachada de día de Lofthouse 14 en Miraflores, Cali — rejas, hojas y letrero",
+  "locale": "es_CO",
+  "pages": [
+    {
+      "path": "/",
+      "title": "Lofts en Cali con Cocina · Barrio Miraflores | Lofthouse 14",
+      "description": "Lofts modernos en Cali, barrio Miraflores, a pasos del Parque del Perro. WiFi, A/C, cocina equipada. Desde $90.000/noche. Check-in autónomo. ¡Reserva directo aquí!",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 1,
+      "section": "home"
+    },
+    {
+      "path": "/lofts",
+      "title": "Nuestros lofts en Miraflores, Cali",
+      "description": "Explora los lofts de Lofthouse 14: categorías Vista, Atrio y Cielo. Reserva directa en Miraflores, Cali.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.95,
+      "section": "catalog"
+    },
+    {
+      "path": "/reservar",
+      "title": "Reservar loft en Cali (Miraflores)",
+      "description": "Elige fechas, huéspedes y extras. Cotiza y confirma tu loft en Miraflores, Cali, por WhatsApp. Check-in autónomo · desde $90.000/noche.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.95,
+      "section": "booking"
+    },
+    {
+      "path": "/ubicacion-miraflores-cali",
+      "title": "Ubicación en Miraflores, Cali",
+      "description": "Cómo llegar a Lofthouse 14 en Miraflores, cerca del Parque del Perro. Mapa, barrio y entorno.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.85,
+      "section": "location"
+    },
+    {
+      "path": "/resenas",
+      "title": "Reseñas de huéspedes",
+      "description": "Opiniones reales de huéspedes en Google, Airbnb y Booking sobre Lofthouse 14 en Cali.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.8,
+      "section": "social-proof"
+    },
+    {
+      "path": "/galeria",
+      "title": "Galería y redes | LOFTHOUSE 14",
+      "description": "Fotos e Instagram de Lofthouse 14: lofts, fachada y experiencias en Miraflores, Cali.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.7,
+      "section": "media"
+    },
+    {
+      "path": "/blog",
+      "title": "Blog | Lofthouse 14",
+      "description": "Guías locales de Cali: Parque del Perro, nómadas digitales y alojamiento médico cerca de Miraflores.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.75,
+      "section": "content"
+    },
+    {
+      "path": "/en",
+      "title": "Lofts in Cali · Miraflores | Lofthouse 14",
+      "description": "Modern lofts in Miraflores, Cali near Parque del Perro. WiFi, A/C, kitchen. Book direct.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.8,
+      "section": "i18n"
+    },
+    {
+      "path": "/politicas",
+      "title": "Políticas — LOFTHOUSE 14",
+      "description": "Conoce nuestras políticas de reservas, depósito de daños, aseo, duración máxima, anticipos, cancelaciones y normas del alojamiento.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.4,
+      "section": "legal"
+    },
+    {
+      "path": "/grupos",
+      "title": "Alquiler Lofts para Grupos en Cali · Hasta 63 personas",
+      "description": "Aloja a tu grupo completo en Cali. Hasta 63 personas en lofts privados en Miraflores. Coordinación incluida, precio por loft. Solicita cotización vía WhatsApp.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.85,
+      "section": "landing"
+    },
+    {
+      "path": "/nomadas-digitales",
+      "title": "Lofts con WiFi para Nómadas Digitales en Cali",
+      "description": "Lofts en Miraflores con cocina, A/C y WiFi para trabajo remoto. Cerca del Parque del Perro. Reserva directa desde $90.000/noche.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.85,
+      "section": "landing"
+    },
+    {
+      "path": "/alojamiento-medico",
+      "title": "Alojamiento Médico Cali · Cerca Clínicas",
+      "description": "Lofts tranquilos en Miraflores para pacientes y acompañantes. Cocina, WiFi y check-in autónomo. Reserva directa por WhatsApp.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.85,
+      "section": "landing"
+    },
+    {
+      "path": "/salsa-cali",
+      "title": "Hospedaje para Salsa en Cali · Miraflores",
+      "description": "Lofts en Miraflores para vivir la salsa en Cali. Base segura cerca del Parque del Perro. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.85,
+      "section": "landing"
+    },
+    {
+      "path": "/blog/que-hacer-cerca-del-parque-del-perro-en-cali",
+      "title": "Qué hacer cerca del Parque del Perro en Cali",
+      "description": "Guía local: gastronomía, cultura y planes a pasos de Lofthouse 14 en Miraflores, Cali.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.65,
+      "section": "blog"
+    },
+    {
+      "path": "/blog/guia-nomadas-digitales-cali-miraflores",
+      "title": "Guía para nómadas digitales en Cali (Miraflores)",
+      "description": "WiFi, cafés, costos y por qué un loft en Miraflores funciona mejor que un hotel para trabajo remoto.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.65,
+      "section": "blog"
+    },
+    {
+      "path": "/blog/alojamiento-medico-en-cali-cerca-de-clinicas",
+      "title": "Alojamiento médico en Cali cerca de clínicas",
+      "description": "Consejos para pacientes y acompañantes: lofts con cocina cerca de clínicas en Miraflores.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.65,
+      "section": "blog"
+    },
+    {
+      "path": "/lofts/loft-01-cali-miraflores",
+      "title": "Loft 01 — Miraflores Cali | Reserva directa",
+      "description": "Loft 01 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-02-cali-miraflores",
+      "title": "Loft 02 — Miraflores Cali | Reserva directa",
+      "description": "Loft 02 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-03-cali-miraflores",
+      "title": "Loft 03 — Miraflores Cali | Reserva directa",
+      "description": "Loft 03 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-05-cali-miraflores",
+      "title": "Loft 05 — Miraflores Cali | Reserva directa",
+      "description": "Loft 05 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-06-cali-miraflores",
+      "title": "Loft 06 — Miraflores Cali | Reserva directa",
+      "description": "Loft 06 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-07-cali-miraflores",
+      "title": "Loft 07 — Miraflores Cali | Reserva directa",
+      "description": "Loft 07 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-08-cali-miraflores",
+      "title": "Loft 08 — Miraflores Cali | Reserva directa",
+      "description": "Loft 08 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-09-cali-miraflores",
+      "title": "Loft 09 — Miraflores Cali | Reserva directa",
+      "description": "Loft 09 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-10-cali-miraflores",
+      "title": "Loft 10 — Miraflores Cali | Reserva directa",
+      "description": "Loft 10 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-11-cali-miraflores",
+      "title": "Loft 11 — Miraflores Cali | Reserva directa",
+      "description": "Loft 11 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-12-cali-miraflores",
+      "title": "Loft 12 — Miraflores Cali | Reserva directa",
+      "description": "Loft 12 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-13-cali-miraflores",
+      "title": "Loft 13 — Miraflores Cali | Reserva directa",
+      "description": "Loft 13 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/lofts/loft-14-cali-miraflores",
+      "title": "Loft 14 — Miraflores Cali | Reserva directa",
+      "description": "Loft 14 en Lofthouse 14, Miraflores, Cali. Cocina, A/C y WiFi. Reserva directa.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": true,
+      "priority": 0.9,
+      "section": "loft-detail"
+    },
+    {
+      "path": "/site-structure.json",
+      "title": "Estructura del sitio (JSON)",
+      "description": "Inventario de rutas públicas con metadatos SEO y Open Graph.",
+      "ogImage": "/gallery/immersive/09-fachada_diurna.webp",
+      "indexable": false,
+      "priority": 0,
+      "section": "meta"
+    }
+  ],
+  "excludedFromPublicIndex": [
+    "/admin",
+    "/admin/*",
+    "/mi-reserva",
+    "/mensajes",
+    "/ayuda",
+    "/confirmacion/*",
+    "/check-in/*",
+    "/preview-movil"
+  ],
+  "notes": [
+    "Este JSON es un inventario legible/máquina para auditoría SEO y documentación.",
+    "El sitemap oficial para buscadores sigue siendo /sitemap.xml.",
+    "La imagen Open Graph por defecto es la fachada diurna con rejas y hojas del árbol."
+  ]
+}

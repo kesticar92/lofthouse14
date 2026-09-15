@@ -1397,7 +1397,7 @@ export function GuidedReservation({
   return (
     <section
       id="reservas"
-      data-wizard-build="extras-v5-draft-consent"
+      data-wizard-build="extras-v6-sticky-footer"
       data-wizard-step={String(step)}
       data-wizard-profile={profile ?? ""}
       className={cn(
@@ -2499,7 +2499,10 @@ export function GuidedReservation({
             </motion.div>
           </AnimatePresence>
 
-          <div className="relative z-50 mt-8 flex flex-col gap-4 border-t border-zinc-100 bg-white pt-6 dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between">
+          <div
+            data-wizard-footer
+            className="sticky bottom-0 z-50 mt-8 -mx-6 flex flex-col gap-4 border-t border-zinc-100 bg-white/95 px-6 py-4 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/95 sm:-mx-8 sm:flex-row sm:items-center sm:justify-between sm:px-8"
+          >
             <div className="text-sm">
               {grandTotal !== null && step >= 1 ? (
                 <>
@@ -2541,6 +2544,7 @@ export function GuidedReservation({
                   <button
                     type="button"
                     data-wizard-next
+                    aria-label="Siguiente paso del configurador"
                     disabled={!canAdvance() || transitionTo !== null}
                     onClick={() => advanceFromCurrentStep()}
                     className="inline-flex shrink-0 items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"

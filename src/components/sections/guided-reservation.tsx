@@ -368,6 +368,7 @@ export function GuidedReservation({
   const mealDaysMin =
     quoteResult.ok && quoteResult.noches === 1 ? 1 : 0;
   const quoteNights = quoteResult.ok ? quoteResult.noches : 0;
+  const quoteOk = quoteResult.ok;
 
   useEffect(() => {
     const days = clampMealDays(
@@ -379,7 +380,17 @@ export function GuidedReservation({
       breakfast: { days, guests },
       lunch: { days, guests },
     });
-  }, [mealDaysDefault, mealDaysMin, quoteNights, guests, checkIn, checkOut]);
+    // Longitud fija (7): no reordenar ni acortar — evita crash de React/HMR
+    // si el tamaño del array de deps cambia entre renders.
+  }, [
+    mealDaysDefault,
+    mealDaysMin,
+    guests,
+    checkIn,
+    checkOut,
+    quoteOk,
+    quoteNights,
+  ]);
 
   /** Vehículos de traslado: mínimo según huéspedes (máx. 4 por vehículo). */
   useEffect(() => {

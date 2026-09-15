@@ -10,18 +10,23 @@ export type ConfiguratorExtra = {
   pricing?: ExtraPricing;
 };
 
+/** Capacidad máxima de pasajeros por vehículo de traslado. */
+export const AIRPORT_VEHICLE_CAPACITY = 4;
+
 export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
   {
     id: "early-checkin",
     label: "Early check-in",
-    description: "Ingreso antes del horario estándar, sujeto a disponibilidad.",
+    description:
+      "Ingreso antes del horario estándar, sujeto a disponibilidad. Si reservas más de un loft, el valor es por cada loft que lo solicite.",
     priceCop: 60_000,
     pricing: "flat",
   },
   {
     id: "late-checkout",
     label: "Late check-out",
-    description: "Salida después de las 11:00 a.m. si la unidad lo permite.",
+    description:
+      "Salida después de las 11:00 a.m. si la unidad lo permite. Si reservas más de un loft, el valor es por cada loft que lo solicite.",
     priceCop: 60_000,
     pricing: "flat",
   },
@@ -29,7 +34,7 @@ export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
     id: "airport-transfer",
     label: "Traslado aeropuerto",
     description:
-      "Automóvil privado sedán con aire acondicionado. Elige recogida en aeropuerto y/o traslado de salida al aeropuerto ($70.000 por trayecto).",
+      "Automóvil privado sedán con aire acondicionado (máx. 4 pasajeros por vehículo). $70.000 por trayecto y por vehículo. Con 5 o más huéspedes se requieren al menos 2 vehículos.",
     priceCop: 70_000,
     pricing: "perAirportLeg",
   },
@@ -82,7 +87,39 @@ export type MealExtraQuantity = {
 export type AirportTransferChoice = {
   pickup: boolean;
   dropoff: boolean;
+  /** Número de vehículos (cada uno máx. 4 pasajeros). */
+  vehicles: number;
 };
+
+export type TimingExtraId = "early-checkin" | "late-checkout";
+
+export type TimingExtraQuantity = {
+  /** Cuántos lofts / apartamentos requieren el servicio. */
+  units: number;
+};
+
+/** Mínimo de vehículos según huéspedes (capacidad 4). */
+export function minAirportVehicles(guests: number): number {
+  const g = Math.max(1, Math.floor(guests || 1));
+  return Math.max(1, Math.ceil(g / AIRPORT_VEHICLE_CAPACITY));
+}
+
+export function clampAirportVehicles(
+  vehicles: number,
+  guests: number,
+  maxVehicles = 20,
+): number {
+  const min = minAirportVehicles(guests);
+  return Math.min(maxVehicles, Math.max(min, Math.floor(vehicles || min)));
+}
+
+export function clampTimingUnits(
+  units: number,
+  lofts: number,
+): number {
+  const max = Math.max(1, Math.floor(lofts || 1));
+  return Math.min(max, Math.max(1, Math.floor(units || max)));
+}
 
 export function airportTransferLegCount(choice: AirportTransferChoice): number {
   return (choice.pickup ? 1 : 0) + (choice.dropoff ? 1 : 0);
@@ -108,6 +145,12 @@ export function extraUnitLabel(extra: ConfiguratorExtra): string {
   if (extra.pricing === "perGuestPerDay") {
     return `+ ${formatCopPlain(extra.priceCop)} / pers. / día`;
   }
+  if (extra.pricing === "perAirportLeg") {
+    return `+ ${formatCopPlain(extra.priceCop)} / trayecto / vehículo`;
+  }
+  if (extra.id === "early-checkin" || extra.id === "late-checkout") {
+    return `+ ${formatCopPlain(extra.priceCop)} / loft`;
+  }
   return `+ ${formatCopPlain(extra.priceCop)}`;
 }
 
@@ -122,6 +165,8 @@ function formatCopPlain(n: number): string {
 export type ExtraLineContext = {
   mealQty?: MealExtraQuantity;
   airport?: AirportTransferChoice;
+  /** Unidades (lofts) para early check-in / late check-out. */
+  units?: number;
 };
 
 export function extraLineTotalCop(
@@ -136,9 +181,14 @@ export function extraLineTotalCop(
   }
   if (extra.pricing === "perAirportLeg") {
     const legs = airportTransferLegCount(
-      ctx?.airport ?? { pickup: false, dropoff: false },
+      ctx?.airport ?? { pickup: false, dropoff: false, vehicles: 1 },
     );
-    return extra.priceCop * legs;
+    const vehicles = Math.max(1, Math.floor(ctx?.airport?.vehicles ?? 1));
+    return extra.priceCop * legs * vehicles;
+  }
+  if (extra.id === "early-checkin" || extra.id === "late-checkout") {
+    const units = Math.max(1, Math.floor(ctx?.units ?? 1));
+    return extra.priceCop * units;
   }
   return extra.priceCop;
 }
@@ -147,6 +197,7 @@ export function extrasTotalCop(
   selectedIds: string[],
   mealQuantities: Partial<Record<MealExtraId, MealExtraQuantity>>,
   airportTransfer: AirportTransferChoice,
+  timingQuantities?: Partial<Record<TimingExtraId, TimingExtraQuantity>>,
 ): number {
   let sum = 0;
   for (const extra of CONFIGURATOR_EXTRAS) {
@@ -157,6 +208,9 @@ export function extrasTotalCop(
     }
     if (extra.id === "airport-transfer") {
       ctx.airport = airportTransfer;
+    }
+    if (extra.id === "early-checkin" || extra.id === "late-checkout") {
+      ctx.units = timingQuantities?.[extra.id]?.units ?? 1;
     }
     sum += extraLineTotalCop(extra, ctx);
   }

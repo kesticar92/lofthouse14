@@ -9,6 +9,10 @@ import {
   normalizeBookingChannel,
   formatChannelNote,
 } from "./channels";
+import {
+  AIRPORT_VEHICLE_CAPACITY,
+  minAirportVehicles,
+} from "@/lib/configurator-extras";
 
 describe("extras catalog", () => {
   it("seed incluye early/late/breakfast/transfer", () => {
@@ -18,14 +22,40 @@ describe("extras catalog", () => {
     }
   });
 
-  it("cotiza early check-in flat", () => {
+  it("cotiza early/late flat por loft (1 loft por defecto)", () => {
     const q = quoteBookingExtras({
       selectedIds: ["early-checkin", "late-checkout"],
       guests: 2,
       nights: 3,
+      lofts: 1,
     });
     expect(q.totalCop).toBe(120_000);
     expect(q.lines).toHaveLength(2);
+  });
+
+  it("multiplica early/late por el total de lofts si no se indica units", () => {
+    const q = quoteBookingExtras({
+      selectedIds: ["early-checkin"],
+      guests: 4,
+      nights: 2,
+      lofts: 3,
+    });
+    expect(q.totalCop).toBe(60_000 * 3);
+    expect(q.lines[0]?.meta).toMatchObject({ units: 3 });
+  });
+
+  it("permite early/late solo para algunos lofts", () => {
+    const q = quoteBookingExtras({
+      selectedIds: ["early-checkin", "late-checkout"],
+      guests: 6,
+      nights: 2,
+      lofts: 3,
+      timingQuantities: {
+        "early-checkin": { units: 2 },
+        "late-checkout": { units: 1 },
+      },
+    });
+    expect(q.totalCop).toBe(60_000 * 2 + 60_000 * 1);
   });
 
   it("cotiza desayuno por huésped/día", () => {
@@ -38,12 +68,41 @@ describe("extras catalog", () => {
     expect(q.totalCop).toBe(15_000 * 2 * 2);
   });
 
-  it("reprices amountCop del cliente", () => {
+  it("traslado: $70.000 × trayectos × vehículos", () => {
+    const q = quoteBookingExtras({
+      selectedIds: ["airport-transfer"],
+      guests: 5,
+      nights: 2,
+      airportTransfer: { pickup: true, dropoff: true, vehicles: 2 },
+    });
+    expect(minAirportVehicles(5)).toBe(2);
+    expect(q.totalCop).toBe(70_000 * 2 * 2);
+    expect(q.lines[0]?.meta).toMatchObject({ legs: 2, vehicles: 2 });
+  });
+
+  it("traslado con 5+ huéspedes fuerza mínimo de vehículos", () => {
     const q = normalizeClientExtras(
-      [{ id: "early-checkin", label: "Hack", amountCop: 1 }],
-      { guests: 2, nights: 2 },
+      [
+        {
+          id: "airport-transfer",
+          pickup: true,
+          dropoff: false,
+          vehicles: 1,
+        },
+      ],
+      { guests: 5, nights: 2, lofts: 2 },
     );
-    expect(q.lines[0]?.amountCop).toBe(60_000);
+    expect(q.lines[0]?.amountCop).toBe(70_000 * 1 * 2);
+    expect(q.lines[0]?.meta).toMatchObject({ vehicles: 2 });
+    expect(AIRPORT_VEHICLE_CAPACITY).toBe(4);
+  });
+
+  it("reprices amountCop del cliente y aplica units de lofts", () => {
+    const q = normalizeClientExtras(
+      [{ id: "early-checkin", label: "Hack", amountCop: 1, units: 2 }],
+      { guests: 2, nights: 2, lofts: 3 },
+    );
+    expect(q.lines[0]?.amountCop).toBe(120_000);
   });
 });
 

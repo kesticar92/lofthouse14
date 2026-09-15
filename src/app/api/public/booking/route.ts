@@ -37,6 +37,12 @@ const bodySchema = z.object({
         id: z.string(),
         label: z.string().optional(),
         amountCop: z.number().optional(),
+        units: z.number().int().min(1).max(14).optional(),
+        vehicles: z.number().int().min(1).max(20).optional(),
+        pickup: z.boolean().optional(),
+        dropoff: z.boolean().optional(),
+        mealDays: z.number().int().min(0).max(60).optional(),
+        mealGuests: z.number().int().min(1).max(20).optional(),
       }),
     )
     .optional(),
@@ -83,6 +89,7 @@ export async function POST(req: Request) {
   const extrasQuoted = normalizeClientExtras(body.extras, {
     guests: body.guests,
     nights: nights ?? 1,
+    lofts: body.lofts ?? 1,
   });
   const extrasPayload = extrasQuoted.lines.map((l) => ({
     id: l.id,

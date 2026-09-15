@@ -7,11 +7,16 @@
 import {
   CONFIGURATOR_EXTRAS,
   airportTransferLegCount,
+  clampAirportVehicles,
+  clampTimingUnits,
   extraLineTotalCop,
+  minAirportVehicles,
   type AirportTransferChoice,
   type ConfiguratorExtra,
   type MealExtraId,
   type MealExtraQuantity,
+  type TimingExtraId,
+  type TimingExtraQuantity,
 } from "@/lib/configurator-extras";
 
 export type BookingExtraLine = {
@@ -38,12 +43,28 @@ export function getExtraById(id: string): ConfiguratorExtra | undefined {
   return CONFIGURATOR_EXTRAS.find((e) => e.id === id);
 }
 
+export type ClientExtraInput = {
+  id: string;
+  label?: string;
+  amountCop?: number;
+  /** Lofts que solicitan early/late. */
+  units?: number;
+  /** Vehículos de traslado. */
+  vehicles?: number;
+  pickup?: boolean;
+  dropoff?: boolean;
+  mealDays?: number;
+  mealGuests?: number;
+};
+
 export type QuoteExtrasInput = {
   selectedIds: string[];
   guests?: number;
   nights?: number;
+  lofts?: number;
   mealQuantities?: Partial<Record<MealExtraId, MealExtraQuantity>>;
   airportTransfer?: AirportTransferChoice;
+  timingQuantities?: Partial<Record<TimingExtraId, TimingExtraQuantity>>;
 };
 
 export type QuoteExtrasResult = {
@@ -66,8 +87,18 @@ function defaultMealQty(
 export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
   const guests = Math.max(1, Math.floor(input.guests ?? 1));
   const nights = Math.max(0, Math.floor(input.nights ?? 1));
+  const lofts = Math.max(1, Math.floor(input.lofts ?? 1));
   const mealDefault = defaultMealQty(nights, guests);
-  const airport = input.airportTransfer ?? { pickup: false, dropoff: false };
+  const airportIn = input.airportTransfer ?? {
+    pickup: false,
+    dropoff: false,
+    vehicles: minAirportVehicles(guests),
+  };
+  const airport: AirportTransferChoice = {
+    pickup: airportIn.pickup,
+    dropoff: airportIn.dropoff,
+    vehicles: clampAirportVehicles(airportIn.vehicles, guests),
+  };
   const lines: BookingExtraLine[] = [];
 
   for (const id of input.selectedIds) {
@@ -93,12 +124,24 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
       airportChoice =
         airportTransferLegCount(airport) > 0
           ? airport
-          : { pickup: true, dropoff: false };
+          : {
+              pickup: true,
+              dropoff: false,
+              vehicles: clampAirportVehicles(airport.vehicles, guests),
+            };
+    }
+    let units: number | undefined;
+    if (extra.id === "early-checkin" || extra.id === "late-checkout") {
+      units = clampTimingUnits(
+        input.timingQuantities?.[extra.id]?.units ?? lofts,
+        lofts,
+      );
     }
 
     const amountCop = extraLineTotalCop(extra, {
       mealQty,
       airport: airportChoice,
+      units,
     });
     lines.push({
       id: extra.id,
@@ -107,15 +150,20 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
       pricing: extra.pricing,
       meta:
         extra.id === "airport-transfer"
-          ? { legs: airportTransferLegCount(airportChoice!) }
-          : mealQty
-            ? { days: mealQty.days, guests: mealQty.guests }
-            : undefined,
+          ? {
+              legs: airportTransferLegCount(airportChoice!),
+              vehicles: airportChoice!.vehicles,
+            }
+          : extra.id === "early-checkin" || extra.id === "late-checkout"
+            ? { units }
+            : mealQty
+              ? { days: mealQty.days, guests: mealQty.guests }
+              : undefined,
     });
   }
 
   const totalCop = lines.reduce((s, l) => s + l.amountCop, 0);
-  return { lines, totalCop, catalog_version: "configurator-v1" };
+  return { lines, totalCop, catalog_version: "configurator-v2" };
 }
 
 /**
@@ -123,17 +171,61 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
  * Si el body trae amountCop pero el id es conocido, se reprices.
  */
 export function normalizeClientExtras(
-  raw: Array<{ id: string; label?: string; amountCop?: number }> | undefined,
-  ctx: { guests?: number; nights?: number },
+  raw: ClientExtraInput[] | undefined,
+  ctx: { guests?: number; nights?: number; lofts?: number },
 ): QuoteExtrasResult {
   if (!raw?.length) {
-    return { lines: [], totalCop: 0, catalog_version: "configurator-v1" };
+    return { lines: [], totalCop: 0, catalog_version: "configurator-v2" };
   }
   const ids = raw.map((r) => r.id);
+  const guests = Math.max(1, Math.floor(ctx.guests ?? 1));
+  const lofts = Math.max(1, Math.floor(ctx.lofts ?? 1));
+
+  const timingQuantities: Partial<
+    Record<TimingExtraId, TimingExtraQuantity>
+  > = {};
+  const mealQuantities: Partial<Record<MealExtraId, MealExtraQuantity>> = {};
+  let airportTransfer: AirportTransferChoice | undefined;
+
+  for (const r of raw) {
+    if (r.id === "early-checkin" || r.id === "late-checkout") {
+      timingQuantities[r.id] = {
+        units: clampTimingUnits(r.units ?? lofts, lofts),
+      };
+    }
+    if (r.id === "breakfast" || r.id === "lunch") {
+      mealQuantities[r.id] = {
+        days: Math.max(0, Math.floor(r.mealDays ?? 0)),
+        guests: Math.max(1, Math.floor(r.mealGuests ?? guests)),
+      };
+    }
+    if (r.id === "airport-transfer") {
+      airportTransfer = {
+        pickup: Boolean(r.pickup),
+        dropoff: Boolean(r.dropoff),
+        vehicles: clampAirportVehicles(
+          r.vehicles ?? minAirportVehicles(guests),
+          guests,
+        ),
+      };
+      if (
+        airportTransferLegCount(airportTransfer) === 0 &&
+        (r.pickup === undefined || r.dropoff === undefined)
+      ) {
+        // Compat: si no vienen flags, asumir al menos recogida.
+        airportTransfer.pickup = true;
+      }
+    }
+  }
+
   const quoted = quoteBookingExtras({
     selectedIds: ids,
     guests: ctx.guests,
     nights: ctx.nights,
+    lofts: ctx.lofts,
+    mealQuantities,
+    airportTransfer,
+    timingQuantities,
   });
   // Conservar labels desconocidos (custom) con amountCop del cliente
   const known = new Set(quoted.lines.map((l) => l.id));

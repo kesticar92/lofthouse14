@@ -24,9 +24,15 @@ import {
   extraLineTotalCop,
   mealDefaultDays,
   airportTransferLegCount,
+  minAirportVehicles,
+  clampAirportVehicles,
+  clampTimingUnits,
+  AIRPORT_VEHICLE_CAPACITY,
   type AirportTransferChoice,
   type MealExtraId,
   type MealExtraQuantity,
+  type TimingExtraId,
+  type TimingExtraQuantity,
   type TripProfile,
 } from "@/lib/configurator-extras";
 import { cn } from "@/lib/cn";
@@ -102,7 +108,14 @@ export function GuidedReservation({
     useState<AirportTransferChoice>({
       pickup: true,
       dropoff: true,
+      vehicles: 1,
     });
+  const [timingQuantities, setTimingQuantities] = useState<
+    Partial<Record<TimingExtraId, TimingExtraQuantity>>
+  >({
+    "early-checkin": { units: 1 },
+    "late-checkout": { units: 1 },
+  });
   const [bookingBusy, setBookingBusy] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [liveOffer, setLiveOffer] = useState<{
@@ -349,7 +362,33 @@ export function GuidedReservation({
     });
   }, [mealDaysDefault, mealDaysMin, guests, checkIn, checkOut]);
 
-  const extrasCop = extrasTotalCop(extras, mealQuantities, airportTransfer);
+  /** Vehículos de traslado: mínimo según huéspedes (máx. 4 por vehículo). */
+  useEffect(() => {
+    setAirportTransfer((prev) => ({
+      ...prev,
+      vehicles: clampAirportVehicles(prev.vehicles, guests),
+    }));
+  }, [guests]);
+
+  /** Early/late: unidades acotadas al número de lofts de la reserva. */
+  useEffect(() => {
+    setTimingQuantities((prev) => ({
+      "early-checkin": {
+        units: clampTimingUnits(prev["early-checkin"]?.units ?? lofts, lofts),
+      },
+      "late-checkout": {
+        units: clampTimingUnits(prev["late-checkout"]?.units ?? lofts, lofts),
+      },
+    }));
+  }, [lofts]);
+
+  const extrasCop = extrasTotalCop(
+    extras,
+    mealQuantities,
+    airportTransfer,
+    timingQuantities,
+  );
+  const minTransferVehicles = minAirportVehicles(guests);
   const subtotalBeforeCoupon =
     quoteResult.ok && quoteResult.totalReserva > 0
       ? quoteResult.totalReserva + extrasCop
@@ -424,12 +463,17 @@ export function GuidedReservation({
         });
         continue;
       }
+      const timingUnits =
+        e.id === "early-checkin" || e.id === "late-checkout"
+          ? timingQuantities[e.id]?.units ?? lofts
+          : undefined;
       const lineTotal = extraLineTotalCop(e, {
         mealQty:
           e.id === "breakfast" || e.id === "lunch"
             ? mealQuantities[e.id]
             : undefined,
         airport: e.id === "airport-transfer" ? airportTransfer : undefined,
+        units: timingUnits,
       });
       let detail = e.label;
       if (e.pricing === "perGuestPerDay") {
@@ -439,10 +483,14 @@ export function GuidedReservation({
         detail = `${e.label} (${formatCOP(e.priceCop)} × ${g} pers. × ${d} día${d === 1 ? "" : "s"})`;
       } else if (e.pricing === "perAirportLeg") {
         const legs = airportTransferLegCount(airportTransfer);
+        const vehicles = Math.max(1, airportTransfer.vehicles);
         const parts: string[] = [];
         if (airportTransfer.pickup) parts.push("recogida");
         if (airportTransfer.dropoff) parts.push("ida");
-        detail = `${e.label} (${formatCOP(e.priceCop)} × ${legs} trayecto${legs === 1 ? "" : "s"}${parts.length ? `: ${parts.join(" + ")}` : ""})`;
+        detail = `${e.label} (${formatCOP(e.priceCop)} × ${legs} trayecto${legs === 1 ? "" : "s"} × ${vehicles} vehículo${vehicles === 1 ? "" : "s"}${parts.length ? `: ${parts.join(" + ")}` : ""})`;
+      } else if (e.id === "early-checkin" || e.id === "late-checkout") {
+        const u = timingUnits ?? 1;
+        detail = `${e.label} (${formatCOP(e.priceCop)} × ${u} loft${u === 1 ? "" : "s"})`;
       }
       lines.push({
         id: `extra-${e.id}`,
@@ -477,6 +525,7 @@ export function GuidedReservation({
     selectedExtras,
     mealQuantities,
     airportTransfer,
+    timingQuantities,
     guests,
     mealDaysDefault,
     couponDiscount,
@@ -524,7 +573,20 @@ export function GuidedReservation({
       const on = prev.includes(id);
       if (on) return prev.filter((x) => x !== id);
       if (id === "airport-transfer") {
-        setAirportTransfer({ pickup: true, dropoff: true });
+        setAirportTransfer({
+          pickup: true,
+          dropoff: true,
+          vehicles: minAirportVehicles(guests),
+        });
+      }
+      if (id === "early-checkin" || id === "late-checkout") {
+        const timingId = id as TimingExtraId;
+        setTimingQuantities((tq) => ({
+          ...tq,
+          [timingId]: {
+            units: clampTimingUnits(tq[timingId]?.units ?? lofts, lofts),
+          },
+        }));
       }
       if (id === "breakfast" || id === "lunch") {
         const mealId = id as MealExtraId;
@@ -542,6 +604,20 @@ export function GuidedReservation({
       }
       return [...prev, id];
     });
+  }
+
+  function updateTimingUnits(id: TimingExtraId, units: number) {
+    setTimingQuantities((prev) => ({
+      ...prev,
+      [id]: { units: clampTimingUnits(units, lofts) },
+    }));
+  }
+
+  function updateAirportVehicles(vehicles: number) {
+    setAirportTransfer((prev) => ({
+      ...prev,
+      vehicles: clampAirportVehicles(vehicles, guests),
+    }));
   }
 
   function applyProfileSuggestion(id: TripProfile) {
@@ -635,22 +711,32 @@ export function GuidedReservation({
       if (e.interestOnly || e.priceCop <= 0) {
         return `• ${e.label}: me interesa`;
       }
+      const timingUnits =
+        e.id === "early-checkin" || e.id === "late-checkout"
+          ? timingQuantities[e.id]?.units ?? effectiveLofts
+          : undefined;
       const lineTotal = extraLineTotalCop(e, {
         mealQty:
           e.id === "breakfast" || e.id === "lunch"
             ? mealQuantities[e.id]
             : undefined,
         airport: e.id === "airport-transfer" ? airportTransfer : undefined,
+        units: timingUnits,
       });
       if (e.pricing === "perAirportLeg") {
         const parts: string[] = [];
         if (airportTransfer.pickup) parts.push("recogida en aeropuerto");
         if (airportTransfer.dropoff) parts.push("traslado al aeropuerto");
-        return `• ${e.label}: ${parts.join(" + ") || "—"} (${formatCOP(lineTotal)} estimado)`;
+        const vehicles = Math.max(1, airportTransfer.vehicles);
+        return `• ${e.label}: ${parts.join(" + ") || "—"} · ${vehicles} vehículo${vehicles === 1 ? "" : "s"} (máx. ${AIRPORT_VEHICLE_CAPACITY} pasajeros c/u) · ${formatCOP(lineTotal)} estimado`;
       }
       if (e.pricing === "perGuestPerDay") {
         const q = mealQuantities[e.id as MealExtraId];
         return `• ${e.label}: ${formatCOP(e.priceCop)}/pers./día × ${q?.guests ?? guests} huésped(es) × ${q?.days ?? mealDaysDefault} día(s) = ${formatCOP(lineTotal)} (estimado)`;
+      }
+      if (e.id === "early-checkin" || e.id === "late-checkout") {
+        const u = timingUnits ?? 1;
+        return `• ${e.label}: ${formatCOP(e.priceCop)} × ${u} loft${u === 1 ? "" : "s"} = ${formatCOP(lineTotal)} (estimado)`;
       }
       return `• ${e.label}: ${formatCOP(e.priceCop)} (estimado)`;
     });
@@ -729,10 +815,12 @@ export function GuidedReservation({
 
     const extrasPayload = CONFIGURATOR_EXTRAS.filter((e) =>
       extras.includes(e.id),
-    ).map((e) => ({
-      id: e.id,
-      label: e.label,
-      amountCop:
+    ).map((e) => {
+      const timingUnits =
+        e.id === "early-checkin" || e.id === "late-checkout"
+          ? timingQuantities[e.id]?.units ?? lofts
+          : undefined;
+      const amountCop =
         e.interestOnly || e.priceCop <= 0
           ? 0
           : extraLineTotalCop(e, {
@@ -740,9 +828,40 @@ export function GuidedReservation({
                 e.id === "breakfast" || e.id === "lunch"
                   ? mealQuantities[e.id]
                   : undefined,
-              airport: e.id === "airport-transfer" ? airportTransfer : undefined,
-            }),
-    }));
+              airport:
+                e.id === "airport-transfer" ? airportTransfer : undefined,
+              units: timingUnits,
+            });
+      const base: {
+        id: string;
+        label: string;
+        amountCop: number;
+        units?: number;
+        vehicles?: number;
+        pickup?: boolean;
+        dropoff?: boolean;
+        mealDays?: number;
+        mealGuests?: number;
+      } = {
+        id: e.id,
+        label: e.label,
+        amountCop,
+      };
+      if (e.id === "early-checkin" || e.id === "late-checkout") {
+        base.units = timingUnits;
+      }
+      if (e.id === "airport-transfer") {
+        base.pickup = airportTransfer.pickup;
+        base.dropoff = airportTransfer.dropoff;
+        base.vehicles = airportTransfer.vehicles;
+      }
+      if (e.id === "breakfast" || e.id === "lunch") {
+        const q = mealQuantities[e.id];
+        base.mealDays = q?.days;
+        base.mealGuests = q?.guests;
+      }
+      return base;
+    });
 
     let reservationCode: string | undefined;
     let confirmedUnits: number[] | undefined = opts?.assignedUnits;
@@ -1483,14 +1602,23 @@ export function GuidedReservation({
                       const isMeal =
                         e.id === "breakfast" || e.id === "lunch";
                       const isAirport = e.id === "airport-transfer";
+                      const isTiming =
+                        e.id === "early-checkin" || e.id === "late-checkout";
                       const mealId = isMeal ? (e.id as MealExtraId) : null;
+                      const timingId = isTiming
+                        ? (e.id as TimingExtraId)
+                        : null;
                       const checked = extras.includes(e.id);
+                      const timingUnits = timingId
+                        ? timingQuantities[timingId]?.units ?? lofts
+                        : undefined;
                       const lineTotal = checked
                         ? extraLineTotalCop(e, {
                             mealQty: mealId
                               ? mealQuantities[mealId]
                               : undefined,
                             airport: isAirport ? airportTransfer : undefined,
+                            units: timingUnits,
                           })
                         : 0;
 
@@ -1520,7 +1648,13 @@ export function GuidedReservation({
                                   <span className="text-sm text-zinc-600 dark:text-zinc-300">
                                     {checked && lineTotal > 0
                                       ? `+ ${formatCOP(lineTotal)}`
-                                      : `+ ${formatCOP(e.priceCop)} / trayecto`}
+                                      : `+ ${formatCOP(e.priceCop)} / trayecto / vehículo`}
+                                  </span>
+                                ) : isTiming ? (
+                                  <span className="text-sm text-zinc-600 dark:text-zinc-300">
+                                    {checked && lineTotal > 0
+                                      ? `+ ${formatCOP(lineTotal)}`
+                                      : `+ ${formatCOP(e.priceCop)} / loft`}
                                   </span>
                                 ) : (
                                   <span className="text-sm">
@@ -1531,8 +1665,40 @@ export function GuidedReservation({
                               <span className="mt-1 block text-xs text-zinc-500">
                                 {e.description}
                               </span>
+                              {checked && isTiming && timingId && lofts > 1 ? (
+                                <div className="mt-3">
+                                  <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+                                    ¿Para cuántos apartamentos?
+                                  </label>
+                                  <select
+                                    value={timingUnits ?? lofts}
+                                    onChange={(ev) =>
+                                      updateTimingUnits(
+                                        timingId,
+                                        Number(ev.target.value) || 1,
+                                      )
+                                    }
+                                    onClick={(ev) => ev.stopPropagation()}
+                                    className="w-full max-w-[12rem] rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+                                  >
+                                    {Array.from(
+                                      { length: lofts },
+                                      (_, i) => i + 1,
+                                    ).map((n) => (
+                                      <option key={n} value={n}>
+                                        {n} loft{n === 1 ? "" : "s"} ·{" "}
+                                        {formatCOP(e.priceCop * n)}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <p className="mt-1 text-[10px] text-zinc-400">
+                                    El valor es {formatCOP(e.priceCop)} por cada
+                                    loft que solicite el servicio.
+                                  </p>
+                                </div>
+                              ) : null}
                               {checked && isAirport ? (
-                                <div className="mt-3 space-y-2">
+                                <div className="mt-3 space-y-3">
                                   <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
                                     <input
                                       type="checkbox"
@@ -1563,6 +1729,62 @@ export function GuidedReservation({
                                     />
                                     Traslado al aeropuerto (salida)
                                   </label>
+                                  {guests > AIRPORT_VEHICLE_CAPACITY ? (
+                                    <div>
+                                      <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+                                        ¿Cuántos vehículos de traslado?
+                                      </label>
+                                      <select
+                                        value={airportTransfer.vehicles}
+                                        onChange={(ev) =>
+                                          updateAirportVehicles(
+                                            Number(ev.target.value) ||
+                                              minTransferVehicles,
+                                          )
+                                        }
+                                        onClick={(ev) => ev.stopPropagation()}
+                                        className="w-full max-w-[14rem] rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+                                      >
+                                        {Array.from(
+                                          {
+                                            length:
+                                              Math.max(
+                                                minTransferVehicles + 4,
+                                                minTransferVehicles,
+                                              ) -
+                                              minTransferVehicles +
+                                              1,
+                                          },
+                                          (_, i) => minTransferVehicles + i,
+                                        ).map((n) => (
+                                          <option key={n} value={n}>
+                                            {n} vehículo{n === 1 ? "" : "s"} ·
+                                            hasta {n * AIRPORT_VEHICLE_CAPACITY}{" "}
+                                            pasajeros
+                                          </option>
+                                        ))}
+                                      </select>
+                                      <p className="mt-1 text-[10px] text-zinc-400">
+                                        Con {guests} huéspedes se requieren al
+                                        menos {minTransferVehicles} vehículo
+                                        {minTransferVehicles === 1
+                                          ? ""
+                                          : "s"}{" "}
+                                        (máx. {AIRPORT_VEHICLE_CAPACITY}{" "}
+                                        pasajeros por vehículo). Puedes pedir
+                                        más si lo deseas. Precio:{" "}
+                                        {formatCOP(e.priceCop)} por trayecto y
+                                        por vehículo.
+                                      </p>
+                                    </div>
+                                  ) : (
+                                    <p className="text-[10px] text-zinc-400">
+                                      Un vehículo alcanza para hasta{" "}
+                                      {AIRPORT_VEHICLE_CAPACITY} pasajeros.
+                                      Precio: {formatCOP(e.priceCop)} por
+                                      trayecto.
+                                    </p>
+                                  )}
                                   {airportTransferLegCount(airportTransfer) ===
                                   0 ? (
                                     <p className="text-xs text-amber-700 dark:text-amber-300">

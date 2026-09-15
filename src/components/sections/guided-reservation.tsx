@@ -284,7 +284,10 @@ export function GuidedReservation({
 
   useEffect(() => {
     return () => {
-      if (transitionTimer.current) clearTimeout(transitionTimer.current);
+      if (transitionTimer.current) {
+        clearTimeout(transitionTimer.current);
+        transitionTimer.current = null;
+      }
     };
   }, []);
 
@@ -297,15 +300,17 @@ export function GuidedReservation({
       transitionTimer.current = null;
     }
 
+    // Commit del paso ya: si el timer se cancela (Strict Mode / HMR),
+    // la navegación no debe quedar a medias con el overlay encima.
+    setStep(clamped);
+
     if (!animate) {
       setTransitionTo(null);
-      setStep(clamped);
       return;
     }
 
     setTransitionTo(clamped);
     transitionTimer.current = setTimeout(() => {
-      setStep(clamped);
       setTransitionTo(null);
       transitionTimer.current = null;
     }, TRANSITION_MS);
@@ -1367,7 +1372,7 @@ export function GuidedReservation({
   return (
     <section
       id="reservas"
-      data-wizard-build="extras-v3-stable-hooks"
+      data-wizard-build="extras-v4-nav-immediate"
       className={cn(
         "scroll-mt-24 bg-[#f2f0eb] dark:bg-zinc-950",
         compact
@@ -1407,7 +1412,7 @@ export function GuidedReservation({
           {transitionTo !== null ? (
             <motion.div
               key="orbital-transition"
-              className="fixed inset-0 z-[80] flex flex-col items-center justify-center gap-6 bg-[#f2f0eb]/70 px-4 backdrop-blur-md dark:bg-zinc-950/70"
+              className="pointer-events-none fixed inset-0 z-[80] flex flex-col items-center justify-center gap-6 bg-[#f2f0eb]/70 px-4 backdrop-blur-md dark:bg-zinc-950/70"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

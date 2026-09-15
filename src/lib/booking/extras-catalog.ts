@@ -83,7 +83,7 @@ function defaultMealQty(
   nights: number,
   guests: number,
 ): MealExtraQuantity {
-  const days = nights <= 0 ? 0 : nights === 1 ? 1 : nights - 1;
+  const days = Math.max(0, Math.floor(nights || 0));
   return { days, guests: Math.max(1, guests) };
 }
 

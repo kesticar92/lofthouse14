@@ -149,12 +149,10 @@ export function airportTransferLegCount(choice: AirportTransferChoice): number {
 
 /**
  * Días sugeridos al marcar comidas (precarga en el configurador).
- * 1 noche → al menos 1 día; más noches → noches − 1 (sin el día de check-in).
+ * Por defecto = noches de la reserva; el huésped puede bajar días después.
  */
 export function mealDefaultDays(noches: number): number {
-  if (noches <= 0) return 0;
-  if (noches === 1) return 1;
-  return noches - 1;
+  return Math.max(0, Math.floor(noches || 0));
 }
 
 /**
@@ -319,6 +317,50 @@ export type TripProfile =
   | "negocios"
   | "medico";
 
+/** Perfil grupo/delegación: piso de lofts y huéspedes. */
+export const GRUPO_MIN_LOFTS = 4;
+export const GRUPO_MAX_LOFTS = 13;
+export const GRUPO_MIN_GUESTS = 4;
+/** Con 4 lofts, tope de huéspedes. */
+export const GRUPO_BASE_MAX_GUESTS = 20;
+/** Por cada loft adicional sobre 4, +5 huéspedes al tope. */
+export const GRUPO_GUESTS_PER_EXTRA_LOFT = 5;
+
+export function grupoMaxGuestsForLofts(lofts: number): number {
+  const L = Math.max(
+    GRUPO_MIN_LOFTS,
+    Math.min(GRUPO_MAX_LOFTS, Math.floor(lofts || GRUPO_MIN_LOFTS)),
+  );
+  return (
+    GRUPO_BASE_MAX_GUESTS + (L - GRUPO_MIN_LOFTS) * GRUPO_GUESTS_PER_EXTRA_LOFT
+  );
+}
+
+/** Lofts mínimos (entre 4 y 13) para cubrir N huéspedes en perfil grupo. */
+export function grupoMinLoftsForGuests(guests: number): number {
+  const g = Math.max(GRUPO_MIN_GUESTS, Math.floor(guests || GRUPO_MIN_GUESTS));
+  if (g <= GRUPO_BASE_MAX_GUESTS) return GRUPO_MIN_LOFTS;
+  const extra = Math.ceil(
+    (g - GRUPO_BASE_MAX_GUESTS) / GRUPO_GUESTS_PER_EXTRA_LOFT,
+  );
+  return Math.min(GRUPO_MAX_LOFTS, GRUPO_MIN_LOFTS + extra);
+}
+
+export function clampGrupoLofts(lofts: number): number {
+  return Math.min(
+    GRUPO_MAX_LOFTS,
+    Math.max(GRUPO_MIN_LOFTS, Math.floor(lofts || GRUPO_MIN_LOFTS)),
+  );
+}
+
+export function clampGrupoGuests(guests: number, lofts: number): number {
+  const max = grupoMaxGuestsForLofts(lofts);
+  return Math.min(
+    max,
+    Math.max(GRUPO_MIN_GUESTS, Math.floor(guests || GRUPO_MIN_GUESTS)),
+  );
+}
+
 export const TRIP_PROFILES: {
   id: TripProfile;
   title: string;
@@ -346,7 +388,7 @@ export const TRIP_PROFILES: {
   {
     id: "grupo",
     title: "Grupo o delegación",
-    hint: "Varios lofts; el total se suma por unidad.",
+    hint: "4 o más lofts.",
     suggestedLofts: 4,
   },
   {

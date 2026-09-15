@@ -30,6 +30,14 @@ import {
   clampPetCount,
   clampTimingUnits,
   isEarlyCheckInOffered,
+  clampGrupoGuests,
+  clampGrupoLofts,
+  grupoMaxGuestsForLofts,
+  grupoMinLoftsForGuests,
+  GRUPO_MAX_LOFTS,
+  GRUPO_MIN_GUESTS,
+  GRUPO_MIN_LOFTS,
+  GRUPO_GUESTS_PER_EXTRA_LOFT,
   AIRPORT_VEHICLE_CAPACITY,
   PETS_PER_LOFT,
   mealMaxDays,
@@ -267,12 +275,23 @@ export function GuidedReservation({
     return covered;
   }, [skipTripStep, skipStaySteps, skipLoftStep]);
 
-  const minLoftsForGuests = Math.max(
-    1,
-    Math.ceil(guests / site.maxGuestsPerLoft),
-  );
-  const capacityOk =
-    guests <= site.maxGuests && lofts >= minLoftsForGuests;
+  const isGrupoProfile = profile === "grupo";
+  const guestsMin = isGrupoProfile ? GRUPO_MIN_GUESTS : 1;
+  const guestsMax = isGrupoProfile
+    ? grupoMaxGuestsForLofts(lofts)
+    : site.maxGuests;
+  const loftsMin = isGrupoProfile ? GRUPO_MIN_LOFTS : 1;
+  const loftsMax = isGrupoProfile ? GRUPO_MAX_LOFTS : site.maxLofts;
+
+  const minLoftsForGuests = isGrupoProfile
+    ? grupoMinLoftsForGuests(guests)
+    : Math.max(1, Math.ceil(guests / site.maxGuestsPerLoft));
+  const capacityOk = isGrupoProfile
+    ? lofts >= loftsMin &&
+      lofts <= loftsMax &&
+      guests >= guestsMin &&
+      guests <= grupoMaxGuestsForLofts(lofts)
+    : guests <= site.maxGuests && lofts >= minLoftsForGuests;
   const datesOk = Boolean(checkIn && checkOut && checkOut > checkIn);
 
   // Si cambian las fechas/huéspedes, liberar bloqueos y realinear comidas.
@@ -888,6 +907,11 @@ export function GuidedReservation({
 
   function applyProfileSuggestion(id: TripProfile) {
     setProfile(id);
+    if (id === "grupo") {
+      setGuests(GRUPO_MIN_GUESTS);
+      setLofts(GRUPO_MIN_LOFTS);
+      return;
+    }
     const p = TRIP_PROFILES.find((x) => x.id === id);
     if (p) {
       setLofts((prev) =>
@@ -1421,7 +1445,7 @@ export function GuidedReservation({
   return (
     <section
       id="reservas"
-      data-wizard-build="extras-v9-vehicles-avail-ui"
+      data-wizard-build="extras-v11-grupo-meals"
       data-wizard-step={String(step)}
       data-wizard-profile={profile ?? ""}
       className={cn(
@@ -1660,8 +1684,9 @@ export function GuidedReservation({
                     Huéspedes y lofts
                   </h3>
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    Cada loft admite hasta {site.maxGuestsPerLoft} personas. Si
-                    viajan más, aumenta el número de lofts para ver el total.
+                    {isGrupoProfile
+                      ? `Para grupo o delegación partimos de ${GRUPO_MIN_LOFTS} lofts y ${GRUPO_MIN_GUESTS} huéspedes. Con ${GRUPO_MIN_LOFTS} lofts puedes hasta ${grupoMaxGuestsForLofts(GRUPO_MIN_LOFTS)} personas; cada loft extra suma ${GRUPO_GUESTS_PER_EXTRA_LOFT} al tope (máx. ${GRUPO_MAX_LOFTS} lofts). Cada loft admite hasta ${site.maxGuestsPerLoft} personas.`
+                      : `Cada loft admite hasta ${site.maxGuestsPerLoft} personas. Si viajan más, aumenta el número de lofts para ver el total.`}
                   </p>
                   {profileMeta ? (
                     <p className="text-sm text-zinc-500">
@@ -1686,16 +1711,34 @@ export function GuidedReservation({
                       </label>
                       <input
                         type="number"
-                        min={1}
-                        max={site.maxGuests}
+                        min={guestsMin}
+                        max={guestsMax}
                         value={guests}
                         onChange={(e) => {
+                          const raw = Number(e.target.value) || guestsMin;
+                          if (isGrupoProfile) {
+                            const nextGuests = Math.max(
+                              guestsMin,
+                              Math.min(
+                                grupoMaxGuestsForLofts(GRUPO_MAX_LOFTS),
+                                raw,
+                              ),
+                            );
+                            const needed = grupoMinLoftsForGuests(nextGuests);
+                            setLofts((prev) =>
+                              clampGrupoLofts(Math.max(prev, needed)),
+                            );
+                            setGuests(
+                              clampGrupoGuests(
+                                nextGuests,
+                                Math.max(lofts, needed),
+                              ),
+                            );
+                            return;
+                          }
                           const next = Math.max(
                             1,
-                            Math.min(
-                              site.maxGuests,
-                              Number(e.target.value) || 1,
-                            ),
+                            Math.min(site.maxGuests, raw),
                           );
                           setGuests(next);
                           setLofts((prev) =>
@@ -1707,6 +1750,12 @@ export function GuidedReservation({
                         }}
                         className="w-full rounded-xl border border-zinc-300 px-4 py-3 dark:border-zinc-600 dark:bg-zinc-950"
                       />
+                      {isGrupoProfile ? (
+                        <p className="mt-1 text-[11px] text-zinc-500">
+                          Entre {guestsMin} y {guestsMax} con {lofts} loft
+                          {lofts === 1 ? "" : "s"}.
+                        </p>
+                      ) : null}
                     </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium">
@@ -1714,22 +1763,34 @@ export function GuidedReservation({
                       </label>
                       <input
                         type="number"
-                        min={1}
-                        max={site.maxLofts}
+                        min={loftsMin}
+                        max={loftsMax}
                         value={lofts}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const raw = Number(e.target.value) || loftsMin;
+                          if (isGrupoProfile) {
+                            const nextLofts = clampGrupoLofts(raw);
+                            setLofts(nextLofts);
+                            setGuests((prev) =>
+                              clampGrupoGuests(prev, nextLofts),
+                            );
+                            return;
+                          }
                           setLofts(
                             Math.max(
                               1,
-                              Math.min(
-                                site.maxLofts,
-                                Number(e.target.value) || 1,
-                              ),
+                              Math.min(site.maxLofts, raw),
                             ),
-                          )
-                        }
+                          );
+                        }}
                         className="w-full rounded-xl border border-zinc-300 px-4 py-3 dark:border-zinc-600 dark:bg-zinc-950"
                       />
+                      {isGrupoProfile ? (
+                        <p className="mt-1 text-[11px] text-zinc-500">
+                          De {loftsMin} a {loftsMax} lofts · tope actual{" "}
+                          {grupoMaxGuestsForLofts(lofts)} huéspedes.
+                        </p>
+                      ) : null}
                     </div>
                   </div>
 
@@ -2213,12 +2274,13 @@ export function GuidedReservation({
                                       className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
                                     />
                                     <p className="mt-1 text-[10px] text-zinc-400">
-                                      Máximo {mealDaysMax} día
-                                      {mealDaysMax === 1 ? "" : "s"} (igual a las
-                                      noches de la reserva)
+                                      Precargado = {mealDaysMax} noche
+                                      {mealDaysMax === 1 ? "" : "s"} de la
+                                      reserva; puedes elegir menos
                                       {mealDaysMin >= 1
-                                        ? "; mínimo 1 con una noche."
-                                        : "."}
+                                        ? " (mínimo 1 con una noche)"
+                                        : ""}
+                                      .
                                     </p>
                                   </div>
                                   <div>
@@ -2228,7 +2290,7 @@ export function GuidedReservation({
                                     <input
                                       type="number"
                                       min={1}
-                                      max={site.maxGuests}
+                                      max={Math.max(1, guests)}
                                       value={
                                         mealQuantities[mealId]?.guests ?? guests
                                       }
@@ -2236,13 +2298,20 @@ export function GuidedReservation({
                                         updateMealQty(mealId, {
                                           guests: Math.max(
                                             1,
-                                            Number(ev.target.value) || 1,
+                                            Math.min(
+                                              guests,
+                                              Number(ev.target.value) || 1,
+                                            ),
                                           ),
                                         })
                                       }
                                       onClick={(ev) => ev.stopPropagation()}
                                       className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
                                     />
+                                    <p className="mt-1 text-[10px] text-zinc-400">
+                                      Precargado con {guests} huésped
+                                      {guests === 1 ? "" : "es"}; puedes bajarlo.
+                                    </p>
                                   </div>
                                 </div>
                               ) : null}

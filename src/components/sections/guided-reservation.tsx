@@ -368,7 +368,16 @@ export function GuidedReservation({
   const mealDaysMin =
     quoteResult.ok && quoteResult.noches === 1 ? 1 : 0;
   const quoteNights = quoteResult.ok ? quoteResult.noches : 0;
-  const quoteOk = quoteResult.ok;
+
+  /** Clave estable (1 sola dep) para no romper React si HMR cambia el tamaño del array. */
+  const mealSyncKey = [
+    mealDaysDefault,
+    mealDaysMin,
+    quoteNights,
+    guests,
+    checkIn || "",
+    checkOut || "",
+  ].join("|");
 
   useEffect(() => {
     const days = clampMealDays(
@@ -380,47 +389,56 @@ export function GuidedReservation({
       breakfast: { days, guests },
       lunch: { days, guests },
     });
-    // Longitud fija (7): no reordenar ni acortar — evita crash de React/HMR
-    // si el tamaño del array de deps cambia entre renders.
-  }, [
-    mealDaysDefault,
-    mealDaysMin,
-    guests,
-    checkIn,
-    checkOut,
-    quoteOk,
-    quoteNights,
-  ]);
+    // Una sola dependencia: evita crash si HMR cambia el tamaño del array.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mealSyncKey ya incluye todos los inputs
+  }, [mealSyncKey]);
 
   /** Vehículos de traslado: mínimo según huéspedes (máx. 4 por vehículo). */
   useEffect(() => {
-    setAirportTransfer((prev) => ({
-      ...prev,
-      vehicles: clampAirportVehicles(prev.vehicles, guests),
-    }));
+    setAirportTransfer((prev) => {
+      const next = clampAirportVehicles(prev.vehicles, guests);
+      return next === prev.vehicles ? prev : { ...prev, vehicles: next };
+    });
   }, [guests]);
 
   /** Early/late/mascota: unidades acotadas al número de lofts. */
   useEffect(() => {
-    setTimingQuantities((prev) => ({
-      "early-checkin": {
-        units: clampTimingUnits(prev["early-checkin"]?.units ?? lofts, lofts),
-      },
-      "late-checkout": {
-        units: clampTimingUnits(prev["late-checkout"]?.units ?? lofts, lofts),
-      },
-      pet: {
-        units: clampTimingUnits(prev.pet?.units ?? lofts, lofts),
-      },
-    }));
+    setTimingQuantities((prev) => {
+      const early = clampTimingUnits(
+        prev["early-checkin"]?.units ?? lofts,
+        lofts,
+      );
+      const late = clampTimingUnits(
+        prev["late-checkout"]?.units ?? lofts,
+        lofts,
+      );
+      const pet = clampTimingUnits(prev.pet?.units ?? lofts, lofts);
+      if (
+        prev["early-checkin"]?.units === early &&
+        prev["late-checkout"]?.units === late &&
+        prev.pet?.units === pet
+      ) {
+        return prev;
+      }
+      return {
+        "early-checkin": { units: early },
+        "late-checkout": { units: late },
+        pet: { units: pet },
+      };
+    });
   }, [lofts]);
 
   /**
    * Confirmar disponibilidad iCal al entrar al resumen,
    * antes de habilitar RESERVAR (no solo al hacer clic).
    */
+  const availSyncKey =
+    step === STEP_CONFIRMAR
+      ? ["confirm", checkIn, checkOut, categoryId ?? "", guests, lofts, quoteResult.ok ? "1" : "0"].join("|")
+      : "idle";
+
   useEffect(() => {
-    if (step !== STEP_CONFIRMAR) {
+    if (availSyncKey === "idle") {
       setAvailCheck((prev) =>
         prev.status === "idle" ? prev : { status: "idle" },
       );
@@ -555,7 +573,7 @@ export function GuidedReservation({
     return () => {
       cancelled = true;
     };
-  }, [step, checkIn, checkOut, categoryId, guests, lofts, quoteResult.ok]);
+  }, [availSyncKey]);
 
   const extrasCop = extrasTotalCop(
     extras,

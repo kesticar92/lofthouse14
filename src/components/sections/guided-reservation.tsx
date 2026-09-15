@@ -29,6 +29,7 @@ import {
   clampMealDays,
   clampPetCount,
   clampTimingUnits,
+  isEarlyCheckInOffered,
   AIRPORT_VEHICLE_CAPACITY,
   PETS_PER_LOFT,
   mealMaxDays,
@@ -417,6 +418,18 @@ export function GuidedReservation({
   const mealDaysMin =
     quoteResult.ok && quoteResult.noches === 1 ? 1 : 0;
 
+  const earlyCheckInOffered = isEarlyCheckInOffered(checkIn);
+
+  /** Si el early ya no aplica (mismo día ≥ 14:00), quitarlo de la selección. */
+  useEffect(() => {
+    if (earlyCheckInOffered) return;
+    setExtras((prev) =>
+      prev.includes("early-checkin")
+        ? prev.filter((id) => id !== "early-checkin")
+        : prev,
+    );
+  }, [earlyCheckInOffered]);
+
   /** Vehículos de traslado: mínimo según huéspedes (máx. 4 por vehículo). */
   useEffect(() => {
     setAirportTransfer((prev) => {
@@ -600,8 +613,11 @@ export function GuidedReservation({
     };
   }, [step]);
 
+  const billableExtras = earlyCheckInOffered
+    ? extras
+    : extras.filter((id) => id !== "early-checkin");
   const extrasCop = extrasTotalCop(
-    extras,
+    billableExtras,
     mealQuantities,
     airportTransfer,
     timingQuantities,
@@ -617,8 +633,13 @@ export function GuidedReservation({
       : null;
 
   const selectedExtras = useMemo(
-    () => CONFIGURATOR_EXTRAS.filter((e) => extras.includes(e.id)),
-    [extras],
+    () =>
+      CONFIGURATOR_EXTRAS.filter(
+        (e) =>
+          extras.includes(e.id) &&
+          (e.id !== "early-checkin" || earlyCheckInOffered),
+      ),
+    [extras, earlyCheckInOffered],
   );
 
   const priceBreakdownLines = useMemo(() => {
@@ -1897,7 +1918,10 @@ export function GuidedReservation({
                     y personas.
                   </p>
                   <ul className="space-y-3">
-                    {CONFIGURATOR_EXTRAS.map((e) => {
+                    {CONFIGURATOR_EXTRAS.filter(
+                      (e) =>
+                        e.id !== "early-checkin" || earlyCheckInOffered,
+                    ).map((e) => {
                       const isMeal =
                         e.id === "breakfast" || e.id === "lunch";
                       const isAirport = e.id === "airport-transfer";

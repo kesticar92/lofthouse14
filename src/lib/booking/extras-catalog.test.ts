@@ -135,6 +135,27 @@ describe("extras catalog", () => {
     );
     expect(q.lines[0]?.amountCop).toBe(120_000);
   });
+
+  it("omite early-checkin si checkIn ya pasó o no aplica", () => {
+    const qPast = quoteBookingExtras({
+      selectedIds: ["early-checkin", "late-checkout"],
+      guests: 2,
+      nights: 1,
+      lofts: 1,
+      checkIn: "2000-01-01",
+    });
+    expect(qPast.lines.map((l) => l.id)).toEqual(["late-checkout"]);
+    expect(qPast.totalCop).toBe(60_000);
+
+    const qFuture = quoteBookingExtras({
+      selectedIds: ["early-checkin"],
+      guests: 2,
+      nights: 1,
+      lofts: 1,
+      checkIn: "2099-06-01",
+    });
+    expect(qFuture.totalCop).toBe(60_000);
+  });
 });
 
 describe("booking channels", () => {

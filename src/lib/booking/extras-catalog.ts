@@ -12,6 +12,7 @@ import {
   clampPetCount,
   clampTimingUnits,
   extraLineTotalCop,
+  isEarlyCheckInOffered,
   maxPetsForLofts,
   minAirportVehicles,
   type AirportTransferChoice,
@@ -65,6 +66,8 @@ export type QuoteExtrasInput = {
   guests?: number;
   nights?: number;
   lofts?: number;
+  /** YYYY-MM-DD — si es hoy ≥ 14:00 Bogotá, se ignora early-checkin. */
+  checkIn?: string;
   mealQuantities?: Partial<Record<MealExtraId, MealExtraQuantity>>;
   airportTransfer?: AirportTransferChoice;
   timingQuantities?: Partial<Record<TimingExtraId, TimingExtraQuantity>>;
@@ -107,6 +110,12 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
   for (const id of input.selectedIds) {
     const extra = getExtraById(id);
     if (!extra) continue;
+    if (
+      extra.id === "early-checkin" &&
+      !isEarlyCheckInOffered(input.checkIn ?? "")
+    ) {
+      continue;
+    }
     if (extra.interestOnly) {
       lines.push({
         id: extra.id,
@@ -193,7 +202,12 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
  */
 export function normalizeClientExtras(
   raw: ClientExtraInput[] | undefined,
-  ctx: { guests?: number; nights?: number; lofts?: number },
+  ctx: {
+    guests?: number;
+    nights?: number;
+    lofts?: number;
+    checkIn?: string;
+  },
 ): QuoteExtrasResult {
   if (!raw?.length) {
     return { lines: [], totalCop: 0, catalog_version: "configurator-v2" };
@@ -250,6 +264,7 @@ export function normalizeClientExtras(
     guests: ctx.guests,
     nights: ctx.nights,
     lofts: ctx.lofts,
+    checkIn: ctx.checkIn,
     mealQuantities,
     airportTransfer,
     timingQuantities,

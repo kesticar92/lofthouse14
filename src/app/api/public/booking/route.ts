@@ -90,6 +90,7 @@ export async function POST(req: Request) {
     guests: body.guests,
     nights: nights ?? 1,
     lofts: body.lofts ?? 1,
+    checkIn: body.check_in,
   });
   const extrasPayload = extrasQuoted.lines.map((l) => ({
     id: l.id,

@@ -21,7 +21,7 @@ export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
     id: "early-checkin",
     label: "Early check-in",
     description:
-      "Ingreso antes del horario estándar, sujeto a disponibilidad. Si reservas más de un loft, el valor es por cada loft que lo solicite.",
+      "Ingreso antes del horario estándar (3:00 p.m.), sujeto a disponibilidad. No aplica el mismo día a partir de las 2:00 p.m. Si reservas más de un loft, el valor es por cada loft que lo solicite.",
     priceCop: 60_000,
     pricing: "flat",
   },
@@ -165,6 +165,48 @@ export function clampMealDays(
   const max = mealMaxDays(noches);
   const min = Math.min(Math.max(0, minDays), max);
   return Math.min(max, Math.max(min, Math.floor(days || 0)));
+}
+
+/**
+ * A partir de esta hora (America/Bogotá) el early check-in del mismo día
+ * ya no se ofrece: el ingreso estándar es desde las 3:00 p.m.
+ */
+export const EARLY_CHECKIN_SAME_DAY_CUTOFF_HOUR = 14;
+
+const EARLY_CHECKIN_TZ = "America/Bogota";
+
+function bogotaCalendarParts(now: Date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: EARLY_CHECKIN_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  return {
+    ymd: `${get("year")}-${get("month")}-${get("day")}`,
+    hour: Number(get("hour")),
+  };
+}
+
+/**
+ * ¿Se ofrece early check-in para esta fecha de ingreso?
+ * - Fechas futuras: sí.
+ * - Mismo día (Bogotá): solo si aún no son las 2:00 p.m.
+ * - Fecha pasada o vacía inválida: no (vacía → sí, hasta tener fechas).
+ */
+export function isEarlyCheckInOffered(
+  checkInYmd: string,
+  now: Date = new Date(),
+): boolean {
+  if (!checkInYmd || !/^\d{4}-\d{2}-\d{2}$/.test(checkInYmd)) return true;
+  const { ymd: today, hour } = bogotaCalendarParts(now);
+  if (checkInYmd > today) return true;
+  if (checkInYmd < today) return false;
+  return hour < EARLY_CHECKIN_SAME_DAY_CUTOFF_HOUR;
 }
 
 /** @deprecated Usa {@link mealDefaultDays}. */

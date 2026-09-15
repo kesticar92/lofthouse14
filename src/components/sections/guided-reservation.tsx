@@ -90,6 +90,7 @@ export function GuidedReservation({
 }: {
   compact?: boolean;
 } = {}) {
+  "use no memo"; // evitar que el React Compiler reescriba deps de efectos
   const [step, setStep] = useState(0);
   const [transitionTo, setTransitionTo] = useState<number | null>(null);
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -156,6 +157,14 @@ export function GuidedReservation({
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
   const depositPct = depositPercentFromEnv();
+  const availCtxRef = useRef({
+    checkIn: "",
+    checkOut: "",
+    categoryId: null as LoftCategoryId | null,
+    guests: 2,
+    lofts: 1,
+    quoteOk: false,
+  });
 
   const profileMeta = TRIP_PROFILES.find((p) => p.id === profile);
 
@@ -247,10 +256,30 @@ export function GuidedReservation({
     guests <= site.maxGuests && lofts >= minLoftsForGuests;
   const datesOk = Boolean(checkIn && checkOut && checkOut > checkIn);
 
-  // Si cambian las fechas, liberar bloqueos de disponibilidad en vivo.
+  // Si cambian las fechas/huéspedes, liberar bloqueos y realinear comidas.
   useEffect(() => {
     setBlockedCategoryIds([]);
     setLiveOffer(null);
+
+    let nights = 0;
+    if (checkIn && checkOut && checkOut > checkIn) {
+      const a = new Date(`${checkIn}T12:00:00`);
+      const b = new Date(`${checkOut}T12:00:00`);
+      nights = Math.max(
+        0,
+        Math.round((b.getTime() - a.getTime()) / 86_400_000),
+      );
+    }
+    const minDays = nights === 1 ? 1 : 0;
+    const days = clampMealDays(
+      Math.max(minDays, mealDefaultDays(nights)),
+      nights,
+      minDays,
+    );
+    setMealQuantities({
+      breakfast: { days, guests },
+      lunch: { days, guests },
+    });
   }, [checkIn, checkOut, guests]);
 
   useEffect(() => {
@@ -367,31 +396,6 @@ export function GuidedReservation({
 
   const mealDaysMin =
     quoteResult.ok && quoteResult.noches === 1 ? 1 : 0;
-  const quoteNights = quoteResult.ok ? quoteResult.noches : 0;
-
-  /** Clave estable (1 sola dep) para no romper React si HMR cambia el tamaño del array. */
-  const mealSyncKey = [
-    mealDaysDefault,
-    mealDaysMin,
-    quoteNights,
-    guests,
-    checkIn || "",
-    checkOut || "",
-  ].join("|");
-
-  useEffect(() => {
-    const days = clampMealDays(
-      Math.max(mealDaysMin, mealDaysDefault),
-      quoteNights,
-      mealDaysMin,
-    );
-    setMealQuantities({
-      breakfast: { days, guests },
-      lunch: { days, guests },
-    });
-    // Una sola dependencia: evita crash si HMR cambia el tamaño del array.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mealSyncKey ya incluye todos los inputs
-  }, [mealSyncKey]);
 
   /** Vehículos de traslado: mínimo según huéspedes (máx. 4 por vehículo). */
   useEffect(() => {
@@ -428,23 +432,26 @@ export function GuidedReservation({
     });
   }, [lofts]);
 
-  /**
-   * Confirmar disponibilidad iCal al entrar al resumen,
-   * antes de habilitar RESERVAR (no solo al hacer clic).
-   */
-  const availSyncKey =
-    step === STEP_CONFIRMAR
-      ? ["confirm", checkIn, checkOut, categoryId ?? "", guests, lofts, quoteResult.ok ? "1" : "0"].join("|")
-      : "idle";
+  /** Snapshot para verificar cupo al entrar a Confirmar (deps fijas: solo `step`). */
+  availCtxRef.current = {
+    checkIn,
+    checkOut,
+    categoryId,
+    guests,
+    lofts,
+    quoteOk: quoteResult.ok,
+  };
 
   useEffect(() => {
-    if (availSyncKey === "idle") {
+    if (step !== STEP_CONFIRMAR) {
       setAvailCheck((prev) =>
         prev.status === "idle" ? prev : { status: "idle" },
       );
       return;
     }
-    if (!checkIn || !checkOut || !categoryId || !quoteResult.ok) {
+
+    const ctx = availCtxRef.current;
+    if (!ctx.checkIn || !ctx.checkOut || !ctx.categoryId || !ctx.quoteOk) {
       setAvailCheck({
         status: "fail",
         message: "Faltan fechas o tipo de loft para verificar cupo.",
@@ -456,19 +463,17 @@ export function GuidedReservation({
     setAvailCheck({ status: "checking" });
     setBookingError(null);
 
-    const requestedLofts = lofts;
-
     void (async () => {
       try {
         const liveRes = await fetch("/api/public/availability/live", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            check_in: checkIn,
-            check_out: checkOut,
-            guests,
-            lofts: requestedLofts,
-            category_id: categoryId,
+            check_in: ctx.checkIn,
+            check_out: ctx.checkOut,
+            guests: ctx.guests,
+            lofts: ctx.lofts,
+            category_id: ctx.categoryId,
           }),
         });
         if (cancelled) return;
@@ -512,11 +517,11 @@ export function GuidedReservation({
               (id) => !availableIds.has(id),
             );
             if (
-              categoryId &&
-              !availableIds.has(categoryId) &&
-              !blocked.includes(categoryId)
+              ctx.categoryId &&
+              !availableIds.has(ctx.categoryId) &&
+              !blocked.includes(ctx.categoryId)
             ) {
-              blocked.push(categoryId);
+              blocked.push(ctx.categoryId);
             }
             setBlockedCategoryIds(blocked);
             setLiveOffer({
@@ -573,7 +578,7 @@ export function GuidedReservation({
     return () => {
       cancelled = true;
     };
-  }, [availSyncKey]);
+  }, [step]);
 
   const extrasCop = extrasTotalCop(
     extras,
@@ -1362,6 +1367,7 @@ export function GuidedReservation({
   return (
     <section
       id="reservas"
+      data-wizard-build="extras-v3-stable-hooks"
       className={cn(
         "scroll-mt-24 bg-[#f2f0eb] dark:bg-zinc-950",
         compact

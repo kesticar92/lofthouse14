@@ -131,16 +131,8 @@ export default function CotizacionesPage() {
   function handleWhatsApp() {
     const text = buildShareText();
     if (!text) return;
-    const telDigits = telefono.replace(/\D/g, "");
-    if (telDigits.length >= 10) {
-      const digits = telDigits.startsWith("57") ? telDigits : `57${telDigits}`;
-      window.open(
-        `https://wa.me/${digits}?text=${encodeURIComponent(text)}`,
-        "_blank",
-      );
-    } else {
-      window.open(waLink(text), "_blank");
-    }
+    // Siempre el WhatsApp oficial de Lofthouse 14 (site.ts).
+    window.open(waLink(text), "_blank", "noopener");
   }
 
   function handlePrint() {

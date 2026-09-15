@@ -1,4 +1,4 @@
-/** Contacto oficial (WhatsApp y teléfono). */
+/** Contacto oficial (WhatsApp y teléfono) — única fuente para CTAs públicos. */
 
 export const WHATSAPP_E164 = "+573181585801";
 export const WHATSAPP_DIGITS = "573181585801";
@@ -17,6 +17,7 @@ export const site = {
   coordinates: { longitude: -76.54356082617328, latitude: 3.4369468662280838 },
   description:
     "14 alojamientos tipo loft / apartaestudio en Miraflores (Cali), cerca de gastronomía, cultura y servicios. Reservas claras por WhatsApp: fechas, huéspedes, capacidad, pago y verificación de identidad para ingreso autónomo.",
+  /** Dígitos internacionales sin + (wa.me). No sustituir en CTAs públicos. */
   whatsappNumber: WHATSAPP_DIGITS,
   whatsappDefaultMessage:
     "Hola! Estuve por lofthouse14.com y quiero reservar para las fechas ____ y ____ personas.",
@@ -58,7 +59,9 @@ export const site = {
   ],
 } as const;
 
+/** Enlace wa.me al número oficial de Lofthouse 14 (siempre el de `site`). */
 export function waLink(text?: string) {
+  const digits = String(site.whatsappNumber).replace(/\D/g, "") || WHATSAPP_DIGITS;
   const msg = encodeURIComponent(text || site.whatsappDefaultMessage);
-  return `https://wa.me/${site.whatsappNumber}?text=${msg}`;
+  return `https://wa.me/${digits}?text=${msg}`;
 }

@@ -9,8 +9,10 @@ import {
   airportTransferLegCount,
   clampAirportVehicles,
   clampMealDays,
+  clampPetCount,
   clampTimingUnits,
   extraLineTotalCop,
+  maxPetsForLofts,
   minAirportVehicles,
   type AirportTransferChoice,
   type ConfiguratorExtra,
@@ -132,13 +134,16 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
             };
     }
     let units: number | undefined;
-    if (
-      extra.id === "early-checkin" ||
-      extra.id === "late-checkout" ||
-      extra.id === "pet"
-    ) {
+    let petCount: number | undefined;
+    if (extra.id === "early-checkin" || extra.id === "late-checkout") {
       units = clampTimingUnits(
         input.timingQuantities?.[extra.id]?.units ?? lofts,
+        lofts,
+      );
+    }
+    if (extra.id === "pet") {
+      petCount = clampPetCount(
+        input.timingQuantities?.pet?.units ?? 1,
         lofts,
       );
     }
@@ -155,6 +160,7 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
       mealQty: mealQtyClamped,
       airport: airportChoice,
       units,
+      petCount,
     });
     lines.push({
       id: extra.id,
@@ -167,13 +173,13 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
               legs: airportTransferLegCount(airportChoice!),
               vehicles: airportChoice!.vehicles,
             }
-          : extra.id === "early-checkin" ||
-              extra.id === "late-checkout" ||
-              extra.id === "pet"
+          : extra.id === "early-checkin" || extra.id === "late-checkout"
             ? { units }
-            : mealQtyClamped
-              ? { days: mealQtyClamped.days, guests: mealQtyClamped.guests }
-              : undefined,
+            : extra.id === "pet"
+              ? { pets: petCount, maxPets: maxPetsForLofts(lofts) }
+              : mealQtyClamped
+                ? { days: mealQtyClamped.days, guests: mealQtyClamped.guests }
+                : undefined,
     });
   }
 
@@ -203,13 +209,14 @@ export function normalizeClientExtras(
   let airportTransfer: AirportTransferChoice | undefined;
 
   for (const r of raw) {
-    if (
-      r.id === "early-checkin" ||
-      r.id === "late-checkout" ||
-      r.id === "pet"
-    ) {
+    if (r.id === "early-checkin" || r.id === "late-checkout") {
       timingQuantities[r.id] = {
         units: clampTimingUnits(r.units ?? lofts, lofts),
+      };
+    }
+    if (r.id === "pet") {
+      timingQuantities.pet = {
+        units: clampPetCount(r.units ?? 1, lofts),
       };
     }
     if (r.id === "breakfast" || r.id === "lunch") {

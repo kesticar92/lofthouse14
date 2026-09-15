@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { site } from "@/lib/site";
+import { site, waLink } from "@/lib/site";
 
 export function SiteFooter() {
   return (
@@ -26,6 +26,15 @@ export function SiteFooter() {
               href={`tel:${site.phoneTel}`}
             >
               {site.phoneDisplay}
+            </a>
+            {" · "}
+            <a
+              className="font-medium text-emerald-400 hover:underline"
+              href={waLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp
             </a>
           </p>
           <p className="text-sm">

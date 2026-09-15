@@ -45,7 +45,7 @@ export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
     id: "pet",
     label: "Mascota",
     description:
-      "Hasta 2 mascotas por loft (no por reserva), con autorización previa. El valor es por cada loft donde haya mascota.",
+      "Hasta 2 mascotas por loft, con autorización previa. $30.000 por cada mascota.",
     priceCop: 30_000,
     pricing: "flat",
   },
@@ -125,6 +125,16 @@ export function clampTimingUnits(
   return Math.min(max, Math.max(1, Math.floor(units || max)));
 }
 
+/** Máximo de mascotas = 2 × número de lofts. */
+export function maxPetsForLofts(lofts: number): number {
+  return PETS_PER_LOFT * Math.max(1, Math.floor(lofts || 1));
+}
+
+export function clampPetCount(count: number, lofts: number): number {
+  const max = maxPetsForLofts(lofts);
+  return Math.min(max, Math.max(1, Math.floor(count || 1)));
+}
+
 export function airportTransferLegCount(choice: AirportTransferChoice): number {
   return (choice.pickup ? 1 : 0) + (choice.dropoff ? 1 : 0);
 }
@@ -170,12 +180,11 @@ export function extraUnitLabel(extra: ConfiguratorExtra): string {
   if (extra.pricing === "perAirportLeg") {
     return `+ ${formatCopPlain(extra.priceCop)} / trayecto / vehículo`;
   }
-  if (
-    extra.id === "early-checkin" ||
-    extra.id === "late-checkout" ||
-    extra.id === "pet"
-  ) {
+  if (extra.id === "early-checkin" || extra.id === "late-checkout") {
     return `+ ${formatCopPlain(extra.priceCop)} / loft`;
+  }
+  if (extra.id === "pet") {
+    return `+ ${formatCopPlain(extra.priceCop)} / mascota`;
   }
   return `+ ${formatCopPlain(extra.priceCop)}`;
 }
@@ -193,6 +202,8 @@ export type ExtraLineContext = {
   airport?: AirportTransferChoice;
   /** Unidades (lofts) para early check-in / late check-out. */
   units?: number;
+  /** Cantidad de mascotas ($30.000 c/u). */
+  petCount?: number;
 };
 
 export function extraLineTotalCop(
@@ -212,13 +223,13 @@ export function extraLineTotalCop(
     const vehicles = Math.max(1, Math.floor(ctx?.airport?.vehicles ?? 1));
     return extra.priceCop * legs * vehicles;
   }
-  if (
-    extra.id === "early-checkin" ||
-    extra.id === "late-checkout" ||
-    extra.id === "pet"
-  ) {
+  if (extra.id === "early-checkin" || extra.id === "late-checkout") {
     const units = Math.max(1, Math.floor(ctx?.units ?? 1));
     return extra.priceCop * units;
+  }
+  if (extra.id === "pet") {
+    const count = Math.max(1, Math.floor(ctx?.petCount ?? ctx?.units ?? 1));
+    return extra.priceCop * count;
   }
   return extra.priceCop;
 }
@@ -239,12 +250,11 @@ export function extrasTotalCop(
     if (extra.id === "airport-transfer") {
       ctx.airport = airportTransfer;
     }
-    if (
-      extra.id === "early-checkin" ||
-      extra.id === "late-checkout" ||
-      extra.id === "pet"
-    ) {
+    if (extra.id === "early-checkin" || extra.id === "late-checkout") {
       ctx.units = timingQuantities?.[extra.id]?.units ?? 1;
+    }
+    if (extra.id === "pet") {
+      ctx.petCount = timingQuantities?.pet?.units ?? 1;
     }
     sum += extraLineTotalCop(extra, ctx);
   }

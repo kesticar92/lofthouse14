@@ -27,10 +27,12 @@ import {
   minAirportVehicles,
   clampAirportVehicles,
   clampMealDays,
+  clampPetCount,
   clampTimingUnits,
   AIRPORT_VEHICLE_CAPACITY,
   PETS_PER_LOFT,
   mealMaxDays,
+  maxPetsForLofts,
   type AirportTransferChoice,
   type MealExtraId,
   type MealExtraQuantity,
@@ -410,7 +412,7 @@ export function GuidedReservation({
     });
   }, [guests]);
 
-  /** Early/late/mascota: unidades acotadas al número de lofts. */
+  /** Early/late/mascota: cantidades acotadas al número de lofts. */
   useEffect(() => {
     setTimingQuantities((prev) => {
       const early = clampTimingUnits(
@@ -421,7 +423,7 @@ export function GuidedReservation({
         prev["late-checkout"]?.units ?? lofts,
         lofts,
       );
-      const pet = clampTimingUnits(prev.pet?.units ?? lofts, lofts);
+      const pet = clampPetCount(prev.pet?.units ?? 1, lofts);
       if (
         prev["early-checkin"]?.units === early &&
         prev["late-checkout"]?.units === late &&
@@ -667,11 +669,11 @@ export function GuidedReservation({
         continue;
       }
       const timingUnits =
-        e.id === "early-checkin" ||
-        e.id === "late-checkout" ||
-        e.id === "pet"
+        e.id === "early-checkin" || e.id === "late-checkout"
           ? timingQuantities[e.id]?.units ?? lofts
           : undefined;
+      const petCount =
+        e.id === "pet" ? timingQuantities.pet?.units ?? 1 : undefined;
       const lineTotal = extraLineTotalCop(e, {
         mealQty:
           e.id === "breakfast" || e.id === "lunch"
@@ -679,6 +681,7 @@ export function GuidedReservation({
             : undefined,
         airport: e.id === "airport-transfer" ? airportTransfer : undefined,
         units: timingUnits,
+        petCount,
       });
       let detail = e.label;
       if (e.pricing === "perGuestPerDay") {
@@ -693,13 +696,12 @@ export function GuidedReservation({
         if (airportTransfer.pickup) parts.push("recogida");
         if (airportTransfer.dropoff) parts.push("ida");
         detail = `${e.label} (${formatCOP(e.priceCop)} × ${legs} trayecto${legs === 1 ? "" : "s"} × ${vehicles} vehículo${vehicles === 1 ? "" : "s"}${parts.length ? `: ${parts.join(" + ")}` : ""})`;
-      } else if (
-        e.id === "early-checkin" ||
-        e.id === "late-checkout" ||
-        e.id === "pet"
-      ) {
+      } else if (e.id === "early-checkin" || e.id === "late-checkout") {
         const u = timingUnits ?? 1;
         detail = `${e.label} (${formatCOP(e.priceCop)} × ${u} loft${u === 1 ? "" : "s"})`;
+      } else if (e.id === "pet") {
+        const c = petCount ?? 1;
+        detail = `${e.label} (${formatCOP(e.priceCop)} × ${c} mascota${c === 1 ? "" : "s"})`;
       }
       lines.push({
         id: `extra-${e.id}`,
@@ -788,12 +790,20 @@ export function GuidedReservation({
           vehicles: minAirportVehicles(guests),
         });
       }
-      if (id === "early-checkin" || id === "late-checkout" || id === "pet") {
+      if (id === "early-checkin" || id === "late-checkout") {
         const timingId = id as TimingExtraId;
         setTimingQuantities((tq) => ({
           ...tq,
           [timingId]: {
             units: clampTimingUnits(tq[timingId]?.units ?? lofts, lofts),
+          },
+        }));
+      }
+      if (id === "pet") {
+        setTimingQuantities((tq) => ({
+          ...tq,
+          pet: {
+            units: clampPetCount(tq.pet?.units ?? 1, lofts),
           },
         }));
       }
@@ -823,7 +833,12 @@ export function GuidedReservation({
   function updateTimingUnits(id: TimingExtraId, units: number) {
     setTimingQuantities((prev) => ({
       ...prev,
-      [id]: { units: clampTimingUnits(units, lofts) },
+      [id]: {
+        units:
+          id === "pet"
+            ? clampPetCount(units, lofts)
+            : clampTimingUnits(units, lofts),
+      },
     }));
   }
 
@@ -928,11 +943,11 @@ export function GuidedReservation({
         return `• ${e.label}: me interesa`;
       }
       const timingUnits =
-        e.id === "early-checkin" ||
-        e.id === "late-checkout" ||
-        e.id === "pet"
+        e.id === "early-checkin" || e.id === "late-checkout"
           ? timingQuantities[e.id]?.units ?? effectiveLofts
           : undefined;
+      const petCount =
+        e.id === "pet" ? timingQuantities.pet?.units ?? 1 : undefined;
       const lineTotal = extraLineTotalCop(e, {
         mealQty:
           e.id === "breakfast" || e.id === "lunch"
@@ -940,6 +955,7 @@ export function GuidedReservation({
             : undefined,
         airport: e.id === "airport-transfer" ? airportTransfer : undefined,
         units: timingUnits,
+        petCount,
       });
       if (e.pricing === "perAirportLeg") {
         const parts: string[] = [];
@@ -952,17 +968,13 @@ export function GuidedReservation({
         const q = mealQuantities[e.id as MealExtraId];
         return `• ${e.label}: ${formatCOP(e.priceCop)}/pers./día × ${q?.guests ?? guests} huésped(es) × ${q?.days ?? mealDaysDefault} día(s) = ${formatCOP(lineTotal)} (estimado)`;
       }
-      if (
-        e.id === "early-checkin" ||
-        e.id === "late-checkout" ||
-        e.id === "pet"
-      ) {
+      if (e.id === "early-checkin" || e.id === "late-checkout") {
         const u = timingUnits ?? 1;
-        const petNote =
-          e.id === "pet"
-            ? ` (hasta ${PETS_PER_LOFT} mascotas/loft)`
-            : "";
-        return `• ${e.label}: ${formatCOP(e.priceCop)} × ${u} loft${u === 1 ? "" : "s"}${petNote} = ${formatCOP(lineTotal)} (estimado)`;
+        return `• ${e.label}: ${formatCOP(e.priceCop)} × ${u} loft${u === 1 ? "" : "s"} = ${formatCOP(lineTotal)} (estimado)`;
+      }
+      if (e.id === "pet") {
+        const c = petCount ?? 1;
+        return `• ${e.label}: ${formatCOP(e.priceCop)} × ${c} mascota${c === 1 ? "" : "s"} (máx. ${PETS_PER_LOFT}/loft) = ${formatCOP(lineTotal)} (estimado)`;
       }
       return `• ${e.label}: ${formatCOP(e.priceCop)} (estimado)`;
     });
@@ -1051,11 +1063,11 @@ export function GuidedReservation({
       extras.includes(e.id),
     ).map((e) => {
       const timingUnits =
-        e.id === "early-checkin" ||
-        e.id === "late-checkout" ||
-        e.id === "pet"
+        e.id === "early-checkin" || e.id === "late-checkout"
           ? timingQuantities[e.id]?.units ?? lofts
           : undefined;
+      const petCount =
+        e.id === "pet" ? timingQuantities.pet?.units ?? 1 : undefined;
       const amountCop =
         e.interestOnly || e.priceCop <= 0
           ? 0
@@ -1067,6 +1079,7 @@ export function GuidedReservation({
               airport:
                 e.id === "airport-transfer" ? airportTransfer : undefined,
               units: timingUnits,
+              petCount,
             });
       const base: {
         id: string;
@@ -1083,12 +1096,11 @@ export function GuidedReservation({
         label: e.label,
         amountCop,
       };
-      if (
-        e.id === "early-checkin" ||
-        e.id === "late-checkout" ||
-        e.id === "pet"
-      ) {
+      if (e.id === "early-checkin" || e.id === "late-checkout") {
         base.units = timingUnits;
+      }
+      if (e.id === "pet") {
+        base.units = petCount;
       }
       if (e.id === "airport-transfer") {
         base.pickup = airportTransfer.pickup;
@@ -1873,9 +1885,8 @@ export function GuidedReservation({
                         e.id === "breakfast" || e.id === "lunch";
                       const isAirport = e.id === "airport-transfer";
                       const isTiming =
-                        e.id === "early-checkin" ||
-                        e.id === "late-checkout" ||
-                        e.id === "pet";
+                        e.id === "early-checkin" || e.id === "late-checkout";
+                      const isPet = e.id === "pet";
                       const mealId = isMeal ? (e.id as MealExtraId) : null;
                       const timingId = isTiming
                         ? (e.id as TimingExtraId)
@@ -1884,6 +1895,9 @@ export function GuidedReservation({
                       const timingUnits = timingId
                         ? timingQuantities[timingId]?.units ?? lofts
                         : undefined;
+                      const petCount = isPet
+                        ? timingQuantities.pet?.units ?? 1
+                        : undefined;
                       const lineTotal = checked
                         ? extraLineTotalCop(e, {
                             mealQty: mealId
@@ -1891,6 +1905,7 @@ export function GuidedReservation({
                               : undefined,
                             airport: isAirport ? airportTransfer : undefined,
                             units: timingUnits,
+                            petCount,
                           })
                         : 0;
 
@@ -1928,6 +1943,12 @@ export function GuidedReservation({
                                       ? `+ ${formatCOP(lineTotal)}`
                                       : `+ ${formatCOP(e.priceCop)} / loft`}
                                   </span>
+                                ) : isPet ? (
+                                  <span className="text-sm text-zinc-600 dark:text-zinc-300">
+                                    {checked && lineTotal > 0
+                                      ? `+ ${formatCOP(lineTotal)}`
+                                      : `+ ${formatCOP(e.priceCop)} / mascota`}
+                                  </span>
                                 ) : (
                                   <span className="text-sm">
                                     + {formatCOP(e.priceCop)}
@@ -1940,9 +1961,7 @@ export function GuidedReservation({
                               {checked && isTiming && timingId && lofts > 1 ? (
                                 <div className="mt-3">
                                   <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
-                                    {e.id === "pet"
-                                      ? "¿En cuántos lofts habrá mascota?"
-                                      : "¿Para cuántos apartamentos?"}
+                                    ¿Para cuántos apartamentos?
                                   </label>
                                   <select
                                     value={timingUnits ?? lofts}
@@ -1966,16 +1985,43 @@ export function GuidedReservation({
                                     ))}
                                   </select>
                                   <p className="mt-1 text-[10px] text-zinc-400">
-                                    {e.id === "pet"
-                                      ? `Hasta ${PETS_PER_LOFT} mascotas por loft (máx. ${PETS_PER_LOFT * lofts} en esta reserva). Valor ${formatCOP(e.priceCop)} por loft.`
-                                      : `El valor es ${formatCOP(e.priceCop)} por cada loft que solicite el servicio.`}
+                                    El valor es {formatCOP(e.priceCop)} por cada
+                                    loft que solicite el servicio.
                                   </p>
                                 </div>
                               ) : null}
-                              {checked && e.id === "pet" && lofts === 1 ? (
-                                <p className="mt-2 text-[10px] text-zinc-400">
-                                  Hasta {PETS_PER_LOFT} mascotas en este loft.
-                                </p>
+                              {checked && isPet ? (
+                                <div className="mt-3">
+                                  <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+                                    ¿Cuántas mascotas?
+                                  </label>
+                                  <select
+                                    value={petCount ?? 1}
+                                    onChange={(ev) =>
+                                      updateTimingUnits(
+                                        "pet",
+                                        Number(ev.target.value) || 1,
+                                      )
+                                    }
+                                    onClick={(ev) => ev.stopPropagation()}
+                                    className="w-full max-w-[14rem] rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+                                  >
+                                    {Array.from(
+                                      { length: maxPetsForLofts(lofts) },
+                                      (_, i) => i + 1,
+                                    ).map((n) => (
+                                      <option key={n} value={n}>
+                                        {n} mascota{n === 1 ? "" : "s"} ·{" "}
+                                        {formatCOP(e.priceCop * n)}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <p className="mt-1 text-[10px] text-zinc-400">
+                                    {formatCOP(e.priceCop)} por mascota. Máximo{" "}
+                                    {PETS_PER_LOFT} por loft (hasta{" "}
+                                    {maxPetsForLofts(lofts)} en esta reserva).
+                                  </p>
+                                </div>
                               ) : null}
                               {checked && isAirport ? (
                                 <div className="mt-3 space-y-3">

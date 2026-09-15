@@ -97,15 +97,24 @@ describe("extras catalog", () => {
     expect(AIRPORT_VEHICLE_CAPACITY).toBe(4);
   });
 
-  it("cotiza mascota por loft (2 mascotas permitidas por loft)", () => {
+  it("cotiza mascota a $30.000 por mascota (no por loft)", () => {
     const q = quoteBookingExtras({
       selectedIds: ["pet"],
       guests: 4,
       nights: 2,
       lofts: 2,
+      timingQuantities: { pet: { units: 3 } },
     });
-    expect(q.totalCop).toBe(30_000 * 2);
-    expect(q.lines[0]?.meta).toMatchObject({ units: 2 });
+    expect(q.totalCop).toBe(30_000 * 3);
+    expect(q.lines[0]?.meta).toMatchObject({ pets: 3 });
+  });
+
+  it("limita mascotas a 2 por loft", () => {
+    const q = normalizeClientExtras(
+      [{ id: "pet", units: 99 }],
+      { guests: 2, nights: 2, lofts: 2 },
+    );
+    expect(q.lines[0]?.amountCop).toBe(30_000 * 4);
   });
 
   it("limita días de desayuno al número de noches", () => {

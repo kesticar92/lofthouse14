@@ -367,27 +367,19 @@ export function GuidedReservation({
 
   const mealDaysMin =
     quoteResult.ok && quoteResult.noches === 1 ? 1 : 0;
+  const quoteNights = quoteResult.ok ? quoteResult.noches : 0;
 
   useEffect(() => {
-    const nights = quoteResult.ok ? quoteResult.noches : 0;
     const days = clampMealDays(
       Math.max(mealDaysMin, mealDaysDefault),
-      nights,
+      quoteNights,
       mealDaysMin,
     );
     setMealQuantities({
       breakfast: { days, guests },
       lunch: { days, guests },
     });
-  }, [
-    mealDaysDefault,
-    mealDaysMin,
-    guests,
-    checkIn,
-    checkOut,
-    quoteResult.ok,
-    quoteResult.noches,
-  ]);
+  }, [mealDaysDefault, mealDaysMin, quoteNights, guests, checkIn, checkOut]);
 
   /** Vehículos de traslado: mínimo según huéspedes (máx. 4 por vehículo). */
   useEffect(() => {
@@ -418,7 +410,9 @@ export function GuidedReservation({
    */
   useEffect(() => {
     if (step !== STEP_CONFIRMAR) {
-      setAvailCheck({ status: "idle" });
+      setAvailCheck((prev) =>
+        prev.status === "idle" ? prev : { status: "idle" },
+      );
       return;
     }
     if (!checkIn || !checkOut || !categoryId || !quoteResult.ok) {
@@ -433,6 +427,8 @@ export function GuidedReservation({
     setAvailCheck({ status: "checking" });
     setBookingError(null);
 
+    const requestedLofts = lofts;
+
     void (async () => {
       try {
         const liveRes = await fetch("/api/public/availability/live", {
@@ -442,7 +438,7 @@ export function GuidedReservation({
             check_in: checkIn,
             check_out: checkOut,
             guests,
-            lofts,
+            lofts: requestedLofts,
             category_id: categoryId,
           }),
         });
@@ -548,8 +544,6 @@ export function GuidedReservation({
     return () => {
       cancelled = true;
     };
-    // goToStep es estable vía closures; no incluirlo evita bucles.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, checkIn, checkOut, categoryId, guests, lofts, quoteResult.ok]);
 
   const extrasCop = extrasTotalCop(
@@ -766,13 +760,18 @@ export function GuidedReservation({
       }
       if (id === "breakfast" || id === "lunch") {
         const mealId = id as MealExtraId;
+        const nights = quoteResult.ok ? quoteResult.noches : mealDaysMax;
         setMealQuantities((mq) => ({
           ...mq,
           [mealId]: {
-            days: Math.max(
+            days: clampMealDays(
+              Math.max(
+                mealDaysMin,
+                mq[mealId]?.days ?? 0,
+                mealDaysDefault,
+              ),
+              nights,
               mealDaysMin,
-              mq[mealId]?.days ?? 0,
-              mealDaysDefault,
             ),
             guests: mq[mealId]?.guests ?? guests,
           },

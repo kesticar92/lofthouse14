@@ -48,7 +48,7 @@ export function ConsentBanner() {
     <div
       role="dialog"
       aria-label="Preferencias de cookies"
-      className="fixed inset-x-3 bottom-24 z-[60] mx-auto max-w-xl rounded-2xl border border-black/10 bg-[#f2f0eb]/95 p-4 shadow-2xl backdrop-blur-md dark:border-white/10 dark:bg-zinc-950/95 md:bottom-6"
+      className="fixed inset-x-3 top-[4.5rem] z-40 mx-auto max-w-xl rounded-2xl border border-black/10 bg-[#f2f0eb]/95 p-4 shadow-2xl backdrop-blur-md dark:border-white/10 dark:bg-zinc-950/95 md:top-auto md:bottom-6"
     >
       <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
         Usamos cookies de medición (GA4

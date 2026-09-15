@@ -181,7 +181,16 @@ export function GuidedReservation({
   const [entryFrom, setEntryFrom] = useState<StayDraftFrom | null>(null);
 
   useEffect(() => {
-    const applyDraft = (draft: StayDraft | null) => {
+    /**
+     * Entrada: alinear campos + paso/skips.
+     * Patch (eventos del propio wizard vía mergeStayDraft): solo campos.
+     * Si no, cada «Siguiente» que persiste el draft re-ejecutaba
+     * resolveEntryStep y podía pelear con goToStep / dejar el CTA raro.
+     */
+    const applyDraft = (
+      draft: StayDraft | null,
+      mode: "entry" | "patch",
+    ) => {
       if (!draft) return;
       if (draft.checkIn) setCheckIn(draft.checkIn);
       if (draft.checkOut) setCheckOut(draft.checkOut);
@@ -209,6 +218,10 @@ export function GuidedReservation({
         draft.from ??
         (hasCategory ? "card" : stayReady ? "banner" : undefined);
 
+      const externalNav = mode === "entry" || Boolean(draft.from);
+
+      if (!externalNav) return;
+
       if (from) setEntryFrom(from);
       if (stayReady) setSkipStaySteps(true);
       if (from || stayReady || hasCategory) setSkipTripStep(true);
@@ -229,11 +242,11 @@ export function GuidedReservation({
       /* ignore */
     }
 
-    applyDraft(queryDraft ?? readStayDraft());
+    applyDraft(queryDraft ?? readStayDraft(), "entry");
 
     const onDraft = (event: Event) => {
       const custom = event as CustomEvent<StayDraft>;
-      applyDraft(custom.detail ?? null);
+      applyDraft(custom.detail ?? null, "patch");
     };
     window.addEventListener(STAY_DRAFT_EVENT, onDraft);
     return () => window.removeEventListener(STAY_DRAFT_EVENT, onDraft);
@@ -1384,7 +1397,9 @@ export function GuidedReservation({
   return (
     <section
       id="reservas"
-      data-wizard-build="extras-v4-nav-immediate"
+      data-wizard-build="extras-v5-draft-consent"
+      data-wizard-step={String(step)}
+      data-wizard-profile={profile ?? ""}
       className={cn(
         "scroll-mt-24 bg-[#f2f0eb] dark:bg-zinc-950",
         compact
@@ -2484,7 +2499,7 @@ export function GuidedReservation({
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-8 flex flex-col gap-4 border-t border-zinc-100 pt-6 dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative z-50 mt-8 flex flex-col gap-4 border-t border-zinc-100 bg-white pt-6 dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-sm">
               {grandTotal !== null && step >= 1 ? (
                 <>
@@ -2525,6 +2540,7 @@ export function GuidedReservation({
                 {step < STEPS.length - 1 ? (
                   <button
                     type="button"
+                    data-wizard-next
                     disabled={!canAdvance() || transitionTo !== null}
                     onClick={() => advanceFromCurrentStep()}
                     className="inline-flex shrink-0 items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"

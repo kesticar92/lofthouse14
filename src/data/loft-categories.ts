@@ -157,6 +157,22 @@ export function getLoftCategory(id: LoftCategoryId): LoftCategory {
   return LOFT_CATEGORIES.find((c) => c.id === id)!;
 }
 
+/**
+ * Capacidad máxima de reserva por tipología (grupo completo).
+ * Cada loft individual admite hasta 5 huéspedes (salvo overrides).
+ */
+export const CATEGORY_RESERVATION_MAX_GUESTS: Record<LoftCategoryId, number> = {
+  vista: 10,
+  atrio: 13,
+  cielo: 40,
+};
+
+export const GUESTS_PER_LOFT_MAX = 5;
+
+export function categoryReservationMaxGuests(id: LoftCategoryId): number {
+  return CATEGORY_RESERVATION_MAX_GUESTS[id];
+}
+
 export function categoryForLoftNumber(n: number): LoftCategory | undefined {
   return LOFT_CATEGORIES.find((c) => c.loftNumbers.includes(n));
 }

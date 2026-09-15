@@ -72,7 +72,9 @@ import {
 import {
   LOFT_CATEGORIES,
   availableLoftsForGuests,
+  categoryReservationMaxGuests,
   getLoftCategory,
+  GUESTS_PER_LOFT_MAX,
   type LoftCategoryId,
 } from "@/data/loft-categories";
 import { SEED_CANCELLATION_POLICY } from "@/lib/policies/cancellation";
@@ -1799,18 +1801,22 @@ export function GuidedReservation({
                         <p className="text-xs font-semibold text-amber-950 dark:text-amber-100">
                           Disponibilidad en vivo
                         </p>
-                        <p className="mt-1 text-xs text-amber-900 dark:text-amber-200">
+                        <p className="mt-1 text-sm text-amber-950 dark:text-amber-100">
                           {liveOffer.message}
                         </p>
                         <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-white">
                           {liveOffer.name}{" "}
                           <span className="font-normal text-zinc-600 dark:text-zinc-400">
-                            desde {formatCOP(liveOffer.priceFromCop)}/noche
+                            · hasta{" "}
+                            {categoryReservationMaxGuests(liveOffer.categoryId)}{" "}
+                            personas · desde{" "}
+                            {formatCOP(liveOffer.priceFromCop)}/noche
                           </span>
                         </p>
                         <p className="mt-0.5 text-[11px] text-zinc-500">
                           Unidades libres ahora: loft{" "}
-                          {liveOffer.assignedUnits.join(", ")}
+                          {liveOffer.assignedUnits.join(", ")} · máx.{" "}
+                          {GUESTS_PER_LOFT_MAX} huéspedes por loft
                         </p>
                         <div className="mt-3 flex flex-wrap justify-end gap-2">
                           <button

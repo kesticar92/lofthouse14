@@ -1,4 +1,9 @@
-import { LOFT_CATEGORIES } from "@/data/loft-categories";
+import {
+  LOFT_CATEGORIES,
+  categoryReservationMaxGuests,
+  GUESTS_PER_LOFT_MAX,
+  getLoftCategory,
+} from "@/data/loft-categories";
 import {
   findAvailableUnits,
   type InventoryUnit,
@@ -23,6 +28,37 @@ import { CATALOG_ROOMS, type MarketingCategory } from "@/lib/catalog/seed";
 import { fetchAndParseIcal } from "@/lib/pms/ical-sync";
 
 export type LoftCategoryId = MarketingCategory;
+
+/** Mensaje claro cuando el tipo elegido no sirve / no tiene cupo. */
+export function formatLiveAvailabilityMessage(input: {
+  reason: "no_units_for_guests" | "category_full" | "no_availability";
+  requestedCategoryId: LoftCategoryId;
+  guests: number;
+  alternative: {
+    categoryId: LoftCategoryId;
+    name: string;
+  } | null;
+}): string {
+  const requested = getLoftCategory(input.requestedCategoryId);
+  const requestedMax = categoryReservationMaxGuests(input.requestedCategoryId);
+  const short = requested.shortLabel;
+
+  const capacityHint = `En ${short} caben máximo ${requestedMax} personas (hasta ${GUESTS_PER_LOFT_MAX} por loft).`;
+
+  let base: string;
+  if (input.reason === "no_units_for_guests") {
+    base = `${requested.name} no está disponible para ${input.guests} huésped${input.guests === 1 ? "" : "es"}. ${capacityHint}`;
+  } else {
+    base = `${requested.name} no tiene cupo para esas fechas con ${input.guests} huésped${input.guests === 1 ? "" : "es"}. ${capacityHint}`;
+  }
+
+  if (input.alternative) {
+    const altMax = categoryReservationMaxGuests(input.alternative.categoryId);
+    return `${base} Alternativa disponible: ${input.alternative.name} (hasta ${altMax} personas).`;
+  }
+
+  return `${base} Por ahora no hay otra tipología libre para ese grupo.`;
+}
 
 export type LiveAvailabilityOk = {
   ok: true;
@@ -311,16 +347,15 @@ export async function checkLiveAvailability(params: {
   }
 
   const preferred = alternatives[0] ?? null;
-  const requestedName = categoryMeta(params.categoryId).name;
 
-  let message: string;
-  if (reason === "no_units_for_guests") {
-    message = `El tipo ${requestedName} no admite ${params.guests} huéspedes con las reglas de capacidad (el loft 5 de Atrio admite máximo 3; grupos grandes usan 7+8 y, de 11 a 13, también el 5).`;
-  } else if (preferred) {
-    message = `No hay disponibilidad de ${requestedName} para esas fechas. Te sugerimos ${preferred.name}, que sí está libre ahora.`;
-  } else {
-    message = `No hay disponibilidad de ${requestedName} ni de otros tipos para esas fechas y ${params.guests} huéspedes.`;
-  }
+  const message = formatLiveAvailabilityMessage({
+    reason,
+    requestedCategoryId: params.categoryId,
+    guests: params.guests,
+    alternative: preferred
+      ? { categoryId: preferred.categoryId, name: preferred.name }
+      : null,
+  });
 
   return {
     ok: false,

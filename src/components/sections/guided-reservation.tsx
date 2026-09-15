@@ -1397,7 +1397,7 @@ export function GuidedReservation({
   return (
     <section
       id="reservas"
-      data-wizard-build="extras-v6-sticky-footer"
+      data-wizard-build="extras-v7-profile-testids"
       data-wizard-step={String(step)}
       data-wizard-profile={profile ?? ""}
       className={cn(
@@ -1503,6 +1503,8 @@ export function GuidedReservation({
                       <button
                         key={p.id}
                         type="button"
+                        data-profile-id={p.id}
+                        aria-pressed={profile === p.id}
                         onClick={() => applyProfileSuggestion(p.id)}
                         className={cn(
                           "rounded-2xl border px-4 py-4 text-left transition",

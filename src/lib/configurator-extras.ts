@@ -37,7 +37,7 @@ export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
     id: "airport-transfer",
     label: "Traslado aeropuerto",
     description:
-      "Automóvil privado sedán con aire acondicionado (máx. 4 pasajeros por vehículo). $70.000 por trayecto y por vehículo. Con 5 o más huéspedes se requieren al menos 2 vehículos.",
+      "Automóvil privado sedán con aire acondicionado (máx. 4 pasajeros por vehículo). $70.000 por trayecto y por vehículo. Sugerimos suficientes vehículos según huéspedes, pero puedes pedir menos si no los necesitas todos.",
     priceCop: 70_000,
     pricing: "perAirportLeg",
   },
@@ -102,19 +102,27 @@ export type TimingExtraQuantity = {
   units: number;
 };
 
-/** Mínimo de vehículos según huéspedes (capacidad 4). */
+/** Mínimo *sugerido* de vehículos según huéspedes (capacidad 4). */
 export function minAirportVehicles(guests: number): number {
   const g = Math.max(1, Math.floor(guests || 1));
   return Math.max(1, Math.ceil(g / AIRPORT_VEHICLE_CAPACITY));
 }
 
+/**
+ * Acota vehículos a 1…max. El cliente puede elegir menos que el sugerido
+ * ({@link minAirportVehicles}) si no necesita todos.
+ */
 export function clampAirportVehicles(
   vehicles: number,
-  guests: number,
+  _guests?: number,
   maxVehicles = 20,
 ): number {
-  const min = minAirportVehicles(guests);
-  return Math.min(maxVehicles, Math.max(min, Math.floor(vehicles || min)));
+  return Math.min(maxVehicles, Math.max(1, Math.floor(vehicles || 1)));
+}
+
+/** Capacidad total con N vehículos. */
+export function airportVehicleCapacity(vehicles: number): number {
+  return Math.max(1, Math.floor(vehicles || 1)) * AIRPORT_VEHICLE_CAPACITY;
 }
 
 export function clampTimingUnits(

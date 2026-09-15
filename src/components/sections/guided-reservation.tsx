@@ -46,6 +46,7 @@ import {
   ConfiguratorOrbitalSteps,
   ConfiguratorOrbitalTransition,
 } from "@/components/sections/configurator-orbital-steps";
+import { AvailabilityCheckingPanel } from "@/components/sections/availability-checking-panel";
 import {
   STAY_DRAFT_EVENT,
   mergeStayDraft,
@@ -1418,7 +1419,7 @@ export function GuidedReservation({
   return (
     <section
       id="reservas"
-      data-wizard-build="extras-v7-profile-testids"
+      data-wizard-build="extras-v9-vehicles-avail-ui"
       data-wizard-step={String(step)}
       data-wizard-profile={profile ?? ""}
       className={cn(
@@ -1501,6 +1502,22 @@ export function GuidedReservation({
                   </p>
                 </motion.div>
               ) : null}
+            </motion.div>
+          ) : null}
+          {availCheck.status === "checking" && transitionTo === null ? (
+            <motion.div
+              key="avail-checking-overlay"
+              className="pointer-events-none fixed inset-0 z-[80] flex flex-col items-center justify-center gap-5 bg-[#f2f0eb]/75 px-4 backdrop-blur-md dark:bg-zinc-950/75"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <AvailabilityCheckingPanel
+                categoryId={categoryId}
+                variant="overlay"
+                className="w-full shadow-2xl"
+              />
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -2096,8 +2113,7 @@ export function GuidedReservation({
                                     />
                                     Traslado al aeropuerto (salida)
                                   </label>
-                                  {guests > AIRPORT_VEHICLE_CAPACITY ? (
-                                    <div>
+                                  <div>
                                       <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
                                         ¿Cuántos vehículos de traslado?
                                       </label>
@@ -2105,8 +2121,7 @@ export function GuidedReservation({
                                         value={airportTransfer.vehicles}
                                         onChange={(ev) =>
                                           updateAirportVehicles(
-                                            Number(ev.target.value) ||
-                                              minTransferVehicles,
+                                            Number(ev.target.value) || 1,
                                           )
                                         }
                                         onClick={(ev) => ev.stopPropagation()}
@@ -2114,44 +2129,53 @@ export function GuidedReservation({
                                       >
                                         {Array.from(
                                           {
-                                            length:
-                                              Math.max(
-                                                minTransferVehicles + 4,
-                                                minTransferVehicles,
-                                              ) -
-                                              minTransferVehicles +
-                                              1,
+                                            length: Math.max(
+                                              5,
+                                              minTransferVehicles + 3,
+                                            ),
                                           },
-                                          (_, i) => minTransferVehicles + i,
+                                          (_, i) => i + 1,
                                         ).map((n) => (
                                           <option key={n} value={n}>
                                             {n} vehículo{n === 1 ? "" : "s"} ·
                                             hasta {n * AIRPORT_VEHICLE_CAPACITY}{" "}
                                             pasajeros
+                                            {n === minTransferVehicles
+                                              ? " (sugerido)"
+                                              : ""}
                                           </option>
                                         ))}
                                       </select>
                                       <p className="mt-1 text-[10px] text-zinc-400">
-                                        Con {guests} huéspedes se requieren al
-                                        menos {minTransferVehicles} vehículo
+                                        Sugerido para {guests} huésped
+                                        {guests === 1 ? "" : "es"}:{" "}
+                                        {minTransferVehicles} vehículo
                                         {minTransferVehicles === 1
                                           ? ""
                                           : "s"}{" "}
                                         (máx. {AIRPORT_VEHICLE_CAPACITY}{" "}
-                                        pasajeros por vehículo). Puedes pedir
-                                        más si lo deseas. Precio:{" "}
+                                        pasajeros c/u). Puedes elegir menos si
+                                        no los necesitas todos. Precio:{" "}
                                         {formatCOP(e.priceCop)} por trayecto y
                                         por vehículo.
                                       </p>
+                                      {airportTransfer.vehicles *
+                                        AIRPORT_VEHICLE_CAPACITY <
+                                      guests ? (
+                                        <p className="mt-1 text-[10px] font-medium text-amber-700 dark:text-amber-300">
+                                          Con {airportTransfer.vehicles}{" "}
+                                          vehículo
+                                          {airportTransfer.vehicles === 1
+                                            ? ""
+                                            : "s"}{" "}
+                                          caben hasta{" "}
+                                          {airportTransfer.vehicles *
+                                            AIRPORT_VEHICLE_CAPACITY}{" "}
+                                          pasajeros; sois {guests}. Coordina el
+                                          resto por WhatsApp o suma vehículos.
+                                        </p>
+                                      ) : null}
                                     </div>
-                                  ) : (
-                                    <p className="text-[10px] text-zinc-400">
-                                      Un vehículo alcanza para hasta{" "}
-                                      {AIRPORT_VEHICLE_CAPACITY} pasajeros.
-                                      Precio: {formatCOP(e.priceCop)} por
-                                      trayecto.
-                                    </p>
-                                  )}
                                   {airportTransferLegCount(airportTransfer) ===
                                   0 ? (
                                     <p className="text-xs text-amber-700 dark:text-amber-300">
@@ -2268,7 +2292,7 @@ export function GuidedReservation({
                         )}
                       >
                         {availCheck.status === "checking"
-                          ? "Verificando calendarios…"
+                          ? "Consultando cupo…"
                           : availCheck.status === "ok"
                             ? availCheck.message ?? "Cupo confirmado"
                             : availCheck.status === "fail"
@@ -2638,7 +2662,8 @@ export function GuidedReservation({
                   ) : null}
                   {availCheck.status === "checking" ? (
                     <p className="text-[11px] text-zinc-500">
-                      Confirmando disponibilidad antes de reservar…
+                      Consultando la disponibilidad de los alojamientos que
+                      seleccionaste…
                     </p>
                   ) : null}
                   {availCheck.status === "fail" ? (

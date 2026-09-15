@@ -80,7 +80,7 @@ describe("extras catalog", () => {
     expect(q.lines[0]?.meta).toMatchObject({ legs: 2, vehicles: 2 });
   });
 
-  it("traslado con 5+ huéspedes fuerza mínimo de vehículos", () => {
+  it("traslado: el cliente puede pedir menos vehículos que el sugerido", () => {
     const q = normalizeClientExtras(
       [
         {
@@ -92,8 +92,9 @@ describe("extras catalog", () => {
       ],
       { guests: 5, nights: 2, lofts: 2 },
     );
-    expect(q.lines[0]?.amountCop).toBe(70_000 * 1 * 2);
-    expect(q.lines[0]?.meta).toMatchObject({ vehicles: 2 });
+    expect(q.lines[0]?.amountCop).toBe(70_000 * 1 * 1);
+    expect(q.lines[0]?.meta).toMatchObject({ vehicles: 1 });
+    expect(minAirportVehicles(5)).toBe(2);
     expect(AIRPORT_VEHICLE_CAPACITY).toBe(4);
   });
 

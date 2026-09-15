@@ -8,6 +8,7 @@ import {
   CONFIGURATOR_EXTRAS,
   airportTransferLegCount,
   clampAirportVehicles,
+  clampMealDays,
   clampTimingUnits,
   extraLineTotalCop,
   minAirportVehicles,
@@ -131,15 +132,27 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
             };
     }
     let units: number | undefined;
-    if (extra.id === "early-checkin" || extra.id === "late-checkout") {
+    if (
+      extra.id === "early-checkin" ||
+      extra.id === "late-checkout" ||
+      extra.id === "pet"
+    ) {
       units = clampTimingUnits(
         input.timingQuantities?.[extra.id]?.units ?? lofts,
         lofts,
       );
     }
 
+    let mealQtyClamped = mealQty;
+    if (mealQty && (extra.id === "breakfast" || extra.id === "lunch")) {
+      mealQtyClamped = {
+        ...mealQty,
+        days: clampMealDays(mealQty.days, nights),
+      };
+    }
+
     const amountCop = extraLineTotalCop(extra, {
-      mealQty,
+      mealQty: mealQtyClamped,
       airport: airportChoice,
       units,
     });
@@ -154,10 +167,12 @@ export function quoteBookingExtras(input: QuoteExtrasInput): QuoteExtrasResult {
               legs: airportTransferLegCount(airportChoice!),
               vehicles: airportChoice!.vehicles,
             }
-          : extra.id === "early-checkin" || extra.id === "late-checkout"
+          : extra.id === "early-checkin" ||
+              extra.id === "late-checkout" ||
+              extra.id === "pet"
             ? { units }
-            : mealQty
-              ? { days: mealQty.days, guests: mealQty.guests }
+            : mealQtyClamped
+              ? { days: mealQtyClamped.days, guests: mealQtyClamped.guests }
               : undefined,
     });
   }
@@ -188,14 +203,19 @@ export function normalizeClientExtras(
   let airportTransfer: AirportTransferChoice | undefined;
 
   for (const r of raw) {
-    if (r.id === "early-checkin" || r.id === "late-checkout") {
+    if (
+      r.id === "early-checkin" ||
+      r.id === "late-checkout" ||
+      r.id === "pet"
+    ) {
       timingQuantities[r.id] = {
         units: clampTimingUnits(r.units ?? lofts, lofts),
       };
     }
     if (r.id === "breakfast" || r.id === "lunch") {
+      const nights = Math.max(0, Math.floor(ctx.nights ?? 0));
       mealQuantities[r.id] = {
-        days: Math.max(0, Math.floor(r.mealDays ?? 0)),
+        days: clampMealDays(r.mealDays ?? 0, nights),
         guests: Math.max(1, Math.floor(r.mealGuests ?? guests)),
       };
     }

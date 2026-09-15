@@ -97,6 +97,28 @@ describe("extras catalog", () => {
     expect(AIRPORT_VEHICLE_CAPACITY).toBe(4);
   });
 
+  it("cotiza mascota por loft (2 mascotas permitidas por loft)", () => {
+    const q = quoteBookingExtras({
+      selectedIds: ["pet"],
+      guests: 4,
+      nights: 2,
+      lofts: 2,
+    });
+    expect(q.totalCop).toBe(30_000 * 2);
+    expect(q.lines[0]?.meta).toMatchObject({ units: 2 });
+  });
+
+  it("limita días de desayuno al número de noches", () => {
+    const q = quoteBookingExtras({
+      selectedIds: ["breakfast"],
+      guests: 2,
+      nights: 3,
+      mealQuantities: { breakfast: { days: 10, guests: 2 } },
+    });
+    expect(q.totalCop).toBe(15_000 * 3 * 2);
+    expect(q.lines[0]?.meta).toMatchObject({ days: 3 });
+  });
+
   it("reprices amountCop del cliente y aplica units de lofts", () => {
     const q = normalizeClientExtras(
       [{ id: "early-checkin", label: "Hack", amountCop: 1, units: 2 }],

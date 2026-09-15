@@ -26,8 +26,11 @@ import {
   airportTransferLegCount,
   minAirportVehicles,
   clampAirportVehicles,
+  clampMealDays,
   clampTimingUnits,
   AIRPORT_VEHICLE_CAPACITY,
+  PETS_PER_LOFT,
+  mealMaxDays,
   type AirportTransferChoice,
   type MealExtraId,
   type MealExtraQuantity,
@@ -115,9 +118,15 @@ export function GuidedReservation({
   >({
     "early-checkin": { units: 1 },
     "late-checkout": { units: 1 },
+    pet: { units: 1 },
   });
   const [bookingBusy, setBookingBusy] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  /** Verificación iCal al llegar al resumen (antes de RESERVAR). */
+  const [availCheck, setAvailCheck] = useState<{
+    status: "idle" | "checking" | "ok" | "fail";
+    message?: string;
+  }>({ status: "idle" });
   const [liveOffer, setLiveOffer] = useState<{
     message: string;
     categoryId: LoftCategoryId;
@@ -351,16 +360,34 @@ export function GuidedReservation({
     [quoteResult.ok, quoteResult.noches],
   );
 
+  const mealDaysMax = useMemo(
+    () => (quoteResult.ok ? mealMaxDays(quoteResult.noches) : 0),
+    [quoteResult.ok, quoteResult.noches],
+  );
+
   const mealDaysMin =
     quoteResult.ok && quoteResult.noches === 1 ? 1 : 0;
 
   useEffect(() => {
-    const days = Math.max(mealDaysMin, mealDaysDefault);
+    const nights = quoteResult.ok ? quoteResult.noches : 0;
+    const days = clampMealDays(
+      Math.max(mealDaysMin, mealDaysDefault),
+      nights,
+      mealDaysMin,
+    );
     setMealQuantities({
       breakfast: { days, guests },
       lunch: { days, guests },
     });
-  }, [mealDaysDefault, mealDaysMin, guests, checkIn, checkOut]);
+  }, [
+    mealDaysDefault,
+    mealDaysMin,
+    guests,
+    checkIn,
+    checkOut,
+    quoteResult.ok,
+    quoteResult.noches,
+  ]);
 
   /** Vehículos de traslado: mínimo según huéspedes (máx. 4 por vehículo). */
   useEffect(() => {
@@ -370,7 +397,7 @@ export function GuidedReservation({
     }));
   }, [guests]);
 
-  /** Early/late: unidades acotadas al número de lofts de la reserva. */
+  /** Early/late/mascota: unidades acotadas al número de lofts. */
   useEffect(() => {
     setTimingQuantities((prev) => ({
       "early-checkin": {
@@ -379,8 +406,151 @@ export function GuidedReservation({
       "late-checkout": {
         units: clampTimingUnits(prev["late-checkout"]?.units ?? lofts, lofts),
       },
+      pet: {
+        units: clampTimingUnits(prev.pet?.units ?? lofts, lofts),
+      },
     }));
   }, [lofts]);
+
+  /**
+   * Confirmar disponibilidad iCal al entrar al resumen,
+   * antes de habilitar RESERVAR (no solo al hacer clic).
+   */
+  useEffect(() => {
+    if (step !== STEP_CONFIRMAR) {
+      setAvailCheck({ status: "idle" });
+      return;
+    }
+    if (!checkIn || !checkOut || !categoryId || !quoteResult.ok) {
+      setAvailCheck({
+        status: "fail",
+        message: "Faltan fechas o tipo de loft para verificar cupo.",
+      });
+      return;
+    }
+
+    let cancelled = false;
+    setAvailCheck({ status: "checking" });
+    setBookingError(null);
+
+    void (async () => {
+      try {
+        const liveRes = await fetch("/api/public/availability/live", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            check_in: checkIn,
+            check_out: checkOut,
+            guests,
+            lofts,
+            category_id: categoryId,
+          }),
+        });
+        if (cancelled) return;
+        if (!liveRes.ok) {
+          setAvailCheck({
+            status: "fail",
+            message:
+              "No se pudo verificar disponibilidad en vivo. Revisa fechas o intenta de nuevo.",
+          });
+          return;
+        }
+        const live = (await liveRes.json()) as {
+          ok?: boolean;
+          message?: string;
+          warning?: string;
+          assignedUnits?: number[];
+          alternative?: {
+            categoryId: LoftCategoryId;
+            name: string;
+            priceFromCop: number;
+            assignedUnits: number[];
+          } | null;
+          alternatives?: Array<{
+            categoryId: LoftCategoryId;
+            name: string;
+            priceFromCop: number;
+            assignedUnits: number[];
+          }>;
+        };
+
+        if (live.warning) setLiveWarning(live.warning);
+        else setLiveWarning(null);
+
+        if (!live.ok) {
+          if (live.alternative) {
+            const availableIds = new Set<LoftCategoryId>([
+              live.alternative.categoryId,
+              ...(live.alternatives ?? []).map((a) => a.categoryId),
+            ]);
+            const blocked = LOFT_CATEGORIES.map((c) => c.id).filter(
+              (id) => !availableIds.has(id),
+            );
+            if (
+              categoryId &&
+              !availableIds.has(categoryId) &&
+              !blocked.includes(categoryId)
+            ) {
+              blocked.push(categoryId);
+            }
+            setBlockedCategoryIds(blocked);
+            setLiveOffer({
+              message:
+                live.message ??
+                "No hay cupo del tipo elegido. Hay otra opción disponible.",
+              categoryId: live.alternative.categoryId,
+              name: live.alternative.name,
+              priceFromCop: live.alternative.priceFromCop,
+              assignedUnits: live.alternative.assignedUnits,
+              warning: live.warning,
+              blockedCategoryIds: blocked,
+            });
+            setAvailCheck({
+              status: "fail",
+              message:
+                live.message ??
+                "Sin cupo del tipo elegido. Revisa la alternativa en el paso Loft.",
+            });
+            setSkipLoftStep(false);
+            goToStep(STEP_LOFT);
+            return;
+          }
+          setAvailCheck({
+            status: "fail",
+            message:
+              live.message ??
+              "No hay disponibilidad para esas fechas. Ajusta fechas o continúa por WhatsApp.",
+          });
+          return;
+        }
+
+        if (live.assignedUnits?.length) {
+          setAssignedUnitsHint(live.assignedUnits);
+          setLofts((prev) => Math.max(prev, live.assignedUnits!.length));
+        }
+        setAvailCheck({
+          status: "ok",
+          message: live.assignedUnits?.length
+            ? `Cupo confirmado · loft ${live.assignedUnits.join(", ")}`
+            : "Cupo confirmado para esas fechas.",
+        });
+      } catch {
+        if (!cancelled) {
+          setAvailCheck({
+            status: "fail",
+            message:
+              "Error al consultar calendarios. Intenta de nuevo antes de reservar.",
+          });
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // goToStep es estable vía closures; no incluirlo evita bucles.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, checkIn, checkOut, categoryId, guests, lofts, quoteResult.ok]);
 
   const extrasCop = extrasTotalCop(
     extras,
@@ -464,7 +634,9 @@ export function GuidedReservation({
         continue;
       }
       const timingUnits =
-        e.id === "early-checkin" || e.id === "late-checkout"
+        e.id === "early-checkin" ||
+        e.id === "late-checkout" ||
+        e.id === "pet"
           ? timingQuantities[e.id]?.units ?? lofts
           : undefined;
       const lineTotal = extraLineTotalCop(e, {
@@ -488,7 +660,11 @@ export function GuidedReservation({
         if (airportTransfer.pickup) parts.push("recogida");
         if (airportTransfer.dropoff) parts.push("ida");
         detail = `${e.label} (${formatCOP(e.priceCop)} × ${legs} trayecto${legs === 1 ? "" : "s"} × ${vehicles} vehículo${vehicles === 1 ? "" : "s"}${parts.length ? `: ${parts.join(" + ")}` : ""})`;
-      } else if (e.id === "early-checkin" || e.id === "late-checkout") {
+      } else if (
+        e.id === "early-checkin" ||
+        e.id === "late-checkout" ||
+        e.id === "pet"
+      ) {
         const u = timingUnits ?? 1;
         detail = `${e.label} (${formatCOP(e.priceCop)} × ${u} loft${u === 1 ? "" : "s"})`;
       }
@@ -579,7 +755,7 @@ export function GuidedReservation({
           vehicles: minAirportVehicles(guests),
         });
       }
-      if (id === "early-checkin" || id === "late-checkout") {
+      if (id === "early-checkin" || id === "late-checkout" || id === "pet") {
         const timingId = id as TimingExtraId;
         setTimingQuantities((tq) => ({
           ...tq,
@@ -658,12 +834,14 @@ export function GuidedReservation({
     id: MealExtraId,
     patch: Partial<MealExtraQuantity>,
   ) {
+    const nights = quoteResult.ok ? quoteResult.noches : mealDaysMax;
     setMealQuantities((prev) => ({
       ...prev,
       [id]: {
-        days: Math.max(
-          mealDaysMin,
+        days: clampMealDays(
           patch.days ?? prev[id]?.days ?? mealDaysDefault,
+          nights,
+          mealDaysMin,
         ),
         guests: patch.guests ?? prev[id]?.guests ?? guests,
       },
@@ -712,7 +890,9 @@ export function GuidedReservation({
         return `• ${e.label}: me interesa`;
       }
       const timingUnits =
-        e.id === "early-checkin" || e.id === "late-checkout"
+        e.id === "early-checkin" ||
+        e.id === "late-checkout" ||
+        e.id === "pet"
           ? timingQuantities[e.id]?.units ?? effectiveLofts
           : undefined;
       const lineTotal = extraLineTotalCop(e, {
@@ -734,9 +914,17 @@ export function GuidedReservation({
         const q = mealQuantities[e.id as MealExtraId];
         return `• ${e.label}: ${formatCOP(e.priceCop)}/pers./día × ${q?.guests ?? guests} huésped(es) × ${q?.days ?? mealDaysDefault} día(s) = ${formatCOP(lineTotal)} (estimado)`;
       }
-      if (e.id === "early-checkin" || e.id === "late-checkout") {
+      if (
+        e.id === "early-checkin" ||
+        e.id === "late-checkout" ||
+        e.id === "pet"
+      ) {
         const u = timingUnits ?? 1;
-        return `• ${e.label}: ${formatCOP(e.priceCop)} × ${u} loft${u === 1 ? "" : "s"} = ${formatCOP(lineTotal)} (estimado)`;
+        const petNote =
+          e.id === "pet"
+            ? ` (hasta ${PETS_PER_LOFT} mascotas/loft)`
+            : "";
+        return `• ${e.label}: ${formatCOP(e.priceCop)} × ${u} loft${u === 1 ? "" : "s"}${petNote} = ${formatCOP(lineTotal)} (estimado)`;
       }
       return `• ${e.label}: ${formatCOP(e.priceCop)} (estimado)`;
     });
@@ -808,6 +996,14 @@ export function GuidedReservation({
     assignedUnits?: number[];
   }) {
     if (!quoteResult.ok || bookingBusy || !policiesAccepted) return;
+    if (availCheck.status === "checking") return;
+    if (availCheck.status !== "ok" && !opts?.assignedUnits) {
+      setBookingError(
+        availCheck.message ??
+          "Confirma disponibilidad antes de reservar (revisa fechas o el tipo de loft).",
+      );
+      return;
+    }
     const effectiveCategory = opts?.categoryOverride ?? categoryId;
     setBookingBusy(true);
     setBookingError(null);
@@ -817,7 +1013,9 @@ export function GuidedReservation({
       extras.includes(e.id),
     ).map((e) => {
       const timingUnits =
-        e.id === "early-checkin" || e.id === "late-checkout"
+        e.id === "early-checkin" ||
+        e.id === "late-checkout" ||
+        e.id === "pet"
           ? timingQuantities[e.id]?.units ?? lofts
           : undefined;
       const amountCop =
@@ -847,7 +1045,11 @@ export function GuidedReservation({
         label: e.label,
         amountCop,
       };
-      if (e.id === "early-checkin" || e.id === "late-checkout") {
+      if (
+        e.id === "early-checkin" ||
+        e.id === "late-checkout" ||
+        e.id === "pet"
+      ) {
         base.units = timingUnits;
       }
       if (e.id === "airport-transfer") {
@@ -874,10 +1076,22 @@ export function GuidedReservation({
             check_in: checkIn,
             check_out: checkOut,
             guests,
+            lofts,
             category_id: effectiveCategory,
           }),
         });
-        if (liveRes.ok) {
+        if (!liveRes.ok) {
+          setBookingError(
+            "No se pudo verificar disponibilidad en vivo. Intenta de nuevo; no abrimos WhatsApp sin cupo confirmado.",
+          );
+          setAvailCheck({
+            status: "fail",
+            message: "Verificación de disponibilidad fallida.",
+          });
+          setBookingBusy(false);
+          return;
+        }
+        {
           const live = (await liveRes.json()) as {
             ok?: boolean;
             message?: string;
@@ -936,6 +1150,7 @@ export function GuidedReservation({
               setSkipLoftStep(false);
               setBookingError(null);
               setBookingBusy(false);
+              setAvailCheck({ status: "fail", message: live.message });
               // Volver al paso loft con la misma animación orbital del wizard.
               goToStep(STEP_LOFT);
               return;
@@ -944,6 +1159,10 @@ export function GuidedReservation({
               live.message ??
                 "No hay disponibilidad para esas fechas. Ajusta fechas o continúa por WhatsApp.",
             );
+            setAvailCheck({
+              status: "fail",
+              message: live.message ?? "Sin disponibilidad",
+            });
             setBookingBusy(false);
             trackWhatsAppClick("guided_reservation_unavailable");
             window.open(
@@ -962,10 +1181,22 @@ export function GuidedReservation({
 
           if (live.assignedUnits?.length) {
             setAssignedUnitsHint(live.assignedUnits);
-            setLofts(Math.max(1, live.assignedUnits.length));
+            setLofts((prev) => Math.max(prev, live.assignedUnits!.length));
             confirmedUnits = live.assignedUnits;
           }
+          setAvailCheck({
+            status: "ok",
+            message: live.assignedUnits?.length
+              ? `Cupo confirmado · loft ${live.assignedUnits.join(", ")}`
+              : "Cupo confirmado",
+          });
         }
+      } else {
+        setBookingError(
+          "Faltan fechas o tipo de loft para confirmar disponibilidad.",
+        );
+        setBookingBusy(false);
+        return;
       }
 
       const unitsForNotes =
@@ -1603,7 +1834,9 @@ export function GuidedReservation({
                         e.id === "breakfast" || e.id === "lunch";
                       const isAirport = e.id === "airport-transfer";
                       const isTiming =
-                        e.id === "early-checkin" || e.id === "late-checkout";
+                        e.id === "early-checkin" ||
+                        e.id === "late-checkout" ||
+                        e.id === "pet";
                       const mealId = isMeal ? (e.id as MealExtraId) : null;
                       const timingId = isTiming
                         ? (e.id as TimingExtraId)
@@ -1668,7 +1901,9 @@ export function GuidedReservation({
                               {checked && isTiming && timingId && lofts > 1 ? (
                                 <div className="mt-3">
                                   <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
-                                    ¿Para cuántos apartamentos?
+                                    {e.id === "pet"
+                                      ? "¿En cuántos lofts habrá mascota?"
+                                      : "¿Para cuántos apartamentos?"}
                                   </label>
                                   <select
                                     value={timingUnits ?? lofts}
@@ -1692,10 +1927,16 @@ export function GuidedReservation({
                                     ))}
                                   </select>
                                   <p className="mt-1 text-[10px] text-zinc-400">
-                                    El valor es {formatCOP(e.priceCop)} por cada
-                                    loft que solicite el servicio.
+                                    {e.id === "pet"
+                                      ? `Hasta ${PETS_PER_LOFT} mascotas por loft (máx. ${PETS_PER_LOFT * lofts} en esta reserva). Valor ${formatCOP(e.priceCop)} por loft.`
+                                      : `El valor es ${formatCOP(e.priceCop)} por cada loft que solicite el servicio.`}
                                   </p>
                                 </div>
+                              ) : null}
+                              {checked && e.id === "pet" && lofts === 1 ? (
+                                <p className="mt-2 text-[10px] text-zinc-400">
+                                  Hasta {PETS_PER_LOFT} mascotas en este loft.
+                                </p>
                               ) : null}
                               {checked && isAirport ? (
                                 <div className="mt-3 space-y-3">
@@ -1802,26 +2043,26 @@ export function GuidedReservation({
                                     <input
                                       type="number"
                                       min={mealDaysMin}
-                                      max={30}
+                                      max={Math.max(mealDaysMin, mealDaysMax)}
                                       value={
                                         mealQuantities[mealId]?.days ??
                                         mealDaysDefault
                                       }
                                       onChange={(ev) =>
                                         updateMealQty(mealId, {
-                                          days: Math.max(
-                                            mealDaysMin,
-                                            Number(ev.target.value) || 0,
-                                          ),
+                                          days: Number(ev.target.value) || 0,
                                         })
                                       }
                                       onClick={(ev) => ev.stopPropagation()}
                                       className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
                                     />
                                     <p className="mt-1 text-[10px] text-zinc-400">
+                                      Máximo {mealDaysMax} día
+                                      {mealDaysMax === 1 ? "" : "s"} (igual a las
+                                      noches de la reserva)
                                       {mealDaysMin >= 1
-                                        ? "Una noche: mínimo 1 día de comida; puedes sumar más días."
-                                        : "Desde el día después del check-in; puedes sumar más días."}
+                                        ? "; mínimo 1 con una noche."
+                                        : "."}
                                     </p>
                                   </div>
                                   <div>
@@ -1888,6 +2129,35 @@ export function GuidedReservation({
                         {guests} / {lofts}
                       </dd>
                     </div>
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-zinc-500">Disponibilidad</dt>
+                      <dd
+                        className={cn(
+                          "text-right font-medium",
+                          availCheck.status === "ok" &&
+                            "text-emerald-700 dark:text-emerald-400",
+                          availCheck.status === "fail" &&
+                            "text-amber-800 dark:text-amber-300",
+                          availCheck.status === "checking" && "text-zinc-500",
+                        )}
+                      >
+                        {availCheck.status === "checking"
+                          ? "Verificando calendarios…"
+                          : availCheck.status === "ok"
+                            ? availCheck.message ?? "Cupo confirmado"
+                            : availCheck.status === "fail"
+                              ? availCheck.message ?? "Sin confirmar"
+                              : "—"}
+                      </dd>
+                    </div>
+                    {assignedUnitsHint?.length ? (
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-zinc-500">Unidades sugeridas</dt>
+                        <dd className="font-medium">
+                          loft {assignedUnitsHint.join(", ")}
+                        </dd>
+                      </div>
+                    ) : null}
                     {selectedExtras.length > 0 ? (
                       <div className="flex justify-between gap-4">
                         <dt className="text-zinc-500">Extras</dt>
@@ -2129,7 +2399,7 @@ export function GuidedReservation({
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-8 flex flex-col gap-4 border-t border-zinc-100 pt-6 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mt-8 flex flex-col gap-4 border-t border-zinc-100 pt-6 dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-sm">
               {grandTotal !== null && step >= 1 ? (
                 <>
@@ -2144,58 +2414,89 @@ export function GuidedReservation({
                 </span>
               )}
             </div>
-            <div className="flex w-full flex-wrap items-end justify-end gap-3">
-              <button
-                type="button"
-                disabled={!canGoBack || transitionTo !== null}
-                onClick={() => {
-                  const prev = prevLogicalStep(step);
-                  if (prev === null) return;
-                  // Al volver, reabrir la sección para poder reconfigurar
-                  // aunque se haya llegado por un atajo (banner/card).
-                  if (prev === STEP_TU_VIAJE) setSkipTripStep(false);
-                  if (prev === STEP_FECHAS || prev === STEP_HUESPEDES) {
-                    setSkipStaySteps(false);
-                  }
-                  if (prev === STEP_LOFT) setSkipLoftStep(false);
-                  goToStep(prev);
-                }}
-                className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600"
-                aria-label="Regresar al paso anterior"
-              >
-                <ChevronLeft className="size-4" aria-hidden />
-                Atrás
-              </button>
-              {step < STEPS.length - 1 ? (
+            <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
+              <div className="flex flex-row flex-wrap items-center justify-end gap-3">
                 <button
                   type="button"
-                  disabled={!canAdvance() || transitionTo !== null}
-                  onClick={() => advanceFromCurrentStep()}
-                  className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                  disabled={!canGoBack || transitionTo !== null}
+                  onClick={() => {
+                    const prev = prevLogicalStep(step);
+                    if (prev === null) return;
+                    // Al volver, reabrir la sección para poder reconfigurar
+                    // aunque se haya llegado por un atajo (banner/card).
+                    if (prev === STEP_TU_VIAJE) setSkipTripStep(false);
+                    if (prev === STEP_FECHAS || prev === STEP_HUESPEDES) {
+                      setSkipStaySteps(false);
+                    }
+                    if (prev === STEP_LOFT) setSkipLoftStep(false);
+                    goToStep(prev);
+                  }}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600"
+                  aria-label="Regresar al paso anterior"
                 >
-                  Siguiente
-                  <ChevronRight className="size-4" aria-hidden />
+                  <ChevronLeft className="size-4" aria-hidden />
+                  Atrás
                 </button>
-              ) : (
-                <div className="flex w-full max-w-md flex-col gap-2 sm:w-auto">
-                  <label
-                    className={cn(
-                      "flex cursor-pointer items-start gap-3 rounded-2xl border px-3.5 py-3 text-sm transition",
-                      policiesAccepted
-                        ? "border-emerald-300 bg-emerald-50/80 text-zinc-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-zinc-100"
-                        : "border-amber-300 bg-amber-50 text-zinc-900 shadow-[0_0_0_1px_rgba(245,158,11,0.35)] dark:border-amber-800 dark:bg-amber-950/40 dark:text-zinc-100",
-                    )}
+                {step < STEPS.length - 1 ? (
+                  <button
+                    type="button"
+                    disabled={!canAdvance() || transitionTo !== null}
+                    onClick={() => advanceFromCurrentStep()}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
                   >
-                    <input
-                      type="checkbox"
-                      checked={policiesAccepted}
-                      onChange={(e) => setPoliciesAccepted(e.target.checked)}
-                      className="mt-0.5 size-5 shrink-0 rounded border-zinc-400"
-                    />
-                    <span className="font-semibold leading-snug">
-                      Acepto las políticas de Lofthouse 14
-                    </span>
-                  </label>
+                    Siguiente
+                    <ChevronRight className="size-4" aria-hidden />
+                  </button>
+                ) : (
+                  <>
+                    <label
+                      className={cn(
+                        "inline-flex max-w-[14rem] cursor-pointer items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition sm:max-w-none sm:text-sm",
+                        policiesAccepted
+                          ? "border-emerald-300 bg-emerald-50/80 text-zinc-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-zinc-100"
+                          : "border-amber-300 bg-amber-50 text-zinc-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-zinc-100",
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={policiesAccepted}
+                        onChange={(e) => setPoliciesAccepted(e.target.checked)}
+                        className="size-4 shrink-0 rounded border-zinc-400"
+                      />
+                      <span className="leading-snug">
+                        Acepto las políticas de Lofthouse 14
+                      </span>
+                    </label>
+                    <button
+                      type="button"
+                      disabled={
+                        !quoteResult.ok ||
+                        bookingBusy ||
+                        !policiesAccepted ||
+                        availCheck.status !== "ok"
+                      }
+                      onClick={() => void handleReservar()}
+                      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                    >
+                      <Image
+                        src="/logos/whatsapp.svg"
+                        alt=""
+                        width={20}
+                        height={20}
+                        className="size-5"
+                        aria-hidden
+                      />
+                      {bookingBusy
+                        ? "Creando reserva…"
+                        : availCheck.status === "checking"
+                          ? "Verificando…"
+                          : "RESERVAR"}
+                    </button>
+                  </>
+                )}
+              </div>
+              {step === STEPS.length - 1 ? (
+                <div className="space-y-1 text-right">
                   {bookingError ? (
                     <p className="text-xs text-amber-800 dark:text-amber-300">
                       {bookingError}
@@ -2204,34 +2505,27 @@ export function GuidedReservation({
                   {liveWarning && !liveOffer ? (
                     <p className="text-[11px] text-zinc-500">{liveWarning}</p>
                   ) : null}
+                  {availCheck.status === "checking" ? (
+                    <p className="text-[11px] text-zinc-500">
+                      Confirmando disponibilidad antes de reservar…
+                    </p>
+                  ) : null}
+                  {availCheck.status === "fail" ? (
+                    <p className="text-[11px] font-medium text-amber-800 dark:text-amber-300">
+                      {availCheck.message ??
+                        "Sin cupo confirmado: RESERVAR permanece deshabilitado."}
+                    </p>
+                  ) : null}
                   {!policiesAccepted ? (
                     <p className="text-[11px] font-medium text-amber-800 dark:text-amber-300">
                       Márcalo para habilitar el botón RESERVAR.
                     </p>
                   ) : null}
-                  <button
-                    type="button"
-                    disabled={
-                      !quoteResult.ok || bookingBusy || !policiesAccepted
-                    }
-                    onClick={() => void handleReservar()}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-5 py-3 text-sm font-bold text-white disabled:opacity-40 dark:bg-white dark:text-zinc-900"
-                  >
-                    <Image
-                      src="/logos/whatsapp.svg"
-                      alt=""
-                      width={20}
-                      height={20}
-                      className="size-5"
-                      aria-hidden
-                    />
-                    {bookingBusy ? "Creando reserva…" : "RESERVAR"}
-                  </button>
                   <p className="text-[11px] text-zinc-500">
                     Se crea la reserva y se abre WhatsApp para confirmar.
                   </p>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

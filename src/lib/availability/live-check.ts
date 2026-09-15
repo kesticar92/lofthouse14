@@ -190,6 +190,7 @@ function tryAssignCategory(params: {
   checkOut: string;
   busyByLoft: Map<number, OccupancyInterval[]>;
   inventory: InventoryUnit[];
+  minUnits?: number;
 }): number[] | null {
   const candidates = candidateLoftsForCategory(params.categoryId, params.guests);
   if (candidates.length === 0 || poolCapacity(candidates) < params.guests) {
@@ -203,7 +204,11 @@ function tryAssignCategory(params: {
     params.busyByLoft,
     params.inventory,
   );
-  const picked = pickUnitsForGuests(free, params.guests);
+  const picked = pickUnitsForGuests(
+    free,
+    params.guests,
+    params.minUnits ?? 1,
+  );
   if (!picked) return null;
   return picked.map((p) => p.unitNumber);
 }
@@ -217,12 +222,15 @@ export async function checkLiveAvailability(params: {
   guests: number;
   checkIn: string;
   checkOut: string;
+  /** Mínimo de lofts/unidades pedidas por el huésped. */
+  lofts?: number;
 }): Promise<LiveAvailabilityResult> {
   const checkedAt = new Date().toISOString();
   const inventory = seedInventoryUnits();
   const allLofts = CATALOG_ROOMS.filter((r) => r.status === "active").map(
     (r) => r.unit_number,
   );
+  const minUnits = Math.max(1, Math.floor(params.lofts ?? 1));
 
   let busyByLoft: Map<number, OccupancyInterval[]>;
   let source: "ical" | "local" = "local";
@@ -257,6 +265,7 @@ export async function checkLiveAvailability(params: {
     checkOut: params.checkOut,
     busyByLoft,
     inventory,
+    minUnits,
   });
 
   if (assigned && assigned.length > 0) {
@@ -288,6 +297,7 @@ export async function checkLiveAvailability(params: {
       checkOut: params.checkOut,
       busyByLoft,
       inventory,
+      minUnits,
     });
     if (altAssigned && altAssigned.length > 0) {
       const meta = categoryMeta(altId);

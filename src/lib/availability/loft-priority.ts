@@ -89,27 +89,44 @@ export function poolCapacity(candidates: LoftCandidate[]): number {
 /**
  * Elige un subconjunto mínimo de unidades libres que cubra `guests`,
  * respetando el orden de prioridad del pool.
+ * Si `minUnits` es mayor, intenta ampliar la selección (p. ej. el huésped
+ * pidió más lofts de los estrictamente necesarios por capacidad).
  */
 export function pickUnitsForGuests(
   freeCandidates: LoftCandidate[],
   guests: number,
+  minUnits = 1,
 ): LoftCandidate[] | null {
   const g = Math.max(1, Math.floor(guests) || 1);
+  const want = Math.max(1, Math.floor(minUnits || 1));
   if (poolCapacity(freeCandidates) < g) return null;
 
   // Caso 1 unidad: la primera que quepa sola (respeta prioridad).
+  let picked: LoftCandidate[] = [];
   const alone = freeCandidates.find((c) => c.maxGuests >= g);
-  if (alone) return [alone];
-
-  // Multi-unidad: greedy en orden de prioridad hasta cubrir capacidad.
-  const picked: LoftCandidate[] = [];
-  let sum = 0;
-  for (const c of freeCandidates) {
-    picked.push(c);
-    sum += c.maxGuests;
-    if (sum >= g) return picked;
+  if (alone) {
+    picked = [alone];
+  } else {
+    // Multi-unidad: greedy en orden de prioridad hasta cubrir capacidad.
+    let sum = 0;
+    for (const c of freeCandidates) {
+      picked.push(c);
+      sum += c.maxGuests;
+      if (sum >= g) break;
+    }
+    if (picked.reduce((s, c) => s + c.maxGuests, 0) < g) return null;
   }
-  return null;
+
+  if (picked.length >= want) return picked;
+
+  const used = new Set(picked.map((p) => p.unitNumber));
+  for (const c of freeCandidates) {
+    if (used.has(c.unitNumber)) continue;
+    picked.push(c);
+    used.add(c.unitNumber);
+    if (picked.length >= want) break;
+  }
+  return picked.length >= Math.min(want, freeCandidates.length) ? picked : null;
 }
 
 /** Categorías ordenadas de más cara a más barata (Vista → Atrio → Cielo). */

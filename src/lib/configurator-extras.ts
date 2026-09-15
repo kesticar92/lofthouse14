@@ -13,6 +13,9 @@ export type ConfiguratorExtra = {
 /** Capacidad máxima de pasajeros por vehículo de traslado. */
 export const AIRPORT_VEHICLE_CAPACITY = 4;
 
+/** Máximo de mascotas permitidas por loft (no por reserva). */
+export const PETS_PER_LOFT = 2;
+
 export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
   {
     id: "early-checkin",
@@ -41,7 +44,8 @@ export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
   {
     id: "pet",
     label: "Mascota",
-    description: "Hasta 2 mascotas con autorización previa.",
+    description:
+      "Hasta 2 mascotas por loft (no por reserva), con autorización previa. El valor es por cada loft donde haya mascota.",
     priceCop: 30_000,
     pricing: "flat",
   },
@@ -49,7 +53,7 @@ export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
     id: "breakfast",
     label: "Desayuno completo de la casa",
     description:
-      "Empieza el día con energía: café o chocolate caliente, leche, huevos al gusto, pan blanco fresco y porción de arroz o fruta de temporada. Servido a partir del día siguiente al check-in.",
+      "Empieza el día con energía: café o chocolate caliente, leche, huevos al gusto, pan blanco fresco y porción de arroz o fruta de temporada. Se vende por día; el máximo de días es igual al número de noches de la reserva.",
     priceCop: 15_000,
     pricing: "perGuestPerDay",
   },
@@ -57,7 +61,7 @@ export const CONFIGURATOR_EXTRAS: ConfiguratorExtra[] = [
     id: "lunch",
     label: "Almuerzo tradicional completo",
     description:
-      "Menú balanceado: sopa y principio del día, ensalada fresca, arroz, proteína a tu elección y bebida natural. Disponible a partir del día siguiente al check-in.",
+      "Menú balanceado: sopa y principio del día, ensalada fresca, arroz, proteína a tu elección y bebida natural. Se vende por día; el máximo de días es igual al número de noches de la reserva.",
     priceCop: 20_000,
     pricing: "perGuestPerDay",
   },
@@ -91,7 +95,7 @@ export type AirportTransferChoice = {
   vehicles: number;
 };
 
-export type TimingExtraId = "early-checkin" | "late-checkout";
+export type TimingExtraId = "early-checkin" | "late-checkout" | "pet";
 
 export type TimingExtraQuantity = {
   /** Cuántos lofts / apartamentos requieren el servicio. */
@@ -135,6 +139,24 @@ export function mealDefaultDays(noches: number): number {
   return noches - 1;
 }
 
+/**
+ * Máximo de días de comida vendibles = noches de la reserva
+ * (p. ej. 3 noches → máx. 3 días de desayuno o almuerzo).
+ */
+export function mealMaxDays(noches: number): number {
+  return Math.max(0, Math.floor(noches || 0));
+}
+
+export function clampMealDays(
+  days: number,
+  noches: number,
+  minDays = 0,
+): number {
+  const max = mealMaxDays(noches);
+  const min = Math.min(Math.max(0, minDays), max);
+  return Math.min(max, Math.max(min, Math.floor(days || 0)));
+}
+
 /** @deprecated Usa {@link mealDefaultDays}. */
 export function mealEligibleDays(noches: number): number {
   return mealDefaultDays(noches);
@@ -148,7 +170,11 @@ export function extraUnitLabel(extra: ConfiguratorExtra): string {
   if (extra.pricing === "perAirportLeg") {
     return `+ ${formatCopPlain(extra.priceCop)} / trayecto / vehículo`;
   }
-  if (extra.id === "early-checkin" || extra.id === "late-checkout") {
+  if (
+    extra.id === "early-checkin" ||
+    extra.id === "late-checkout" ||
+    extra.id === "pet"
+  ) {
     return `+ ${formatCopPlain(extra.priceCop)} / loft`;
   }
   return `+ ${formatCopPlain(extra.priceCop)}`;
@@ -186,7 +212,11 @@ export function extraLineTotalCop(
     const vehicles = Math.max(1, Math.floor(ctx?.airport?.vehicles ?? 1));
     return extra.priceCop * legs * vehicles;
   }
-  if (extra.id === "early-checkin" || extra.id === "late-checkout") {
+  if (
+    extra.id === "early-checkin" ||
+    extra.id === "late-checkout" ||
+    extra.id === "pet"
+  ) {
     const units = Math.max(1, Math.floor(ctx?.units ?? 1));
     return extra.priceCop * units;
   }
@@ -209,7 +239,11 @@ export function extrasTotalCop(
     if (extra.id === "airport-transfer") {
       ctx.airport = airportTransfer;
     }
-    if (extra.id === "early-checkin" || extra.id === "late-checkout") {
+    if (
+      extra.id === "early-checkin" ||
+      extra.id === "late-checkout" ||
+      extra.id === "pet"
+    ) {
       ctx.units = timingQuantities?.[extra.id]?.units ?? 1;
     }
     sum += extraLineTotalCop(extra, ctx);

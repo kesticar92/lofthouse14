@@ -12,6 +12,7 @@ export async function POST(req: Request) {
   const checkIn = String(b.check_in ?? "").trim();
   const checkOut = String(b.check_out ?? "").trim();
   const guests = Number(b.guests ?? 1);
+  const loftsRaw = Number(b.lofts ?? 1);
   const categoryRaw = String(b.category_id ?? b.category ?? "").trim();
 
   if (!checkIn || !checkOut || checkOut <= checkIn) {
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
     guests: Math.floor(guests),
     checkIn,
     checkOut,
+    lofts: Number.isFinite(loftsRaw) ? Math.max(1, Math.floor(loftsRaw)) : 1,
   });
 
   return Response.json(result);

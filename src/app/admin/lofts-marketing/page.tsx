@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { AdminShell, AdminCard } from "@/components/admin/admin-shell";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import type { LoftCategoryId } from "@/data/loft-categories";
@@ -270,12 +271,12 @@ export default function AdminLoftsMarketingPage() {
             >
               Recargar
             </button>
-            <a
+            <Link
               href="/"
               className="inline-flex items-center rounded-full border border-zinc-300 px-6 py-2.5 text-sm font-semibold dark:border-zinc-600"
             >
               Ver sitio
-            </a>
+            </Link>
           </div>
 
           <p className="text-xs text-zinc-500">

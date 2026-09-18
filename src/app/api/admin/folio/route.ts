@@ -36,7 +36,6 @@ function serialize(code: string) {
       ? {
           percent: payment.deposit_percent,
           amount: payment.deposit_amount,
-          paid: payment.amount_paid,
           status: payment.status,
           ...balanceForPayment(payment),
         }
@@ -71,7 +70,6 @@ export async function GET(req: Request) {
           ? {
               percent: payment.deposit_percent,
               amount: payment.deposit_amount,
-              paid: payment.amount_paid,
               status: payment.status,
               ...balanceForPayment(payment),
             }

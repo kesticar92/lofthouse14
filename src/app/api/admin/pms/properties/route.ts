@@ -9,7 +9,7 @@ export async function GET() {
   const denied = enforceOrganizationId(organizationId);
   if (denied) return denied;
 
-  let query = supabase
+  const query = supabase
     .from("properties")
     .select(
       "id, name, ical_token, created_at, updated_at, organization_id, room_id",

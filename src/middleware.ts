@@ -34,13 +34,16 @@ function hasLocalAdmin(request: NextRequest): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Canonical host: apex → www (SEO + cookies)
+  // Canonical host: apex → www (SEO + cookies).
+  // Importante: no reutilizar request.nextUrl (trae el puerto interno :3000
+  // detrás de nginx) o el navegador acaba en https://www…:3000 (timeout).
   const host = request.headers.get("host")?.split(":")[0]?.toLowerCase();
   if (host === "lofthouse14.com") {
-    const url = request.nextUrl.clone();
-    url.host = "www.lofthouse14.com";
-    url.protocol = "https:";
-    return NextResponse.redirect(url, 308);
+    const dest = new URL(
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+      "https://www.lofthouse14.com",
+    );
+    return NextResponse.redirect(dest, 308);
   }
 
 
